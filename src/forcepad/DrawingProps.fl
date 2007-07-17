@@ -1,0 +1,79 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0108 
+header_name {.h} 
+code_name {.cpp}
+decl {\#define MR_OK 0} {public
+} 
+
+decl {\#define MR_CANCEL 1} {public
+} 
+
+decl {\#include "PaintView.h"} {} 
+
+class CDrawingProps {open
+} {
+  decl {void* m_view} {}
+  decl {int m_modalResult} {}
+  Function {CDrawingProps()} {open
+  } {
+    Fl_Window wndDrawingProps {
+      label {Drawing properties} open selected
+      xywh {370 217 184 73} type Double box UP_BOX non_modal noborder visible
+    } {
+      Fl_Button btnOk {
+        callback {m_modalResult = MR_OK;
+wndDrawingProps->hide();}
+        image {../..//images/additional_close.xpm} xywh {174 1 9 42} down_box DOWN_BOX labelsize 12
+        code0 {\#include "Fl_HoverButton.h"}
+        class Fl_HoverButton
+      }
+      Fl_Value_Slider sldBlendFactor {
+        label Blending
+        callback {if (m_view!=NULL)
+{
+	CPaintView* paintView = (CPaintView*)m_view;
+	paintView->setBlendFactor((int)sldBlendFactor->value());
+}}
+        xywh {57 4 108 17} type {Horz Knob} labelsize 10 align 4 maximum 255 step 1 value 255
+      }
+      Fl_Value_Slider sldLineWidth {
+        label {Line width}
+        callback {if (m_view!=NULL)
+{
+	CPaintView* paintView = (CPaintView*)m_view;
+	paintView->setLineWidth((int)sldLineWidth->value());
+}}
+        xywh {57 24 108 17} type {Horz Knob} labelsize 10 align 4 minimum 1 maximum 128 step 1 value 4
+      }
+    }
+  }
+  Function {~CDrawingProps()} {} {
+    code {delete wndDrawingProps;} {}
+  }
+  Function {show()} {} {
+    code {setSize(wndDrawingProps->w(),btnOk->h()+2);
+
+if (m_view!=NULL)
+{
+	CPaintView* paintView = (CPaintView*) m_view;
+	sldBlendFactor->value(paintView->getBlendFactor());
+	sldLineWidth->value(paintView->getLineWidth());
+}
+
+wndDrawingProps->show();
+//while (wndDrawingProps->visible()) Fl::wait();} {}
+  }
+  Function {setPosition(int x, int y)} {} {
+    code {wndDrawingProps->position(x, y);} {}
+  }
+  Function {setSize(int width, int height)} {} {
+    code {wndDrawingProps->size_range(0, 0);
+wndDrawingProps->size(width, height);} {}
+  }
+  Function {setView(void* p)} {} {
+    code {m_view = p;} {}
+  }
+  Function {hide()} {} {
+    code {wndDrawingProps->hide();} {}
+  }
+} 
