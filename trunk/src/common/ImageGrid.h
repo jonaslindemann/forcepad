@@ -35,6 +35,7 @@ private:
 	CImagePtr m_image;
 	float m_maxIntensity;
 	bool m_useImage;
+	bool m_averageOverGridSquare;
 protected:
 	float*** m_grid;
 	int m_width;
@@ -73,6 +74,8 @@ public:
 	void setUseImage(bool flag);
 
 	void setMaxIntensity(float maxIntensity);
+
+	void snapToGrid(int& x, int& y);
 
 	virtual void doGeometry();
 };

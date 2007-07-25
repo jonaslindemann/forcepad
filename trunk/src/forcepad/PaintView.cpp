@@ -1,6 +1,6 @@
 //
 // ForcePAD - Educational Finite Element Software
-// Copyright (C) 2000-2007 Division of Structural Mecahnics, Lund University
+// Copyright (C) 2000-2007 Division of Structural Mechanics, Lund University
 //
 // Written by Jonas Lindemann
 //
@@ -350,14 +350,30 @@ int CPaintView::handle(int event)
 	
 	int x = Fl::event_x();
 	int y = Fl::event_y();
+
+	int sx, sy;
 	
 	// If the SHIFT button is down coordinates are snapped
 	// to a grid
 	
 	if ((Fl::event_state()&FL_SHIFT)>0)
 	{
-		x = x - x%m_gridSpacing;
-		y = y - y%m_gridSpacing;
+		sx = x - m_drawingOffsetX;
+		sy = y - m_drawingOffsetY;
+		m_femGrid->snapToGrid(sx, sy);
+		x = sx + m_drawingOffsetX;
+		y = sy + m_drawingOffsetY;
+	}
+	else
+	{
+		if (m_snapToGrid)
+		{
+			sx = x - m_drawingOffsetX;
+			sy = y - m_drawingOffsetY;
+			m_femGrid->snapToGrid(sx, sy);
+			x = sx + m_drawingOffsetX;
+			y = sy + m_drawingOffsetY;
+		}
 	}
 	
 	// Call the different event methods
@@ -407,6 +423,17 @@ void CPaintView::onPush(int x, int y)
 	//
 	
 	int ww, hh;
+
+	int sx, sy;
+
+	if (m_snapToGrid)
+	{
+		sx = x - m_drawingOffsetX;
+		sy = y - m_drawingOffsetY;
+		m_femGrid->snapToGrid(sx, sy);
+		x = sx + m_drawingOffsetX;
+		y = sy + m_drawingOffsetY;
+	}
 	
 	m_start[0] = x;
 	m_start[1] = y;
@@ -562,9 +589,11 @@ void CPaintView::onDrag(int x, int y)
 			{
 				// Update the position of the force
 
-				m_femGrid->removePointForce(m_selectedForce);
-				m_selectedForce->setPosition(x-m_drawingOffsetX, h()-y-m_drawingOffsetY);
-				m_femGrid->addForce(m_selectedForce);
+				//m_femGrid->removePointForce(m_selectedForce);
+				//m_selectedForce->setPosition(x-m_drawingOffsetX, h()-y-m_drawingOffsetY);
+				//m_femGrid->addForce(m_selectedForce);
+
+				m_femGrid->moveForce(m_selectedForce, x-m_drawingOffsetX, h()-y-m_drawingOffsetY);
 
 			}
 			else
@@ -1480,89 +1509,89 @@ bool CPaintView::execute()
 		if (fl_ask("Model contains >10000 degrees of freedom.\nCalculation can take a long time.\nContinue?")==0)	
 			return false;
 		
-		//
-		// Initiate solver
-		//
-		
-		so_print("CPaintView","\tInitiating solver.");
-		
-		m_solver = new CFemGridSolver();
-		m_solver->setStatusMessageEvent(m_statusMessageEvent);
-		m_solver->setLogMessageEvent(m_logMessageEvent);
-		m_solver->setUseWeight(m_useWeight);
-		m_solver->setConstraintStiffnessScale(m_constraintStiffnessScale);
-		m_solver->setForceMagnitude(m_forceMagnitude);
+	//
+	// Initiate solver
+	//
+	
+	so_print("CPaintView","\tInitiating solver.");
+	
+	m_solver = new CFemGridSolver();
+	m_solver->setStatusMessageEvent(m_statusMessageEvent);
+	m_solver->setLogMessageEvent(m_logMessageEvent);
+	m_solver->setUseWeight(m_useWeight);
+	m_solver->setConstraintStiffnessScale(m_constraintStiffnessScale);
+	m_solver->setForceMagnitude(m_forceMagnitude);
 
-		if (m_useWeight)
-			m_solver->setWeight(m_weight);
+	if (m_useWeight)
+		m_solver->setWeight(m_weight);
 
-		m_solver->setFemGrid(m_femGrid);
+	m_solver->setFemGrid(m_femGrid);
+	
+	//
+	// Execute calculation
+	//
+	
+	so_print("CPaintView","\tExecuting solver.");
+	
+	m_solver->execute();
+	
+	//
+	// Check for errors
+	//
+	
+	so_print("CPaintView","\tChecking for errors.");
+	
+	switch (m_solver->getLastError()) {
+	case CFemGridSolver::ET_NO_ERROR:
+		errors = false;
+		break;
+	case CFemGridSolver::ET_NO_ELEMENTS:
+		fl_message("No structure to solve.");
+		break;
+	case CFemGridSolver::ET_NO_BCS:
+		fl_message("Add locks to structure.");
+		break;
+	case CFemGridSolver::ET_NO_LOADS:
+		fl_message("No loads defined on structure.");
+		break;
+	case CFemGridSolver::ET_UNSTABLE:
+		fl_message("Structure unstable. Try adding locks.");
+		break;
+	case CFemGridSolver::ET_INVALID_MODEL:
+		fl_message("Model invalid.");
+		break;
+	case CFemGridSolver::ET_LOAD_OUTSIDE_AE:
+		fl_message("Loads defined outside structure.");
+		break;
+	case CFemGridSolver::ET_BC_OUTSIDE_AE:
+		fl_message("Locks defined outside structure.");
+		break;
+	default:
 		
-		//
-		// Execute calculation
-		//
-		
-		so_print("CPaintView","\tExecuting solver.");
-		
-		m_solver->execute();
-		
-		//
-		// Check for errors
-		//
-		
-		so_print("CPaintView","\tChecking for errors.");
-		
-		switch (m_solver->getLastError()) {
-		case CFemGridSolver::ET_NO_ERROR:
-			errors = false;
-			break;
-		case CFemGridSolver::ET_NO_ELEMENTS:
-			fl_message("No structure to solve.");
-			break;
-		case CFemGridSolver::ET_NO_BCS:
-			fl_message("Add locks to structure.");
-			break;
-		case CFemGridSolver::ET_NO_LOADS:
-			fl_message("No loads defined on structure.");
-			break;
-		case CFemGridSolver::ET_UNSTABLE:
-			fl_message("Structure unstable. Try adding locks.");
-			break;
-		case CFemGridSolver::ET_INVALID_MODEL:
-			fl_message("Model invalid.");
-			break;
-		case CFemGridSolver::ET_LOAD_OUTSIDE_AE:
-			fl_message("Loads defined outside structure.");
-			break;
-		case CFemGridSolver::ET_BC_OUTSIDE_AE:
-			fl_message("Locks defined outside structure.");
-			break;
-		default:
-			
-			break;
-		}
-		
-		//
-		// Clean up and redraw
-		//
-		
-		so_print("CPaintView","\tDestroying solver.");
-		
-		// delete solver;
-		
-		if (errors)
-		{
-			m_femGrid->setShowGrid(false);
-			this->invalidate();
-		}
-		else
-			m_femGrid->setShowGrid(true);
-		
-		so_print("CPaintView","\tRedraw.");
-		
-		this->redraw();
+		break;
+	}
+	
+	//
+	// Clean up and redraw
+	//
+	
+	so_print("CPaintView","\tDestroying solver.");
+	
+	// delete solver;
+	
+	if (errors)
+	{
+		m_femGrid->setShowGrid(false);
+		this->invalidate();
+	}
+	else
+		m_femGrid->setShowGrid(true);
+	
+	so_print("CPaintView","\tRedraw.");
+	
+	this->redraw();
 
-		return !errors;
+	return !errors;
 }
 
 void CPaintView::newModel()
@@ -3081,6 +3110,23 @@ double CPaintView::getWeight()
 {
 	return m_weight;
 }
+
+void CPaintView::lockScaleFactor()
+{
+	m_femGrid->setLockScale(true);
+}
+
+void CPaintView::unlockScaleFactor()
+{
+	m_femGrid->setLockScale(false);
+}
+
+void CPaintView::setSnapToGrid(bool flag)
+{
+	m_snapToGrid = flag;
+}
+
+bool getSnapToGrid();
 
 
 void CPaintView::setModeChangeEvent(CPVModeChangeEvent* eventMethod)

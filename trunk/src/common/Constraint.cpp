@@ -199,6 +199,9 @@ void CConstraint::saveToStream(ostream &out)
 	case CT_VECTOR:
 		out << 3 << " ";
 		break;
+	case CT_HINGE:
+		out << 4 << " ";
+		break;
 	default:
 		out << 2 << " ";
 		break;
@@ -228,6 +231,9 @@ void CConstraint::readFromStream(istream &in)
 	case 3:
 		m_constraintType = CT_VECTOR;
 		break;
+	case 4:
+		m_constraintType = CT_HINGE;
+		break;
 	default:
 		m_constraintType = CT_XY;
 		break;
@@ -236,7 +242,10 @@ void CConstraint::readFromStream(istream &in)
 	in >> m_size;
 
 	if (m_constraintType == CT_VECTOR)
+	{
 		in >> m_direction[0] >> m_direction[1];
+		m_reactionForce->setDirection(m_direction[0], m_direction[1]);
+	}
 }
 
 // ------------------------------------------------------------

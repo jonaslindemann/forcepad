@@ -33,24 +33,25 @@ CImageGrid::CImageGrid()
 	m_cols = -1;
 	m_maxIntensity = 1.0;
 	m_useImage = true;
+	m_averageOverGridSquare = true;
 }
 
 CImageGrid::~CImageGrid()
 {
 	int i, j;
-	
+
 	// Delete old grid, if any.
-	
+
 	if (m_grid!=NULL)
 	{
 		for (i=0; i<m_rows; i++)
 		{
 			for (j=0; j<m_cols; j++)
 				delete [] m_grid[i][j];
-			
+
 			delete [] m_grid[i];
 		}
-		
+
 		delete [] m_grid;
 	}
 }
@@ -58,7 +59,7 @@ CImageGrid::~CImageGrid()
 void CImageGrid::setImage(CImage *image)
 {
 	m_image = image;
-	
+
 	m_width = m_image->getWidth();
 	m_height = m_image->getHeight();
 }
@@ -66,15 +67,15 @@ void CImageGrid::setImage(CImage *image)
 void CImageGrid::doGeometry()
 {
 	int i, j;
-	
+
 	if (m_grid!=NULL)
 	{
-	/*
-	glBegin(GL_LINES);
-	glColor3f(1.0f, 0.0f, 0.0f);
-	glVertex2i(0,0);
-	glVertex2i(50,50);
-	glEnd();
+		/*
+		glBegin(GL_LINES);
+		glColor3f(1.0f, 0.0f, 0.0f);
+		glVertex2i(0,0);
+		glVertex2i(50,50);
+		glEnd();
 		*/
 		for (i=0; i<m_rows; i++)
 		{
@@ -90,7 +91,7 @@ void CImageGrid::doGeometry()
 						glVertex2i((j+1)*m_stride, i*m_stride);
 						glVertex2i((j+1)*m_stride, (i+1)*m_stride);
 						glEnd();
-						
+
 						glBegin(GL_TRIANGLES);
 						glColor3f((1.0f-m_grid[i][j][1])*m_maxIntensity, (1.0f-m_grid[i][j][1])*m_maxIntensity, (1.0f-m_grid[i][j][1])*m_maxIntensity);
 						glVertex2i(j*m_stride, i*m_stride);
@@ -109,7 +110,7 @@ void CImageGrid::doGeometry()
 						glVertex2i((j+1)*m_stride, i*m_stride);
 						glVertex2i(j*m_stride, (i+1)*m_stride);
 						glEnd();
-						
+
 						glBegin(GL_TRIANGLES);
 						glColor3f((1.0f-m_grid[i][j][1])*m_maxIntensity, (1.0f-m_grid[i][j][1])*m_maxIntensity, (1.0f-m_grid[i][j][1])*m_maxIntensity);
 						glVertex2i((j+1)*m_stride, i*m_stride);
@@ -135,32 +136,32 @@ void CImageGrid::initGrid()
 	GLubyte gridValue;
 	int nGridValues1, nGridValues2, nGridValuesDiag;
 	int nNonZeroValues;
-	
+
 	// Delete old grid, if any.
-	
+
 	if (m_grid!=NULL)
 	{
 		for (i=0; i<m_rows; i++)
 		{
 			for (j=0; j<m_cols; j++)
 				delete [] m_grid[i][j];
-			
+
 			delete [] m_grid[i];
 		}
-		
+
 		delete [] m_grid;
 	}
-	
+
 	// Create new grid
-	
+
 	if (m_useImage)
 	{
 		m_rows = m_height/m_stride;
 		m_cols = m_width/m_stride;
 	}
-	
+
 	m_grid = new float** [m_rows];
-	
+
 	for (i=0; i<m_rows; i++)
 	{
 		m_grid[i] = new float* [m_cols];
@@ -171,31 +172,28 @@ void CImageGrid::initGrid()
 			m_grid[i][j][1] = 0.0f;
 		}
 	}
-	
+
 	// Fill grid
-	
+
 	if (m_useImage)
 	{
-		
+
 		nNonZeroValues = 0;
-		
+
 		for (i=0; i<m_rows; i++)
 		{
 			for (j=0; j<m_cols; j++)
 			{
-				
-				// Determine grid cell type
-				
-				if (((i+j)%2)==0)
+
+				if (m_averageOverGridSquare)
 				{
-					
-					// Calculate average of lower right half
-					
+					// Calculate average of grid square
+
 					gridSum1 = 0.0f;
 					nGridValues1 = 0;
 					for (k=0; k<m_stride; k++)
 					{
-						for (l=k+1; l<m_stride; l++)
+						for (l=0; l<m_stride; l++)
 						{
 							nGridValues1++;
 							if ((i*m_stride+k<m_height)&&(j*m_stride+l<m_width))
@@ -205,101 +203,131 @@ void CImageGrid::initGrid()
 							gridSum1 += (float)gridValue;
 						}
 					}
-					
-					// Calculate average of upper left half
-					
-					gridSum2 = 0.0f;
-					nGridValues2 = 0;
-					for (k=1; k<m_stride; k++)
-					{
-						for (l=0; l<m_stride-k; l++)
-						{
-							nGridValues2++;
-							if ((i*m_stride+k<m_height)&&(j*m_stride+l<m_width))
-								m_image->getValue(j*m_stride+l, i*m_stride+k, 0, gridValue);
-							else
-								gridValue = 0.0f;
-							gridSum2 += (float)gridValue;
-						}
-					}
-					
-					// Adjust for diagonal
-					
-					gridSumDiag = 0.0f;
-					nGridValuesDiag = 0;
-					for (k=0; k<m_stride; k++)
-					{
-						l = k;
-						
-						nGridValuesDiag++;
-						if ((i*m_stride+k<m_height)&&(j*m_stride+l<m_width))
-							m_image->getValue(j*m_stride+l, i*m_stride+k, 0, gridValue);
-						else
-							gridValue = 0.0f;
-						gridSumDiag += (float)gridValue;
-					}
+
+					m_grid[i][j][0] = 1.0f - gridSum1/(float)nGridValues1/255.0f;
+					m_grid[i][j][1] = 1.0f - gridSum1/(float)nGridValues1/255.0f;
+
+					if ((m_grid[i][j][0]>0.0f)||(m_grid[i][j][1]>0.0f))
+						nNonZeroValues++;
 				}
 				else
 				{
-					
-					// Calculate average of lower left half
-					
-					gridSum1 = 0.0f;
-					nGridValues1 = 0;
-					for (k=0; k<m_stride; k++)
+
+					// Determine grid cell type
+
+					if (((i+j)%2)==0)
 					{
-						for (l=0; l<m_stride-k-1; l++)
+
+						// Calculate average of lower right half
+
+						gridSum1 = 0.0f;
+						nGridValues1 = 0;
+						for (k=0; k<m_stride; k++)
 						{
-							nGridValues1++;
+							for (l=k+1; l<m_stride; l++)
+							{
+								nGridValues1++;
+								if ((i*m_stride+k<m_height)&&(j*m_stride+l<m_width))
+									m_image->getValue(j*m_stride+l, i*m_stride+k, 0, gridValue);
+								else
+									gridValue = 0.0f;
+								gridSum1 += (float)gridValue;
+							}
+						}
+
+						// Calculate average of upper left half
+
+						gridSum2 = 0.0f;
+						nGridValues2 = 0;
+						for (k=1; k<m_stride; k++)
+						{
+							for (l=0; l<m_stride-k; l++)
+							{
+								nGridValues2++;
+								if ((i*m_stride+k<m_height)&&(j*m_stride+l<m_width))
+									m_image->getValue(j*m_stride+l, i*m_stride+k, 0, gridValue);
+								else
+									gridValue = 0.0f;
+								gridSum2 += (float)gridValue;
+							}
+						}
+
+						// Adjust for diagonal
+
+						gridSumDiag = 0.0f;
+						nGridValuesDiag = 0;
+						for (k=0; k<m_stride; k++)
+						{
+							l = k;
+
+							nGridValuesDiag++;
 							if ((i*m_stride+k<m_height)&&(j*m_stride+l<m_width))
 								m_image->getValue(j*m_stride+l, i*m_stride+k, 0, gridValue);
 							else
 								gridValue = 0.0f;
-							gridSum1 += (float)gridValue;
+							gridSumDiag += (float)gridValue;
 						}
 					}
-					
-					// Calculate average of upper right half
-					
-					gridSum2 = 0.0f;
-					nGridValues2 = 0;
-					for (k=1; k<m_stride; k++)
+					else
 					{
-						for (l=m_stride-k-1; l<m_stride; l++)
+
+						// Calculate average of lower left half
+
+						gridSum1 = 0.0f;
+						nGridValues1 = 0;
+						for (k=0; k<m_stride; k++)
 						{
-							nGridValues2++;
+							for (l=0; l<m_stride-k-1; l++)
+							{
+								nGridValues1++;
+								if ((i*m_stride+k<m_height)&&(j*m_stride+l<m_width))
+									m_image->getValue(j*m_stride+l, i*m_stride+k, 0, gridValue);
+								else
+									gridValue = 0.0f;
+								gridSum1 += (float)gridValue;
+							}
+						}
+
+						// Calculate average of upper right half
+
+						gridSum2 = 0.0f;
+						nGridValues2 = 0;
+						for (k=1; k<m_stride; k++)
+						{
+							for (l=m_stride-k-1; l<m_stride; l++)
+							{
+								nGridValues2++;
+								if ((i*m_stride+k<m_height)&&(j*m_stride+l<m_width))
+									m_image->getValue(j*m_stride+l, i*m_stride+k, 0, gridValue);
+								else
+									gridValue = 0.0f;
+								gridSum2 += (float)gridValue;
+							}
+						}
+
+						// Adjust for diagonal
+
+						gridSumDiag = 0.0f;
+						nGridValuesDiag = 0;
+						for (k=0; k<m_stride; k++)
+						{
+							l = m_stride-k-1;
+							nGridValuesDiag++;
 							if ((i*m_stride+k<m_height)&&(j*m_stride+l<m_width))
 								m_image->getValue(j*m_stride+l, i*m_stride+k, 0, gridValue);
 							else
-								gridValue = 0.0f;
-							gridSum2 += (float)gridValue;
+								gridValue = 0;
+							gridSumDiag += (float)gridValue;
 						}
 					}
-					
-					// Adjust for diagonal
-					
-					gridSumDiag = 0.0f;
-					nGridValuesDiag = 0;
-					for (k=0; k<m_stride; k++)
-					{
-						l = m_stride-k-1;
-						nGridValuesDiag++;
-						if ((i*m_stride+k<m_height)&&(j*m_stride+l<m_width))
-							m_image->getValue(j*m_stride+l, i*m_stride+k, 0, gridValue);
-						else
-							gridValue = 0;
-						gridSumDiag += (float)gridValue;
-					}
+					m_grid[i][j][0] = 1.0f - (gridSum1+gridSumDiag/2.0f)/(float)(nGridValues1+nGridValuesDiag/2)/255.0f;
+					m_grid[i][j][1] = 1.0f - (gridSum2+gridSumDiag/2.0f)/(float)(nGridValues2+nGridValuesDiag/2)/255.0f;
+
+					if ((m_grid[i][j][0]>0.0f)||(m_grid[i][j][1]>0.0f))
+						nNonZeroValues++;
 				}
-				
-				m_grid[i][j][0] = 1.0f - (gridSum1+gridSumDiag/2.0f)/(float)(nGridValues1+nGridValuesDiag/2)/255.0f;
-				m_grid[i][j][1] = 1.0f - (gridSum2+gridSumDiag/2.0f)/(float)(nGridValues2+nGridValuesDiag/2)/255.0f;
-				
-				if ((m_grid[i][j][0]>0.0f)||(m_grid[i][j][1]>0.0f))
-					nNonZeroValues++;
-				
+			}
 		}
-	}
 	}
 }
 
@@ -340,6 +368,17 @@ CImageGrid::TElementType CImageGrid::getGridElementType(int row, int col)
 		return CImageGrid::ET_LEFT_DIAGONAL;
 }
 
+void CImageGrid::snapToGrid(int& x, int& y)
+{
+	int row, col;
+
+	col = (int)((double)x / (double)m_stride + 0.5);
+	row = (int)((double)y / (double)m_stride + 0.5);
+
+	x = m_stride * col;
+	y = m_stride * row;
+}
+
 void CImageGrid::getElementCoords(int row, int col, int element, double *ex, double *ey)
 {
 	if (m_grid!=NULL)
@@ -351,7 +390,7 @@ void CImageGrid::getElementCoords(int row, int col, int element, double *ex, dou
 				ex[0] = (double)col*m_stride;
 				ex[1] = (double)(col+1)*m_stride;
 				ex[2] = (double)(col+1)*m_stride;
-				
+
 				ey[0] = (double)row*m_stride;
 				ey[1] = (double)row*m_stride;
 				ey[2] = (double)(row+1)*m_stride;
@@ -361,7 +400,7 @@ void CImageGrid::getElementCoords(int row, int col, int element, double *ex, dou
 				ex[0] = (double)col*m_stride;
 				ex[1] = (double)(col+1)*m_stride;
 				ex[2] = (double)col*m_stride;
-				
+
 				ey[0] = (double)row*m_stride;
 				ey[1] = (double)(row+1)*m_stride;
 				ey[2] = (double)(row+1)*m_stride;
@@ -373,7 +412,7 @@ void CImageGrid::getElementCoords(int row, int col, int element, double *ex, dou
 				ex[0] = (double)col*m_stride;
 				ex[1] = (double)(col+1)*m_stride;
 				ex[2] = (double)col*m_stride;
-				
+
 				ey[0] = (double)row*m_stride;
 				ey[1] = (double)row*m_stride;
 				ey[2] = (double)(row+1)*m_stride;
@@ -383,14 +422,14 @@ void CImageGrid::getElementCoords(int row, int col, int element, double *ex, dou
 				ex[0] = (double)(col+1)*m_stride;
 				ex[1] = (double)(col+1)*m_stride;
 				ex[2] = (double)col*m_stride;
-				
+
 				ey[0] = (double)row*m_stride;
 				ey[1] = (double)(row+1)*m_stride;
 				ey[2] = (double)(row+1)*m_stride;
 			}
 			break;
 		default:
-			
+
 			break;
 		}
 	}
@@ -398,6 +437,44 @@ void CImageGrid::getElementCoords(int row, int col, int element, double *ex, dou
 
 void CImageGrid::getElementTopo(int row, int col, int element, int *dx, int *dy)
 {
+	//
+	//     ET_RIGHT_DIAGONAL
+	//
+	//     e = element
+	//
+	//     o----------o
+	//     |        / |
+	//     | e=1  /   |
+	//     |    /     |
+	//     |  /   e=0 |
+	//     |/         |
+	//     o----------o
+	//
+	//     e=0: dx = [0, 1, 1]
+	//          dy = [0, 0, 1]
+	//
+	//     e=1: dx = [0, 1, 1]
+	//          dy = [0, 0, 1]
+	//
+	//
+	//     ET_LEFT_DIAGONAL
+	//
+	//     e = element
+	//
+	//     o----------o
+	//     |\         |
+	//     |  \  e=1  |
+	//     |    \     |
+	//     | e=0  \   |
+	//     |        \ |
+	//     o----------o
+	//
+	//     e=0: dx = [0, 1, 0]
+	//          dy = [0, 0, 1]
+	//
+	//     e=1: dx = [1, 1, 0]
+	//          dy = [0, 1, 1]
+	//
 	if (m_grid!=NULL)
 	{
 		switch (getGridElementType(row, col)) {
@@ -407,7 +484,7 @@ void CImageGrid::getElementTopo(int row, int col, int element, int *dx, int *dy)
 				dx[0] = 0;
 				dx[1] = 1;
 				dx[2] = 1;
-				
+
 				dy[0] = 0;
 				dy[1] = 0;
 				dy[2] = 1;
@@ -417,7 +494,7 @@ void CImageGrid::getElementTopo(int row, int col, int element, int *dx, int *dy)
 				dx[0] = 0;
 				dx[1] = 1;
 				dx[2] = 0;
-				
+
 				dy[0] = 0;
 				dy[1] = 1;
 				dy[2] = 1;
@@ -429,7 +506,7 @@ void CImageGrid::getElementTopo(int row, int col, int element, int *dx, int *dy)
 				dx[0] = 0;
 				dx[1] = 1;
 				dx[2] = 0;
-				
+
 				dy[0] = 0;
 				dy[1] = 0;
 				dy[2] = 1;
@@ -439,14 +516,14 @@ void CImageGrid::getElementTopo(int row, int col, int element, int *dx, int *dy)
 				dx[0] = 1;
 				dx[1] = 1;
 				dx[2] = 0;
-				
+
 				dy[0] = 0;
 				dy[1] = 1;
 				dy[2] = 1;
 			}
 			break;
 		default:
-			
+
 			break;
 		}
 	}

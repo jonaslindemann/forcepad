@@ -377,6 +377,8 @@ public:
 	void cut();
 	void copy();
 	void updateSelectionBox();
+	void lockScaleFactor();
+	void unlockScaleFactor();
 
 	/*
 	 *    Properties
@@ -453,6 +455,9 @@ public:
 
 	void setWeight(double value);
 	double getWeight();
+
+	void setSnapToGrid(bool flag);
+	bool getSnapToGrid();
 
 	// Events
 
