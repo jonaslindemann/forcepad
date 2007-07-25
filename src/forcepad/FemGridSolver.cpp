@@ -142,6 +142,7 @@ void CFemGridSolver::execute()
 
 	logMessage("CFemGridSolver","Enumerating dofs and calculating bandwidth.");
 
+	m_femGrid->resetDofs();
 	m_nDof =  m_femGrid->enumerateDofs(ED_LEFT_RIGHT);
 	bwLeftRight = m_femGrid->getBandwidth()-1;
 
@@ -234,6 +235,7 @@ void CFemGridSolver::execute()
 			{
 				if (m_femGrid->getElement(i, j, k, elementValue, ex, ey, topo))
 				{
+					
 					//
 					// Get element coordinates
 					//
@@ -274,6 +276,8 @@ void CFemGridSolver::execute()
 						if (m_outputMatlab)
 							Topo_out(nElements+1,l+1) = topo[l];
 					}
+
+					//cout << DofTopo ;
 
 					// 
 					// Create element matrix

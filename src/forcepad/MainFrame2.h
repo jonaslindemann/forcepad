@@ -234,6 +234,11 @@ private:
   void cb_sldLineWidth_i(Fl_Value_Slider*, void*);
   static void cb_sldLineWidth(Fl_Value_Slider*, void*);
 public:
+  Fl_HoverButton *btnGridSnap;
+private:
+  void cb_btnGridSnap_i(Fl_HoverButton*, void*);
+  static void cb_btnGridSnap(Fl_HoverButton*, void*);
+public:
   Fl_Scroll *scrRightStressToolbar;
   Fl_HoverButton *btnTensionCompression;
 private:
@@ -255,11 +260,6 @@ private:
   void cb_rolArrowSize_i(Fl_Roller*, void*);
   static void cb_rolArrowSize(Fl_Roller*, void*);
 public:
-  Fl_Roller *rolArrowWidth;
-private:
-  void cb_rolArrowWidth_i(Fl_Roller*, void*);
-  static void cb_rolArrowWidth(Fl_Roller*, void*);
-public:
   Fl_Roller *rolTransparency;
 private:
   void cb_rolTransparency_i(Fl_Roller*, void*);
@@ -269,6 +269,11 @@ public:
 private:
   void cb_rolStep_i(Fl_Roller*, void*);
   static void cb_rolStep(Fl_Roller*, void*);
+public:
+  Fl_HoverButton *btnLockScale;
+private:
+  void cb_btnLockScale_i(Fl_HoverButton*, void*);
+  static void cb_btnLockScale(Fl_HoverButton*, void*);
 public:
   Fl_Scroll *scrRightDisplacementToolbar;
   Fl_Slider *sldDisplacementScale;

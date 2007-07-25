@@ -1,6 +1,6 @@
 //
 // ForcePAD - Educational Finite Element Software
-// Copyright (C) 2000-2007 Division of Structural Mecahnics, Lund University
+// Copyright (C) 2000-2007 Division of Structural Mechanics, Lund University
 //
 // Written by Jonas Lindemann
 //
@@ -74,6 +74,8 @@ private:
 	CColorMapPtr m_colorMap;
 
 	int*** m_dofs;
+	int**** m_elementDofs;
+	int** m_doubleDofs;
 
 	int m_dofRows;
 	int m_dofCols;
@@ -112,6 +114,10 @@ private:
 	bool m_dimmedConstraints;
 	bool m_undeformedGrid;
 
+	double m_maxStressFactor;
+	double m_maxPosStressFactor;
+	double m_maxNegStressFactor;
+
 	int m_stressStep;
 
 	double*** m_results;
@@ -126,6 +132,7 @@ private:
 	void calcMaxMin(int* arr, int size, int &maxVal, int &minVal );
 
 	void drawGrid();
+	void drawGrid2();
 	void drawUndeformedGrid();
 	void drawConstraints();
 	void drawForces();
@@ -133,6 +140,8 @@ private:
 	void drawMisesStress();
 	void drawDebugPoints();
 	void drawStressArrow(double x, double y, const double* values);
+	void drawDoubleDofs();
+	void drawGridPoints();
 public:
 	CFemGrid();
 	virtual ~CFemGrid();
@@ -150,6 +159,7 @@ public:
 	void calcCenterOfStiffness(int &cgx, int &cgy);
 	void removePointConstraint(CConstraint* constraint);
 	void removePointForce(CForce* force);
+	void moveForce(CForce* force, int x, int y);
 	void getConstraints(int x1, int y1, int x2, int y2, CConstraintSelection* selection);
 	void getForces(int x1, int y1, int x2, int y2, CForceSelection* selection);
 	CForce* getNearestForce(int x, int y);
@@ -200,6 +210,9 @@ public:
 	void erasePointConstraint(int x, int y, int brushSize);
 	int getPointConstraintsSize();
 
+	void setDoubleNode(int row, int col);
+	void clearDoubleNode(int row, int col);
+
 	void setDisplacementSize(int size);
 	int getDisplacementSize();
 	void setDisplacement(int dof, double value);
@@ -208,9 +221,8 @@ public:
 	void setDisplacementScale(double scaleFactor);
 
 	void setResult(int i, int j, int element, const double* values);
-	void getResult(int i, int j, int element, double* values);
-
 	void setResult(int i, int j, int element, int index, double value);
+	void getResult(int i, int j, int element, double* values);
 
 	double getMaxNodeValue();
 	void setMaxNodeValue(double value);
@@ -253,6 +265,9 @@ public:
 	double getElementTreshold();
 
 	int getPointLoadSize();
+
+	void setGridSpacing(int spacing);
+	int getGridSpacing();
 
 	virtual void setImage(CImage* image);
 	virtual void initGrid();

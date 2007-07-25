@@ -97,6 +97,7 @@ void CMainFrame::cb_settingsMenuCalculation_i(Fl_Menu_*, void*) {
 calcSettings->setView(paintView);
 calcSettings->show();
 delete calcSettings;
+paintView->setViewMode(CPaintView::VM_SKETCH);
 }
 void CMainFrame::cb_settingsMenuCalculation(Fl_Menu_* o, void* v) {
   ((CMainFrame*)(o->parent()->user_data()))->cb_settingsMenuCalculation_i(o,v);
@@ -6974,6 +6975,313 @@ void CMainFrame::cb_sldLineWidth(Fl_Value_Slider* o, void* v) {
   ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_sldLineWidth_i(o,v);
 }
 
+void CMainFrame::cb_btnGridSnap_i(Fl_HoverButton*, void*) {
+  if (btnGridSnap->value()>0)
+	paintView->setSnapToGrid(true);
+else
+	paintView->setSnapToGrid(false);
+}
+void CMainFrame::cb_btnGridSnap(Fl_HoverButton* o, void* v) {
+  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnGridSnap_i(o,v);
+}
+
+static const char *idata_grid[] = {
+"    36    36      256            2",
+"`` c None",
+"`. c #ebe8d7",
+"`# c #eae7d6",
+"`a c #e8e5d5",
+"`b c #e6e4d3",
+"`c c #e6e3d2",
+"`d c #e7e4d4",
+"`e c #e2dfcf",
+"`f c #dedbcb",
+"`g c #dddaca",
+"`h c #dcd9ca",
+"`i c #e3e0d0",
+"`j c #dfdccc",
+"`k c #a4a39d",
+"`l c #90908d",
+"`m c #9d9c97",
+"`n c #d5d2c3",
+"`o c #dad8c8",
+"`p c #e1dece",
+"`q c #9b9b96",
+"`r c #8c8b89",
+"`s c #9d9c96",
+"`t c #d4d1c2",
+"`u c #e4e1d0",
+"`v c #a4a49d",
+"`w c #969591",
+"`x c #a5a49d",
+"`y c #d6d3c4",
+"`z c #dbd9c9",
+"`A c #9b9a95",
+"`B c #808080",
+"`C c #cbc8ba",
+"`D c #9a9995",
+"`E c #e0ddcd",
+"`F c #979692",
+"`G c #cdcabb",
+"`H c #989893",
+"`I c #8c8c89",
+"`J c #9c9b95",
+"`K c #c7c4b6",
+"`L c #d1cfbf",
+"`M c #8d8d8a",
+"`N c #9e9d98",
+"`O c #c8c5b7",
+"`P c #d2cfc0",
+"`Q c #d3d0c1",
+"`R c #cac7b9",
+"`S c #c5c3b4",
+"`T c #c9c6b8",
+"`U c #d9d6c6",
+"`V c #ceccbd",
+"`W c #d9d7c7",
+"`X c #e9e6d5",
+"`Y c #e5e2d1",
+"`Z c #d8d5c5",
+"`0 c #a5a49e",
+"`1 c #91908d",
+"`2 c #9e9d97",
+"`3 c #a6a49e",
+"`4 c #d7d4c5",
+"`5 c #9b9a96",
+"`6 c #cdcbbc",
+"`7 c #989792",
+"`8 c #999893",
+".` c #9c9c96",
+".. c #9f9d98",
+".# c #8e8d8b",
+".a c #9c9c95",
+".b c #c4c2b4",
+".c c #c6c4b5",
+".d c #ccc9ba",
+".e c #cfcdbe",
+".f c #d0cebf",
+".g c #9f9e98",
+".h c #9c9b96",
+".i c #8c8c8a",
+".j c #969692",
+".k c #a7a69f",
+".l c #999894",
+".m c #8d8c8a",
+".n c #8e8d8a",
+".o c #c3c1b3",
+".p c #a6a59e",
+".q c #91918e",
+".r c #9f9e99",
+".s c #9c9b97",
+".t c #a8a69f",
+".u c #8e8e8b",
+".v c #c2c0b2",
+".w c #000000",
+".x c #000000",
+".y c #000000",
+".z c #000000",
+".A c #000000",
+".B c #000000",
+".C c #000000",
+".D c #000000",
+".E c #000000",
+".F c #000000",
+".G c #000000",
+".H c #000000",
+".I c #000000",
+".J c #000000",
+".K c #000000",
+".L c #000000",
+".M c #000000",
+".N c #000000",
+".O c #000000",
+".P c #000000",
+".Q c #000000",
+".R c #000000",
+".S c #000000",
+".T c #000000",
+".U c #000000",
+".V c #000000",
+".W c #000000",
+".X c #000000",
+".Y c #000000",
+".Z c #000000",
+".0 c #000000",
+".1 c #000000",
+".2 c #000000",
+".3 c #000000",
+".4 c #000000",
+".5 c #000000",
+".6 c #000000",
+".7 c #000000",
+".8 c #000000",
+"#` c #000000",
+"#. c #000000",
+"## c #000000",
+"#a c #000000",
+"#b c #000000",
+"#c c #000000",
+"#d c #000000",
+"#e c #000000",
+"#f c #000000",
+"#g c #000000",
+"#h c #000000",
+"#i c #000000",
+"#j c #000000",
+"#k c #000000",
+"#l c #000000",
+"#m c #000000",
+"#n c #000000",
+"#o c #000000",
+"#p c #000000",
+"#q c #000000",
+"#r c #000000",
+"#s c #000000",
+"#t c #000000",
+"#u c #000000",
+"#v c #000000",
+"#w c #000000",
+"#x c #000000",
+"#y c #000000",
+"#z c #000000",
+"#A c #000000",
+"#B c #000000",
+"#C c #000000",
+"#D c #000000",
+"#E c #000000",
+"#F c #000000",
+"#G c #000000",
+"#H c #000000",
+"#I c #000000",
+"#J c #000000",
+"#K c #000000",
+"#L c #000000",
+"#M c #000000",
+"#N c #000000",
+"#O c #000000",
+"#P c #000000",
+"#Q c #000000",
+"#R c #000000",
+"#S c #000000",
+"#T c #000000",
+"#U c #000000",
+"#V c #000000",
+"#W c #000000",
+"#X c #000000",
+"#Y c #000000",
+"#Z c #000000",
+"#0 c #000000",
+"#1 c #000000",
+"#2 c #000000",
+"#3 c #000000",
+"#4 c #000000",
+"#5 c #000000",
+"#6 c #000000",
+"#7 c #000000",
+"#8 c #000000",
+"a` c #000000",
+"a. c #000000",
+"a# c #000000",
+"aa c #000000",
+"ab c #000000",
+"ac c #000000",
+"ad c #000000",
+"ae c #000000",
+"af c #000000",
+"ag c #000000",
+"ah c #000000",
+"ai c #000000",
+"aj c #000000",
+"ak c #000000",
+"al c #000000",
+"am c #000000",
+"an c #000000",
+"ao c #000000",
+"ap c #000000",
+"aq c #000000",
+"ar c #000000",
+"as c #000000",
+"at c #000000",
+"au c #000000",
+"av c #000000",
+"aw c #000000",
+"ax c #000000",
+"ay c #000000",
+"az c #000000",
+"aA c #000000",
+"aB c #000000",
+"aC c #000000",
+"aD c #000000",
+"aE c #000000",
+"aF c #000000",
+"aG c #000000",
+"aH c #000000",
+"aI c #000000",
+"aJ c #000000",
+"aK c #000000",
+"aL c #000000",
+"aM c #000000",
+"aN c #000000",
+"aO c #000000",
+"aP c #000000",
+"aQ c #000000",
+"aR c #000000",
+"aS c #000000",
+"aT c #000000",
+"aU c #000000",
+"aV c #000000",
+"aW c #000000",
+"aX c #000000",
+"aY c #000000",
+"aZ c #000000",
+"a0 c #000000",
+"a1 c #000000",
+"a2 c #000000",
+"a3 c #000000",
+"a4 c #000000",
+"a5 c #000000",
+"a6 c #000000",
+"a7 c #000000",
+"a8 c #000000",
+"````````````````````````````````````````````````````````````````````````",
+"`````.`#`#`#`#`#`.`.`.`#`#`#`#`#`.`.`.`#`#`#`#`#`.`.`.`#`#`#`#`#`.``````",
+"`````#`a`b`c`b`a`#`#`#`d`b`c`b`d`#`#`#`a`b`b`b`a`#`#`#`a`b`b`b`a`#``````",
+"```#`b`e`f`g`f`e`b`d`c`e`f`h`f`e`b`d`b`i`j`g`j`i`b`d`b`i`j`g`j`i`d`#````",
+"```a`e`k`l`m`n`o`p`i`p`q`r`s`t`o`p`u`e`v`w`x`y`z`e`u`e`v`w`x`y`z`i`a`.``",
+"```b`f`A`B`w`C`n`h`j`z`D`B`w`C`t`h`E`h`A`B`F`G`y`g`E`g`A`B`F`G`y`j`b`.``",
+"```c`g`H`I`J`K`L`o`f`o`m`M`J`K`L`o`f`o`N`M`J`O`P`o`f`o`N`M`J`O`Q`f`b`#``",
+"```c`f`Q`R`S`R`Q`z`f`z`Q`T`S`R`Q`z`j`z`Q`C`K`C`t`h`j`z`Q`C`K`C`t`f`b`#``",
+"```d`e`U`L`V`L`U`j`e`j`U`L`V`L`W`j`e`j`W`P`V`P`W`E`e`j`W`P`V`P`W`e`d`.``",
+"```X`Y`f`W`Z`o`f`i`c`i`f`W`Z`o`j`i`c`u`j`o`U`o`j`u`c`i`j`o`U`o`j`c`X`.``",
+"```#`b`e`f`h`f`e`c`b`c`e`f`z`f`e`b`b`b`e`f`g`f`e`b`b`b`e`f`g`f`e`b`#`.``",
+"```#`b`p`h`o`g`p`Y`b`Y`p`h`o`h`p`Y`b`c`p`g`z`f`p`c`b`c`p`g`z`f`e`b`#`.``",
+"```a`i`0`1`2`y`z`e`u`p`q`I`2`y`z`e`u`e`0`w`3`4`h`e`Y`e`0`w`3`4`g`u`a`.``",
+"```b`j`5`B`F`6`y`f`E`g`A`B`F`6`y`f`p`f`5`B`7`V`4`f`p`f`5`B`7`V`4`E`b`.``",
+"```c`g`8`I.``K`P`o`f`o`2`M.``K`P`o`f`o...#.a`T`Q`z`f`z...#.a`T`Q`f`b`#``",
+"```c`f`Q`T.b`T`Q`o`f`o`P`O.b`T`Q`z`j`z`Q`R.c`C`Q`z`j`z`Q`R.c`C`Q`f`b`#``",
+"```b`E`4`V.d`V`4`f`p`f`4`V.d`V`Z`f`e`f`Z.e`G.f`Z`f`e`f`Z.e`G.f`Z`p`d`.``",
+"```X`u`g`4`y`Z`g`e`Y`e`g`4`y`Z`f`e`Y`i`f`Z`4`Z`f`i`Y`e`f`Z`4`Z`f`Y`X`.``",
+"```#`b`e`g`z`f`e`c`b`c`e`g`z`f`e`c`b`b`e`f`h`f`e`b`b`c`e`f`h`f`e`b`#`.``",
+"```#`b`e`g`z`f`e`c`b`c`e`g`o`g`e`c`b`b`e`f`h`f`e`b`b`b`e`f`h`f`e`b`#`.``",
+"```X`u`3`1.g`Z`g`e`Y`e.h.i`N`4`g`e`Y`i`3.j.k`U`f`i`c`i`3.j.k`U`f`Y`X`.``",
+"```d`E.h`B`7`V`4`f`p`f`5`B`7`V`4`f`e`f.h`B`H.f`Z`j`e`f.h`B`H.f`U`p`d`.``",
+"```b`f.l.m`s`T`Q`o`f`o`2.n.``T`P`z`j`z...#`s`C`Q`z`j`z...#`s`C`Q`f`b`#``",
+"```c`g`P`K.o`K`P`o`f`o`L`K.o`K`P`o`f`o`Q`O.b`T`Q`z`f`o`Q`O.b`T`Q`f`b`#``",
+"```b`j`y`6`R`6`y`f`E`f`y`6`R`6`4`f`p`f`4`V`C`V`4`f`p`f`4`V`C`V`4`E`b`.``",
+"```a`i`z`y`Q`y`z`e`u`e`z`y`Q`y`h`e`u`e`h`4`t`4`h`e`u`e`h`4`t`4`h`u`a`.``",
+"```#`b`p`h`o`g`p`Y`b`Y`p`h`o`g`p`Y`b`c`p`g`z`g`p`c`b`Y`p`g`z`g`e`b`#`.``",
+"```#`b`e`f`h`f`e`c`b`c`e`f`z`f`e`b`b`b`e`f`g`f`e`b`b`b`e`f`g`f`i`b`#`.``",
+"```X`Y.p.q.r`o`f`i`c`i.s.m.r`W`f`i`c`u.p`F.t`o`j`u`b`u.p`F.t`o`E`c`X`.``",
+"```d`e.h`B`H`L`U`j`e`f.h`B`H`L`U`j`e`j.h`B`8`Q`W`E`i`E.h`B`8`Q`o`e`d`.``",
+"```b`f.l.m`s`R`Q`z`f`o`N.#`s`R`Q`z`j`z.g.u`s`C`t`h`j`h.g.u`s`C`t`f`b`#``",
+"```c`g`L`K.v`K`L`o`f`o.f.c.v`K`L`o`f`o`P`K.o`O`P`o`f`o`P`K.o`O`Q`f`b`#``",
+"```b`f`n`C`K`C`n`h`j`h`t`C`K`C`n`h`E`h`n.d`O`G`y`g`E`h`n.d`O`G`y`j`b`.``",
+"```a`e`o`t`P`n`o`p`i`p`o`n`P`n`o`p`u`p`o`y`Q`y`z`e`u`p`o`y`Q`y`z`i`a`.``",
+"```#`b`e`f`h`f`e`b`d`b`e`f`g`f`e`b`d`b`e`f`g`f`e`b`d`b`e`f`g`f`i`b`#````",
+"`````#`a`b`c`b`a`#`#`#`a`b`c`b`a`#`#`#`a`b`c`b`a`#`#`#`a`b`c`b`a`#``````"
+};
+static Fl_Pixmap image_grid(idata_grid);
+
 void CMainFrame::cb_btnTensionCompression_i(Fl_HoverButton*, void*) {
   paintView->setStressMode(CFemGrid::SM_ALL);
 }
@@ -7893,13 +8201,6 @@ void CMainFrame::cb_rolArrowSize(Fl_Roller* o, void* v) {
   ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_rolArrowSize_i(o,v);
 }
 
-void CMainFrame::cb_rolArrowWidth_i(Fl_Roller*, void*) {
-  paintView->setStressWidth(rolArrowWidth->value());
-}
-void CMainFrame::cb_rolArrowWidth(Fl_Roller* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_rolArrowWidth_i(o,v);
-}
-
 void CMainFrame::cb_rolTransparency_i(Fl_Roller*, void*) {
   paintView->setStressAlpha(rolTransparency->value());
 }
@@ -7912,6 +8213,16 @@ void CMainFrame::cb_rolStep_i(Fl_Roller*, void*) {
 }
 void CMainFrame::cb_rolStep(Fl_Roller* o, void* v) {
   ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_rolStep_i(o,v);
+}
+
+void CMainFrame::cb_btnLockScale_i(Fl_HoverButton*, void*) {
+  if (btnLockScale->value()>0)
+	paintView->unlockScaleFactor();
+else
+	paintView->lockScaleFactor();
+}
+void CMainFrame::cb_btnLockScale(Fl_HoverButton* o, void* v) {
+  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_btnLockScale_i(o,v);
 }
 
 void CMainFrame::cb_sldDisplacementScale_i(Fl_Slider*, void*) {
@@ -14268,9 +14579,9 @@ CMainFrame::CMainFrame() {
       } // Fl_HoverButton* btnRotateBc2
       scrRightBCToolbar->end();
     } // Fl_Scroll* scrRightBCToolbar
-    { scrRightDrawingToolbar = new Fl_Scroll(277, 82, 53, 371);
+    { scrRightDrawingToolbar = new Fl_Scroll(277, 53, 53, 410);
       scrRightDrawingToolbar->box(FL_FLAT_BOX);
-      { btnRectangle = new Fl_HoverButton(282, 88, 42, 42);
+      { btnRectangle = new Fl_HoverButton(282, 59, 42, 42);
         btnRectangle->tooltip("Draw rectangle");
         btnRectangle->type(102);
         btnRectangle->box(FL_UP_BOX);
@@ -14287,7 +14598,7 @@ CMainFrame::CMainFrame() {
         btnRectangle->align(FL_ALIGN_CENTER);
         btnRectangle->when(FL_WHEN_RELEASE);
       } // Fl_HoverButton* btnRectangle
-      { btnEllipse = new Fl_HoverButton(282, 133, 42, 42);
+      { btnEllipse = new Fl_HoverButton(282, 104, 42, 42);
         btnEllipse->tooltip("Draw circle");
         btnEllipse->type(102);
         btnEllipse->box(FL_UP_BOX);
@@ -14303,7 +14614,7 @@ CMainFrame::CMainFrame() {
         btnEllipse->align(FL_ALIGN_CENTER);
         btnEllipse->when(FL_WHEN_RELEASE);
       } // Fl_HoverButton* btnEllipse
-      { btnLine = new Fl_HoverButton(282, 179, 42, 42);
+      { btnLine = new Fl_HoverButton(282, 150, 42, 42);
         btnLine->tooltip("Draw line");
         btnLine->type(102);
         btnLine->box(FL_UP_BOX);
@@ -14319,8 +14630,8 @@ CMainFrame::CMainFrame() {
         btnLine->align(FL_ALIGN_CENTER);
         btnLine->when(FL_WHEN_RELEASE);
       } // Fl_HoverButton* btnLine
-      { Fl_Group* o = new Fl_Group(283, 191, 41, 158);
-        { Fl_HoverButton* o = new Fl_HoverButton(283, 236, 20, 19);
+      { Fl_Group* o = new Fl_Group(283, 162, 41, 158);
+        { Fl_HoverButton* o = new Fl_HoverButton(283, 207, 20, 19);
           o->type(102);
           o->box(FL_THIN_UP_BOX);
           o->down_box(FL_THIN_DOWN_BOX);
@@ -14334,7 +14645,7 @@ CMainFrame::CMainFrame() {
           o->align(FL_ALIGN_CENTER);
           o->when(FL_WHEN_RELEASE);
         } // Fl_HoverButton* o
-        { Fl_HoverButton* o = new Fl_HoverButton(283, 273, 20, 19);
+        { Fl_HoverButton* o = new Fl_HoverButton(283, 244, 20, 19);
           o->type(102);
           o->box(FL_THIN_UP_BOX);
           o->down_box(FL_THIN_DOWN_BOX);
@@ -14348,7 +14659,7 @@ CMainFrame::CMainFrame() {
           o->align(FL_ALIGN_CENTER);
           o->when(FL_WHEN_RELEASE);
         } // Fl_HoverButton* o
-        { Fl_HoverButton* o = new Fl_HoverButton(283, 311, 20, 19);
+        { Fl_HoverButton* o = new Fl_HoverButton(283, 282, 20, 19);
           o->type(102);
           o->box(FL_THIN_UP_BOX);
           o->down_box(FL_THIN_DOWN_BOX);
@@ -14362,7 +14673,7 @@ CMainFrame::CMainFrame() {
           o->align(FL_ALIGN_CENTER);
           o->when(FL_WHEN_RELEASE);
         } // Fl_HoverButton* o
-        { Fl_HoverButton* o = new Fl_HoverButton(303, 236, 20, 19);
+        { Fl_HoverButton* o = new Fl_HoverButton(303, 207, 20, 19);
           o->type(102);
           o->box(FL_THIN_UP_BOX);
           o->down_box(FL_THIN_DOWN_BOX);
@@ -14376,7 +14687,7 @@ CMainFrame::CMainFrame() {
           o->align(FL_ALIGN_CENTER);
           o->when(FL_WHEN_RELEASE);
         } // Fl_HoverButton* o
-        { Fl_HoverButton* o = new Fl_HoverButton(303, 273, 20, 19);
+        { Fl_HoverButton* o = new Fl_HoverButton(303, 244, 20, 19);
           o->type(102);
           o->box(FL_THIN_UP_BOX);
           o->down_box(FL_THIN_DOWN_BOX);
@@ -14390,7 +14701,7 @@ CMainFrame::CMainFrame() {
           o->align(FL_ALIGN_CENTER);
           o->when(FL_WHEN_RELEASE);
         } // Fl_HoverButton* o
-        { Fl_HoverButton* o = new Fl_HoverButton(303, 311, 20, 19);
+        { Fl_HoverButton* o = new Fl_HoverButton(303, 282, 20, 19);
           o->type(102);
           o->box(FL_THIN_UP_BOX);
           o->down_box(FL_THIN_DOWN_BOX);
@@ -14404,7 +14715,7 @@ CMainFrame::CMainFrame() {
           o->align(FL_ALIGN_CENTER);
           o->when(FL_WHEN_RELEASE);
         } // Fl_HoverButton* o
-        { Fl_HoverButton* o = new Fl_HoverButton(283, 254, 20, 19);
+        { Fl_HoverButton* o = new Fl_HoverButton(283, 225, 20, 19);
           o->type(102);
           o->box(FL_THIN_UP_BOX);
           o->down_box(FL_THIN_DOWN_BOX);
@@ -14418,7 +14729,7 @@ CMainFrame::CMainFrame() {
           o->align(FL_ALIGN_CENTER);
           o->when(FL_WHEN_RELEASE);
         } // Fl_HoverButton* o
-        { Fl_HoverButton* o = new Fl_HoverButton(283, 292, 20, 19);
+        { Fl_HoverButton* o = new Fl_HoverButton(283, 263, 20, 19);
           o->type(102);
           o->box(FL_THIN_UP_BOX);
           o->down_box(FL_THIN_DOWN_BOX);
@@ -14432,7 +14743,7 @@ CMainFrame::CMainFrame() {
           o->align(FL_ALIGN_CENTER);
           o->when(FL_WHEN_RELEASE);
         } // Fl_HoverButton* o
-        { Fl_HoverButton* o = new Fl_HoverButton(283, 330, 20, 19);
+        { Fl_HoverButton* o = new Fl_HoverButton(283, 301, 20, 19);
           o->type(102);
           o->box(FL_THIN_UP_BOX);
           o->down_box(FL_THIN_DOWN_BOX);
@@ -14446,7 +14757,7 @@ CMainFrame::CMainFrame() {
           o->align(FL_ALIGN_CENTER);
           o->when(FL_WHEN_RELEASE);
         } // Fl_HoverButton* o
-        { Fl_HoverButton* o = new Fl_HoverButton(303, 254, 20, 19);
+        { Fl_HoverButton* o = new Fl_HoverButton(303, 225, 20, 19);
           o->type(102);
           o->box(FL_THIN_UP_BOX);
           o->down_box(FL_THIN_DOWN_BOX);
@@ -14460,7 +14771,7 @@ CMainFrame::CMainFrame() {
           o->align(FL_ALIGN_CENTER);
           o->when(FL_WHEN_RELEASE);
         } // Fl_HoverButton* o
-        { Fl_HoverButton* o = new Fl_HoverButton(303, 292, 20, 19);
+        { Fl_HoverButton* o = new Fl_HoverButton(303, 263, 20, 19);
           o->type(102);
           o->box(FL_THIN_UP_BOX);
           o->down_box(FL_THIN_DOWN_BOX);
@@ -14474,7 +14785,7 @@ CMainFrame::CMainFrame() {
           o->align(FL_ALIGN_CENTER);
           o->when(FL_WHEN_RELEASE);
         } // Fl_HoverButton* o
-        { Fl_HoverButton* o = new Fl_HoverButton(303, 330, 20, 19);
+        { Fl_HoverButton* o = new Fl_HoverButton(303, 301, 20, 19);
           o->type(102);
           o->box(FL_THIN_UP_BOX);
           o->down_box(FL_THIN_DOWN_BOX);
@@ -14490,7 +14801,7 @@ CMainFrame::CMainFrame() {
         } // Fl_HoverButton* o
         o->end();
       } // Fl_Group* o
-      { sldLineWidth = new Fl_Value_Slider(293, 367, 22, 78, "Width");
+      { sldLineWidth = new Fl_Value_Slider(293, 338, 22, 75, "Width");
         sldLineWidth->labelsize(10);
         sldLineWidth->minimum(1);
         sldLineWidth->maximum(30);
@@ -14500,11 +14811,27 @@ CMainFrame::CMainFrame() {
         sldLineWidth->align(129);
         sldLineWidth->deactivate();
       } // Fl_Value_Slider* sldLineWidth
+      { btnGridSnap = new Fl_HoverButton(283, 418, 42, 42);
+        btnGridSnap->tooltip("Snap to grid");
+        btnGridSnap->type(1);
+        btnGridSnap->box(FL_UP_BOX);
+        btnGridSnap->down_box(FL_DOWN_BOX);
+        btnGridSnap->color(FL_BACKGROUND_COLOR);
+        btnGridSnap->selection_color((Fl_Color)51);
+        btnGridSnap->image(image_grid);
+        btnGridSnap->labeltype(FL_NORMAL_LABEL);
+        btnGridSnap->labelfont(0);
+        btnGridSnap->labelsize(14);
+        btnGridSnap->labelcolor(FL_FOREGROUND_COLOR);
+        btnGridSnap->callback((Fl_Callback*)cb_btnGridSnap);
+        btnGridSnap->align(FL_ALIGN_CENTER);
+        btnGridSnap->when(FL_WHEN_RELEASE);
+      } // Fl_HoverButton* btnGridSnap
       scrRightDrawingToolbar->end();
     } // Fl_Scroll* scrRightDrawingToolbar
     { scrRightStressToolbar = new Fl_Scroll(332, 52, 53, 413);
       scrRightStressToolbar->box(FL_FLAT_BOX);
-      { btnTensionCompression = new Fl_HoverButton(337, 350, 42, 42);
+      { btnTensionCompression = new Fl_HoverButton(337, 324, 42, 42);
         btnTensionCompression->tooltip("Show both compression and tension");
         btnTensionCompression->type(102);
         btnTensionCompression->box(FL_UP_BOX);
@@ -14521,7 +14848,7 @@ CMainFrame::CMainFrame() {
         btnTensionCompression->align(FL_ALIGN_CENTER);
         btnTensionCompression->when(FL_WHEN_RELEASE);
       } // Fl_HoverButton* btnTensionCompression
-      { btnTension = new Fl_HoverButton(337, 393, 42, 29);
+      { btnTension = new Fl_HoverButton(337, 367, 42, 29);
         btnTension->tooltip("Show only tension");
         btnTension->type(102);
         btnTension->box(FL_UP_BOX);
@@ -14537,7 +14864,7 @@ CMainFrame::CMainFrame() {
         btnTension->align(FL_ALIGN_CENTER);
         btnTension->when(FL_WHEN_RELEASE);
       } // Fl_HoverButton* btnTension
-      { btnCompression = new Fl_HoverButton(337, 423, 42, 29);
+      { btnCompression = new Fl_HoverButton(337, 397, 42, 29);
         btnCompression->tooltip("Show only compression");
         btnCompression->type(102);
         btnCompression->box(FL_UP_BOX);
@@ -14562,17 +14889,7 @@ CMainFrame::CMainFrame() {
         rolArrowSize->callback((Fl_Callback*)cb_rolArrowSize);
         rolArrowSize->align(FL_ALIGN_TOP);
       } // Fl_Roller* rolArrowSize
-      { rolArrowWidth = new Fl_Roller(347, 143, 23, 57, "Width");
-        rolArrowWidth->tooltip("Width of stress arrows");
-        rolArrowWidth->labelsize(10);
-        rolArrowWidth->minimum(1);
-        rolArrowWidth->maximum(30);
-        rolArrowWidth->step(1);
-        rolArrowWidth->value(1);
-        rolArrowWidth->callback((Fl_Callback*)cb_rolArrowWidth);
-        rolArrowWidth->align(FL_ALIGN_TOP);
-      } // Fl_Roller* rolArrowWidth
-      { rolTransparency = new Fl_Roller(347, 214, 23, 57, "Transp");
+      { rolTransparency = new Fl_Roller(347, 142, 23, 57, "Transp");
         rolTransparency->tooltip("Transparency of stress arrows");
         rolTransparency->labelsize(10);
         rolTransparency->step(0.01);
@@ -14580,7 +14897,7 @@ CMainFrame::CMainFrame() {
         rolTransparency->callback((Fl_Callback*)cb_rolTransparency);
         rolTransparency->align(FL_ALIGN_TOP);
       } // Fl_Roller* rolTransparency
-      { rolStep = new Fl_Roller(347, 285, 23, 57, "Step");
+      { rolStep = new Fl_Roller(347, 213, 23, 57, "Step");
         rolStep->tooltip("Render stresses for every \"Step\" element.");
         rolStep->labelsize(10);
         rolStep->minimum(1);
@@ -14590,6 +14907,25 @@ CMainFrame::CMainFrame() {
         rolStep->callback((Fl_Callback*)cb_rolStep);
         rolStep->align(FL_ALIGN_TOP);
       } // Fl_Roller* rolStep
+      { Fl_Group* o = new Fl_Group(335, 275, 45, 45);
+        { btnLockScale = new Fl_HoverButton(337, 277, 42, 42, "Auto scale");
+          btnLockScale->tooltip("Show both compression and tension");
+          btnLockScale->type(1);
+          btnLockScale->box(FL_UP_BOX);
+          btnLockScale->down_box(FL_DOWN_BOX);
+          btnLockScale->value(1);
+          btnLockScale->color(FL_BACKGROUND_COLOR);
+          btnLockScale->selection_color((Fl_Color)51);
+          btnLockScale->labeltype(FL_NORMAL_LABEL);
+          btnLockScale->labelfont(0);
+          btnLockScale->labelsize(10);
+          btnLockScale->labelcolor(FL_FOREGROUND_COLOR);
+          btnLockScale->callback((Fl_Callback*)cb_btnLockScale);
+          btnLockScale->align(FL_ALIGN_WRAP);
+          btnLockScale->when(FL_WHEN_RELEASE);
+        } // Fl_HoverButton* btnLockScale
+        o->end();
+      } // Fl_Group* o
       scrRightStressToolbar->end();
     } // Fl_Scroll* scrRightStressToolbar
     { scrRightDisplacementToolbar = new Fl_Scroll(387, 41, 53, 411);
@@ -15472,6 +15808,7 @@ void CMainFrame::onViewModeChange(CPaintView::TViewMode oldMode, CPaintView::TVi
 	modeMenuSketch->deactivate();
 	modeMenuAction->activate();
 	modeMenuPhysics->activate();
+	btnSketch->setonly();
 	
 	hideRightToolbars();
 	hideLeftToolbars();
@@ -15494,6 +15831,7 @@ else if (newMode == CPaintView::VM_PHYSICS)
 	modeMenuSketch->activate();
 	modeMenuAction->activate();
 	modeMenuPhysics->deactivate();
+	btnPhysical->setonly();
 	
 	hideRightToolbars();
 	hideLeftToolbars();
@@ -15512,6 +15850,7 @@ else
 	modeMenuSketch->activate();
 	modeMenuAction->deactivate();
 	modeMenuPhysics->activate();
+	btnAction->setonly();
 
 	hideRightToolbars();
 	hideLeftToolbars();
