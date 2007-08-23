@@ -5965,8 +5965,7 @@ static const char *idata_action_rotate_bc[] = {
 static Fl_Pixmap image_action_rotate_bc(idata_action_rotate_bc);
 
 void CMainFrame::cb_btnRectangle_i(Fl_HoverButton*, void*) {
-  paintView->hideDialogs();
-paintView->setEditMode(CPaintView::EM_RECTANGLE);
+  paintView->setEditMode(CPaintView::EM_RECTANGLE);
 sldLineWidth->deactivate();
 m_sketchEditMode = paintView->getEditMode();
 }
@@ -6272,8 +6271,7 @@ static const char *idata_rectangle[] = {
 static Fl_Pixmap image_rectangle(idata_rectangle);
 
 void CMainFrame::cb_btnEllipse_i(Fl_HoverButton*, void*) {
-  paintView->hideDialogs();
-paintView->setEditMode(CPaintView::EM_ELLIPSE);
+  paintView->setEditMode(CPaintView::EM_ELLIPSE);
 sldLineWidth->deactivate();
 m_sketchEditMode = paintView->getEditMode();
 }
@@ -6579,8 +6577,7 @@ static const char *idata_ellipse[] = {
 static Fl_Pixmap image_ellipse(idata_ellipse);
 
 void CMainFrame::cb_btnLine_i(Fl_HoverButton*, void*) {
-  paintView->hideDialogs();
-paintView->setEditMode(CPaintView::EM_LINE);
+  paintView->setEditMode(CPaintView::EM_LINE);
 sldLineWidth->activate();
 }
 void CMainFrame::cb_btnLine(Fl_HoverButton* o, void* v) {

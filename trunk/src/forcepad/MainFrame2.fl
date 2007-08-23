@@ -198,7 +198,7 @@ m_sketchEditMode = paintView->getEditMode();}
         Fl_Button btnFloodFill {
           callback {paintView->setEditMode(CPaintView::EM_FLOODFILL);
 showRightToolbar(scrRightFillToolbar);
-m_sketchEditMode = paintView->getEditMode();}
+m_sketchEditMode = paintView->getEditMode();} selected
           tooltip {Flood fill tool} image {../../images/floodfill.xpm} xywh {5 168 42 42} type Radio down_box DOWN_BOX selection_color 51
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
@@ -342,8 +342,7 @@ m_physicsEditMode = paintView->getEditMode();}
         xywh {277 53 53 410} box FLAT_BOX
       } {
         Fl_Button btnRectangle {
-          callback {paintView->hideDialogs();
-paintView->setEditMode(CPaintView::EM_RECTANGLE);
+          callback {paintView->setEditMode(CPaintView::EM_RECTANGLE);
 sldLineWidth->deactivate();
 m_sketchEditMode = paintView->getEditMode();}
           tooltip {Draw rectangle} image {../../images/rectangle.xpm} xywh {282 59 42 42} type Radio down_box DOWN_BOX value 1 selection_color 51
@@ -351,8 +350,7 @@ m_sketchEditMode = paintView->getEditMode();}
           class Fl_HoverButton
         }
         Fl_Button btnEllipse {
-          callback {paintView->hideDialogs();
-paintView->setEditMode(CPaintView::EM_ELLIPSE);
+          callback {paintView->setEditMode(CPaintView::EM_ELLIPSE);
 sldLineWidth->deactivate();
 m_sketchEditMode = paintView->getEditMode();}
           tooltip {Draw circle} image {../../images/ellipse.xpm} xywh {282 104 42 42} type Radio down_box DOWN_BOX selection_color 51
@@ -360,8 +358,7 @@ m_sketchEditMode = paintView->getEditMode();}
           class Fl_HoverButton
         }
         Fl_Button btnLine {
-          callback {paintView->hideDialogs();
-paintView->setEditMode(CPaintView::EM_LINE);
+          callback {paintView->setEditMode(CPaintView::EM_LINE);
 sldLineWidth->activate();}
           tooltip {Draw line} image {../../images/line.xpm} xywh {282 150 42 42} type Radio down_box DOWN_BOX selection_color 51
           code0 {\#include "Fl_HoverButton.h"}
@@ -1116,8 +1113,7 @@ else
 		paintView->setDrawStress(false);
 		showRightToolbar(scrRightDisplacementToolbar);
 	}	
-}} {selected
-    }
+}} {}
   }
   Function {onStatusMessage(const std::string& message, const int progress)} {return_type void
   } {

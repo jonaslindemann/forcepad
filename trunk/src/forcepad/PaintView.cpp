@@ -27,15 +27,8 @@
 #include "NewModelDlg.h"
 #include "FemGridSolver.h"
 #include "FemGridSolverCORBA.h"
-
-#ifdef FORCEPAD_NEW_UI
 #include "MainFrame2.h"
-#else
-#include "MainFrame.h"
-#endif
-
 #include "StatusOutput.h"
-
 #include "JpegImage.h"
 #include "PngImage.h"
 
@@ -59,6 +52,7 @@
 #endif
 
 #include <FL/filename.H>
+#include <FL/fl_draw.H>
 
 #include <fstream>
 #include <string>
@@ -75,9 +69,9 @@
 using namespace NEWMAT;
 #endif
 
-//
+/////////////////////////////////////////////////////////////
 // Structures used for copy and paste in Windows
-//
+/////////////////////////////////////////////////////////////
 
 #ifdef WIN32
 
@@ -97,15 +91,9 @@ typedef struct _FPRGBTRIPLE { //rgbt
 
 class CPaintView;
 
-void cb_hideDialogs(void* p)
-{
-	CPaintView* view = (CPaintView*) p;
-	view->hideDialogs();
-}
-
-//
+/////////////////////////////////////////////////////////////
 // CPaintView constructor destructor
-//
+/////////////////////////////////////////////////////////////
 
 CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 : Fl_Gl_Window(x,y,w,h,l)
@@ -134,7 +122,6 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 	m_useWeight = false;
 	m_useBlendingExtension = false;
 	m_calcCG = false;
-	m_dialogsVisible = false;
 	m_resized = true;
 	m_drawImage = false;
 	m_importMode = IM_NEW_MODEL;
@@ -261,29 +248,6 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 	
 	// Create dialogs
 	
-	m_brushPropsDlg = new CBrushProps();
-	m_brushPropsDlg->setView((void*)this);
-	
-	m_drawingPropsDlg = new CDrawingProps();
-	m_drawingPropsDlg->setView((void*)this);
-	
-	m_drawingToolsDlg = new CDrawingTools();
-	m_drawingToolsDlg->setView((void*)this);
-	
-	m_stiffnessPropsDlg = new CStiffnessProps();
-	m_stiffnessPropsDlg->setView((void*)this);
-	
-	m_bcTypesDlg = new CBcTypes();
-	m_bcTypesDlg->setView((void*)this);
-	
-	m_importPropsDlg = new CImportProps();
-	m_importPropsDlg->setView((void*)this);
-	
-#ifndef FORCEPAD_RIGID
-	m_calcPropsDlg = new CCalcProps();
-	m_calcPropsDlg->setView((void*)this);
-#endif
-	
 	createCursors();
 
 	m_modeChangeEvent = NULL;
@@ -305,12 +269,6 @@ CPaintView::~CPaintView()
 	
 	deleteBrushes();
 	
-	delete m_brushPropsDlg;
-	delete m_drawingPropsDlg;
-	delete m_drawingToolsDlg;
-	delete m_stiffnessPropsDlg;
-	delete m_bcTypesDlg;
-	
 	
 #ifdef FORCEPAD_RIGID
 	int i;
@@ -322,9 +280,9 @@ CPaintView::~CPaintView()
 	deleteCursors();
 }
 
-//
+/////////////////////////////////////////////////////////////
 // CPaintView FLTK overrides
-//
+/////////////////////////////////////////////////////////////
 
 void CPaintView::draw()
 {
@@ -412,9 +370,9 @@ int CPaintView::handle(int event)
 	}
 }
 
-//
+/////////////////////////////////////////////////////////////
 // CPaintView event methods
-//
+/////////////////////////////////////////////////////////////
 
 void CPaintView::onPush(int x, int y)
 {
@@ -450,9 +408,6 @@ void CPaintView::onPush(int x, int y)
 		// Rotate existing force
 
 		m_selectedForce = m_femGrid->getNearestForce(x-m_drawingOffsetX, h()-y-m_drawingOffsetY);
-
-		cout << m_selectedForce << endl;
-
 		break;
 	case EM_CONSTRAINT:
 		
@@ -1252,30 +1207,9 @@ void CPaintView::onMove(int x, int y)
 	}
 }
 
-// CPaintView methods
-//
-
-void CPaintView::clearMesh()
-{
-	so_print("CPaintView","clearMesh()");
-	m_femGrid->setShowGrid(false);
-	this->redraw();
-}
-
-void CPaintView::clearImage()
-{
-	so_print("CPaintView","clearImage()");
-	m_drawing->fillColor(255,255,255);
-	
-	m_femGrid->clearForces();
-	m_femGrid->clearConstraints();
-	m_femGrid->clearResults();
-	m_femGrid->setShowGrid(false);
-	
-	m_showMesh = false;
-	
-	this->redraw();
-}
+/////////////////////////////////////////////////////////////
+// CPaintView private methods
+/////////////////////////////////////////////////////////////
 
 void CPaintView::loadBrushes()
 {
@@ -1488,6 +1422,182 @@ void CPaintView::deleteBrushes()
 	m_currentInvertedBrush = NULL;
 }
 
+void CPaintView::clearMesh()
+{
+	so_print("CPaintView","clearMesh()");
+	m_femGrid->setShowGrid(false);
+	this->redraw();
+}
+
+void CPaintView::clearResults()
+{
+	so_print("CPaintView", "clearResults()");
+	m_femGrid->clearResults();
+	this->redraw();
+}
+
+void CPaintView::updateSelectionBox()
+{
+	so_print("CPaintView", "updateSelectionBox()");
+	m_selectionBox->setPosition(m_selectionStart[0]+m_drawingOffsetX, m_selectionStart[1]+m_drawingOffsetY);
+	m_selectionBox->setSize(m_selectionEnd[0]-m_selectionStart[0], m_selectionEnd[1]-m_selectionStart[1]);
+}
+
+void CPaintView::resetUndoArea()
+{
+	so_print("CPaintView", "resetUndoArea()");
+	m_undoStart[0] = 65000;
+	m_undoStart[1] = 65000;
+	m_undoEnd[0] = -65000;
+	m_undoEnd[1] = -65000;
+}
+
+void CPaintView::updateUndo()
+{
+	so_print("CPaintView", "updateUndo()");
+	int x1, y1, x2, y2;
+	
+	if (m_undoStart[0]==65000)
+		return;
+	
+	if (m_undoStart[0]>m_undoEnd[0])
+	{
+		x1 = m_undoEnd[0];
+		x2 = m_undoStart[0];
+	}
+	else
+	{
+		x1 = m_undoStart[0];
+		x2 = m_undoEnd[0];
+	}
+	
+	if (m_undoStart[1]>m_undoEnd[1])
+	{
+		y1 = m_undoEnd[1];
+		y2 = m_undoStart[1];
+	}
+	else
+	{
+		y1 = m_undoStart[1];
+		y2 = m_undoEnd[1];
+	}
+	
+	m_undoClipboard->copy(x1, y1, x2, y2);
+}
+
+void CPaintView::disableDrawing()
+{
+	m_lockDrawing = true;
+}
+
+void CPaintView::enableDrawing()
+{
+	m_lockDrawing = false;
+}
+
+void CPaintView::updateModel()
+{
+	so_print("CPaintView","updateModel()");
+	if (m_mainFrame!=NULL)
+	{
+		((CMainFrame*)m_mainFrame)->setPixelWeight(m_femGrid->getPixelArea()*1e-3);
+		((CMainFrame*)m_mainFrame)->setExternalForce(m_femGrid->getPixelArea()*m_relativeForceSize*1e-3);
+		calcRigidReactions();
+		this->redraw();
+	}
+}
+
+void CPaintView::updateCursor()
+{
+	switch (m_editMode) {
+	case EM_BRUSH:
+	case EM_DIRECT_BRUSH:
+	case EM_ERASE:
+	case EM_DIRECT_ERASE:
+		fl_cursor_ex( m_cursors[m_currentBrushIdx] );
+		break;
+	case EM_SELECT_BOX:
+		fl_cursor_ex( m_cursors[10] );
+		break;
+	case EM_FORCE:
+		fl_cursor_ex( m_cursors[11] );
+		break;
+	case EM_CONSTRAINT:
+		fl_cursor_ex( m_cursors[12] );
+		break;
+	case EM_CONSTRAINT_VECTOR:
+		fl_cursor_ex( m_cursors[12] );
+		break;
+	case EM_CONSTRAINT_HINGE:
+		fl_cursor_ex( m_cursors[12] );
+		break;
+	case EM_LINE:
+		fl_cursor_ex( m_cursors[13] );
+		break;
+	case EM_RECTANGLE:
+		fl_cursor_ex( m_cursors[14] );
+		break;
+	case EM_ELLIPSE:
+		fl_cursor_ex( m_cursors[15] );
+		break;
+	case EM_FLOODFILL:
+		fl_cursor_ex( m_cursors[16] );
+		break;
+	case EM_ERASE_CONSTRAINTS_FORCES:
+		fl_cursor_ex( m_cursors[17] );
+		break;
+	default:
+		fl_cursor( FL_CURSOR_DEFAULT );
+	}
+}
+
+void CPaintView::createCursors()
+{
+	int i;
+	
+	for (i=0; i<20; i++)
+		m_cursors[i] = new Fl_Cursor_Shape();
+	
+	m_cursors[0]->shape( rshape4_hotX, rshape4_hotY, rshape4_and, rshape4_xor );
+	m_cursors[1]->shape( rshape8_hotX, rshape8_hotY, rshape8_and, rshape8_xor );
+	m_cursors[2]->shape( rshape16_hotX, rshape16_hotY, rshape16_and, rshape16_xor );
+	m_cursors[3]->shape( rshape32_hotX, rshape32_hotY, rshape32_and, rshape32_xor );
+	m_cursors[4]->shape( rshape32_hotX, rshape32_hotY, rshape32_and, rshape32_xor );
+	m_cursors[5]->shape( sshape4_hotX, sshape4_hotY, sshape4_and, sshape4_xor );
+	m_cursors[6]->shape( sshape8_hotX, sshape8_hotY, sshape8_and, sshape8_xor );
+	m_cursors[7]->shape( sshape16_hotX, sshape16_hotY, sshape16_and, sshape16_xor );
+	m_cursors[8]->shape( sshape32_hotX, sshape32_hotY, sshape32_and, sshape32_xor );
+	m_cursors[9]->shape( sshape32_hotX, sshape32_hotY, sshape32_and, sshape32_xor );
+	m_cursors[10]->shape( cross_select_hotX, cross_select_hotY, cross_select_and, cross_select_xor );
+	m_cursors[11]->shape( cross_load_hotX, cross_load_hotY, cross_load_and, cross_load_xor );
+	m_cursors[12]->shape( cross_bc_hotX, cross_bc_hotY, cross_bc_and, cross_bc_xor );
+	m_cursors[13]->shape( cross_line_hotX, cross_line_hotY, cross_line_and, cross_line_xor );
+	m_cursors[14]->shape( cross_rect_hotX, cross_rect_hotY, cross_rect_and, cross_rect_xor );
+	m_cursors[15]->shape( cross_circle_hotX, cross_circle_hotY, cross_circle_and, cross_circle_xor );
+	m_cursors[16]->shape( cross_bucket_hotX, cross_bucket_hotY, cross_bucket_and, cross_bucket_xor );
+	m_cursors[17]->shape( erase_hotX, erase_hotX, erase_and, erase_xor );
+	
+}
+
+void CPaintView::deleteCursors()
+{
+	int i;
+	
+	for (i=0; i<20; i++)
+		delete m_cursors[i];
+}
+
+void CPaintView::checkOpenGLVersion()
+{
+	m_checkOpenGL = false;
+	so_print("checkOpenGLVersion", (const char *)glGetString(GL_VENDOR));
+	so_print("checkOpenGLVersion", (const char *)glGetString(GL_RENDERER));
+	so_print("checkOpenGLVersion", (const char *)glGetString(GL_VERSION));
+}
+
+/////////////////////////////////////////////////////////////
+// CPaintView public methods
+/////////////////////////////////////////////////////////////
 
 bool CPaintView::execute()
 {
@@ -1883,92 +1993,6 @@ void CPaintView::openModel()
 	enableDrawing();
 }
 
-void CPaintView::clearResults()
-{
-	so_print("CPaintView", "clearResults()");
-	m_femGrid->clearResults();
-	this->redraw();
-}
-
-void CPaintView::showBrushProps(int x, int y)
-{
-	so_print("CPaintView", "showBrushProps()");
-	m_brushPropsDlg->setPosition(x, y);
-	m_brushPropsDlg->show();
-	m_dialogsVisible = true;
-}
-
-void CPaintView::hideDialogs()
-{
-	so_print("CPaintView", "hideDialogs()");
-	m_brushPropsDlg->hide();
-	m_drawingPropsDlg->hide();
-	m_drawingToolsDlg->hide();
-	m_stiffnessPropsDlg->hide();
-	m_bcTypesDlg->hide();
-	m_importPropsDlg->hide();
-#ifndef FORCEPAD_RIGID
-	m_calcPropsDlg->hide();
-#endif
-	m_dialogsVisible = false;
-}
-
-void CPaintView::showDrawingProps(int x, int y)
-{
-	so_print("CPaintView", "showDrawingProps()");
-	m_drawingPropsDlg->setPosition(x, y);
-	m_drawingPropsDlg->show();
-	m_dialogsVisible = true;
-}
-
-void CPaintView::showDrawingTools(int x, int y)
-{
-	so_print("CPaintView", "showDrawingTools()");
-	m_drawingToolsDlg->setPosition(x, y);
-	m_drawingToolsDlg->show();
-	m_dialogsVisible = true;
-}
-
-void CPaintView::showStiffnessProps(int x, int y)
-{
-	so_print("CPaintView", "showStiffnessProps()");
-	m_stiffnessPropsDlg->setPosition(x, y);
-	m_stiffnessPropsDlg->show();
-	m_dialogsVisible = true;
-}
-
-void CPaintView::showBcTypes(int x, int y)
-{
-	so_print("CPaintView", "showBcTypes()");
-	m_bcTypesDlg->setPosition(x, y);
-	m_bcTypesDlg->show();
-	m_dialogsVisible = true;
-}
-
-void CPaintView::showCalcProps(int x, int y)
-{
-#ifndef FORCEPAD_RIGID
-	m_calcPropsDlg->setPosition(x, y);
-	m_calcPropsDlg->show();
-	m_dialogsVisible = true;
-#endif
-}
-
-void CPaintView::showImportProps(int x, int y)
-{
-	so_print("CPaintView", "showImportProps()");
-	m_importPropsDlg->setPosition(x, y);
-	m_importPropsDlg->show();
-	m_dialogsVisible = true;
-}
-
-void CPaintView::updateSelectionBox()
-{
-	so_print("CPaintView", "updateSelectionBox()");
-	m_selectionBox->setPosition(m_selectionStart[0]+m_drawingOffsetX, m_selectionStart[1]+m_drawingOffsetY);
-	m_selectionBox->setSize(m_selectionEnd[0]-m_selectionStart[0], m_selectionEnd[1]-m_selectionStart[1]);
-}
-
 void CPaintView::copy()
 {
 	so_print("CPaintView", "copy()");
@@ -2089,47 +2113,6 @@ void CPaintView::undoToDrawing()
 }
 
 
-void CPaintView::resetUndoArea()
-{
-	so_print("CPaintView", "resetUndoArea()");
-	m_undoStart[0] = 65000;
-	m_undoStart[1] = 65000;
-	m_undoEnd[0] = -65000;
-	m_undoEnd[1] = -65000;
-}
-
-void CPaintView::updateUndo()
-{
-	so_print("CPaintView", "updateUndo()");
-	int x1, y1, x2, y2;
-	
-	if (m_undoStart[0]==65000)
-		return;
-	
-	if (m_undoStart[0]>m_undoEnd[0])
-	{
-		x1 = m_undoEnd[0];
-		x2 = m_undoStart[0];
-	}
-	else
-	{
-		x1 = m_undoStart[0];
-		x2 = m_undoEnd[0];
-	}
-	
-	if (m_undoStart[1]>m_undoEnd[1])
-	{
-		y1 = m_undoEnd[1];
-		y2 = m_undoStart[1];
-	}
-	else
-	{
-		y1 = m_undoStart[1];
-		y2 = m_undoEnd[1];
-	}
-	
-	m_undoClipboard->copy(x1, y1, x2, y2);
-}
 
 void CPaintView::copyToWindows()
 {
@@ -2515,101 +2498,19 @@ void CPaintView::calcRigidReactions()
 #endif
 }
 
-void CPaintView::updateModel()
+void CPaintView::lockScaleFactor()
 {
-	so_print("CPaintView","updateModel()");
-	if (m_mainFrame!=NULL)
-	{
-		((CMainFrame*)m_mainFrame)->setPixelWeight(m_femGrid->getPixelArea()*1e-3);
-		((CMainFrame*)m_mainFrame)->setExternalForce(m_femGrid->getPixelArea()*m_relativeForceSize*1e-3);
-		calcRigidReactions();
-		this->redraw();
-	}
+	m_femGrid->setLockScale(true);
 }
 
-void CPaintView::updateCursor()
+void CPaintView::unlockScaleFactor()
 {
-	switch (m_editMode) {
-	case EM_BRUSH:
-	case EM_DIRECT_BRUSH:
-	case EM_ERASE:
-	case EM_DIRECT_ERASE:
-		fl_cursor( m_cursors[m_currentBrushIdx] );
-		break;
-	case EM_SELECT_BOX:
-		fl_cursor( m_cursors[10] );
-		break;
-	case EM_FORCE:
-		fl_cursor( m_cursors[11] );
-		break;
-	case EM_CONSTRAINT:
-		fl_cursor( m_cursors[12] );
-		break;
-	case EM_CONSTRAINT_VECTOR:
-		fl_cursor( m_cursors[12] );
-		break;
-	case EM_CONSTRAINT_HINGE:
-		fl_cursor( m_cursors[12] );
-		break;
-	case EM_LINE:
-		fl_cursor( m_cursors[13] );
-		break;
-	case EM_RECTANGLE:
-		fl_cursor( m_cursors[14] );
-		break;
-	case EM_ELLIPSE:
-		fl_cursor( m_cursors[15] );
-		break;
-	case EM_FLOODFILL:
-		fl_cursor( m_cursors[16] );
-		break;
-	case EM_ERASE_CONSTRAINTS_FORCES:
-		fl_cursor( m_cursors[17] );
-		break;
-	default:
-		fl_cursor( FL_CURSOR_DEFAULT );
-	}
+	m_femGrid->setLockScale(false);
 }
 
-void CPaintView::createCursors()
-{
-	int i;
-	
-	for (i=0; i<20; i++)
-		m_cursors[i] = new Fl_Cursor_Shape();
-	
-	m_cursors[0]->shape( rshape4_hotX, rshape4_hotY, rshape4_and, rshape4_xor );
-	m_cursors[1]->shape( rshape8_hotX, rshape8_hotY, rshape8_and, rshape8_xor );
-	m_cursors[2]->shape( rshape16_hotX, rshape16_hotY, rshape16_and, rshape16_xor );
-	m_cursors[3]->shape( rshape32_hotX, rshape32_hotY, rshape32_and, rshape32_xor );
-	m_cursors[4]->shape( rshape32_hotX, rshape32_hotY, rshape32_and, rshape32_xor );
-	m_cursors[5]->shape( sshape4_hotX, sshape4_hotY, sshape4_and, sshape4_xor );
-	m_cursors[6]->shape( sshape8_hotX, sshape8_hotY, sshape8_and, sshape8_xor );
-	m_cursors[7]->shape( sshape16_hotX, sshape16_hotY, sshape16_and, sshape16_xor );
-	m_cursors[8]->shape( sshape32_hotX, sshape32_hotY, sshape32_and, sshape32_xor );
-	m_cursors[9]->shape( sshape32_hotX, sshape32_hotY, sshape32_and, sshape32_xor );
-	m_cursors[10]->shape( cross_select_hotX, cross_select_hotY, cross_select_and, cross_select_xor );
-	m_cursors[11]->shape( cross_load_hotX, cross_load_hotY, cross_load_and, cross_load_xor );
-	m_cursors[12]->shape( cross_bc_hotX, cross_bc_hotY, cross_bc_and, cross_bc_xor );
-	m_cursors[13]->shape( cross_line_hotX, cross_line_hotY, cross_line_and, cross_line_xor );
-	m_cursors[14]->shape( cross_rect_hotX, cross_rect_hotY, cross_rect_and, cross_rect_xor );
-	m_cursors[15]->shape( cross_circle_hotX, cross_circle_hotY, cross_circle_and, cross_circle_xor );
-	m_cursors[16]->shape( cross_bucket_hotX, cross_bucket_hotY, cross_bucket_and, cross_bucket_xor );
-	m_cursors[17]->shape( erase_hotX, erase_hotX, erase_and, erase_xor );
-	
-}
-
-void CPaintView::deleteCursors()
-{
-	int i;
-	
-	for (i=0; i<20; i++)
-		delete m_cursors[i];
-}
-
-//
+/////////////////////////////////////////////////////////////
 // Get/set methods
-//
+/////////////////////////////////////////////////////////////
 
 void CPaintView::setRelativeForceSize(double size)
 {
@@ -2867,16 +2768,6 @@ bool CPaintView::getCalcCG()
 	return m_calcCG;
 }
 
-void CPaintView::disableDrawing()
-{
-	m_lockDrawing = true;
-}
-
-void CPaintView::enableDrawing()
-{
-	m_lockDrawing = false;
-}
-
 void CPaintView::showAbout()
 {
 #ifdef WIN32
@@ -3002,8 +2893,6 @@ void CPaintView::setColorMap(int index)
 		filenameIndex = oss.str();
 		filename = applicationDir + "/colormaps/colormap" + filenameIndex + ".map";
 		
-		cout << "colormap = " << filename << endl;
-
 		m_femGrid->getColorMap()->open(filename.c_str());
 		this->redraw();
 	}
@@ -3111,16 +3000,6 @@ double CPaintView::getWeight()
 	return m_weight;
 }
 
-void CPaintView::lockScaleFactor()
-{
-	m_femGrid->setLockScale(true);
-}
-
-void CPaintView::unlockScaleFactor()
-{
-	m_femGrid->setLockScale(false);
-}
-
 void CPaintView::setSnapToGrid(bool flag)
 {
 	m_snapToGrid = flag;
@@ -3153,13 +3032,4 @@ void CPaintView::setLogMessageEvent(CGSLogMessageEvent* eventMethod)
 {
 	m_logMessageEvent = eventMethod;
 }
-
-void CPaintView::checkOpenGLVersion()
-{
-	m_checkOpenGL = false;
-	so_print("checkOpenGLVersion", (const char *)glGetString(GL_VENDOR));
-	so_print("checkOpenGLVersion", (const char *)glGetString(GL_RENDERER));
-	so_print("checkOpenGLVersion", (const char *)glGetString(GL_VERSION));
-}
-
 

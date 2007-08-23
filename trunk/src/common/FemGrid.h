@@ -39,6 +39,9 @@ typedef deque<CForcePtr>::iterator CForceQueIter;
 typedef deque<CConstraintPtr> CConstraintQue;
 typedef deque<CConstraintPtr>::iterator CConstraintQueIter;
 
+typedef vector<vector<int>> CElementList;
+typedef vector<vector<int>>::iterator CElementListIter;
+
 #define ED_LEFT_RIGHT 0
 #define ED_BOTTOM_TOP 1
 
@@ -173,6 +176,7 @@ public:
 	void saveToStream(ostream &out);
 	void setDrawStressOnce(bool flag);
 	void resetStressDrawing();
+	void getElements(int x1, int y1, int x2, int y2, CElementList& list);
 
 	IvfClassInfo("CFemGrid",CImageGrid);
 

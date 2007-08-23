@@ -49,13 +49,6 @@
 #include "ForcePadClipboard.h"
 #include "ScreenImage.h"
 
-#include "BrushProps.h"
-#include "DrawingProps.h"
-#include "DrawingTools.h"
-#include "StiffnessProps.h"
-#include "BcTypes.h"
-#include "CalcProps.h"
-#include "ImportProps.h"
 #include "FemGridSolver.h"
 
 #include "CGIndicator.h"
@@ -231,19 +224,6 @@ private:
 	CReactionForce* m_reactionForces[3];
 #endif
 
-	/*
-	 *    Dialogs
-	 */
-
-	bool m_dialogsVisible;
-	CBrushProps* m_brushPropsDlg;
-	CDrawingProps* m_drawingPropsDlg;
-	CDrawingTools* m_drawingToolsDlg;
-	CStiffnessProps* m_stiffnessPropsDlg;
-	CBcTypes* m_bcTypesDlg;
-	CCalcProps* m_calcPropsDlg;
-	CImportProps* m_importPropsDlg;
-
 	void* m_mainFrame;
 
 	/*
@@ -268,12 +248,6 @@ private:
 	CGSStatusMessageEvent* m_statusMessageEvent;
 	CGSLogMessageEvent* m_logMessageEvent;
 
-	/** Loads brushes from /brushes */
-	void loadBrushes();
-
-	/** Clean up brush lists */
-	void deleteBrushes();
-
 	/*
 	 *    Private event handlers
 	 */
@@ -293,36 +267,35 @@ private:
 	/** Handles OpenGL drawing */
 	void onDraw();
 
+	/** Clear frame buffer **/
 	void onClear();
+
+	/** Handles initialisation of OpenGL context **/
 	void onInitContext();
 
+	/** Check for OpenGL version **/
 	void checkOpenGLVersion();
 
-public:
-	void undoToDrawing();
+	void deleteCursors();
+	void createCursors();
+	void updateCursor();
+	void resetUndoArea();
+	void updateUndoArea(int x, int y, int brushSize);
+	void updateUndo();
 
-	void showBcTypes(int x, int y);
-	void showStiffnessProps(int x, int y);
-	void showDrawingTools(int x, int y);
-	void showDrawingProps(int x, int y);
-	void showCalcProps(int x, int y);
-	void showBrushProps(int x, int y);
-	void showImportProps(int x, int y);
-	void hideDialogs();
+	/** Loads brushes from /brushes */
+	void loadBrushes();
 
-	double getStiffness();
-	void setStiffness(double stiffness);
-	int getLineWidth();
-	int getCurrentBrushIdx();
-	int getBlendFactor();
+	/** Clean up brush lists */
+	void deleteBrushes();
+
+	void clearMesh();
 	void clearResults();
-	void openModel();
-	const char* getModelName();
-	void setModelName(const char* name);
-	/*
-	 *   Constructors 
-	 */
+	void updateSelectionBox();
+	void enableDrawing();
+	void disableDrawing();
 
+public:
 	/** 
 	 * PaintView class constructor.
 	 *
@@ -348,35 +321,24 @@ public:
 	 *    Methods
 	 */
 
-	void clearMesh();
-	void clearImage();
 	void executeCorba();
 	bool execute();
 
-	void setViewMode(TViewMode mode);
+	void undoToDrawing();
 
 	void newModel();
 	void saveModel();
 	void openImage();
-
-	void deleteCursors();
-	void createCursors();
-	void updateCursor();
+	void openModel();
 
 	void showAbout();
-	void enableDrawing();
-	void disableDrawing();
 	void updateModel();
 	void calcRigidReactions();
 	void pasteFromWindows();
 	void copyToWindows();
-	void updateUndo();
-	void resetUndoArea();
-	void updateUndoArea(int x, int y, int brushSize);
 	void undo();
 	void cut();
 	void copy();
-	void updateSelectionBox();
 	void lockScaleFactor();
 	void unlockScaleFactor();
 
@@ -384,14 +346,50 @@ public:
 	 *    Properties
 	 */
 
-	void setGridStride(int stride);
-	int getGridStride();
+	// Application modes
+
+	void setViewMode(TViewMode mode);
+	void setEditMode(TEditMode mode);
+	TEditMode getEditMode();
+	void setImportMode(TImportMode mode);
+	TImportMode getImportMode();
+
+	// Child/Parent relationship
+
+	void setMainFrame(void* frame);
+	void setCommandLine(int argc, char** argv);
+
+	// Model related settings
+
+	void setModelName(const char* name);
+	const char* getModelName();
+
+	// Drawing settings
+
+	int getCurrentBrushIdx();
+	int getBlendFactor();
+	void setStiffness(double stiffness);
+	double getStiffness();
 	void setCurrentBrush(int idx);
 	void setBlendFactor(int factor);
 	void getForegroundColor(float &red, float &green, float &blue);
 	void setBackgroundColor(float red, float green, float blue);
 	void setForegroundColor(float red, float green, float blue);
 	void setBrushMagnification(int factor);
+	void setConstraintType(CConstraint::TConstraintType constraintType);
+	void setRelativeForceSize(double size);
+	void setCalcCG(bool flag);
+	bool getCalcCG();
+	void setSnapToGrid(bool flag);
+	bool getSnapToGrid();
+	void setGridStride(int stride);
+	int getGridStride();
+
+	// Visualisation settings
+
+	void setStressMode(CFemGrid::TStressMode mode);
+	void setStressStep(int step);
+	int getStressStep();
 	void setMaxIntensity(float intensity);
 	void setLockScaling(bool flag);
 	void setStressTreshold(double lower, double upper);
@@ -400,20 +398,7 @@ public:
 	void setStressAlpha(double alpha);
 	void setDisplacementScale(double value);
 	void setLineWidth(int width);
-	void setEditMode(TEditMode mode);
-	TEditMode getEditMode();
-	void setCommandLine(int argc, char** argv);
-	void setConstraintType(CConstraint::TConstraintType constraintType);
-	void setImportMode(TImportMode mode);
-	TImportMode getImportMode();
-	void setUseWeight(bool flag);
-	void setStressStep(int step);
-	int getStressStep();
-	void setMainFrame(void* frame);
-	void setRelativeForceSize(double size);
-	void setStressMode(CFemGrid::TStressMode mode);
-	void setCalcCG(bool flag);
-	bool getCalcCG();
+	int getLineWidth();
 
 	void setDrawStress(bool flag);
 	bool getDrawStress();
@@ -428,6 +413,8 @@ public:
 	void setUpperMisesTreshold(double upper);
 
 	// Calculation settings
+
+	void setUseWeight(bool flag);
 
 	void setElementTreshold(double value);
 	double getElementTreshold();
@@ -455,9 +442,6 @@ public:
 
 	void setWeight(double value);
 	double getWeight();
-
-	void setSnapToGrid(bool flag);
-	bool getSnapToGrid();
 
 	// Events
 
