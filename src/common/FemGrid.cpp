@@ -24,6 +24,8 @@
 
 #include "FemGrid.h"
 
+#include "Vec3d.h"
+
 CFemGrid::CFemGrid()
 {
 	m_showGrid = false;
@@ -281,25 +283,43 @@ void CFemGrid::clearDofs()
 int CFemGrid::enumerateDofs(int direction)
 {
 	//
-	//    o----------------o----------------o
-	//    |              / |              / |
-	//    |            /   |            /   |
-	//    |          /     |          /     |
-	//    |        /       |        /       |
-	//    |      /         |      /         |
-	//    |    /           |    /           |
-	//    |  /             |  /             |
-	//    |/               |/               |
-	//    o----------------*----------------o
-	//    |              / |              / |
-	//    |            /   |            /   |
-	//    |          /     |          /     |
-	//    |        /       |        /       |
-	//    |      /         |      /         |
-	//    |    /           |    /           |
-	//    |  /             |  /             |
-	//    |/               |/               |
-	//    o----------------o----------------o
+	//    o----------------o---------------o o---------------o----------------o
+	//    |              / |              / |              / |              / |
+	//    |            /   |            /   |            /   |            /   |
+	//    |          /     |          /     |          /     |          /     |
+	//    |        /       |        /       |        /       |        /       |
+	//    |      /         |      /         |      /         |      /         |
+	//    |    /           |    /           |    /           |    /           |
+	//    |  /             |  /             |  /             |  /             |
+	//    |/               |/               |/               |/               |
+	//    o----------------o---------------o o---------------o----------------o
+	//    |              / |              / |              / |              / |
+	//    |            /   |            /   |            /   |            /   |
+	//    |          /     |          /     |          /     |          /     |
+	//    |        /       |        /       |        /       |        /       |
+	//    |      /         |      /         |      /         |      /         |
+	//    |    /           |    /           |    /           |    /           |
+	//    |  /             |  /             |  /             |  /             |
+	//    |/               |/               |/               |/               |
+	//    o----------------o---------------o o---------------o----------------o
+	//    |              / |              / |              / |              / |
+	//    |            /   |            /   |            /   |            /   |
+	//    |          /     |          /     |          /     |          /     |
+	//    |        /       |        /       |        /       |        /       |
+	//    |      /         |      /         |      /         |      /         |
+	//    |    /           |    /           |    /           |    /           |
+	//    |  /             |  /             |  /             |  /             |
+	//    |/               |/               |/               |/               |
+	//    o----------------o---------------o o---------------o----------------o
+	//    |              / |              / |              / |              / |
+	//    |            /   |            /   |            /   |            /   |
+	//    |          /     |          /     |          /     |          /     |
+	//    |        /       |        /       |        /       |        /       |
+	//    |      /         |      /         |      /         |      /         |
+	//    |    /           |    /           |    /           |    /           |
+	//    |  /             |  /             |  /             |  /             |
+	//    |/               |/               |/               |/               |
+	//    o----------------o---------------o o---------------o----------------o
 	//
 	//    * = 0 : Fully coupled 
 	//        1 : Uncoupled in x-direction
@@ -1535,7 +1555,6 @@ void CFemGrid::drawGridPoints()
 	float alpha = 0.7;
 	double ex[3];
 	double ey[3];
-	float value;
 
 
 	for (i=0; i<m_rows; i++)
@@ -2083,7 +2102,6 @@ CForce* CFemGrid::getNearestForce(int x, int y)
 
 	for (i=0; i<selection->getSize(); i++)
 	{
-		cout << i << endl;
 		CForcePtr force = selection->getForce(i);
 		force->getPosition(xf, yf);
 		dist = sqrt(pow(xf - (double)x, 2) + pow(yf - (double)y, 2));
@@ -2170,12 +2188,10 @@ void CFemGrid::removePointForce(CForce *force)
 				prevfi = fi-1;
 			else
 			{
-				cout << "Force " << aForce << " erased..." << endl;
 				prevfi = m_pointForces[fys].begin();
 				m_pointForces[fys].erase(fi);
 				return;
 			}
-			cout << "Force " << aForce << " erased..." << endl;
 			m_pointForces[fys].erase(fi);
 			fi = prevfi;
 		}
@@ -2231,12 +2247,13 @@ void CFemGrid::removePointConstraint(CConstraint *constraint)
 			if (fi!=m_pointConstraints[fys].begin())
 				prevfi = fi-1;
 			else
+			{
 				prevfi = m_pointConstraints[fys].begin();
-
+				m_pointConstraints[fys].erase(fi);
+				return;
+			}
 			m_pointConstraints[fys].erase(fi);
 			fi = prevfi;
-
-			aConstraint->delReference();
 		}
 	}
 }
@@ -2354,6 +2371,44 @@ int CFemGrid::getConstraintsSize()
 	}
 
 	return constraintCount;
+}
+
+void CFemGrid::getElements(int x1, int y1, int x2, int y2, CElementList& list)
+{
+	double ex = (double)(x2 - x1);
+	double ey = (double)(y2 - y1);
+
+	CVec3d v;
+	v.setComponents(ex, ey, 0.0);
+	double l = v.length();
+	v.normalize();
+
+	double t;
+	double dt = 0.5;
+	double x, y, z;
+	int r, c, oldR, oldC;
+	CVec3d p;
+
+	p.setComponents((double)x1, (double)y1, 0.0);
+	p.getComponents(x, y, z);
+	t = 0.0;
+	oldR = (int)(x / m_stride);
+	oldC = (int)(y / m_stride);
+
+	vector<int> elementPos;
+	elementPos.push_back(oldR);
+	elementPos.push_back(oldC);
+	list.push_back(elementPos);
+
+	while (t<l)
+	{
+		r = (int)(x / m_stride);
+		c = (int)(y / m_stride);
+		if ((r!=oldR)||(c!=oldC))
+		{
+			
+		}
+	}
 }
 
 void CFemGrid::setShowReactionForces(bool flag)

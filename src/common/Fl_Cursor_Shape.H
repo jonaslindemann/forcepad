@@ -45,7 +45,7 @@
 class Fl_Cursor_Shape;
 
 
-extern void fl_cursor(Fl_Cursor_Shape *c);
+extern void fl_cursor_ex(Fl_Cursor_Shape *c);
 
 
 class Fl_Cursor_Shape {

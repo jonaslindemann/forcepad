@@ -549,14 +549,12 @@ void CImage::copyFrom(CImage* image, int startx, int starty, const float* color)
 				if ((i<m_size[0])&&(j<m_size[1]))
 				{
 					image->getPixel(i, j, red, green, blue);
-					//cout << "raw: " << (int)red << ", " << (int)green << ", " << (int)blue << endl;
 					if ((red!=255)&&(green!=255)&&(blue!=255))
 					{
 						red = (GLubyte)(color[0]*255);
 						green = (GLubyte)(color[1]*255);
 						blue = (GLubyte)(color[2]*255);
 						setPixel(startx + i, starty + j, red, green, blue);
-						//cout << "processed: " << (int)red << ", " << (int)green << ", " << (int)blue << endl;
 					}
 				}
 			}

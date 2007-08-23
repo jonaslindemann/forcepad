@@ -271,6 +271,7 @@ void CConstraint::assignFrom(CConstraint *constraint)
 	this->setColor(constraint->getColor());
 	m_direction[0] = ex;
 	m_direction[1] = ey;
+	m_reactionForce->setDirection(ex, ey);
 }
 
 // ------------------------------------------------------------

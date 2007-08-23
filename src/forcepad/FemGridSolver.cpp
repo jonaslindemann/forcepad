@@ -277,8 +277,6 @@ void CFemGridSolver::execute()
 							Topo_out(nElements+1,l+1) = topo[l];
 					}
 
-					//cout << DofTopo ;
-
 					// 
 					// Create element matrix
 					//
@@ -837,8 +835,6 @@ void CFemGridSolver::execute()
 						values[2] = alfa;
 						values[3] = misesStress;
 						
-						cout << "sigm = " << misesStress;
-										
 						m_femGrid->setResult(i, j, k, values);
 					}
 				}
@@ -938,11 +934,7 @@ void CFemGridSolver::execute()
 				maxReactionForce = fabs(es);
 
 			constraint->getReactionForce()->setValue(es);
-
-			cout << "es = " << es << endl;
 		}
-
-		cout << "Max reaction force = " << maxReactionForce << endl;
 
 		for (vci=vectorConstraints.begin(); vci!=vectorConstraints.end(); vci++)
 		{
@@ -950,8 +942,6 @@ void CFemGridSolver::execute()
 
 			double force = 100.0 * constraint->getReactionForce()->getValue()/maxReactionForce;
 			constraint->getReactionForce()->setLength(-force);
-			
-			cout << "Reaction force = " << force << endl;
 		}
 	}
 

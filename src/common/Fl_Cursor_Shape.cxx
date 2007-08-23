@@ -61,7 +61,7 @@
 //|
 //| activate this cursor shape for the given application
 //|
-void fl_cursor(Fl_Cursor_Shape *c) {
+void fl_cursor_ex(Fl_Cursor_Shape *c) {
   Fl_Window *win = Fl::first_window();
   if ( !win ) 
 	  return;
