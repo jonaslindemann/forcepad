@@ -2,6 +2,9 @@
 
 static char g_buff[512];
 
+#include <cstdarg>
+#include <cstdio>
+
 const char* so_format(char* format, ...)
 {
 	va_list args; 
