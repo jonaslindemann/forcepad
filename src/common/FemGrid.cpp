@@ -607,6 +607,18 @@ void CFemGrid::getNearestDofs(int x, int y, int *dofs)
 	this->getGridSize(rows, cols);
 	//rows++; cols++;
 
+	if (x<0)
+		x = 0;
+
+	if (y<0)
+		y = 0;
+
+	if (x>=this->getImage()->getWidth())
+		x = this->getImage()->getWidth()-1;
+
+	if (y>=this->getImage()->getHeight())
+		y = this->getImage()->getHeight()-1;
+
 	int stride = this->getStride();
 	int xg = (int) ( 0.49 + ((double)x)/(double)stride );
 	int yg = (int) ( 0.49 + ((double)y)/(double)stride );
@@ -2211,6 +2223,7 @@ void CFemGrid::moveForce(CForce* force, int x, int y)
 	fxs = (int)fx;
 	fys = (int)fy;
 
+
 	for (fi=m_pointForces[fys].begin(); (!m_pointForces[fys].empty())&&(fi!=m_pointForces[fys].end()); fi++)
 	{
 		CForce* aForce = (*fi);
@@ -2220,9 +2233,18 @@ void CFemGrid::moveForce(CForce* force, int x, int y)
 
 	m_pointForces[fys].erase(eraseForce);
 
-	force->setPosition((double)x, (double)y);
 
-	m_pointForces[(int)y].push_back(force);
+	if ((int)y>=m_pointForces.size())
+	{
+		force->setPosition((double)x, (double)m_pointForces.size()-1);
+		m_pointForces[m_pointForces.size()-1].push_back(force);
+	}
+	else
+	{
+		force->setPosition((double)x, (double)y);
+		m_pointForces[(int)y].push_back(force);
+	}
+
 }
 
 void CFemGrid::removePointConstraint(CConstraint *constraint)
