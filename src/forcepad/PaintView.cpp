@@ -28,7 +28,7 @@
 #include "FemGridSolver.h"
 #include "FemGridSolverCORBA.h"
 #include "MainFrame2.h"
-#include "StatusOutput.h"
+#include "LogWindow.h"
 #include "JpegImage.h"
 #include "PngImage.h"
 

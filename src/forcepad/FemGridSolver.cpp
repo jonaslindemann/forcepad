@@ -27,7 +27,7 @@
 
 #include "matlabgen.h"
 
-#include "StatusOutput.h"
+#include "LogWindow.h"
 
 #ifndef NO_FLTK_DIALOGS
 #include "StatusDlg.h"
@@ -783,10 +783,10 @@ void CFemGridSolver::execute()
 
 						double misesStress = sqrt(	pow(sig1,2) - sig1*sig2 + pow(sig2,2) );
 
-						if (misesStress>m_maxMisesStressValue)
-							m_maxMisesStressValue = misesStress;
+						//if (misesStress>m_maxMisesStressValue)
+						//	m_maxMisesStressValue = misesStress;
 								
-						m_femGrid->setResult(i, j, k, 3, misesStress);
+						//m_femGrid->setResult(i, j, k, 3, misesStress);
 
 					}
 					else
@@ -857,6 +857,11 @@ void CFemGridSolver::execute()
 					double sig2 = (sigx_avg+sigy_avg)/2.0-R; 
 					double alfa = atan2(tau_avg,ds)/2.0;
 					
+					double misesStress = sqrt(	pow(sig1,2) - sig1*sig2 + pow(sig2,2) );
+
+					if (misesStress>m_maxMisesStressValue)
+						m_maxMisesStressValue = misesStress;
+
 					if (fabs(sig1)>m_maxStressValue)
 						m_maxStressValue = fabs(sig1);
 					
@@ -882,13 +887,17 @@ void CFemGridSolver::execute()
 					values[0] = sig1;
 					values[1] = sig2;
 					values[2] = alfa;
-					
+
 					m_femGrid->setResult(i, j, 0, values);
 					m_femGrid->setResult(i, j, 1, values);
+					m_femGrid->setResult(i, j, 0, 3, misesStress);
+					m_femGrid->setResult(i, j, 1, 3, misesStress);
 				}
 			}
 		}
 	}
+
+	cout << "Max misses stress = " << m_maxMisesStressValue << endl;
 
 	///////////////////////////////////////////////////////////////////////////
 	// Calculate reaction forces from vector constraints
@@ -1231,10 +1240,10 @@ void CFemGridSolver::executeUpdate()
 
 						double misesStress = sqrt(	pow(sig1,2) - sig1*sig2 + pow(sig2,2) );
 
-						if (misesStress>m_maxMisesStressValue)
-							m_maxMisesStressValue = misesStress;
+						//if (misesStress>m_maxMisesStressValue)
+						//	m_maxMisesStressValue = misesStress;
 								
-						m_femGrid->setResult(i, j, k, 3, misesStress);
+						//m_femGrid->setResult(i, j, k, 3, misesStress);
 
 					}
 					else
@@ -1304,6 +1313,11 @@ void CFemGridSolver::executeUpdate()
 					double sig1 = (sigx_avg+sigy_avg)/2.0+R; 
 					double sig2 = (sigx_avg+sigy_avg)/2.0-R; 
 					double alfa = atan2(tau_avg,ds)/2.0;
+
+					double misesStress = sqrt(	pow(sig1,2) - sig1*sig2 + pow(sig2,2) );
+
+					if (misesStress>m_maxMisesStressValue)
+						m_maxMisesStressValue = misesStress;
 					
 					if (fabs(sig1)>m_maxStressValue)
 						m_maxStressValue = fabs(sig1);
@@ -1333,6 +1347,8 @@ void CFemGridSolver::executeUpdate()
 					
 					m_femGrid->setResult(i, j, 0, values);
 					m_femGrid->setResult(i, j, 1, values);
+					m_femGrid->setResult(i, j, 0, 3, misesStress);
+					m_femGrid->setResult(i, j, 1, 3, misesStress);
 				}
 			}
 		}

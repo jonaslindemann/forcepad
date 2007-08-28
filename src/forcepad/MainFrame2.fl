@@ -15,7 +15,8 @@ decl {\#endif} {}
 
 decl {\#include "forcepad_config.h"} {} 
 
-decl {\#include "StatusOutput.h"} {} 
+decl {\#include "LogWindow.h"} {selected
+} 
 
 decl {\#include "CalcSettings.h"} {global
 } 
@@ -198,7 +199,7 @@ m_sketchEditMode = paintView->getEditMode();}
         Fl_Button btnFloodFill {
           callback {paintView->setEditMode(CPaintView::EM_FLOODFILL);
 showRightToolbar(scrRightFillToolbar);
-m_sketchEditMode = paintView->getEditMode();} selected
+m_sketchEditMode = paintView->getEditMode();}
           tooltip {Flood fill tool} image {../../images/floodfill.xpm} xywh {5 168 42 42} type Radio down_box DOWN_BOX selection_color 51
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton

@@ -34,7 +34,8 @@
 #endif
 
 #include "SplashFrame.h"
-#include "StatusOutput.h"
+//#include "StatusOutput.h"
+#include "LogWindow.h"
 
 int
 main(int argc, char **argv)
