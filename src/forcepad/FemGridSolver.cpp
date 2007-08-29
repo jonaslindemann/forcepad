@@ -29,10 +29,6 @@
 
 #include "LogWindow.h"
 
-#ifndef NO_FLTK_DIALOGS
-#include "StatusDlg.h"
-#endif
-
 //#include "StructuralElement.h"
 //#include "StructuralElementPair.h"
 

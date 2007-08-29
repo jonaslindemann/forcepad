@@ -1,8 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0105 
+version 1.0108 
 header_name {.h} 
 code_name {.cpp}
-decl {int x;} {} 
+decl {\#include <string>} {global
+} 
+
+decl {\#include "forcepad_config.h"} {global
+} 
 
 Function {cbHide(void* w)} {open
 } {
@@ -10,51 +14,79 @@ Function {cbHide(void* w)} {open
 window->hide();} {}
 } 
 
-decl {/** Splash window class. */} {public
-} 
-
 class CSplashFrame {open
 } {
   decl {bool m_timer} {}
-  decl {/** SplashFrame class constructor. */} {public
-  }
-  Function {CSplashFrame()} {} {
+  Function {CSplashFrame()} {open
+  } {
     Fl_Window wndSplash {open
-      xywh {444 111 402 302} type Double noborder visible
+      xywh {444 111 402 302} type Double modal noborder visible
     } {
-      Fl_Box boxImage {selected
-        image {C:/Work/dev/forcepad-2.2.1/images/splash.xpm} xywh {0 0 402 302}
+      Fl_Box boxImage {
+        image {../../images/splash2.png} xywh {0 0 402 302}
       }
       Fl_Button btnClose {
         label Close
         callback {wndSplash->hide();}
-        xywh {335 265 55 25} box THIN_UP_FRAME down_box THIN_DOWN_FRAME labelsize 12 labelcolor 7
+        xywh {335 265 55 25} box THIN_UP_FRAME down_box THIN_DOWN_FRAME labelsize 12
+      }
+      Fl_Output versionBox {selected
+        xywh {10 107 235 52} type Multiline box THIN_DOWN_FRAME labelsize 11 align 0 textsize 11
       }
     }
   }
-  decl {/** Show window and start timer. */} {public
-  }
   Function {show()} {open
   } {
-    code {if (m_timer)
+    code {using namespace std;
+
+string versionString = FORCEPAD_VERSION_STRING;
+versionString += "\\nCompiled: ";
+versionString += __TIME__;
+versionString += " ";
+versionString += __DATE__;
+
+versionBox->value(versionString.c_str());
+
+if (m_timer)
 	Fl::add_timeout(4.0,cbHide,(void*)wndSplash);
 
-wndSplash->position(Fl::w() / 2 - wndSplash->w() / 2, Fl::h() / 2 - wndSplash->h() / 2);
 wndSplash->show();} {}
   }
-  decl {/** Center window on screen. */} {public
-  }
-  Function {center()} {} {
+  Function {center()} {open
+  } {
     code {wndSplash->position(Fl::w()/2-wndSplash->w()/2,Fl::h()/2-wndSplash->h()/2);} {}
   }
-  decl {/** Enable/Disable timer for window closure. */} {public
-  }
-  Function {setTimer(bool flag)} {} {
+  Function {setTimer(bool flag)} {open
+  } {
     code {m_timer = flag;} {}
   }
-  decl {/** Hide window. */} {public
-  }
-  Function {hide()} {} {
+  Function {hide()} {open
+  } {
     code {wndSplash->hide();} {}
+  }
+  Function {~CSplashFrame()} {open return_type virtual
+  } {
+    code {wndSplash->hide();
+delete wndSplash;} {}
+  }
+  Function {showModal()} {open
+  } {
+    code {using namespace std;
+
+string versionString = FORCEPAD_VERSION_STRING;
+versionString += "\\nCompiled: ";
+versionString += __TIME__;
+versionString += " ";
+versionString += __DATE__;
+
+versionBox->value(versionString.c_str());
+
+m_timer = false;
+wndSplash->show();
+while (wndSplash->visible()) Fl::wait();} {}
+  }
+  Function {centerWindow(Fl_Window* window)} {open
+  } {
+    code {wndSplash->position(window->x()+window->w()/2-wndSplash->w()/2, window->y()+window->h()/2-wndSplash->h()/2);} {}
   }
 } 

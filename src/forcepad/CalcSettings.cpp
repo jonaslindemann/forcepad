@@ -152,3 +152,7 @@ void CCalcSettings::getData() {
 	view->setGridStride(gridStep->value());
 }
 }
+
+void CCalcSettings::centerWindow(Fl_Window* window) {
+  mainWindow->position(window->x()+window->w()/2-mainWindow->w()/2, window->y()+window->h()/2-mainWindow->h()/2);
+}

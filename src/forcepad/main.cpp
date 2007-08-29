@@ -53,11 +53,6 @@ main(int argc, char **argv)
 	#else
 	Fl::scheme("GTK+");
 	#endif
-	//
-	// Show driver information message
-	//
-
-	//fl_message("NOTICE: It is very important that the graphics driver is updated when using ForcePAD. \nUsing old drivers can lead to unpredictable behavior.");
 
 	//
 	// Create main window
@@ -77,7 +72,7 @@ main(int argc, char **argv)
 
 	CSplashFrame* splash = new CSplashFrame();
 	splash->setTimer(true);
-	splash->center();
+	splash->centerWindow(frame->getMainWindow());
 	splash->show();
 
 	//

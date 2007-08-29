@@ -8,17 +8,13 @@ decl {\#define MR_OK 0} {public
 decl {\#define MR_CANCEL 1} {public
 } 
 
-decl {/** New dialog class. */} {public
-} 
-
 class CNewModelDlg {open
 } {
   decl {int m_modalResult} {}
-  decl {/** NewModelDlg class constructor. */} {public
-  }
-  Function {CNewModelDlg()} {} {
+  Function {CNewModelDlg()} {open
+  } {
     Fl_Window wndNewModel {
-      label {New model} open selected
+      label {New model} open
       xywh {351 57 309 142} type Double modal visible
     } {
       Fl_Button btnOk {
@@ -38,50 +34,47 @@ wndNewModel->hide();}
       } {
         Fl_Value_Slider sldImageWidth {
           label {Image width (pixels)}
-          xywh {17 28 201 20} type {Horz Knob} labelsize 12 align 5 minimum 160 maximum 1280 step 20 value 640
+          xywh {17 28 201 20} type Horizontal labelsize 12 align 5 minimum 160 maximum 1280 step 20 value 640
         }
         Fl_Value_Slider sldImageHeight {
           label {Image height (pixels)}
-          xywh {17 68 201 20} type {Horz Knob} labelsize 12 align 5 minimum 160 maximum 1280 step 20 value 480
+          xywh {17 68 201 20} type Horizontal labelsize 12 align 5 minimum 160 maximum 1280 step 20 value 480
         }
         Fl_Value_Slider sldInitialStiffness {
           label {Initial stiffness (0 = no stiffness)}
-          xywh {17 107 201 20} type {Horz Knob} labelsize 12 align 5 maximum 255 step 1
+          xywh {17 107 201 20} type Horizontal labelsize 12 align 5 maximum 255 step 1
         }
       }
     }
   }
-  decl {/** NewModelDlg class destructor. */} {public
-  }
   Function {~CNewModelDlg()} {} {
-    code {delete wndNewModel;} {}
+    code {wndNewModel->hide();
+delete wndNewModel;} {}
   }
-  decl {/** Shows dialog and waits for user to respond. */} {public
-  }
-  Function {show()} {} {
+  Function {show()} {open
+  } {
     code {wndNewModel->show();
 while (wndNewModel->visible()) Fl::wait();} {}
-  }
-  decl {/** Return result of user response. (MR_OK or MR_CANCEL) */} {public
   }
   Function {getModalResult()} {return_type int
   } {
     code {return m_modalResult;} {}
   }
-  decl {/** Set default grid size. */} {public
-  }
   Function {setSize(int width, int height)} {} {
     code {sldImageWidth->value(width);
 sldImageHeight->value(height);} {}
-  }
-  decl {/** Get chosen size of node grid. */} {public
   }
   Function {getSize(int &width, int &height)} {} {
     code {width = sldImageWidth->value();
 height = sldImageHeight->value();} {}
   }
-  Function {getInitialStiffness()} {open return_type int
+  Function {getInitialStiffness()} {return_type int
   } {
     code {return sldInitialStiffness->value();} {}
+  }
+  Function {centerWindow(Fl_Window* window)} {open
+  } {
+    code {wndNewModel->position(window->x()+window->w()/2-wndNewModel->w()/2, window->y()+window->h()/2-wndNewModel->h()/2);} {selected
+    }
   }
 } 

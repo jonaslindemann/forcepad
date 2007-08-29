@@ -34,7 +34,7 @@ CNewModelDlg::CNewModelDlg() {
     { grpNewModel = new Fl_Group(5, 6, 223, 129);
       grpNewModel->box(FL_DOWN_FRAME);
       { sldImageWidth = new Fl_Value_Slider(17, 28, 201, 20, "Image width (pixels)");
-        sldImageWidth->type(5);
+        sldImageWidth->type(1);
         sldImageWidth->labelsize(12);
         sldImageWidth->minimum(160);
         sldImageWidth->maximum(1280);
@@ -43,7 +43,7 @@ CNewModelDlg::CNewModelDlg() {
         sldImageWidth->align(FL_ALIGN_TOP_LEFT);
       } // Fl_Value_Slider* sldImageWidth
       { sldImageHeight = new Fl_Value_Slider(17, 68, 201, 20, "Image height (pixels)");
-        sldImageHeight->type(5);
+        sldImageHeight->type(1);
         sldImageHeight->labelsize(12);
         sldImageHeight->minimum(160);
         sldImageHeight->maximum(1280);
@@ -52,7 +52,7 @@ CNewModelDlg::CNewModelDlg() {
         sldImageHeight->align(FL_ALIGN_TOP_LEFT);
       } // Fl_Value_Slider* sldImageHeight
       { sldInitialStiffness = new Fl_Value_Slider(17, 107, 201, 20, "Initial stiffness (0 = no stiffness)");
-        sldInitialStiffness->type(5);
+        sldInitialStiffness->type(1);
         sldInitialStiffness->labelsize(12);
         sldInitialStiffness->maximum(255);
         sldInitialStiffness->step(1);
@@ -66,7 +66,8 @@ CNewModelDlg::CNewModelDlg() {
 }
 
 CNewModelDlg::~CNewModelDlg() {
-  delete wndNewModel;
+  wndNewModel->hide();
+delete wndNewModel;
 }
 
 void CNewModelDlg::show() {
@@ -84,10 +85,14 @@ sldImageHeight->value(height);
 }
 
 void CNewModelDlg::getSize(int &width, int &height) {
-  width = (int)sldImageWidth->value();
-height = (int)sldImageHeight->value();
+  width = sldImageWidth->value();
+height = sldImageHeight->value();
 }
 
 int CNewModelDlg::getInitialStiffness() {
-  return (int)sldInitialStiffness->value();
+  return sldInitialStiffness->value();
+}
+
+void CNewModelDlg::centerWindow(Fl_Window* window) {
+  wndNewModel->position(window->x()+window->w()/2-wndNewModel->w()/2, window->y()+window->h()/2-wndNewModel->h()/2);
 }

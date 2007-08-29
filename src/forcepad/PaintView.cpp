@@ -57,6 +57,7 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <algorithm>
 
 #include <newmat.h>
 #include <newmatio.h>
@@ -88,6 +89,24 @@ typedef struct _FPRGBTRIPLE { //rgbt
 } FPRGBTRIPLE ;
 
 #endif
+
+void splitPath(const std::string& fullPathAndFilename, std::string& path, std::string& filename)
+{
+	using namespace std;
+	string fullPath(fullPathAndFilename);
+	replace(fullPath.begin(), fullPath.end(), '\\', '/');
+	string::size_type lastSlashPos = fullPath.find_last_of("/");
+	if (lastSlashPos==std::string::npos)
+	{
+		path = "";
+		filename = fullPath;
+	}
+	else
+	{
+		path=fullPath.substr(0,lastSlashPos);
+		filename=fullPath.substr(lastSlashPos+1,fullPath.size()-lastSlashPos-1);
+	}
+}
 
 class CPaintView;
 
@@ -243,7 +262,6 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 	
 	// Set initial model name
 	
-	m_modelName = NULL;
 	setModelName("noname.fp2");
 	
 	// Create dialogs
@@ -255,6 +273,7 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 	m_viewModeErrorEvent = NULL;
 	m_statusMessageEvent = NULL;
 	m_logMessageEvent = NULL;
+	m_modelChangedEvent = NULL;
 }
 
 
@@ -263,9 +282,6 @@ CPaintView::~CPaintView()
 	so_print("CPaintView","~CPaintView()");
 	
 	// Do the usual cleanup
-	
-	if (m_modelName!=NULL)
-		delete [] m_modelName;
 	
 	deleteBrushes();
 	
@@ -1712,6 +1728,7 @@ void CPaintView::newModel()
 	
 	CNewModelDlg* dlg = new CNewModelDlg();
 	dlg->setSize(640, 480);
+	dlg->centerWindow(this->window());
 	dlg->show();
 	
 	if (dlg->getModalResult()!=MR_CANCEL)
@@ -1922,15 +1939,15 @@ void CPaintView::openImage()
 	enableDrawing();
 }
 
-void CPaintView::saveModel()
+void CPaintView::saveModelAs()
 {
-	so_print("CPaintView", "saveModel()");
+	so_print("CPaintView", "saveModelAs()");
 	
 	//
 	// Ask for file name
 	//
-	
-	char* fname = fl_file_chooser("Save forcepad model", "*.fp2", m_modelName);
+
+	char* fname = fl_file_chooser("Save forcepad model", "*.fp2", m_modelName.c_str());
 	
 	if (fname!=NULL)
 	{
@@ -1938,9 +1955,6 @@ void CPaintView::saveModel()
 	}
 	else
 		return;
-		/*
-		}
-	*/
 	
 	//
 	// Save file
@@ -1949,9 +1963,45 @@ void CPaintView::saveModel()
 	using namespace std;
 	
 	fstream f;
-	f.open(m_modelName, ios::out);
+	f.open(m_modelName.c_str(), ios::out);
 	m_femGrid->saveToStream(f);
 	f.close();
+
+	cout << "Model saved as: " << m_modelName << endl;
+}
+
+void CPaintView::saveModel()
+{
+	so_print("CPaintView", "saveModel()");
+	
+	//
+	// Ask for file name
+	//
+
+	if (m_modelName=="noname.fp2")
+	{
+		char* fname = fl_file_chooser("Save forcepad model", "*.fp2", m_modelName.c_str());
+		
+		if (fname!=NULL)
+		{
+			setModelName(fname);
+		}
+		else
+			return;
+	}
+	
+	//
+	// Save file
+	//
+	
+	using namespace std;
+	
+	fstream f;
+	f.open(m_modelName.c_str(), ios::out);
+	m_femGrid->saveToStream(f);
+	f.close();
+
+	cout << "Model saved as: " << m_modelName << endl;
 }
 
 void CPaintView::openModel()
@@ -1980,7 +2030,7 @@ void CPaintView::openModel()
 		using namespace std;
 		
 		fstream f;
-		f.open(m_modelName, ios::in);
+		f.open(m_modelName.c_str(), ios::in);
 		m_femGrid->readFromStream(f);
 		f.close();
 		
@@ -2727,19 +2777,24 @@ void CPaintView::setConstraintType(CConstraint::TConstraintType constraintType)
 	m_constraintType = constraintType;
 }
 
-void CPaintView::setModelName(const char *name)
+void CPaintView::setModelName(const std::string& modelName)
 {
-	if (m_modelName!=NULL)
-		delete [] m_modelName;
-	
-	m_modelName = new char[strlen(name)+1];
-	strcpy(m_modelName, name);
+	m_modelName = modelName;
+
+	if (m_modelChangedEvent!=NULL)
+	{
+		string filePath;
+		string filename;
+
+		::splitPath(m_modelName, filePath, filename);
+		m_modelChangedEvent->onModelChanged(filename);
+	}
 }
 
-const char* CPaintView::getModelName()
-{
-	return m_modelName;
-}
+//const char* CPaintView::getModelName()
+//{
+//	return m_modelName;
+//}
 
 void CPaintView::setCalcCG(bool flag)
 {
@@ -3033,3 +3088,7 @@ void CPaintView::setLogMessageEvent(CGSLogMessageEvent* eventMethod)
 	m_logMessageEvent = eventMethod;
 }
 
+void CPaintView::setModelChangedEvent(CPVModelChangedEvent* eventMethod)
+{
+	m_modelChangedEvent = eventMethod;
+}
