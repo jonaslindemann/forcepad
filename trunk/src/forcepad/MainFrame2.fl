@@ -15,7 +15,9 @@ decl {\#endif} {}
 
 decl {\#include "forcepad_config.h"} {} 
 
-decl {\#include "LogWindow.h"} {selected
+decl {\#include "LogWindow.h"} {} 
+
+decl {\#include "SplashFrame.h"} {public global
 } 
 
 decl {\#include "CalcSettings.h"} {global
@@ -25,7 +27,7 @@ decl {\#include <iostream>} {}
 
 decl {\#include <string>} {} 
 
-class CMainFrame {open : {CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusMessageEvent, CGSLogMessageEvent, CPVViewModeErrorEvent}
+class CMainFrame {open : {CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusMessageEvent, CGSLogMessageEvent, CPVViewModeErrorEvent, CPVModelChangedEvent}
 } {
   decl {CPaintView::TEditMode m_saveEditMode;} {}
   decl {CPaintView::TEditMode m_sketchEditMode;} {}
@@ -54,7 +56,7 @@ class CMainFrame {open : {CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusM
             xywh {0 0 30 20} shortcut 0x4006f labelsize 12
           }
           MenuItem fileMenuSave {
-            label {&Save...}
+            label {&Save.}
             callback {paintView->saveModel();}
             xywh {0 0 30 20} shortcut 0x40073 labelsize 12
           }
@@ -125,6 +127,7 @@ editMenuCopy->deactivate();}
             label {&Calculation...}
             callback {CCalcSettings* calcSettings = new CCalcSettings();
 calcSettings->setView(paintView);
+calcSettings->centerWindow(wndMain);
 calcSettings->show();
 delete calcSettings;
 paintView->setViewMode(CPaintView::VM_SKETCH);}
@@ -141,6 +144,10 @@ paintView->setViewMode(CPaintView::VM_SKETCH);}
           }
           MenuItem helpMenuAbout {
             label {&About}
+            callback {CSplashFrame* splashFrame = new CSplashFrame();
+splashFrame->centerWindow(wndMain);
+splashFrame->showModal();
+delete splashFrame;}
             xywh {0 0 30 20} labelsize 12 divider
           }
           MenuItem helpMenuLog {
@@ -334,7 +341,7 @@ m_physicsEditMode = paintView->getEditMode();}
         Fl_Button btnRotateBc2 {
           callback {paintView->setEditMode(CPaintView::EM_ROTATE_CONSTRAINT_VECTOR);
 m_physicsEditMode = paintView->getEditMode();}
-          tooltip {Rotate constraint} image {../../images/action_rotate_bc.xpm} xywh {227 194 42 42} type Radio down_box DOWN_BOX selection_color 51
+          tooltip {Rotate constraint} image {../../images/action_rotate_bc.xpm} xywh {227 194 42 42} type Radio down_box DOWN_BOX selection_color 51 hide deactivate
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
         }
@@ -849,7 +856,7 @@ if (btnRemoveBcHinge->value()==1)
 	paintView->setEditMode(CPaintView::EM_ERASE_CONSTRAINTS_FORCES);
 
 m_physicsEditMode = paintView->getEditMode();}
-          tooltip Contraints image {../../images/bc_hinge.xpm} xywh {502 228 42 42} type Radio down_box DOWN_BOX selection_color 51
+          tooltip Contraints image {../../images/bc_hinge.xpm} xywh {502 228 42 42} type Radio down_box DOWN_BOX selection_color 51 hide deactivate
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
         }
@@ -885,13 +892,15 @@ paintView->setViewModeChangeEvent(this);
 paintView->setStatusMessageEvent(this);
 paintView->setLogMessageEvent(this);
 paintView->setViewModeErrorEvent(this);
+paintView->setModelChangedEvent(this);
 m_sketchEditMode = CPaintView::EM_BRUSH;
 m_physicsEditMode = CPaintView::EM_FORCE;} {}
   }
   Function {~CMainFrame()} {} {
     code {delete paintView;} {}
   }
-  Function {show()} {} {
+  Function {show()} {open
+  } {
     code {\#ifdef WIN32
 extern HINSTANCE fl_display;
 wndMain->icon((char *)LoadIcon(fl_display, MAKEINTRESOURCE(IDI_FORCEPAD)));
@@ -944,7 +953,10 @@ modeMenuAction->activate();
 hideRightToolbars();
 hideLeftToolbars();
 showLeftToolbar(scrLeftToolbar);
-showRightToolbar(scrRightDrawToolbar);} {}
+showRightToolbar(scrRightDrawToolbar);
+
+paintView->setModelName("noname.fp2");} {selected
+    }
   }
   Function {close()} {} {
     code {wndMain->hide();
@@ -1001,7 +1013,7 @@ if (self!=btnConstraint2)
 
 this->paintView->setCommandLine(argc, argv);} {}
   }
-  Function {onModeChange(CPaintView::TEditMode oldMode, CPaintView::TEditMode newMode)} {open return_type void
+  Function {onModeChange(CPaintView::TEditMode oldMode, CPaintView::TEditMode newMode)} {return_type void
   } {
     code {cout << "Edit mode = " << paintView->getEditMode() << endl;
 
@@ -1020,7 +1032,7 @@ else
 	btnCopy->deactivate();
 }} {}
   }
-  Function {onViewModeChange(CPaintView::TViewMode oldMode, CPaintView::TViewMode newMode)} {open return_type void
+  Function {onViewModeChange(CPaintView::TViewMode oldMode, CPaintView::TViewMode newMode)} {return_type void
   } {
     code {if (newMode == CPaintView::VM_SKETCH)
 {
@@ -1137,7 +1149,7 @@ scrLeftResultToolbar->deactivate();
 scrLeftPhysicsToolbar->hide();
 scrLeftPhysicsToolbar->deactivate();} {}
   }
-  Function {hideRightToolbars()} {open return_type void
+  Function {hideRightToolbars()} {return_type void
   } {
     code {scrRightForceToolbar->hide();
 scrRightForceToolbar->deactivate();
@@ -1160,7 +1172,7 @@ scrRightMisesStressToolbar->deactivate();
 scrRightBCHingeToolbar->hide();
 scrRightBCHingeToolbar->deactivate();} {}
   }
-  Function {showLeftToolbar(Fl_Widget* toolbar)} {open return_type void
+  Function {showLeftToolbar(Fl_Widget* toolbar)} {return_type void
   } {
     code {hideLeftToolbars();
 
@@ -1170,7 +1182,7 @@ toolbar->show();
 toolbar->activate();
 wndMain->insert(*toolbar,0);} {}
   }
-  Function {showRightToolbar(Fl_Widget* toolbar)} {open return_type void
+  Function {showRightToolbar(Fl_Widget* toolbar)} {return_type void
   } {
     code {hideRightToolbars();
 
@@ -1182,11 +1194,22 @@ toolbar->activate();
 toolbar->redraw();
 wndMain->insert(*toolbar,0);} {}
   }
-  Function {onViewModeError(CPaintView::TViewMode oldMode, CPaintView::TViewMode newMode)} {open
-  } {
+  Function {onViewModeError(CPaintView::TViewMode oldMode, CPaintView::TViewMode newMode)} {} {
     code {if (oldMode = CPaintView::VM_SKETCH)
 	btnSketch->setonly();
 if (oldMode = CPaintView::VM_PHYSICS)
 	btnPhysical->setonly();} {}
+  }
+  Function {centerWindow(Fl_Window* window)} {} {
+    code {window->position(wndMain->x()+wndMain->w()/2-wndMain->w()/2, wndMain->y()+wndMain->h()/2-window->h()/2);} {}
+  }
+  Function {getMainWindow()} {return_type {Fl_Window*}
+  } {
+    code {return wndMain;} {}
+  }
+  Function {onModelChanged(const std::string& newModelName)} {open
+  } {
+    code {string caption = newModelName + " - ForcePAD 2";
+wndMain->label(caption.c_str());} {}
   }
 } 

@@ -4,6 +4,7 @@
 #define MainFrame2_h
 #include <FL/Fl.H>
 /** Main window class generated from FLTK. */
+#include "SplashFrame.h"
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Menu_Bar.H>
 #include <FL/Fl_Scroll.H>
@@ -18,7 +19,7 @@
 #include <FL/Fl_Slider.H>
 #include <FL/Fl_Check_Button.H>
 
-class CMainFrame : CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusMessageEvent, CGSLogMessageEvent, CPVViewModeErrorEvent {
+class CMainFrame : CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusMessageEvent, CGSLogMessageEvent, CPVViewModeErrorEvent, CPVModelChangedEvent {
   CPaintView::TEditMode m_saveEditMode; 
   CPaintView::TEditMode m_sketchEditMode; 
   CPaintView::TEditMode m_physicsEditMode; 
@@ -95,6 +96,10 @@ public:
   static Fl_Menu_Item *helpMenu;
   static Fl_Menu_Item *helpMenuContents;
   static Fl_Menu_Item *helpMenuAbout;
+private:
+  void cb_helpMenuAbout_i(Fl_Menu_*, void*);
+  static void cb_helpMenuAbout(Fl_Menu_*, void*);
+public:
   static Fl_Menu_Item *helpMenuLog;
 private:
   void cb_helpMenuLog_i(Fl_Menu_*, void*);
@@ -467,5 +472,8 @@ public:
   void showLeftToolbar(Fl_Widget* toolbar);
   void showRightToolbar(Fl_Widget* toolbar);
   void onViewModeError(CPaintView::TViewMode oldMode, CPaintView::TViewMode newMode);
+  void centerWindow(Fl_Window* window);
+  Fl_Window* getMainWindow();
+  void onModelChanged(const std::string& newModelName);
 };
 #endif

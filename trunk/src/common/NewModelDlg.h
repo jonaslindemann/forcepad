@@ -5,7 +5,6 @@
 #include <FL/Fl.H>
 #define MR_OK 0
 #define MR_CANCEL 1
-/** New dialog class. */
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Group.H>
@@ -13,7 +12,6 @@
 
 class CNewModelDlg {
   int m_modalResult; 
-/** NewModelDlg class constructor. */
 public:
   CNewModelDlg();
   Fl_Double_Window *wndNewModel;
@@ -31,16 +29,12 @@ public:
   Fl_Value_Slider *sldImageWidth;
   Fl_Value_Slider *sldImageHeight;
   Fl_Value_Slider *sldInitialStiffness;
-/** NewModelDlg class destructor. */
   ~CNewModelDlg();
-/** Shows dialog and waits for user to respond. */
   void show();
-/** Return result of user response. (MR_OK or MR_CANCEL) */
   int getModalResult();
-/** Set default grid size. */
   void setSize(int width, int height);
-/** Get chosen size of node grid. */
   void getSize(int &width, int &height);
   int getInitialStiffness();
+  void centerWindow(Fl_Window* window);
 };
 #endif

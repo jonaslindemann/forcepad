@@ -63,6 +63,7 @@
 class CPVModeChangeEvent;
 class CPVViewModeChangeEvent;
 class CPVViewModeErrorEvent;
+class CPVModelChangedEvent;
 
 class CPaintView : public Fl_Gl_Window {
 public:
@@ -139,7 +140,7 @@ private:
 	bool m_snapToGrid;
 	int m_gridSpacing;
 
-	char* m_modelName;
+	std::string m_modelName;
 
 	bool m_useWeight;
 
@@ -244,6 +245,7 @@ private:
 	CPVModeChangeEvent* m_modeChangeEvent;
 	CPVViewModeChangeEvent* m_viewModeChangeEvent;
 	CPVViewModeErrorEvent* m_viewModeErrorEvent;
+	CPVModelChangedEvent* m_modelChangedEvent;
 
 	CGSStatusMessageEvent* m_statusMessageEvent;
 	CGSLogMessageEvent* m_logMessageEvent;
@@ -328,6 +330,7 @@ public:
 
 	void newModel();
 	void saveModel();
+	void saveModelAs();
 	void openImage();
 	void openModel();
 
@@ -361,8 +364,8 @@ public:
 
 	// Model related settings
 
-	void setModelName(const char* name);
-	const char* getModelName();
+	void setModelName(const std::string& modelName);
+	//const char* getModelName();
 
 	// Drawing settings
 
@@ -450,6 +453,7 @@ public:
 	void setViewModeErrorEvent(CPVViewModeErrorEvent* eventMethod);
 	void setStatusMessageEvent(CGSStatusMessageEvent* eventMethod);
 	void setLogMessageEvent(CGSLogMessageEvent* eventMethod);
+	void setModelChangedEvent(CPVModelChangedEvent* eventMethod);
 };
 
 class CPVModeChangeEvent {
@@ -468,6 +472,12 @@ class CPVViewModeErrorEvent {
 public:
 	virtual ~CPVViewModeErrorEvent() {};
 	virtual void onViewModeError(CPaintView::TViewMode oldMode, CPaintView::TViewMode newMode) = 0;
+};
+
+class CPVModelChangedEvent {
+public:
+	virtual ~CPVModelChangedEvent() {};
+	virtual void onModelChanged(const std::string& newModelName) = 0;
 };
 
 #endif 

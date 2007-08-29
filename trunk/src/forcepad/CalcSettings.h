@@ -42,5 +42,6 @@ public:
   void setView(void* view);
   void setData();
   void getData();
+  void centerWindow(Fl_Window* window);
 };
 #endif

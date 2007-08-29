@@ -95,12 +95,23 @@ void CMainFrame::cb_modeMenuAction(Fl_Menu_* o, void* v) {
 void CMainFrame::cb_settingsMenuCalculation_i(Fl_Menu_*, void*) {
   CCalcSettings* calcSettings = new CCalcSettings();
 calcSettings->setView(paintView);
+calcSettings->centerWindow(wndMain);
 calcSettings->show();
 delete calcSettings;
 paintView->setViewMode(CPaintView::VM_SKETCH);
 }
 void CMainFrame::cb_settingsMenuCalculation(Fl_Menu_* o, void* v) {
   ((CMainFrame*)(o->parent()->user_data()))->cb_settingsMenuCalculation_i(o,v);
+}
+
+void CMainFrame::cb_helpMenuAbout_i(Fl_Menu_*, void*) {
+  CSplashFrame* splashFrame = new CSplashFrame();
+splashFrame->centerWindow(wndMain);
+splashFrame->showModal();
+delete splashFrame;
+}
+void CMainFrame::cb_helpMenuAbout(Fl_Menu_* o, void* v) {
+  ((CMainFrame*)(o->parent()->user_data()))->cb_helpMenuAbout_i(o,v);
 }
 
 void CMainFrame::cb_helpMenuLog_i(Fl_Menu_*, void*) {
@@ -114,7 +125,7 @@ Fl_Menu_Item CMainFrame::menu_mainMenu[] = {
  {"&File", 0,  0, 0, 64, FL_NORMAL_LABEL, 0, 12, 0},
  {"&New", 0x4006e,  (Fl_Callback*)CMainFrame::cb_fileMenuNew, 0, 0, FL_NORMAL_LABEL, 0, 12, 0},
  {"&Open...", 0x4006f,  (Fl_Callback*)CMainFrame::cb_fileMenuOpen, 0, 0, FL_NORMAL_LABEL, 0, 12, 0},
- {"&Save...", 0x40073,  (Fl_Callback*)CMainFrame::cb_fileMenuSave, 0, 0, FL_NORMAL_LABEL, 0, 12, 0},
+ {"&Save.", 0x40073,  (Fl_Callback*)CMainFrame::cb_fileMenuSave, 0, 0, FL_NORMAL_LABEL, 0, 12, 0},
  {"S&ave as...", 0x50073,  0, 0, 128, FL_NORMAL_LABEL, 0, 12, 0},
  {"E&xit", 0,  (Fl_Callback*)CMainFrame::cb_fileMenuExit, 0, 0, FL_NORMAL_LABEL, 0, 12, 0},
  {0,0,0,0,0,0,0,0,0},
@@ -134,7 +145,7 @@ Fl_Menu_Item CMainFrame::menu_mainMenu[] = {
  {0,0,0,0,0,0,0,0,0},
  {"&Help", 0,  0, 0, 64, FL_NORMAL_LABEL, 0, 12, 0},
  {"&Contents", 0,  0, 0, 0, FL_NORMAL_LABEL, 0, 12, 0},
- {"&About", 0,  0, 0, 128, FL_NORMAL_LABEL, 0, 12, 0},
+ {"&About", 0,  (Fl_Callback*)CMainFrame::cb_helpMenuAbout, 0, 128, FL_NORMAL_LABEL, 0, 12, 0},
  {"Application &Log", 0,  (Fl_Callback*)CMainFrame::cb_helpMenuLog, 0, 0, FL_NORMAL_LABEL, 0, 12, 0},
  {0,0,0,0,0,0,0,0,0},
  {0,0,0,0,0,0,0,0,0}
@@ -14276,6 +14287,8 @@ CMainFrame::CMainFrame() {
         btnRotateBc2->callback((Fl_Callback*)cb_btnRotateBc2);
         btnRotateBc2->align(FL_ALIGN_CENTER);
         btnRotateBc2->when(FL_WHEN_RELEASE);
+        btnRotateBc2->hide();
+        btnRotateBc2->deactivate();
       } // Fl_HoverButton* btnRotateBc2
       scrRightBCToolbar->end();
     } // Fl_Scroll* scrRightBCToolbar
@@ -15294,6 +15307,8 @@ CMainFrame::CMainFrame() {
         btnConstraintHinge->callback((Fl_Callback*)cb_btnConstraintHinge);
         btnConstraintHinge->align(FL_ALIGN_CENTER);
         btnConstraintHinge->when(FL_WHEN_RELEASE);
+        btnConstraintHinge->hide();
+        btnConstraintHinge->deactivate();
       } // Fl_HoverButton* btnConstraintHinge
       scrLeftPhysicsToolbar->end();
     } // Fl_Scroll* scrLeftPhysicsToolbar
@@ -15357,6 +15372,7 @@ paintView->setViewModeChangeEvent(this);
 paintView->setStatusMessageEvent(this);
 paintView->setLogMessageEvent(this);
 paintView->setViewModeErrorEvent(this);
+paintView->setModelChangedEvent(this);
 m_sketchEditMode = CPaintView::EM_BRUSH;
 m_physicsEditMode = CPaintView::EM_FORCE;
 }
@@ -15419,6 +15435,8 @@ hideRightToolbars();
 hideLeftToolbars();
 showLeftToolbar(scrLeftToolbar);
 showRightToolbar(scrRightDrawToolbar);
+
+paintView->setModelName("noname.fp2");
 }
 
 void CMainFrame::close() {
@@ -15667,4 +15685,17 @@ void CMainFrame::onViewModeError(CPaintView::TViewMode oldMode, CPaintView::TVie
 	btnSketch->setonly();
 if (oldMode = CPaintView::VM_PHYSICS)
 	btnPhysical->setonly();
+}
+
+void CMainFrame::centerWindow(Fl_Window* window) {
+  window->position(wndMain->x()+wndMain->w()/2-wndMain->w()/2, wndMain->y()+wndMain->h()/2-window->h()/2);
+}
+
+Fl_Window* CMainFrame::getMainWindow() {
+  return wndMain;
+}
+
+void CMainFrame::onModelChanged(const std::string& newModelName) {
+  string caption = newModelName + " - ForcePAD 2";
+wndMain->label(caption.c_str());
 }
