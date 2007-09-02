@@ -55,7 +55,7 @@ CFemGridSolver::CFemGridSolver()
 	m_youngsModulus = 0.35;
 	m_thickness = 1.0;
 	m_ptype = 1;
-	m_constraintStiffnessScale = 1e3;
+	m_constraintStiffnessScale = 1e6;
 	m_reduceSystemMatrix = false;
 
 	// Events
@@ -114,7 +114,7 @@ void CFemGridSolver::execute()
 {
 	int i, j, k, l;
 	int rows, cols;
-	float elementValue;
+	double elementValue;
 	double ex[3];
 	double ey[3];
 	int topo[6];
@@ -129,6 +129,31 @@ void CFemGridSolver::execute()
 	//
 
 	m_errorStatus = CFemGridSolver::ET_NO_ERROR;
+
+	CConstraint* pointConstraint = m_femGrid->getFirstPointConstraint();
+
+	while (pointConstraint!=NULL) 
+	{
+		switch (pointConstraint->getConstraintType()) {
+		case CConstraint::CT_HINGE:
+			double x, y;
+			double x1, y1, x2, y2;
+			double oldValue;
+			double scaleFactor;
+			scaleFactor = 0.1;
+			pointConstraint->getPosition(x, y);
+			pointConstraint->getHingeStart(x1, y1);
+			pointConstraint->getHingeEnd(x2, y2);
+			oldValue = m_femGrid->getStiffness(x, y);
+			m_femGrid->setStiffnessLine(x1, y1, x2, y2, 0.0, (double)m_femGrid->getStride()*1.0);
+			m_femGrid->setStiffness(x, y, oldValue*scaleFactor, 0, false);
+			break;
+		default:
+			break;
+		}
+
+		pointConstraint = m_femGrid->getNextPointConstraint();
+	}
 
 	//
 	// Calculate optimum bandwidth
@@ -231,7 +256,6 @@ void CFemGridSolver::execute()
 			{
 				if (m_femGrid->getElement(i, j, k, elementValue, ex, ey, topo))
 				{
-					
 					//
 					// Get element coordinates
 					//
@@ -259,7 +283,8 @@ void CFemGridSolver::execute()
 					// Get element properties
 					//
 					
-					calfem::hooke(ptype, E*(double)elementValue*m_stiffnessScalefactor, v, D);
+					//calfem::hooke(ptype, E*(double)elementValue*m_stiffnessScalefactor, v, D);
+					calfem::hooke(ptype, E*(double)elementValue, v, D);
 
 					// 
 					// Get element topology
@@ -403,7 +428,7 @@ void CFemGridSolver::execute()
 	}
 
 	int nConstraints = m_femGrid->getPointConstraintsSize();
-	CConstraint* pointConstraint = m_femGrid->getFirstPointConstraint();
+	pointConstraint = m_femGrid->getFirstPointConstraint();
 
 	set<int> uniqueDofs;
 	set<int> uniqueVectorDofs;
@@ -453,11 +478,11 @@ void CFemGridSolver::execute()
 				vectorBcsDefined = true;
 				break;
 			default:
-				uniqueDofs.insert(dofs[0]);
-				uniqueDofs.insert(dofs[1]);
-				prescribedValues[dofs[0]] = 0.0;
-				prescribedValues[dofs[1]] = 0.0;
-				bcsDefined = true;
+				//uniqueDofs.insert(dofs[0]);
+				//uniqueDofs.insert(dofs[1]);
+				//prescribedValues[dofs[0]] = 0.0;
+				//prescribedValues[dofs[1]] = 0.0;
+				//bcsDefined = true;
 				break;
 			}
 		}
@@ -620,16 +645,16 @@ void CFemGridSolver::execute()
 		so_print("CFemGridSolver","Solving reduced system.");
 		progressMessage("Solving.", 60);
 
-		Try 
-		{
+//		Try 
+//		{
 			LinearEquationSolver X = Ksys;
 			m_a = X.i() * fsys;
-		}
-		CatchAll 
-		{
-			m_errorStatus = ET_INVALID_MODEL;
-			return;
-		}
+//		}
+//		CatchAll 
+//		{
+//			m_errorStatus = ET_INVALID_MODEL;
+//			return;
+//		}
 
 		so_print("CFemGridSolver","Done.");
 	}
@@ -734,7 +759,8 @@ void CFemGridSolver::execute()
 					// Get element properties
 					//
 					
-					calfem::hooke(ptype, E*(double)elementValue*m_stiffnessScalefactor, v, D);
+					//calfem::hooke(ptype, E*(double)elementValue*m_stiffnessScalefactor, v, D);
+					calfem::hooke(ptype, E*(double)elementValue, v, D);
 
 					// 
 					// Get element topology
@@ -972,7 +998,7 @@ void CFemGridSolver::executeUpdate()
 	double ex[3];
 	double ey[3];
 	int topo[6];
-	float elementValue;
+	double elementValue;
 
 	double E = m_elasticModulus;
 	double v = m_youngsModulus;
@@ -1293,7 +1319,19 @@ void CFemGridSolver::executeUpdate()
 				}
 			}
 
-			if ((m_femGrid->getElement(i, j, 0, elementValue, ex, ey, topo))
+			if (m_femGrid->isSpecialElement(i,j, 0)&&(m_femGrid->isSpecialElement(i,j,1)))
+			{
+				double values[4];
+				values[0] = 0.0;
+				values[1] = 0.0;
+				values[2] = 0.0;
+				
+				m_femGrid->setResult(i, j, 0, values);
+				m_femGrid->setResult(i, j, 1, values);
+				m_femGrid->setResult(i, j, 0, 3, 0.0);
+				m_femGrid->setResult(i, j, 1, 3, 0.0);
+			}
+			else if ((m_femGrid->getElement(i, j, 0, elementValue, ex, ey, topo))
 				&&(m_femGrid->getElement(i, j, 0, elementValue, ex, ey, topo)))
 			{
 				if (m_femGrid->getAverageStress())

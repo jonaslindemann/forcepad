@@ -33,11 +33,12 @@ IvfSmartPointer(CImageGrid);
 class CImageGrid : public CShape {
 private:
 	CImagePtr m_image;
-	float m_maxIntensity;
+	double m_maxIntensity;
 	bool m_useImage;
 	bool m_averageOverGridSquare;
 protected:
-	float*** m_grid;
+	double*** m_grid;
+	bool*** m_specialElement;
 	int m_width;
 	int m_height;
 	int m_rows;
@@ -73,9 +74,12 @@ public:
 
 	void setUseImage(bool flag);
 
-	void setMaxIntensity(float maxIntensity);
+	void setMaxIntensity(double maxIntensity);
 
 	void snapToGrid(int& x, int& y);
+
+	bool isSpecialElement(int row, int col, int element);
+	void setSpecialElement(int row, int col, int element, bool special);
 
 	virtual void doGeometry();
 };

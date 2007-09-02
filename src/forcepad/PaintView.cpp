@@ -260,10 +260,6 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 	
 	resetUndoArea();
 	
-	// Set initial model name
-	
-	setModelName("noname.fp2");
-	
 	// Create dialogs
 	
 	createCursors();
@@ -274,6 +270,10 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 	m_statusMessageEvent = NULL;
 	m_logMessageEvent = NULL;
 	m_modelChangedEvent = NULL;
+
+	// Set initial model name
+	
+	setModelName("noname.fp2");
 }
 
 
@@ -2787,7 +2787,8 @@ void CPaintView::setModelName(const std::string& modelName)
 		string filename;
 
 		::splitPath(m_modelName, filePath, filename);
-		m_modelChangedEvent->onModelChanged(filename);
+		if (m_modelChangedEvent!=NULL)
+			m_modelChangedEvent->onModelChanged(filename);
 	}
 }
 
@@ -2933,21 +2934,34 @@ void CPaintView::setStressType(CFemGrid::TStressType stressType)
 
 void CPaintView::setColorMap(int index)
 {
+	so_print("CPaintView", "setColorMap()");
 	if ((index>=1)&&(index<=17))
 	{
 		string filename = "";
 		string filenameIndex = "";
+#ifdef WIN32
+		char cfilename[512];
+		::GetModuleFileName(NULL, cfilename, sizeof(cfilename));
+		string applicationExeLocation = cfilename;
+#else
 		string applicationExeLocation = this->m_argv[0];
-
+#endif
 		int pos = applicationExeLocation.find_last_of("\\");
-
 		string applicationDir = applicationExeLocation.substr(0,pos);
 
 		ostringstream oss;
 		oss << index;
 		filenameIndex = oss.str();
-		filename = applicationDir + "/colormaps/colormap" + filenameIndex + ".map";
+		if (pos>=0)
+#ifdef WIN32
+			filename = applicationDir + "\\colormaps\\colormap" + filenameIndex + ".map";
+#else
+			filename = applicationDir + "/colormaps/colormap" + filenameIndex + ".map";
+#endif
+		else
+			filename = "colormaps/colormap" + filenameIndex + ".map";
 		
+		cout << "Loading colormap: " << filename << endl;
 		m_femGrid->getColorMap()->open(filename.c_str());
 		this->redraw();
 	}

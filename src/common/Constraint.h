@@ -91,6 +91,9 @@ public:
 	void getDirection(double &ex, double &ey);
 	void setDirection(double ex, double ey);
 
+	void getHingeStart(double &x, double &y);
+	void getHingeEnd(double &x, double &y);
+
 	double getVectorSize();
 	void setVectorSize(double size);
 

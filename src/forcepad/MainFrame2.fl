@@ -62,6 +62,7 @@ class CMainFrame {open : {CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusM
           }
           MenuItem fileMenuSaveAs {
             label {S&ave as...}
+            callback {paintView->saveModelAs();}
             xywh {0 0 30 20} shortcut 0x50073 labelsize 12 divider
           }
           MenuItem fileMenuExit {
@@ -321,7 +322,7 @@ else
           class Fl_HoverButton
         }
       }
-      Fl_Scroll scrRightBCToolbar {
+      Fl_Scroll scrRightBCToolbar {open
         xywh {222 98 53 304} box FLAT_BOX
       } {
         Fl_Button btnAddBc2 {
@@ -856,32 +857,25 @@ if (btnRemoveBcHinge->value()==1)
 	paintView->setEditMode(CPaintView::EM_ERASE_CONSTRAINTS_FORCES);
 
 m_physicsEditMode = paintView->getEditMode();}
-          tooltip Contraints image {../../images/bc_hinge.xpm} xywh {502 228 42 42} type Radio down_box DOWN_BOX selection_color 51 hide deactivate
+          tooltip Contraints image {../../images/bc_hinge.xpm} xywh {502 228 42 42} type Radio down_box DOWN_BOX selection_color 51
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
         }
       }
-      Fl_Scroll scrRightBCHingeToolbar {open
-        xywh {200 232 53 304} box FLAT_BOX
+      Fl_Scroll scrRightBCHingeToolbar {open selected
+        xywh {195 51 53 304} box FLAT_BOX
       } {
         Fl_Button btnAddBcHinge {
           callback {paintView->setEditMode(CPaintView::EM_CONSTRAINT_HINGE);
 m_physicsEditMode = paintView->getEditMode();}
-          tooltip {Add point constraint} image {../../images/actions_add_bchinge.xpm} xywh {205 238 42 42} type Radio down_box DOWN_BOX value 1 selection_color 51
+          tooltip {Add point constraint} image {../../images/actions_add_bchinge.xpm} xywh {200 57 42 42} type Radio down_box DOWN_BOX value 1 selection_color 51
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
         }
         Fl_Button btnRemoveBcHinge {
           callback {paintView->setEditMode(CPaintView::EM_ERASE_CONSTRAINTS_FORCES);
 m_physicsEditMode = paintView->getEditMode();}
-          tooltip {Erase point contraints} image {../../images/action_remove_bchinge.xpm} xywh {205 283 42 42} type Radio down_box DOWN_BOX selection_color 51
-          code0 {\#include "Fl_HoverButton.h"}
-          class Fl_HoverButton
-        }
-        Fl_Button btnRotateBcHinge {
-          callback {paintView->setEditMode(CPaintView::EM_ROTATE_CONSTRAINT_VECTOR);
-m_physicsEditMode = paintView->getEditMode();}
-          tooltip {Rotate constraint} image {../../images/action_rotate_bchinge.xpm} xywh {205 328 42 42} type Radio down_box DOWN_BOX selection_color 51
+          tooltip {Erase point contraints} image {../../images/action_remove_bchinge.xpm} xywh {200 102 42 42} type Radio down_box DOWN_BOX selection_color 51
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
         }
@@ -955,8 +949,7 @@ hideLeftToolbars();
 showLeftToolbar(scrLeftToolbar);
 showRightToolbar(scrRightDrawToolbar);
 
-paintView->setModelName("noname.fp2");} {selected
-    }
+paintView->setModelName("noname.fp2");} {}
   }
   Function {close()} {} {
     code {wndMain->hide();
@@ -1140,7 +1133,7 @@ Fl::flush();} {}
   } {
     code {std::cout << context << ": " << message << std::endl;} {}
   }
-  Function {hideLeftToolbars()} {return_type void
+  Function {hideLeftToolbars()} {open return_type void
   } {
     code {scrLeftToolbar->hide();
 scrLeftToolbar->deactivate();
@@ -1149,7 +1142,7 @@ scrLeftResultToolbar->deactivate();
 scrLeftPhysicsToolbar->hide();
 scrLeftPhysicsToolbar->deactivate();} {}
   }
-  Function {hideRightToolbars()} {return_type void
+  Function {hideRightToolbars()} {open return_type void
   } {
     code {scrRightForceToolbar->hide();
 scrRightForceToolbar->deactivate();
@@ -1172,7 +1165,7 @@ scrRightMisesStressToolbar->deactivate();
 scrRightBCHingeToolbar->hide();
 scrRightBCHingeToolbar->deactivate();} {}
   }
-  Function {showLeftToolbar(Fl_Widget* toolbar)} {return_type void
+  Function {showLeftToolbar(Fl_Widget* toolbar)} {open return_type void
   } {
     code {hideLeftToolbars();
 
@@ -1182,7 +1175,7 @@ toolbar->show();
 toolbar->activate();
 wndMain->insert(*toolbar,0);} {}
   }
-  Function {showRightToolbar(Fl_Widget* toolbar)} {return_type void
+  Function {showRightToolbar(Fl_Widget* toolbar)} {open return_type void
   } {
     code {hideRightToolbars();
 

@@ -77,8 +77,6 @@ private:
 	CColorMapPtr m_colorMap;
 
 	int*** m_dofs;
-	int**** m_elementDofs;
-	int** m_doubleDofs;
 
 	int m_dofRows;
 	int m_dofCols;
@@ -178,6 +176,14 @@ public:
 	void resetStressDrawing();
 	void getElements(int x1, int y1, int x2, int y2, CElementList& list);
 
+	// Functions for hinge constraints
+
+	void getElementPos(double x, double y, int& r, int& c);
+	double getStiffness(double x, double y);
+	void setStiffness(double x, double y, double value);
+	void setStiffness(double x, double y, double value, int offsetElements, bool special);
+	void setStiffnessLine(double x1, double y1, double x2, double y2, double value, double width);
+
 	IvfClassInfo("CFemGrid",CImageGrid);
 
 	int enumerateDofs(int direction);
@@ -201,7 +207,7 @@ public:
 
 	void setShowReactionForces(bool flag);
 
-	bool getElement(int row, int col, int element, float &value, double* ex, double* ey, int* topo);
+	bool getElement(int row, int col, int element, double &value, double* ex, double* ey, int* topo);
 	int getBandwidth();
 	void getNearestDofs(int x, int y, int* dofs);
 
@@ -213,9 +219,6 @@ public:
 	CConstraint* getNextPointConstraint();
 	void erasePointConstraint(int x, int y, int brushSize);
 	int getPointConstraintsSize();
-
-	void setDoubleNode(int row, int col);
-	void clearDoubleNode(int row, int col);
 
 	void setDisplacementSize(int size);
 	int getDisplacementSize();
@@ -258,7 +261,7 @@ public:
 	void setUndeformedGrid(bool flag);
 	bool getUndeformedGrid();
 
-	void setMaxIntensity(float intensity);
+	void setMaxIntensity(double intensity);
 
 	void setColorMap(CColorMap* colorMap);
 	CColorMap* getColorMap();

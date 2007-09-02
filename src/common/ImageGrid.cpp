@@ -29,6 +29,7 @@ CImageGrid::CImageGrid()
 	m_image = NULL;
 	m_stride = 8;
 	m_grid = NULL;
+	m_specialElement = NULL;
 	m_rows = -1;
 	m_cols = -1;
 	m_maxIntensity = 1.0;
@@ -47,12 +48,17 @@ CImageGrid::~CImageGrid()
 		for (i=0; i<m_rows; i++)
 		{
 			for (j=0; j<m_cols; j++)
+			{
 				delete [] m_grid[i][j];
+				delete [] m_specialElement[i][j];
+			}
 
 			delete [] m_grid[i];
+			delete [] m_specialElement[i];
 		}
 
 		delete [] m_grid;
+		delete [] m_specialElement;
 	}
 }
 
@@ -72,7 +78,7 @@ void CImageGrid::doGeometry()
 	{
 		/*
 		glBegin(GL_LINES);
-		glColor3f(1.0f, 0.0f, 0.0f);
+		glColor3f(1.0, 0.0, 0.0);
 		glVertex2i(0,0);
 		glVertex2i(50,50);
 		glEnd();
@@ -83,17 +89,17 @@ void CImageGrid::doGeometry()
 			{
 				if (((i+j)%2)==0)
 				{
-					if (m_grid[i][j][0]>0.0f)
+					if (m_grid[i][j][0]>0.0)
 					{
 						glBegin(GL_TRIANGLES);
-						glColor3f((1.0f-m_grid[i][j][0])*m_maxIntensity, (1.0f-m_grid[i][j][0])*m_maxIntensity, (1.0f-m_grid[i][j][0])*m_maxIntensity);
+						glColor3f((1.0-m_grid[i][j][0])*m_maxIntensity, (1.0-m_grid[i][j][0])*m_maxIntensity, (1.0-m_grid[i][j][0])*m_maxIntensity);
 						glVertex2i(j*m_stride, i*m_stride);
 						glVertex2i((j+1)*m_stride, i*m_stride);
 						glVertex2i((j+1)*m_stride, (i+1)*m_stride);
 						glEnd();
 
 						glBegin(GL_TRIANGLES);
-						glColor3f((1.0f-m_grid[i][j][1])*m_maxIntensity, (1.0f-m_grid[i][j][1])*m_maxIntensity, (1.0f-m_grid[i][j][1])*m_maxIntensity);
+						glColor3f((1.0-m_grid[i][j][1])*m_maxIntensity, (1.0-m_grid[i][j][1])*m_maxIntensity, (1.0-m_grid[i][j][1])*m_maxIntensity);
 						glVertex2i(j*m_stride, i*m_stride);
 						glVertex2i((j+1)*m_stride, (i+1)*m_stride);
 						glVertex2i(j*m_stride, (i+1)*m_stride);
@@ -102,17 +108,17 @@ void CImageGrid::doGeometry()
 				}
 				else
 				{
-					if (m_grid[i][j][0]>0.0f)
+					if (m_grid[i][j][0]>0.0)
 					{
 						glBegin(GL_TRIANGLES);
-						glColor3f((1.0f-m_grid[i][j][0])*m_maxIntensity, (1.0f-m_grid[i][j][0])*m_maxIntensity, (1.0f-m_grid[i][j][0])*m_maxIntensity);
+						glColor3f((1.0-m_grid[i][j][0])*m_maxIntensity, (1.0-m_grid[i][j][0])*m_maxIntensity, (1.0-m_grid[i][j][0])*m_maxIntensity);
 						glVertex2i(j*m_stride, i*m_stride);
 						glVertex2i((j+1)*m_stride, i*m_stride);
 						glVertex2i(j*m_stride, (i+1)*m_stride);
 						glEnd();
 
 						glBegin(GL_TRIANGLES);
-						glColor3f((1.0f-m_grid[i][j][1])*m_maxIntensity, (1.0f-m_grid[i][j][1])*m_maxIntensity, (1.0f-m_grid[i][j][1])*m_maxIntensity);
+						glColor3f((1.0-m_grid[i][j][1])*m_maxIntensity, (1.0-m_grid[i][j][1])*m_maxIntensity, (1.0-m_grid[i][j][1])*m_maxIntensity);
 						glVertex2i((j+1)*m_stride, i*m_stride);
 						glVertex2i((j+1)*m_stride, (i+1)*m_stride);
 						glVertex2i(j*m_stride, (i+1)*m_stride);
@@ -132,7 +138,7 @@ void CImageGrid::setStride(int stride)
 void CImageGrid::initGrid()
 {
 	int i, j, k, l;
-	float gridSum1, gridSum2, gridSumDiag;
+	double gridSum1, gridSum2, gridSumDiag;
 	GLubyte gridValue;
 	int nGridValues1, nGridValues2, nGridValuesDiag;
 	int nNonZeroValues;
@@ -144,12 +150,17 @@ void CImageGrid::initGrid()
 		for (i=0; i<m_rows; i++)
 		{
 			for (j=0; j<m_cols; j++)
+			{
 				delete [] m_grid[i][j];
+				delete [] m_specialElement[i][j];
+			}
 
 			delete [] m_grid[i];
+			delete [] m_specialElement[i];
 		}
 
 		delete [] m_grid;
+		delete [] m_specialElement;
 	}
 
 	// Create new grid
@@ -160,16 +171,21 @@ void CImageGrid::initGrid()
 		m_cols = m_width/m_stride;
 	}
 
-	m_grid = new float** [m_rows];
+	m_grid = new double** [m_rows];
+	m_specialElement = new bool** [m_rows];
 
 	for (i=0; i<m_rows; i++)
 	{
-		m_grid[i] = new float* [m_cols];
+		m_grid[i] = new double* [m_cols];
+		m_specialElement[i] = new bool* [m_cols];
 		for (j=0; j<m_cols; j++)
 		{
-			m_grid[i][j] = new float[2];
-			m_grid[i][j][0] = 0.0f;
-			m_grid[i][j][1] = 0.0f;
+			m_grid[i][j] = new double[2];
+			m_grid[i][j][0] = 0.0;
+			m_grid[i][j][1] = 0.0;
+			m_specialElement[i][j] = new bool[2];
+			m_specialElement[i][j][0] = false;
+			m_specialElement[i][j][1] = false;
 		}
 	}
 
@@ -189,7 +205,7 @@ void CImageGrid::initGrid()
 				{
 					// Calculate average of grid square
 
-					gridSum1 = 0.0f;
+					gridSum1 = 0.0;
 					nGridValues1 = 0;
 					for (k=0; k<m_stride; k++)
 					{
@@ -199,15 +215,15 @@ void CImageGrid::initGrid()
 							if ((i*m_stride+k<m_height)&&(j*m_stride+l<m_width))
 								m_image->getValue(j*m_stride+l, i*m_stride+k, 0, gridValue);
 							else
-								gridValue = 0.0f;
-							gridSum1 += (float)gridValue;
+								gridValue = 0.0;
+							gridSum1 += (double)gridValue;
 						}
 					}
 
-					m_grid[i][j][0] = 1.0f - gridSum1/(float)nGridValues1/255.0f;
-					m_grid[i][j][1] = 1.0f - gridSum1/(float)nGridValues1/255.0f;
+					m_grid[i][j][0] = 1.0 - gridSum1/(double)nGridValues1/255.0f;
+					m_grid[i][j][1] = 1.0 - gridSum1/(double)nGridValues1/255.0f;
 
-					if ((m_grid[i][j][0]>0.0f)||(m_grid[i][j][1]>0.0f))
+					if ((m_grid[i][j][0]>0.0)||(m_grid[i][j][1]>0.0))
 						nNonZeroValues++;
 				}
 				else
@@ -220,7 +236,7 @@ void CImageGrid::initGrid()
 
 						// Calculate average of lower right half
 
-						gridSum1 = 0.0f;
+						gridSum1 = 0.0;
 						nGridValues1 = 0;
 						for (k=0; k<m_stride; k++)
 						{
@@ -230,14 +246,14 @@ void CImageGrid::initGrid()
 								if ((i*m_stride+k<m_height)&&(j*m_stride+l<m_width))
 									m_image->getValue(j*m_stride+l, i*m_stride+k, 0, gridValue);
 								else
-									gridValue = 0.0f;
-								gridSum1 += (float)gridValue;
+									gridValue = 0.0;
+								gridSum1 += (double)gridValue;
 							}
 						}
 
 						// Calculate average of upper left half
 
-						gridSum2 = 0.0f;
+						gridSum2 = 0.0;
 						nGridValues2 = 0;
 						for (k=1; k<m_stride; k++)
 						{
@@ -247,14 +263,14 @@ void CImageGrid::initGrid()
 								if ((i*m_stride+k<m_height)&&(j*m_stride+l<m_width))
 									m_image->getValue(j*m_stride+l, i*m_stride+k, 0, gridValue);
 								else
-									gridValue = 0.0f;
-								gridSum2 += (float)gridValue;
+									gridValue = 0.0;
+								gridSum2 += (double)gridValue;
 							}
 						}
 
 						// Adjust for diagonal
 
-						gridSumDiag = 0.0f;
+						gridSumDiag = 0.0;
 						nGridValuesDiag = 0;
 						for (k=0; k<m_stride; k++)
 						{
@@ -264,8 +280,8 @@ void CImageGrid::initGrid()
 							if ((i*m_stride+k<m_height)&&(j*m_stride+l<m_width))
 								m_image->getValue(j*m_stride+l, i*m_stride+k, 0, gridValue);
 							else
-								gridValue = 0.0f;
-							gridSumDiag += (float)gridValue;
+								gridValue = 0.0;
+							gridSumDiag += (double)gridValue;
 						}
 					}
 					else
@@ -273,7 +289,7 @@ void CImageGrid::initGrid()
 
 						// Calculate average of lower left half
 
-						gridSum1 = 0.0f;
+						gridSum1 = 0.0;
 						nGridValues1 = 0;
 						for (k=0; k<m_stride; k++)
 						{
@@ -283,14 +299,14 @@ void CImageGrid::initGrid()
 								if ((i*m_stride+k<m_height)&&(j*m_stride+l<m_width))
 									m_image->getValue(j*m_stride+l, i*m_stride+k, 0, gridValue);
 								else
-									gridValue = 0.0f;
-								gridSum1 += (float)gridValue;
+									gridValue = 0.0;
+								gridSum1 += (double)gridValue;
 							}
 						}
 
 						// Calculate average of upper right half
 
-						gridSum2 = 0.0f;
+						gridSum2 = 0.0;
 						nGridValues2 = 0;
 						for (k=1; k<m_stride; k++)
 						{
@@ -300,14 +316,14 @@ void CImageGrid::initGrid()
 								if ((i*m_stride+k<m_height)&&(j*m_stride+l<m_width))
 									m_image->getValue(j*m_stride+l, i*m_stride+k, 0, gridValue);
 								else
-									gridValue = 0.0f;
-								gridSum2 += (float)gridValue;
+									gridValue = 0.0;
+								gridSum2 += (double)gridValue;
 							}
 						}
 
 						// Adjust for diagonal
 
-						gridSumDiag = 0.0f;
+						gridSumDiag = 0.0;
 						nGridValuesDiag = 0;
 						for (k=0; k<m_stride; k++)
 						{
@@ -317,13 +333,13 @@ void CImageGrid::initGrid()
 								m_image->getValue(j*m_stride+l, i*m_stride+k, 0, gridValue);
 							else
 								gridValue = 0;
-							gridSumDiag += (float)gridValue;
+							gridSumDiag += (double)gridValue;
 						}
 					}
-					m_grid[i][j][0] = 1.0f - (gridSum1+gridSumDiag/2.0f)/(float)(nGridValues1+nGridValuesDiag/2)/255.0f;
-					m_grid[i][j][1] = 1.0f - (gridSum2+gridSumDiag/2.0f)/(float)(nGridValues2+nGridValuesDiag/2)/255.0f;
+					m_grid[i][j][0] = 1.0 - (gridSum1+gridSumDiag/2.0f)/(double)(nGridValues1+nGridValuesDiag/2)/255.0f;
+					m_grid[i][j][1] = 1.0 - (gridSum2+gridSumDiag/2.0f)/(double)(nGridValues2+nGridValuesDiag/2)/255.0f;
 
-					if ((m_grid[i][j][0]>0.0f)||(m_grid[i][j][1]>0.0f))
+					if ((m_grid[i][j][0]>0.0)||(m_grid[i][j][1]>0.0))
 						nNonZeroValues++;
 				}
 			}
@@ -358,6 +374,19 @@ double CImageGrid::getGridValue(int row, int col, int element)
 	}
 	else
 		return 0.0;
+}
+
+bool CImageGrid::isSpecialElement(int row, int col, int element)
+{
+	if (m_specialElement!=NULL)
+	{
+		if ((row>=0)&&(row<m_rows)&&(col>=0)&&(col<m_cols)&&(element>=0)&&(element<2))
+			return m_specialElement[row][col][element];
+		else
+			return false;
+	}
+	else
+		return false;
 }
 
 CImageGrid::TElementType CImageGrid::getGridElementType(int row, int col)
@@ -529,7 +558,7 @@ void CImageGrid::getElementTopo(int row, int col, int element, int *dx, int *dy)
 	}
 }
 
-void CImageGrid::setMaxIntensity(float maxIntensity)
+void CImageGrid::setMaxIntensity(double maxIntensity)
 {
 	m_maxIntensity = maxIntensity;
 }
@@ -551,6 +580,15 @@ void CImageGrid::setGridValue(int row, int col, int element, double value)
 	{
 		if ((row>=0)&&(row<m_rows)&&(col>=0)&&(col<m_cols)&&(element>=0)&&(element<2))
 			m_grid[row][col][element] = value;
+	}
+}
+
+void CImageGrid::setSpecialElement(int row, int col, int element, bool special)
+{
+	if (m_specialElement!=NULL)
+	{
+		if ((row>=0)&&(row<m_rows)&&(col>=0)&&(col<m_cols)&&(element>=0)&&(element<2))
+			m_specialElement[row][col][element] = special;
 	}
 }
 
