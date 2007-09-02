@@ -45,6 +45,10 @@ private:
   static void cb_fileMenuSave(Fl_Menu_*, void*);
 public:
   static Fl_Menu_Item *fileMenuSaveAs;
+private:
+  void cb_fileMenuSaveAs_i(Fl_Menu_*, void*);
+  static void cb_fileMenuSaveAs(Fl_Menu_*, void*);
+public:
   static Fl_Menu_Item *fileMenuExit;
 private:
   void cb_fileMenuExit_i(Fl_Menu_*, void*);
@@ -447,11 +451,6 @@ public:
 private:
   void cb_btnRemoveBcHinge_i(Fl_HoverButton*, void*);
   static void cb_btnRemoveBcHinge(Fl_HoverButton*, void*);
-public:
-  Fl_HoverButton *btnRotateBcHinge;
-private:
-  void cb_btnRotateBcHinge_i(Fl_HoverButton*, void*);
-  static void cb_btnRotateBcHinge(Fl_HoverButton*, void*);
 public:
   ~CMainFrame();
   void show();

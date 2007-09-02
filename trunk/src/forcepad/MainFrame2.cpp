@@ -32,6 +32,13 @@ void CMainFrame::cb_fileMenuSave(Fl_Menu_* o, void* v) {
   ((CMainFrame*)(o->parent()->user_data()))->cb_fileMenuSave_i(o,v);
 }
 
+void CMainFrame::cb_fileMenuSaveAs_i(Fl_Menu_*, void*) {
+  paintView->saveModelAs();
+}
+void CMainFrame::cb_fileMenuSaveAs(Fl_Menu_* o, void* v) {
+  ((CMainFrame*)(o->parent()->user_data()))->cb_fileMenuSaveAs_i(o,v);
+}
+
 void CMainFrame::cb_fileMenuExit_i(Fl_Menu_*, void*) {
   wndMain->hide();
 }
@@ -126,7 +133,7 @@ Fl_Menu_Item CMainFrame::menu_mainMenu[] = {
  {"&New", 0x4006e,  (Fl_Callback*)CMainFrame::cb_fileMenuNew, 0, 0, FL_NORMAL_LABEL, 0, 12, 0},
  {"&Open...", 0x4006f,  (Fl_Callback*)CMainFrame::cb_fileMenuOpen, 0, 0, FL_NORMAL_LABEL, 0, 12, 0},
  {"&Save.", 0x40073,  (Fl_Callback*)CMainFrame::cb_fileMenuSave, 0, 0, FL_NORMAL_LABEL, 0, 12, 0},
- {"S&ave as...", 0x50073,  0, 0, 128, FL_NORMAL_LABEL, 0, 12, 0},
+ {"S&ave as...", 0x50073,  (Fl_Callback*)CMainFrame::cb_fileMenuSaveAs, 0, 128, FL_NORMAL_LABEL, 0, 12, 0},
  {"E&xit", 0,  (Fl_Callback*)CMainFrame::cb_fileMenuExit, 0, 0, FL_NORMAL_LABEL, 0, 12, 0},
  {0,0,0,0,0,0,0,0,0},
  {"&Edit", 0,  0, 0, 64, FL_NORMAL_LABEL, 0, 12, 0},
@@ -13656,311 +13663,6 @@ static const char *idata_action_remove_bchinge[] = {
 };
 static Fl_Pixmap image_action_remove_bchinge(idata_action_remove_bchinge);
 
-void CMainFrame::cb_btnRotateBcHinge_i(Fl_HoverButton*, void*) {
-  paintView->setEditMode(CPaintView::EM_ROTATE_CONSTRAINT_VECTOR);
-m_physicsEditMode = paintView->getEditMode();
-}
-void CMainFrame::cb_btnRotateBcHinge(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnRotateBcHinge_i(o,v);
-}
-
-static const char *idata_action_rotate_bchinge[] = {
-"    36    36      256            2",
-"`` c #ece9d8",
-"`. c #ebe8d7",
-"`# c #eae7d6",
-"`a c #e7e4d4",
-"`b c #e8e5d5",
-"`c c #e9e6d5",
-"`d c #bdbadc",
-"`e c #e6e4d3",
-"`f c #e6e3d2",
-"`g c #d3d1c2",
-"`h c #71706b",
-"`i c #e4e1d0",
-"`j c #8280e6",
-"`k c #0000ff",
-"`l c #7e7ce2",
-"`m c #dedbcb",
-"`n c #dfdccc",
-"`o c #c1bfb2",
-"`p c #504f4e",
-"`q c #535351",
-"`r c #d9d7c7",
-"`s c #dad8c8",
-"`t c #e5e2d1",
-"`u c #9b9ae1",
-"`v c #0404fe",
-"`w c #b5b3c9",
-"`x c #d6d3c4",
-"`y c #dddaca",
-"`z c #acaa9f",
-"`A c #474747",
-"`B c #404040",
-"`C c #ccc9ba",
-"`D c #ceccbd",
-"`E c #d9d7d6",
-"`F c #0e0efc",
-"`G c #0606fd",
-"`H c #8785cf",
-"`I c #c8c5b7",
-"`J c #cdcabb",
-"`K c #e0ddcd",
-"`L c #95938b",
-"`M c #bab8aa",
-"`N c #c0bdaf",
-"`O c #aaa8d7",
-"`P c #1313f9",
-"`Q c #9a98c8",
-"`R c #c1beb0",
-"`S c #d3d0c1",
-"`T c #7e7d77",
-"`U c #a8a69a",
-"`V c #b3b0a3",
-"`W c #c3c1b3",
-"`X c #d5d2c3",
-"`Y c #e1dece",
-"`Z c #9997df",
-"`0 c #d7d4c5",
-"`1 c #c9c6bf",
-"`2 c #c5c3b4",
-"`3 c #c1bfb1",
-"`4 c #cac7b9",
-"`5 c #a9a79d",
-"`6 c #73726d",
-"`7 c #a19f95",
-"`8 c #424242",
-".` c #9c9a8f",
-".. c #a9a79b",
-".# c #bebbae",
-".a c #d1cfbf",
-".b c #9b99e1",
-".c c #8f8ed6",
-".d c #d0cebf",
-".e c #c6c4b5",
-".f c #c9c6b8",
-".g c #e3e0d0",
-".h c #84837c",
-".i c #656460",
-".j c #8d8b82",
-".k c #a6a498",
-".l c #bcb9ac",
-".m c #9a98e0",
-".n c #0a0afc",
-".o c #9c9aca",
-".p c #d4d1c2",
-".q c #4b4a49",
-".r c #535250",
-".s c #949287",
-".t c #464645",
-".u c #8c8b81",
-".v c #a8a599",
-".w c #bdbaad",
-".x c #dfdccf",
-".y c #b9b7d8",
-".z c #bbb9d6",
-".A c #7c7ae1",
-".B c #0909fc",
-".C c #9896c6",
-".D c #c2c0b2",
-".E c #d8d5c5",
-".F c #e2dfcf",
-".G c #bab8ab",
-".H c #7e7d76",
-".I c #98968b",
-".J c #86847b",
-".K c #99978c",
-".L c #afada0",
-".M c #ccc9c1",
-".N c #6261e5",
-".O c #0a0afd",
-".P c #0d0dfb",
-".Q c #6e6ddc",
-".R c #cdcabe",
-".S c #cfcdbe",
-".T c #7675d8",
-".U c #9c9b91",
-".V c #9d9b90",
-".W c #a09e93",
-".X c #aaa89c",
-".Y c #b9b7a9",
-".Z c #c5c3b7",
-".0 c #2827f4",
-".1 c #4c4cff",
-".2 c #9898ff",
-".3 c #8c8cff",
-".4 c #4040ff",
-".5 c #3231e9",
-".6 c #bfbcae",
-".7 c #d2cfc0",
-".8 c #dcd9ca",
-"#` c #98968e",
-"#. c #a4a297",
-"## c #a7a498",
-"#a c #acaa9e",
-"#b c #b7b5a8",
-"#c c #706fda",
-"#d c #9c9cff",
-"#e c #ffffff",
-"#f c #8080ff",
-"#g c #7270bd",
-"#h c #c7c4b6",
-"#i c #bbb9ac",
-"#j c #555452",
-"#k c #6e6d68",
-"#l c #a7a599",
-"#m c #b1afa2",
-"#n c #b8b6a9",
-"#o c #cac7bc",
-"#p c #5858ff",
-"#q c #3838ff",
-"#r c #1c1bec",
-"#s c #a5a397",
-"#t c #b4b1a4",
-"#u c #cdcbbc",
-"#v c #c4c2b4",
-"#w c #acacff",
-"#x c #8888ff",
-"#y c #96948c",
-"#z c #d9d6c6",
-"#A c #a19fd2",
-"#B c #c8c8ff",
-"#C c #a8a8ff",
-"#D c #7d7b91",
-"#E c #bbb9ce",
-"#F c #86847e",
-"#G c #a19f93",
-"#H c #bbb9ab",
-"#I c #d8d5c8",
-"#J c #0707fd",
-"#K c #3737fe",
-"#L c #1616e7",
-"#M c #9e9c91",
-"#N c #d9d6c9",
-"#O c #1b1af6",
-"#P c #504f9c",
-"#Q c #89877d",
-"#R c #dbd9c9",
-"#S c #c2c0c0",
-"#T c #3f3ffe",
-"#U c #2424d0",
-"#V c #7e7c73",
-"#W c #908f84",
-"#X c #6765e9",
-"#Y c #b6b4ae",
-"#Z c #4f4ecf",
-"#0 c #0807fa",
-"#1 c #0a0af5",
-"#2 c #4140af",
-"#3 c #7b7a74",
-"#4 c #8a887e",
-"#5 c #6362e2",
-"#6 c #a4a296",
-"#7 c #7b7aa0",
-"#8 c #777694",
-"a` c #88867d",
-"a. c #8f8e83",
-"a# c #9b9a8e",
-"aa c #a3a1e0",
-"ab c #9b9ac9",
-"ac c #b5b3a6",
-"ad c #adab9e",
-"ae c #63625e",
-"af c #62615e",
-"ag c #76756f",
-"ah c #777671",
-"ai c #797872",
-"aj c #87857e",
-"ak c #8c8b83",
-"al c #c4c1b4",
-"am c #cfcdd5",
-"an c #2222f6",
-"ao c #a2a096",
-"ap c #61605d",
-"aq c #686763",
-"ar c #cccabb",
-"as c #c2c0c9",
-"at c #a09eca",
-"au c #b2afa4",
-"av c #73726c",
-"aw c #6160e8",
-"ax c #cbc8ba",
-"ay c #6d6c68",
-"az c #595956",
-"aA c #494948",
-"aB c #959489",
-"aC c #b2afc6",
-"aD c #a3a197",
-"aE c #5f5e5b",
-"aF c #4b4b4a",
-"aG c #444443",
-"aH c #807f77",
-"aI c #969489",
-"aJ c #a3a195",
-"aK c #dad8d7",
-"aL c #9c9a91",
-"aM c #4d4d4b",
-"aN c #605f5c",
-"aO c #777670",
-"aP c #918f86",
-"aQ c #78766f",
-"aR c #929086",
-"aS c #9b998d",
-"aT c #acaad9",
-"aU c #1414fa",
-"aV c #7d7b74",
-"aW c #72716b",
-"aX c #9f9d92",
-"aY c #b6b4a7",
-"aZ c #cfcdc5",
-"a0 c #b0ada1",
-"a1 c #000000",
-"a2 c #000000",
-"a3 c #000000",
-"a4 c #000000",
-"a5 c #000000",
-"a6 c #000000",
-"a7 c #000000",
-"a8 c #000000",
-"````````````````````````````````````````````````````````````````````````",
-"````````````````````````````````````````````````````````````````````````",
-"`````````````````````.`.`.`.`````````````````````````````.`.`#`#`#`.`.``",
-"`````````````````.`#`a`b`b`#`#`.```````````````````````.`c`d`e`f`e`b`#`.",
-"```````````````.`c`g`h`i`i`f`b`#`.```````````````````.`b`j`k`l`m`n`i`a`#",
-"```````````.`#`b`o`p`q`r`s`n`t`b`.`````````````````.`#`u`v`k`v`w`x`y`i`b",
-"`````````.`#`b`z`A`B`B`C`D`x`n`e`#```````````````.`#`E`F`k`G`H`I`J`x`K`e",
-"`````````.`b`L`B`B`B`B`M`N`C`r`i`c`````````````.`#`a`i`O`P`Q`R`R`I`S`m`e",
-"```````.`a`T`B`B`B`B`B`U`V`W`X`Y`b`.`````````.`c`u`Z`m`0`1`2`N`3`4`X`n`e",
-"```````.`5`6`7`8`B`B`B.`...#.a`K`a`.`.`.`.`#`b.b`v`v.c.d`C`I.e.f.a`s.g`b",
-"```````#`e`m.h`B`B.i`B.j.k.l.d`m`e`b`b`a`a`e.m`v`k.n.o.f`4`C`D.p`s`Y`e`#",
-"```````#`f`0.q`B.r.s.t.u.v.w.d`y.x.y.z`n`n`m.A`k.B.C.D`W`4.a.E`y.F`e`c`.",
-"```````#`f.G`B`B.H.I.J.K.L`3.M.N.O`k`k.P.Q.R.S.T.C`N.#.D`C`x`m`t`a`#`.``",
-"```````#`f.U`B`B.V.V.W.X.Y.Z.0`k.1.2.3.4`k.5.6`N.6.#`N`I.7.8`i`b`#`.````",
-"```````#`f#``B`B#.###a#b`W#c`k#d#e#e#e#e#f`k#g`V.Y`N#h.S`r.F`a`#````````",
-"```````#`e#i#j#k#l#m#n`W#o.O#p#e#e#e#e#e#e#q#r#s#t`3#u.E`K`e`#`.````````",
-"```````.`a`n.p.e.w.w#v#u`w`k#w#e#e#e#e#e#e#x`k#y#a`R.a`y`t`c`.``````````",
-"```````.`b.F#z.S.f`4.S`x#A`k#B#e#e#e#e#e#e#C`k#D.k.#.a`n`a`.````````````",
-"```````.`c`f`K`r`x`x`s.8#E`k#w#e#e#e#e#e#e#x`k#F#G#H.a`n`a`.````````````",
-"`````````.`b`f.F`K`Y.F`Y#I#J#p#e#e#e#e#e#e#K#L.J#M`M.d`n`b`.````````````",
-"`````````.`.`c`a`e`a`e`i#N#O`k#d#e#e#e#e#f`k#P#Q#G.l.7`Y`b`.````````````",
-"`````````````.`.`#`c`b`i#R#S.n`k.1.2.3#T`k#U#V#W`U`3`X.F`b`.`.``````````",
-"```````````````.`#`b`u#X#z`J#Y#Z#0`k`k#1#2#3#4.``V`I.E.F`e`b`c`#`#`.`.``",
-"```````````````.`c`u`v`k#5`4`N`V#6#7#8a`a`a.a##a.#`J.E`m`Y.F`i`t`e`b`#`.",
-"`````````````.`#aa`v`k.nab`2`3.wac#a#6.W.W##adaeafagahaiaiajakal`n`t`a`#",
-"```````````.`#`aaman.n`Q.D`3#v.e.e.D.w`M.Y.w.Daoap`B`B`B`B`Baqar`x`m`t`b",
-"`````````.`#`d`i`masat#v`N.D.f.d.p.p.a.S#u#u#uauav`8`B`B`B#j#m`N`J#z.F`a",
-"```````.`c`u`vaw`0.aax`2#v.f.a#z`m`K`n.Dapayaz`B`B`B`B`BaAaB##ac.e`X`Y`a",
-"`````.`#`u`v`k.naC`Caxax#u`S`s`Y`f`a`faD`B`B`B`B`BaEaFaGaHaIaJ#t.e`0.F`b",
-"`````.aK`F`k.n`Q`2.e`C.a`0`y.F`e`c`#`aaLaM.qaNaO.VaP`8aQaRaS..#H`J#R`t`c",
-"`````.`aaTaUab`3`N`2`D.E`m`i`a`#`.`.`b.F#z`C.6`V..aVaW.`aX.vaY#h`x`Y`a`#",
-"`````#`a`naZax.D.D.f.p`y`i`b`#`.```.`b`i`s`D`W`M#ta0.L.L`V#H#h.p`m`f`#`.",
-"`````.`a.F#z.dax`C.a`s.F`a`#```````.`c`f`n`0`D.f`2`W`W`W#h`J`x`m`t`c`.``",
-"`````.`c`t`n`r`x`0#R`Y`e`#`.`````````#`b`t`n#R.E`x`X`X`x.E#R`Y`f`b`.````",
-"`````.`#`b`t.F`K`Y`i`e`c`.```````````.`#`b`e`i.g.F.F.F.F.g`t`a`c`.``````",
-"```````.`#`c`a`a`a`b`#`.```````````````.`.`#`c`b`b`b`b`b`b`c`#`.````````"
-};
-static Fl_Pixmap image_action_rotate_bchinge(idata_action_rotate_bchinge);
-
 CMainFrame::CMainFrame() {
   { wndMain = new Fl_Double_Window(733, 574, "ForcePAD 2");
     wndMain->user_data((void*)(this));
@@ -15307,14 +15009,12 @@ CMainFrame::CMainFrame() {
         btnConstraintHinge->callback((Fl_Callback*)cb_btnConstraintHinge);
         btnConstraintHinge->align(FL_ALIGN_CENTER);
         btnConstraintHinge->when(FL_WHEN_RELEASE);
-        btnConstraintHinge->hide();
-        btnConstraintHinge->deactivate();
       } // Fl_HoverButton* btnConstraintHinge
       scrLeftPhysicsToolbar->end();
     } // Fl_Scroll* scrLeftPhysicsToolbar
-    { scrRightBCHingeToolbar = new Fl_Scroll(200, 232, 53, 304);
+    { scrRightBCHingeToolbar = new Fl_Scroll(195, 51, 53, 304);
       scrRightBCHingeToolbar->box(FL_FLAT_BOX);
-      { btnAddBcHinge = new Fl_HoverButton(205, 238, 42, 42);
+      { btnAddBcHinge = new Fl_HoverButton(200, 57, 42, 42);
         btnAddBcHinge->tooltip("Add point constraint");
         btnAddBcHinge->type(102);
         btnAddBcHinge->box(FL_UP_BOX);
@@ -15331,7 +15031,7 @@ CMainFrame::CMainFrame() {
         btnAddBcHinge->align(FL_ALIGN_CENTER);
         btnAddBcHinge->when(FL_WHEN_RELEASE);
       } // Fl_HoverButton* btnAddBcHinge
-      { btnRemoveBcHinge = new Fl_HoverButton(205, 283, 42, 42);
+      { btnRemoveBcHinge = new Fl_HoverButton(200, 102, 42, 42);
         btnRemoveBcHinge->tooltip("Erase point contraints");
         btnRemoveBcHinge->type(102);
         btnRemoveBcHinge->box(FL_UP_BOX);
@@ -15347,22 +15047,6 @@ CMainFrame::CMainFrame() {
         btnRemoveBcHinge->align(FL_ALIGN_CENTER);
         btnRemoveBcHinge->when(FL_WHEN_RELEASE);
       } // Fl_HoverButton* btnRemoveBcHinge
-      { btnRotateBcHinge = new Fl_HoverButton(205, 328, 42, 42);
-        btnRotateBcHinge->tooltip("Rotate constraint");
-        btnRotateBcHinge->type(102);
-        btnRotateBcHinge->box(FL_UP_BOX);
-        btnRotateBcHinge->down_box(FL_DOWN_BOX);
-        btnRotateBcHinge->color(FL_BACKGROUND_COLOR);
-        btnRotateBcHinge->selection_color((Fl_Color)51);
-        btnRotateBcHinge->image(image_action_rotate_bchinge);
-        btnRotateBcHinge->labeltype(FL_NORMAL_LABEL);
-        btnRotateBcHinge->labelfont(0);
-        btnRotateBcHinge->labelsize(14);
-        btnRotateBcHinge->labelcolor(FL_FOREGROUND_COLOR);
-        btnRotateBcHinge->callback((Fl_Callback*)cb_btnRotateBcHinge);
-        btnRotateBcHinge->align(FL_ALIGN_CENTER);
-        btnRotateBcHinge->when(FL_WHEN_RELEASE);
-      } // Fl_HoverButton* btnRotateBcHinge
       scrRightBCHingeToolbar->end();
     } // Fl_Scroll* scrRightBCHingeToolbar
     wndMain->end();

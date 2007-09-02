@@ -40,7 +40,6 @@ CFemGrid::CFemGrid()
 	m_invertColorMap = false;
 
 	m_dofs = NULL;
-	m_doubleDofs = NULL;
 	m_bandwidth = 0;
 	m_displacementScale = 1.0;
 	m_displacements = NULL;
@@ -226,16 +225,13 @@ void CFemGrid::initDofs()
 	// Create new grid
 
 	m_dofs = new int** [rows];
-	m_doubleDofs = new int* [rows];
 
 	for (i=0; i<rows; i++)
 	{
 		m_dofs[i] = new int* [cols];
-		m_doubleDofs[i] = new int [cols];
 		for (j=0; j<cols; j++)
 		{
 			m_dofs[i][j] = new int[4];
-			m_doubleDofs[i][j] = 0;
 			m_dofs[i][j][0] = -1;
 			m_dofs[i][j][1] = -1;
 			m_dofs[i][j][2] = -1;
@@ -268,14 +264,6 @@ void CFemGrid::clearDofs()
 
 		delete [] m_dofs;
 	}
-	if (m_doubleDofs!=NULL)
-	{
-		for (i=0; i<m_dofRows; i++)
-			delete [] m_doubleDofs[i];
-
-		delete [] m_doubleDofs;
-	}
-	m_doubleDofs = NULL;
 	m_dofs = NULL;
 }
 
@@ -441,7 +429,6 @@ void CFemGrid::resetDofs()
 
 	rows++;
 	cols++;
-
 	if (m_dofs!=NULL)
 	{
 		for (j=0; j<cols; j++)
@@ -462,7 +449,7 @@ void CFemGrid::initGrid()
 	initResults();
 }
 
-bool CFemGrid::getElement(int row, int col, int element, float &value, double *ex, double *ey, int *topo)
+bool CFemGrid::getElement(int row, int col, int element, double &value, double *ex, double *ey, int *topo)
 {
 	int rows, cols;
 	int i;
@@ -483,30 +470,8 @@ bool CFemGrid::getElement(int row, int col, int element, float &value, double *e
 
 			for (i=0; i<3; i++)
 			{
-				if (m_doubleDofs[ row+dy[i] ][ col+dx[i] ]>0)
-				{
-					if (m_doubleDofs[ row+dy[i] ][ col+dx[i] ]==1)
-					{
-						topo[dof++] = m_elementDofs[row][col][element][i*2];
-						topo[dof++] = m_dofs[ row+dy[i] ][ col+dx[i] ][1];
-					}
-					if (m_doubleDofs[ row+dy[i] ][ col+dx[i] ]==2)
-					{
-						topo[dof++] = m_dofs[ row+dy[i] ][ col+dx[i] ][0];
-						topo[dof++] = m_elementDofs[row][col][element][i*2+1];
-					}
-					if (m_doubleDofs[ row+dy[i] ][ col+dx[i] ]==3)
-					{
-						topo[dof++] = m_elementDofs[row][col][element][i*2];
-						topo[dof++] = m_elementDofs[row][col][element][i*2+1];
-					}
-				}
-				else
-				{
-					topo[dof++] = m_dofs[ row+dy[i] ][ col+dx[i] ][0];
-					topo[dof++] = m_dofs[ row+dy[i] ][ col+dx[i] ][1];
-				}
-
+				topo[dof++] = m_dofs[ row+dy[i] ][ col+dx[i] ][0];
+				topo[dof++] = m_dofs[ row+dy[i] ][ col+dx[i] ][1];
 			}
 			return true;
 		}
@@ -802,11 +767,11 @@ void CFemGrid::drawGrid2()
 	int i, j, kk, l;
 	double dx, dy;
 	double k = m_displacementScale/m_maxNodeValue;
-	float alpha = 0.7;
+	double alpha = 0.7;
 	int topo[6];
 	double ex[3];
 	double ey[3];
-	float value;
+	double value;
 
 	if (m_displacements!=NULL)
 	{
@@ -844,7 +809,7 @@ void CFemGrid::drawGrid()
 	int i, j;
 	double dx, dy;
 	double k = m_displacementScale/m_maxNodeValue;
-	float alpha = 0.7;
+	double alpha = 0.7;
 
 	if (m_displacements!=NULL)
 	{
@@ -993,7 +958,7 @@ void CFemGrid::drawUndeformedGrid()
 	int i, j;
 	double dx, dy;
 	double k = 0.0;
-	float alpha = 0.3;
+	double alpha = 0.3;
 
 	if (m_displacements!=NULL)
 	{
@@ -1139,23 +1104,6 @@ void CFemGrid::drawUndeformedGrid()
 
 void CFemGrid::drawDoubleDofs()
 {
-	int i, j;
-	int rows, cols;
-
-	this->getGridSize(rows, cols);
-
-	glBegin(GL_POINTS);
-	glPointSize(4);
-	glColor3f(1.0, 0.0, 0.0);
-	for (i=0; i<=rows; i++)
-	{
-		for (j=0; j<=cols; j++)
-		{
-			if (m_doubleDofs[i][j]>0)
-				glVertex2d(j*m_stride, i*m_stride);
-		}
-	}
-	glEnd();
 }
 
 
@@ -1564,7 +1512,7 @@ void CFemGrid::drawDebugPoints()
 void CFemGrid::drawGridPoints()
 {
 	int i, j, kk, l;
-	float alpha = 0.7;
+	double alpha = 0.7;
 	double ex[3];
 	double ey[3];
 
@@ -1667,9 +1615,9 @@ void CFemGrid::drawStressArrow(double x, double y, const double *values)
 			(m_stressMode==CFemGrid::SM_ALL))
 		{
 			if (sig1>0)
-				glColor4f(1.0f, 0.0f, 0.0f, (float)m_stressAlpha);
+				glColor4f(1.0f, 0.0f, 0.0f, (double)m_stressAlpha);
 			else
-				glColor4f(0.0f, 0.0f, 1.0f, (float)m_stressAlpha);
+				glColor4f(0.0f, 0.0f, 1.0f, (double)m_stressAlpha);
 
 			glVertex2d(x - 0.5*sig1*m_stressSize*cos(alpha), y - 0.5*sig1*m_stressSize*sin(alpha));
 			glVertex2d(x + 0.5*sig1*m_stressSize*cos(alpha), y + 0.5*sig1*m_stressSize*sin(alpha));
@@ -1680,9 +1628,9 @@ void CFemGrid::drawStressArrow(double x, double y, const double *values)
 			(m_stressMode==CFemGrid::SM_ALL))
 		{
 			if (sig2>0)
-				glColor4f(1.0f, 0.0f, 0.0f, (float)m_stressAlpha);
+				glColor4f(1.0f, 0.0f, 0.0f, (double)m_stressAlpha);
 			else
-				glColor4f(0.0f, 0.0f, 1.0f, (float)m_stressAlpha);
+				glColor4f(0.0f, 0.0f, 1.0f, (double)m_stressAlpha);
 
 			glVertex2d(x - 0.5*sig2*m_stressSize*cos(alpha+M_PI/2.0), y - 0.5*sig2*m_stressSize*sin(alpha+M_PI/2.0));
 			glVertex2d(x + 0.5*sig2*m_stressSize*cos(alpha+M_PI/2.0), y + 0.5*sig2*m_stressSize*sin(alpha+M_PI/2.0));
@@ -1719,7 +1667,7 @@ void CFemGrid::setStressTreshold(double lower, double upper)
 
 }
 
-void CFemGrid::setMaxIntensity(float intensity)
+void CFemGrid::setMaxIntensity(double intensity)
 {
 	m_maxIntensity = intensity;
 }
@@ -2073,6 +2021,96 @@ void CFemGrid::calcCenterOfGravity(int &x, int &y)
 		x = -1;
 		y = -1;
 	}
+}
+
+void CFemGrid::getElementPos(double x, double y, int& r, int& c)
+{
+	r = (int)((double)y / m_stride);
+	c = (int)((double)x / m_stride);	
+}
+
+double CFemGrid::getStiffness(double x, double y)
+{
+	double v1, v2;
+	int r, c;
+
+	this->getElementPos(x, y, r, c);
+	v1 = this->getGridValue(r, c, 0);
+	v2 = this->getGridValue(r, c, 1);
+
+	return (v1 + v2)*0.5;
+}
+
+void CFemGrid::setStiffness(double x, double y, double value)
+{
+	int r, c;
+	double v;
+
+	this->getElementPos(x, y, r, c);
+	v = this->getGridValue(r, c, 0);
+	this->setGridValue(r, c, 0, value);
+	v = this->getGridValue(r, c, 1);
+	this->setGridValue(r, c, 1, value);
+}
+
+void CFemGrid::setStiffness(double x, double y, double value, int offsetElements, bool special)
+{
+	int r, c;
+
+	int i, j;
+
+	this->getElementPos(x, y, r, c);
+
+	for (i=r-offsetElements; i<=r+offsetElements; i++)
+	{
+		for (j=c-offsetElements; j<=c+offsetElements; j++)
+		{
+			this->setGridValue(i, j, 0, value);
+			this->setGridValue(i, j, 1, value);
+			this->setSpecialElement(i, j, 0, special);
+			this->setSpecialElement(i, j, 1, special);
+		}
+	}
+}
+
+void CFemGrid::setStiffnessLine(double x1, double y1, double x2, double y2, double value, double width)
+{
+	CVec3d v;
+	v.setComponents(x2-x1, y2-y1, 0.0);
+	double l = v.length();
+	v.normalize();
+
+	CVec3d up;
+	up.setComponents(0.0, 0.0, 1.0);
+	
+	CVec3d left = v * up;
+	left.normalize();
+
+	double step = 0.5;
+	double t = 0.0;
+	double s = 0.0;
+	
+	CVec3d p0;
+	CVec3d p1;
+	p0.setComponents(x1, y1, 0.0);
+	double x, y, z;
+
+	p1 = p0;// - (width/2.0)*left;
+
+//	while (s<=width)
+//	{
+		p1 = p0;// - (width/2.0)*left + s*left;
+
+		while (t<=l)
+		{
+			p1.getComponents(x, y, z);
+			this->setStiffness(x, y, value);
+			t = t + step;
+			p1 = p1 + v*step;
+		}
+//		s = s + step;
+		t = 0.0;
+//	}
 }
 
 CForce* CFemGrid::getNearestForce(int x, int y)
@@ -2450,26 +2488,6 @@ void CFemGrid::setShowReactionForces(bool flag)
 			constraint->setShowReactionForce(flag);
 		}
 	}
-}
-
-void CFemGrid::setDoubleNode(int row, int col)
-{
-	int rows, cols;
-
-	this->getGridSize(rows, cols);
-
-	if ((row>=0)&&(row<=rows)&&(col>=0)&&(col<=cols))
-		m_doubleDofs[row][col] = true;
-}
-
-void CFemGrid::clearDoubleNode(int row, int col)
-{
-	int rows, cols;
-
-	this->getGridSize(rows, cols);
-
-	if ((row>=0)&&(row<=rows)&&(col>=0)&&(col<=cols))
-		m_doubleDofs[row][col] = false;
 }
 
 void CFemGrid::setAverageStress(bool flag)

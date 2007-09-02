@@ -159,6 +159,22 @@ void CConstraint::doGeometry()
 	}
 }
 
+void CConstraint::getHingeStart(double &x, double &y)
+{
+	double xx, yy;
+	this->getPosition(xx, yy);
+	x = xx - m_hingeLength*m_direction[0];
+	y = yy - m_hingeLength*m_direction[1];
+}
+
+void CConstraint::getHingeEnd(double &x, double &y)
+{
+	double xx, yy;
+	this->getPosition(xx, yy);
+	x = xx + m_hingeLength*m_direction[0];
+	y = yy + m_hingeLength*m_direction[1];
+}
+
 // ------------------------------------------------------------
 void CConstraint::setConstraintType(TConstraintType type)
 {
@@ -210,6 +226,9 @@ void CConstraint::saveToStream(ostream &out)
 
 	if (m_constraintType == CT_VECTOR)
 		out << m_direction[0] << " " << m_direction[1] << " ";
+
+	if (m_constraintType == CT_HINGE)
+		out << m_direction[0] << " " << m_direction[1] << " " << m_hingeLength << " ";
 }
 
 // ------------------------------------------------------------
@@ -246,6 +265,9 @@ void CConstraint::readFromStream(istream &in)
 		in >> m_direction[0] >> m_direction[1];
 		m_reactionForce->setDirection(m_direction[0], m_direction[1]);
 	}
+
+	if (m_constraintType == CT_HINGE)
+		in >> m_direction[0] >> m_direction[1] >> m_hingeLength;
 }
 
 // ------------------------------------------------------------
