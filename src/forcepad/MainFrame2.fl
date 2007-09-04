@@ -862,7 +862,7 @@ m_physicsEditMode = paintView->getEditMode();}
           class Fl_HoverButton
         }
       }
-      Fl_Scroll scrRightBCHingeToolbar {open selected
+      Fl_Scroll scrRightBCHingeToolbar {open
         xywh {195 51 53 304} box FLAT_BOX
       } {
         Fl_Button btnAddBcHinge {
@@ -1025,7 +1025,7 @@ else
 	btnCopy->deactivate();
 }} {}
   }
-  Function {onViewModeChange(CPaintView::TViewMode oldMode, CPaintView::TViewMode newMode)} {return_type void
+  Function {onViewModeChange(CPaintView::TViewMode oldMode, CPaintView::TViewMode newMode)} {open return_type void
   } {
     code {if (newMode == CPaintView::VM_SKETCH)
 {
@@ -1066,6 +1066,8 @@ else if (newMode == CPaintView::VM_PHYSICS)
 		showRightToolbar(scrRightForceToolbar);
 	if (btnConstraint2->value()==1)
 		showRightToolbar(scrRightBCToolbar);
+	if (btnConstraintHinge->value()==1)
+		showRightToolbar(scrRightBCHingeToolbar);
 
 	paintView->setEditMode(m_physicsEditMode);
 }
@@ -1119,7 +1121,8 @@ else
 		paintView->setDrawStress(false);
 		showRightToolbar(scrRightDisplacementToolbar);
 	}	
-}} {}
+}} {selected
+    }
   }
   Function {onStatusMessage(const std::string& message, const int progress)} {return_type void
   } {
@@ -1133,7 +1136,7 @@ Fl::flush();} {}
   } {
     code {std::cout << context << ": " << message << std::endl;} {}
   }
-  Function {hideLeftToolbars()} {open return_type void
+  Function {hideLeftToolbars()} {return_type void
   } {
     code {scrLeftToolbar->hide();
 scrLeftToolbar->deactivate();
@@ -1142,7 +1145,7 @@ scrLeftResultToolbar->deactivate();
 scrLeftPhysicsToolbar->hide();
 scrLeftPhysicsToolbar->deactivate();} {}
   }
-  Function {hideRightToolbars()} {open return_type void
+  Function {hideRightToolbars()} {return_type void
   } {
     code {scrRightForceToolbar->hide();
 scrRightForceToolbar->deactivate();
@@ -1165,7 +1168,7 @@ scrRightMisesStressToolbar->deactivate();
 scrRightBCHingeToolbar->hide();
 scrRightBCHingeToolbar->deactivate();} {}
   }
-  Function {showLeftToolbar(Fl_Widget* toolbar)} {open return_type void
+  Function {showLeftToolbar(Fl_Widget* toolbar)} {return_type void
   } {
     code {hideLeftToolbars();
 
@@ -1175,7 +1178,7 @@ toolbar->show();
 toolbar->activate();
 wndMain->insert(*toolbar,0);} {}
   }
-  Function {showRightToolbar(Fl_Widget* toolbar)} {open return_type void
+  Function {showRightToolbar(Fl_Widget* toolbar)} {return_type void
   } {
     code {hideRightToolbars();
 
@@ -1200,8 +1203,7 @@ if (oldMode = CPaintView::VM_PHYSICS)
   } {
     code {return wndMain;} {}
   }
-  Function {onModelChanged(const std::string& newModelName)} {open
-  } {
+  Function {onModelChanged(const std::string& newModelName)} {} {
     code {string caption = newModelName + " - ForcePAD 2";
 wndMain->label(caption.c_str());} {}
   }
