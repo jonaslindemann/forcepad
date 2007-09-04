@@ -24,16 +24,12 @@
 
 
 #include "FemGridSolver.h"
-
 #include "matlabgen.h"
-
 #include "LogWindow.h"
 
-//#include "StructuralElement.h"
-//#include "StructuralElementPair.h"
-
-//#define WANT_STREAM
-//#define WANT_MATH
+#ifdef WIN32
+#include <windows.h>
+#endif
 
 #include <set>
 #include <fstream>
@@ -120,15 +116,22 @@ void CFemGridSolver::execute()
 	int topo[6];
 
 	int maxBandwidth;
-	//int nDof;
 	int bwLeftRight;
 	int bwBottomTop;
+
+#ifdef WIN32
+	DWORD startTime = timeGetTime();
+#endif
 
 	//
 	// Reset error status
 	//
 
 	m_errorStatus = CFemGridSolver::ET_NO_ERROR;
+
+	//
+	// Apply hinge constraints directly to stiffness grid
+	//
 
 	CConstraint* pointConstraint = m_femGrid->getFirstPointConstraint();
 
@@ -145,7 +148,7 @@ void CFemGridSolver::execute()
 			pointConstraint->getHingeStart(x1, y1);
 			pointConstraint->getHingeEnd(x2, y2);
 			oldValue = m_femGrid->getStiffness(x, y);
-			m_femGrid->setStiffnessLine(x1, y1, x2, y2, 0.0, (double)m_femGrid->getStride()*1.0);
+			m_femGrid->setStiffnessLine(x1, y1, x2, y2, 0.0, (double)m_femGrid->getStride()*0.2);
 			m_femGrid->setStiffness(x, y, oldValue*scaleFactor, 0, false);
 			break;
 		default:
@@ -189,16 +192,15 @@ void CFemGridSolver::execute()
 		return;
 	}
 
-	///////////////////////////////////////////////////////////////////////////
+	//
 	// Assemble system
-	///////////////////////////////////////////////////////////////////////////
+	//
 
 	SymmetricBandMatrix K(m_nDof,maxBandwidth);
 	K = 0.0;
 
 	this->progressMessage("Assembling system matrix.", 20);
 
-	//ColumnVector f;
 	ColumnVector fsys;
 	ColumnVector gdof;
 	ColumnVector ldof;
@@ -211,7 +213,6 @@ void CFemGridSolver::execute()
 
 	RowVector Ex(3);
 	RowVector Ey(3);
-	//RowVector Eq(2);
 	m_Eq.ReSize(2);
 	m_Eq = 0.0;
 	if (m_useWeight)
@@ -283,8 +284,7 @@ void CFemGridSolver::execute()
 					// Get element properties
 					//
 					
-					//calfem::hooke(ptype, E*(double)elementValue*m_stiffnessScalefactor, v, D);
-					calfem::hooke(ptype, E*(double)elementValue, v, D);
+					calfem::hooke(ptype, E*(double)elementValue*m_stiffnessScalefactor, v, D);
 
 					// 
 					// Get element topology
@@ -414,9 +414,9 @@ void CFemGridSolver::execute()
 		return;
 	}
 
-	///////////////////////////////////////////////////////////////////////////
+	//
 	// Define constraints
-	///////////////////////////////////////////////////////////////////////////
+	//
 
 	so_print("CFemGridSolver","Defining constraints.");
 	progressMessage("Setting up boundary conditions.", 40);
@@ -478,11 +478,6 @@ void CFemGridSolver::execute()
 				vectorBcsDefined = true;
 				break;
 			default:
-				//uniqueDofs.insert(dofs[0]);
-				//uniqueDofs.insert(dofs[1]);
-				//prescribedValues[dofs[0]] = 0.0;
-				//prescribedValues[dofs[1]] = 0.0;
-				//bcsDefined = true;
 				break;
 			}
 		}
@@ -496,9 +491,9 @@ void CFemGridSolver::execute()
 		return;
 	}
 
-	///////////////////////////////////////////////////////////////////////////
+	//
 	// Assemble Vector Constraints
-	///////////////////////////////////////////////////////////////////////////
+	//
 
 	if (vectorBcsDefined)
 	{
@@ -633,9 +628,9 @@ void CFemGridSolver::execute()
 		K.CleanUp();
 	}
 
-	///////////////////////////////////////////////////////////////////////////
+	//
 	// Solve system
-	///////////////////////////////////////////////////////////////////////////
+	//
 
 	if (m_reduceSystemMatrix)
 	{
@@ -645,16 +640,16 @@ void CFemGridSolver::execute()
 		so_print("CFemGridSolver","Solving reduced system.");
 		progressMessage("Solving.", 60);
 
-//		Try 
-//		{
+		Try 
+		{
 			LinearEquationSolver X = Ksys;
 			m_a = X.i() * fsys;
-//		}
-//		CatchAll 
-//		{
-//			m_errorStatus = ET_INVALID_MODEL;
-//			return;
-//		}
+		}
+		CatchAll 
+		{
+			m_errorStatus = ET_INVALID_MODEL;
+			return;
+		}
 
 		so_print("CFemGridSolver","Done.");
 	}
@@ -682,9 +677,9 @@ void CFemGridSolver::execute()
 
 	so_print("CFemGridSolver","Calculating results.");
 
-	///////////////////////////////////////////////////////////////////////////
+	//
 	// Create global displacement vector
-	///////////////////////////////////////////////////////////////////////////
+	//
 
 	so_print("CFemGridSolver","\tCreating global displacement vector.");
 
@@ -720,9 +715,9 @@ void CFemGridSolver::execute()
 		}
 	}
 
-	///////////////////////////////////////////////////////////////////////////
+	//
 	// Store element forces in elements
-	///////////////////////////////////////////////////////////////////////////
+	//
 	
 	RowVector Ed(6);
 	RowVector Es(6); Es = -1.0;
@@ -759,8 +754,7 @@ void CFemGridSolver::execute()
 					// Get element properties
 					//
 					
-					//calfem::hooke(ptype, E*(double)elementValue*m_stiffnessScalefactor, v, D);
-					calfem::hooke(ptype, E*(double)elementValue, v, D);
+					calfem::hooke(ptype, E*(double)elementValue*m_stiffnessScalefactor, v, D);
 
 					// 
 					// Get element topology
@@ -804,12 +798,6 @@ void CFemGridSolver::execute()
 						double alfa = atan2(tau[k],ds)/2.0;
 
 						double misesStress = sqrt(	pow(sig1,2) - sig1*sig2 + pow(sig2,2) );
-
-						//if (misesStress>m_maxMisesStressValue)
-						//	m_maxMisesStressValue = misesStress;
-								
-						//m_femGrid->setResult(i, j, k, 3, misesStress);
-
 					}
 					else
 					{
@@ -921,16 +909,9 @@ void CFemGridSolver::execute()
 
 	cout << "Max misses stress = " << m_maxMisesStressValue << endl;
 
-	///////////////////////////////////////////////////////////////////////////
+	//
 	// Calculate reaction forces from vector constraints
-	///////////////////////////////////////////////////////////////////////////
-
-	//void bar2s(
-	//   RowVector &ex,
-	//   RowVector &ey,
-	//   RowVector &ep,
-	//   RowVector &ed,
-	//   double &es);
+	//
 
 	if (vectorBcsDefined)
 	{
@@ -986,6 +967,11 @@ void CFemGridSolver::execute()
 	m_femGrid->setMaxNodeValue(m_maxNodeValue);
 	m_femGrid->setMaxMisesStressValue(m_maxMisesStressValue);
 
+#ifdef WIN32
+	DWORD endTime = timeGetTime();
+	cout << "Total execution time (ms) = " << endTime - startTime << endl;
+#endif
+
 	progressMessage("Finished.", 99);
 	progressMessage("Finished.", 0);
 
@@ -1016,9 +1002,9 @@ void CFemGridSolver::executeUpdate()
 
 	m_femGrid->getGridSize(rows, cols);
 
-	///////////////////////////////////////////////////////////////////////////
+	//
 	// Define constraints
-	///////////////////////////////////////////////////////////////////////////
+	//
 
 	if (m_femGrid->getPointConstraintsSize()==0)
 	{
@@ -1077,11 +1063,6 @@ void CFemGridSolver::executeUpdate()
 				vectorBcsDefined = true;
 				break;
 			default:
-				uniqueDofs.insert(dofs[0]);
-				uniqueDofs.insert(dofs[1]);
-				prescribedValues[dofs[0]] = 0.0;
-				prescribedValues[dofs[1]] = 0.0;
-				bcsDefined = true;
 				break;
 			}
 		}
@@ -1089,9 +1070,9 @@ void CFemGridSolver::executeUpdate()
 		pointConstraint = m_femGrid->getNextPointConstraint();
 	}
 
-	///////////////////////////////////////////////////////////////////////////
+	//
 	// Scale load vector for body weight
-	///////////////////////////////////////////////////////////////////////////
+	//
 
 	m_f = 0.0;
 
@@ -1106,9 +1087,9 @@ void CFemGridSolver::executeUpdate()
 			m_f(i) = -m_weight*m_f(i)/Fsum;
 	}
 
-	///////////////////////////////////////////////////////////////////////////
+	//
 	// Setup load vector
-	///////////////////////////////////////////////////////////////////////////
+	//
 
 	bool loadsDefined = false;
 	double vx, vy;
@@ -1150,9 +1131,9 @@ void CFemGridSolver::executeUpdate()
 		return;
 	}
 
-	///////////////////////////////////////////////////////////////////////////
+	//
 	// Update solution vector 
-	///////////////////////////////////////////////////////////////////////////
+	//
 
 	m_a.ReSize(m_nDof,1);
 	m_a = 0.0;
@@ -1168,9 +1149,9 @@ void CFemGridSolver::executeUpdate()
 		return;
 	}
 
-	///////////////////////////////////////////////////////////////////////////
+	//
 	// Create global displacement vector
-	///////////////////////////////////////////////////////////////////////////
+	//
 
 	m_maxNodeValue = -1.0e300;
 
@@ -1183,9 +1164,9 @@ void CFemGridSolver::executeUpdate()
 			m_maxNodeValue = fabs(m_a(i));
 	}
 
-	///////////////////////////////////////////////////////////////////////////
+	//
 	// Store element forces in elements
-	///////////////////////////////////////////////////////////////////////////
+	//
 	
 	RowVector Ed(6);
 	RowVector Es(6); Es = -1.0;
@@ -1261,12 +1242,6 @@ void CFemGridSolver::executeUpdate()
 						double alfa = atan2(tau[k],ds)/2.0;
 
 						double misesStress = sqrt(	pow(sig1,2) - sig1*sig2 + pow(sig2,2) );
-
-						//if (misesStress>m_maxMisesStressValue)
-						//	m_maxMisesStressValue = misesStress;
-								
-						//m_femGrid->setResult(i, j, k, 3, misesStress);
-
 					}
 					else
 					{
@@ -1388,9 +1363,9 @@ void CFemGridSolver::executeUpdate()
 		}
 	}
 
-	///////////////////////////////////////////////////////////////////////////
+	//
 	// Calculate reaction forces from vector constraints
-	///////////////////////////////////////////////////////////////////////////
+	//
 
 	if (vectorBcsDefined)
 	{
@@ -1526,7 +1501,6 @@ double CFemGridSolver::getConstraintStiffnessScale()
 {
 	return m_constraintStiffnessScale;
 }
-
 
 void CFemGridSolver::setStatusMessageEvent(CGSStatusMessageEvent* eventMethod)
 {

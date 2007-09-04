@@ -153,9 +153,6 @@ void CConstraint::doGeometry()
 			glVertex2d(x, y);
 		}
 		glEnd();
-
-		if (m_visibleReaction)
-			m_reactionForce->render();
 	}
 }
 

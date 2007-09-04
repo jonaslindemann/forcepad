@@ -15242,6 +15242,8 @@ else if (newMode == CPaintView::VM_PHYSICS)
 		showRightToolbar(scrRightForceToolbar);
 	if (btnConstraint2->value()==1)
 		showRightToolbar(scrRightBCToolbar);
+	if (btnConstraintHinge->value()==1)
+		showRightToolbar(scrRightBCHingeToolbar);
 
 	paintView->setEditMode(m_physicsEditMode);
 }
