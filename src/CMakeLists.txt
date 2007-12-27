@@ -1,1 +1,1 @@
-SUBDIRS(ivf2d common forcepad calfemcxx newmat)
+SUBDIRS(ivf2d common forcepad calfemcxx newmat opt_solver)

@@ -22,14 +22,12 @@
 
 #include "calfem.h"
 
-#define PrintMatrix(A) printMatrix(#A, A);
-
 namespace calfem {
 
 void printMatrix(std::string name, Matrix & A)
 {
 	std::cout << name << " = [" << A.nrows() << "x" << A.ncols() << "]" << std::endl;
-	std::cout << std::setw(8) << std::setprecision(4) << A;
+	std::cout << std::setw(10) << std::setprecision(4) << std::scientific << A;
 	std::cout << std::endl;
 }
 
@@ -778,8 +776,6 @@ void plani4e(
 
 	RowVector b = eq;
 
-	std::cout << "-------------- Input matrices -------------------" << std::endl;
-
 	PrintMatrix(ex);
 	PrintMatrix(ey);
 	PrintMatrix(ep);
@@ -802,15 +798,28 @@ void plani4e(
 	}
 	else if (ir==2)
 	{
-		g1=0.774596669241483; g2=0.0;
-		w1=0.555555555555555; w2=0.888888888888888;
+		g1=0.577350269189626;
+		w1=1.0;
 
 		gp.resize(4,2);
+		w.resize(4,2);
 
-		gp.column(1) << -g1 << g1 << -g1 << g1;
-		gp.column(2) << -g1 << -g1 << g1 << g1;
-		w.column(1) << w1 << w1 << w1 << w1;
-		w.column(2) << w1 << w1 << w1 << w1;
+		//    gp(:,1)=[-g1; g1;-g1; g1];  gp(:,2)=[-g1;-g1; g1; g1];
+
+		gp 
+			<< -g1 << -g1
+			<< g1 << -g1
+			<< -g1 << g1
+			<< g1 << g1;
+
+		w 
+			<< w1 << w1
+			<< w1 << w1
+			<< w1 << w1
+			<< w1 << w1;
+
+		PrintMatrix(gp);
+		PrintMatrix(w);
 	}
 	else if (ir==3)
 	{
@@ -818,11 +827,35 @@ void plani4e(
 		w1=0.555555555555555; w2=0.888888888888888;		
 
 		gp.resize(9,2);
+		w.resize(9,2);
 
-		gp.column(1) << -g1 << -g2 << g1 << -g1 << g2 << g1 << -g1 << g2 << g1;
-		gp.column(2) << -g1 << -g1 << -g1 << g2 << g2 << g2 << g1 << g1 << g1;
-		w.column(1) << w1 << w2 << w1 << w1 << w2 << w1 << w1 << w2 << w1;
-		w.column(2) << w1 << w1 << w1 << w2 << w2 << w2 << w1 << w1 << w1;
+		gp 
+			<< -g1 << -g1
+			<< -g2 << -g1
+			<< g1 << -g1
+			<< -g1 << g2
+			<< g2 << g2
+			<< g1 << g2
+			<< -g1 << g1
+			<< g2 << g1
+			<< g1 << g1;
+
+		//gp.column(1) << -g1 << -g2 << g1 << -g1 << g2 << g1 << -g1 << g2 << g1;
+		//gp.column(2) << -g1 << -g1 << -g1 << g2 << g2 << g2 << g1 << g1 << g1;
+
+		w 
+			<< w1 << w1
+			<< w2 << w1
+			<< w1 << w1
+			<< w1 << w2
+			<< w2 << w2
+			<< w1 << w2
+			<< w1 << w1
+			<< w2 << w1
+			<< w1 << w1;
+
+		//w.column(1) << w1 << w2 << w1 << w1 << w2 << w1 << w1 << w2 << w1;
+		//w.column(2) << w1 << w1 << w1 << w2 << w2 << w2 << w1 << w1 << w1;
 	}
 
 	ColumnVector wp(gp.nrows());
@@ -831,19 +864,16 @@ void plani4e(
 	ColumnVector eta = gp.column(2);
 	int r2 = ngp*2;
 
-
-
 	Matrix N(gp.nrows(),4);
 	N.column(1) = SP(1-xsi,1-eta)/4.0;
 	N.column(2) = SP(1+xsi,1-eta)/4.0;
 	N.column(3) = SP(1+xsi,1+eta)/4.0;
 	N.column(4) = SP(1-xsi,1+eta)/4.0;
 
-	std::cout << "-------------- Form functions -------------------" << std::endl;
-
 	PrintMatrix(N);
 
-	Matrix dNr(r2+1,4);
+	Matrix dNr(r2,4);
+	dNr = 0.0;
 
 	ColumnVector m1 = -(1-eta)/4;
 	ColumnVector m2 =  (1-eta)/4;
@@ -858,7 +888,7 @@ void plani4e(
 	unsigned int i, j;
 
 	j = 1;
-	for (i=1; i<=(unsigned int)r2; i+=2)
+	for (i=1; i<(unsigned int)r2; i+=2)
 	{
 		dNr(i,1) = m1(j);
 		dNr(i,2) = m2(j);
@@ -868,7 +898,7 @@ void plani4e(
 	}
 
 	j = 1;
-	for (i=2; i<=(unsigned int)r2+1; i+=2)
+	for (i=2; i<(unsigned int)r2+1; i+=2)
 	{
 		dNr(i,1) = n1(j);
 		dNr(i,2) = n2(j);
@@ -907,6 +937,8 @@ void plani4e(
 
 		PrintMatrix(Dm);
 
+		Ke = 0.0;
+
 		for (i=1; i<=(unsigned int)ngp; i++)
 		{
       //indx=[ 2*i-1; 2*i ];
@@ -920,6 +952,7 @@ void plani4e(
 			Matrix J = (JT.row(2*i-1) & JT.row(2*i));
 			PrintMatrix(J);
 			double detJ = J.determinant();
+
 			Matrix Jinv = J.i();
 			PrintMatrix(Jinv);
 
@@ -929,11 +962,15 @@ void plani4e(
 			//  [2x2] x [2x4] = [2x4]
 			Matrix dNx = Jinv*(dNr.row(2*i-1) & dNr.row(2*i));
 
+			PrintMatrix(dNx);
+
 			Matrix B(3,8);
 
 			B << dNx(1,1) << 0.0      << dNx(1,2) << 0.0      << dNx(1,3) << 0.0      << dNx(1,4) << 0.0
 			  << 0.0      << dNx(2,1) << 0.0      << dNx(2,2) << 0.0      << dNx(2,3) << 0.0      << dNx(2,4)
 			  << dNx(2,1) << dNx(1,1) << dNx(2,2) << dNx(1,2) << dNx(2,3) << dNx(1,3) << dNx(2,4) << dNx(1,4);
+
+			PrintMatrix(B);
 
 			Matrix N2(2,8);
 

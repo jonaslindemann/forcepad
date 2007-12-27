@@ -25,6 +25,12 @@
 
 #include "forcepad_defs.h"
 
+#ifdef CALFEM_DEBUG_OUTPUT
+#define PrintMatrix(A) calfem::printMatrix(#A, A);
+#else
+#define PrintMatrix(A)
+#endif
+
 namespace calfem {
 
 void hooke(int ptype, double E, double v, Matrix &D);
@@ -132,6 +138,7 @@ void assem(
 
 double maxValue(RowVector& rowVector);
 double minValue(RowVector& rowVector);
+void printMatrix(std::string name, Matrix & A);
 }
 
 #endif
