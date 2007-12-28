@@ -16,29 +16,9 @@ CNodeList::CNodeList ()
 }
 
 // ------------------------------------------------------------
-CNodeList::CNodeList (const CNodeList&)
-		:CBase()
-		//TODO: check and complete member initialisation list!
-{
-	// PRESERVE:BEGIN
-	// Insert your preservable code here...
-	// PRESERVE:END
-}
-
-// ------------------------------------------------------------
 CNodeList::~CNodeList ()
 {
 	// PRESERVE:BEGIN
 	// Insert your preservable code here...
 	// PRESERVE:END
 }
-
-// ------------------------------------------------------------
-CNodeList& CNodeList::operator = (const CNodeList &arg)
-{
-	// PRESERVE:BEGIN
-	// Insert your preservable code here...
-	return *this;
-	// PRESERVE:END
-}
-

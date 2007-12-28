@@ -10,7 +10,7 @@ CMesh2d::CMesh2d(unsigned int rows, unsigned int cols, double width, double heig
 	m_height = height;
 	m_createElementMatrixEvent = NULL;
 	m_nodeDofs = nodeDofs;
-	m_bandwidth = 0;
+	m_bandWidth = 0;
 	this->initialize();
 }
 
@@ -135,7 +135,7 @@ int CMesh2d::enumerateDofsVertical(int start)
 		for (j=0; j<m_rows+1; j++)
 			dofCount = m_nodeArray[j][i]->getDofs()->enumerate(dofCount);
 
-	m_bandwidth = m_nodeDofs*(m_rows+1);
+	m_bandWidth = m_nodeDofs*(m_rows+1);
 
 	return dofCount;
 }

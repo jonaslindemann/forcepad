@@ -28,7 +28,7 @@ private:
 	double m_width;
 	double m_height;
 
-	unsigned int m_bandwidth;
+	unsigned int m_bandWidth;
 	unsigned int m_nodeDofs;
 
 	CCreateElementMatrixEvent* m_createElementMatrixEvent;
