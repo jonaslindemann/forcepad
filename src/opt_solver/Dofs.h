@@ -13,17 +13,18 @@ private:
 	std::vector<int> m_dofs;
 public:
 	CDofs ();
-	CDofs (CDofs&);
 	virtual ~CDofs ();
-	CDofs& operator = (const CDofs &arg);
 
 	ClassInfo("CDofs",CBase);
 
+	void reset();
+
 	void setSize(int nDofs);
 	size_t getSize();
-	int enumerate(int start);
+
 	int getDof(unsigned int dof);
-	void reset();
+	void setDof(unsigned int dof, int number);
+
 	void print(std::ostream& out);
 };
 

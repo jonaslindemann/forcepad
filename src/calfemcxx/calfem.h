@@ -139,6 +139,10 @@ void assem(
 double maxValue(RowVector& rowVector);
 double minValue(RowVector& rowVector);
 void printMatrix(std::string name, Matrix & A);
+
+void writeRowVector(const char* name, RowVector &v, std::ostream &out);
+void writeColVector(const char* name, ColumnVector &v, std::ostream &out);
+void writeMatrix(const char* name, Matrix &m, std::ostream &out);
 }
 
 #endif

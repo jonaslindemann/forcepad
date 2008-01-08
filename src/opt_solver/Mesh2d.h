@@ -4,22 +4,17 @@
 #include "RFemBase.h"
 #include "Element.h"
 #include "Node3d.h"
-#include "Constraint.h"
 #include "Force.h"
 
 SmartPointer(CMesh2d);
 
 typedef std::vector<CNode3dPtr> TNodeList;
 
-typedef std::map<unsigned int,double> TConstraintMap;
-typedef std::map<unsigned int,double>::const_iterator TConstraintMapIterator;
-typedef std::map<unsigned int,double> TForceMap;
-typedef std::map<unsigned int,double>::const_iterator TForceMapIterator;
+typedef std::map<CConstraintPtr, CNode3dPtr> TConstraintMap;
+typedef std::vector<CConstraintPtr> TConstraintList;
 
-class CCreateElementMatrixEvent {
-public:
-	virtual ReturnMatrix onCreateElementMatrix(int row, int col, TNodeList& nodes) = 0;
-};
+typedef std::map<CForcePtr, CNode3dPtr> TForceMap;
+typedef std::vector<CForcePtr> TForceList;
 
 class CMesh2d : public CBase {
 private:
@@ -31,25 +26,27 @@ private:
 	unsigned int m_bandWidth;
 	unsigned int m_nodeDofs;
 
-	CCreateElementMatrixEvent* m_createElementMatrixEvent;
+	unsigned int m_totalDofs;
 
-	std::vector<CNode3dPtr> m_nodeList;
+	TNodeList m_nodeList;
+	TNodeList m_tempNodeList;
 	std::vector<std::vector<CNode3dPtr>> m_nodeArray;
 
 	TConstraintMap m_constraintMap;
+	TConstraintList m_constraintList;
+
 	TForceMap m_forceMap;
-	std::vector<CForcePtr> m_forceList;
+	TForceList m_forceList;
 
 	Matrix m_relativeStiffness;
 
 	SymmetricBandMatrix m_K;
+	ColumnVector m_f;
 
 	void initialize();
 public:
 	CMesh2d(unsigned int rows, unsigned int cols, double width, double height, unsigned int nodeDofs);
 	virtual ~CMesh2d ();
-
-	void setCreateElementMatrixEvent(CCreateElementMatrixEvent* event);
 
 	void setMesh(int rows, int cols);
 	void setSize(double width, double height);
@@ -57,6 +54,10 @@ public:
 	double getHeight();
 	double getElementWidth();
 	double getElementHeight();
+
+	CNode3d* getNode(unsigned int row, unsigned int col);
+	TNodeList& getNodeList(unsigned int row, unsigned int col);
+	ReturnMatrix getTopo(unsigned int row, unsigned int col);
 
 	unsigned int getRows();
 	unsigned int getCols();
@@ -78,12 +79,14 @@ public:
 	void applyForceHorisontal(unsigned int row, unsigned int start, unsigned int end, double fx, double fy);
 	void applyForceVertical(unsigned int col, unsigned int start, unsigned int end, double fx, double fy);
 
+	virtual ReturnMatrix onCreateElementMatrix(TNodeList& nodes, double relativeStiffness) = 0;
+	virtual int onGetElementMatrixSize() = 0;
+
 	void assembleGlobalStiffnessMatrix();
 
 	void print(std::ostream& out);
 
-	TConstraintMap& getConstraints();
-	TForceMap& getForces();
+	ReturnMatrix getGlobalStiffnessMatrix();
 
 	ClassInfo("CMesh2d", CBase);
 };

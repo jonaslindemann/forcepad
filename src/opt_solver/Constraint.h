@@ -5,24 +5,22 @@
 #define _CConstraint_H_
 
 #include "RFemBase.h"
-#include "Node3d.h"
 
 SmartPointer(CConstraint);
 
 class CConstraint : public CBase {
 private:
-	CNode3dPtr m_node;
 	std::vector<bool> m_prescribed;
 	std::vector<double> m_value;
 public:
 	CConstraint ();
 	virtual ~CConstraint ();
 
-	void setNode(CNode3d* node);
-	CNode3d* getNode();
-
 	void prescribeDof(unsigned int dof, double value);
 	void releaseDof(unsigned int dof);
+	bool isDofPrescribed(unsigned int dof);
+
+	bool isActive();
 
 	ClassInfo("CConstraint",CBase);
 };
