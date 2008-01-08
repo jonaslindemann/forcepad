@@ -335,9 +335,9 @@ void CFemGridSolver::execute()
 
 		cf.open("calfem.m", ios::out);
 
-		writeMatrix("Ex", Ex_out, cf);
-		writeMatrix("Ey", Ey_out, cf);
-		writeMatrix("Topo", Topo_out, cf);
+		calfem::writeMatrix("Ex", Ex_out, cf);
+		calfem::writeMatrix("Ey", Ey_out, cf);
+		calfem::writeMatrix("Topo", Topo_out, cf);
 
 		cf.close();
 	}

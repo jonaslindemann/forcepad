@@ -6,7 +6,7 @@
 
 SmartPointer(CPlani4Mesh2d);
 
-class CPlani4Mesh2d : public CMesh2d, CCreateElementMatrixEvent {
+class CPlani4Mesh2d : public CMesh2d {
 private:
 	Matrix m_D;
 	double m_E;
@@ -17,13 +17,19 @@ private:
 	CPlani4Ptr m_plani4;
 	CPlani4::TElementType m_elementType;
 	CPlani4::TIntegrationScheme m_integrationScheme;
-	void updateDMatrix();
+	void updateDMatrix(double relativeStiffness=1.0);
 	void updateElement();
 public:
 	CPlani4Mesh2d(unsigned int rows, unsigned int cols, double width, double height);
 	virtual ~CPlani4Mesh2d();
 
-	ReturnMatrix onCreateElementMatrix(int row, int col, TNodeList& nodes);
+	void setYoungsModulus(double E);
+	void setPoissonsRatio(double v);
+	void setThickness(double t);
+
+	virtual ReturnMatrix onCreateElementMatrix(TNodeList& nodes, double relativeStiffness);
+	virtual int onGetElementMatrixSize();
+
 };
 
 #endif

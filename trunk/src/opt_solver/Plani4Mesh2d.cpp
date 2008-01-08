@@ -3,7 +3,6 @@
 CPlani4Mesh2d::CPlani4Mesh2d(unsigned int rows, unsigned int cols, double width, double height)
 :CMesh2d(rows, cols, width, height, 2)
 {
-	this->setCreateElementMatrixEvent(this);
 	m_E = 2.1e6;
 	m_v = 0.35;
 	m_t = 1.0;
@@ -37,7 +36,7 @@ void CPlani4Mesh2d::updateElement()
 	m_plani4->setConstitutiveMatrix(m_D);
 }
 
-void CPlani4Mesh2d::updateDMatrix()
+void CPlani4Mesh2d::updateDMatrix(double relativeStiffness)
 {
 	int ptype;
 
@@ -52,10 +51,39 @@ void CPlani4Mesh2d::updateDMatrix()
 		m_D.resize(4,4); m_D = 0.0;
 	}
 
-	calfem::hooke(ptype, m_E, m_v, m_D);
+	calfem::hooke(ptype, m_E*relativeStiffness, m_v, m_D);
 }
 
-ReturnMatrix CPlani4Mesh2d::onCreateElementMatrix(int row, int col, TNodeList& nodes)
+void CPlani4Mesh2d::setYoungsModulus(double E)
 {
-	return m_plani4->getStiffnessMatrix();		
+	m_E = E;
+	this->updateDMatrix();
 }
+
+void CPlani4Mesh2d::setPoissonsRatio(double v)
+{
+	m_v = v;
+}
+
+void CPlani4Mesh2d::setThickness(double t)
+{
+	m_t = t;
+}
+
+ReturnMatrix CPlani4Mesh2d::onCreateElementMatrix(TNodeList& nodes, double relativeStiffness)
+{
+	m_plani4->setNode(1, nodes[0]);
+	m_plani4->setNode(2, nodes[1]);
+	m_plani4->setNode(3, nodes[2]);
+	m_plani4->setNode(4, nodes[3]);
+	this->updateDMatrix(relativeStiffness);
+	m_Ke = m_plani4->getStiffnessMatrix();
+	m_Ke.release(); return m_Ke;
+}
+
+int CPlani4Mesh2d::onGetElementMatrixSize()
+{
+	return 8;
+}
+
+

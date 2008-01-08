@@ -30,6 +30,7 @@
 #define RFEM_VERSION_RELEASE 0
 
 #include <iostream>
+#include <fstream>
 #include <iomanip>
 #include <cstdio>
 #include <cmath>

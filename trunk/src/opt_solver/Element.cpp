@@ -50,7 +50,6 @@ void CElement::setNode(unsigned int idx, CNode3d* node)
 	if ((idx>0)&&(idx<=m_nodes.size()))
 	{
 		m_nodes[idx-1] = node;
-		m_nodes[idx-1]->getDofs()->setSize(m_nodeDofSize);
 	}
 }
 

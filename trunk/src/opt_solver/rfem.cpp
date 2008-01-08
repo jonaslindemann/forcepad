@@ -9,40 +9,42 @@ int main(int argc, char* argv[])
 {
 	cout << "Creating mesh..." << endl;
 
-	CPlani4Mesh2dPtr mesh = new CPlani4Mesh2d(200, 200, 1.0, 1.0);
+	CPlani4Mesh2dPtr mesh = new CPlani4Mesh2d(10, 10, 1.0, 1.0);
 
-	cout << "Done." << endl;
-	cout << "Enumerating dofs..." << endl;
-
-	int dofCount = mesh->enumerateDofs(1);
-
-	cout << "Done." << endl;
-	cout << "Total number of dofs = " << dofCount << endl << endl;
+	cout << "Setting up boundary conditions." << endl;
 
 	mesh->constrainNode(0, 0, 1, 0.0);
 	mesh->constrainNode(0, 0, 2, 0.0);
 	mesh->constrainNode(0, mesh->getRows(), 2, 0.0);
-
 	mesh->applyForceNode(mesh->getRows(), mesh->getCols() % 2, 0.0, -1e4);
 
-	TConstraintMap& constraints = mesh->getConstraints();
-	TConstraintMapIterator ci;
+	cout << "Enumerating dofs... ";
 
-	cout << "Constrained dofs." << endl;
+	int dofCount = mesh->enumerateDofs(1);
 
-	for (ci=constraints.begin(); ci!=constraints.end(); ci++)
-		cout << ci->first << " = " << ci->second << std::endl;
+	cout << "Total number of dofs = " << dofCount << endl << endl;
 
-	TForceMap& forces = mesh->getForces();
-	TForceMapIterator fi;
+	cout << "Setting up material properties." << endl;
 
-	cout << "Force dofs." << endl;
+	mesh->setYoungsModulus(2.1e9);
+	mesh->setPoissonsRatio(0.35);
+	mesh->setThickness(0.1);
 
-	for (fi=forces.begin(); fi!=forces.end(); fi++)
-		cout << fi->first << " = " << fi->second << std::endl;
+	cout << "Setting up system matrix." << endl;
 
-	Matrix D;
-	calfem::hooke(1, 2.1e9, 0.3, D);
+	mesh->assembleGlobalStiffnessMatrix();
+
+	Matrix K = mesh->getGlobalStiffnessMatrix();
+
+	using namespace std;
+
+	cout << "Writing global stiffness matrix to disk." << endl;
+	
+	fstream cf;
+	cf.open("calfem.m", ios::out);
+	calfem::writeMatrix("K", K, cf);
+	cf.close();
+
 
 	return 0;
 }
