@@ -1007,7 +1007,7 @@ void writeColVector(const char* name, ColumnVector &v, std::ostream &out)
 
 	int i;
 
-	for (i=1; i<=v.Ncols(); i++)
+	for (i=1; i<=v.Nrows(); i++)
 		out << v(i) << std::endl;
 
 	out << "];" << endl;
@@ -1022,7 +1022,30 @@ void writeMatrix(const char* name, Matrix &m, std::ostream &out)
 	for (i=1; i<=m.Nrows(); i++)
 	{
 		for (j=1; j<=m.Ncols(); j++)
+		{
+			//std::cout << "row = " << i << " col = " << j << std::endl;
 			out << m(i,j) << " ";
+		}
+
+		out << ";" << std::endl;
+	}
+
+	out << "];" << endl;
+}
+
+void writeMatrix(const char* name, SymmetricBandMatrix &m, std::ostream &out)
+{
+	out << name << " = [" << std::endl;
+
+	int i, j;
+
+	for (i=1; i<=m.Nrows(); i++)
+	{
+		for (j=1; j<=m.Ncols(); j++)
+		{
+			//std::cout << "row = " << i << " col = " << j << std::endl;
+			out << m(i,j) << " ";
+		}
 
 		out << ";" << std::endl;
 	}

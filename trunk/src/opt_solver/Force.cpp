@@ -16,16 +16,3 @@ CForce::~CForce ()
 
 }
 
-// ------------------------------------------------------------
-void CForce::setNode(CNode3d* node)
-{
-	m_node = node;
-}
-
-// ------------------------------------------------------------
-CNode3d* CForce::getNode()
-{
-	return m_node;
-}
-
-

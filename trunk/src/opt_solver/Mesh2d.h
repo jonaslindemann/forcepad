@@ -11,9 +11,11 @@ SmartPointer(CMesh2d);
 typedef std::vector<CNode3dPtr> TNodeList;
 
 typedef std::map<CConstraintPtr, CNode3dPtr> TConstraintMap;
+typedef std::map<CConstraintPtr, CNode3dPtr>::iterator TConstraintMapIterator;
 typedef std::vector<CConstraintPtr> TConstraintList;
 
 typedef std::map<CForcePtr, CNode3dPtr> TForceMap;
+typedef std::map<CForcePtr, CNode3dPtr>::iterator TForceMapIterator;
 typedef std::vector<CForcePtr> TForceList;
 
 class CMesh2d : public CBase {
@@ -83,10 +85,12 @@ public:
 	virtual int onGetElementMatrixSize() = 0;
 
 	void assembleGlobalStiffnessMatrix();
+	void assembleForceVector();
 
 	void print(std::ostream& out);
 
 	ReturnMatrix getGlobalStiffnessMatrix();
+	ReturnMatrix getForceVector();
 
 	ClassInfo("CMesh2d", CBase);
 };

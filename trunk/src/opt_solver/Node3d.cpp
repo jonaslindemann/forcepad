@@ -32,6 +32,18 @@ CConstraint* CNode3d::getConstraint()
 	return m_constraint;
 }
 
+void CNode3d::setForce(CForce* force)
+{
+	m_force = force;
+}
+
+CForce* CNode3d::getForce()
+{
+	if (m_force == NULL)
+		m_force = new CForce();
+	return m_force;
+}
+
 int CNode3d::enumerateDofs(int start)
 {
 	m_dofs->reset();
@@ -63,16 +75,18 @@ int CNode3d::enumerateDofs(int start)
 
 void CNode3d::prescribeDof(unsigned int dof, double value)
 {
-	m_constraint = this->getConstraint();
-	m_constraint->prescribeDof(dof, value);
+	CConstraintPtr constraint = this->getConstraint();
+	constraint->prescribeDof(dof, value);
 }
 
 void CNode3d::releaseDof(unsigned int dof)
 {
-	m_constraint = this->getConstraint();
-	m_constraint->releaseDof(dof);
-	if (!m_constraint->isActive())
-		m_constraint = NULL;
+	if (m_constraint!=NULL)
+	{
+		m_constraint->releaseDof(dof);
+		if (!m_constraint->isActive())
+			m_constraint = NULL;
+	}
 }
 
 bool CNode3d::isDofPrescribed(unsigned int dof)
@@ -83,6 +97,17 @@ bool CNode3d::isDofPrescribed(unsigned int dof)
 		return m_constraint->isDofPrescribed(dof);
 }
 
+void CNode3d::applyForce(double fx, double fy)
+{
+	CForcePtr force = this->getForce();
+	force->setComponents(fx, fy, 0.0);
+}
+
+void CNode3d::clearForce()
+{
+	if (m_force!=NULL)
+		m_force = NULL;
+}
 
 void CNode3d::print(std::ostream& out)
 {

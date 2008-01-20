@@ -105,20 +105,20 @@ int CMesh2d::enumerateDofs(int start)
 	if (bwHor>bwVert)
 	{
 		m_bandWidth = bwVert;
-		m_totalDofs = enumerateDofsVertical(start);
+		m_totalDofs = enumerateDofsVertical(start)-1;
 		return m_totalDofs;
 	}
 	
 	if (bwHor<bwVert)
 	{
 		m_bandWidth = bwHor;
-		m_totalDofs = enumerateDofsHorisontal(start);
+		m_totalDofs = enumerateDofsHorisontal(start)-1;
 		return m_totalDofs;
 	}
 
 	m_bandWidth = bwHor;	
 
-	m_totalDofs = enumerateDofsHorisontal(start);
+	m_totalDofs = enumerateDofsHorisontal(start)-1;
 	return m_totalDofs;
 }
 
@@ -204,14 +204,13 @@ void CMesh2d::constrainVertical(unsigned int col, unsigned int start, unsigned i
 
 void CMesh2d::applyForceNode(unsigned int row, unsigned int col, double fx, double fy)
 {
-	//if ((row>=0)&&(row<=m_rows)&&(col>=0)&&(col<=m_rows))
-	//{
-	//	CNode3dPtr node = m_nodeArray[row][col];
-	//	if (fabs(fx)>0.0)
-	//		this->m_forceMap[node->getDofs()->getDof(1)] = fx;
-	//	if (fabs(fy)>0.0)
-	//		this->m_forceMap[node->getDofs()->getDof(2)] = fy;
-	//}	
+	if ((row>=0)&&(row<=m_rows)&&(col>=0)&&(col<=m_rows))
+	{
+		CNode3dPtr node = m_nodeArray[row][col];
+		node->applyForce(fx, fy);
+		m_forceMap[node->getForce()] = node;
+		m_forceList.push_back(node->getForce());
+	}
 }
 
 void CMesh2d::applyForceRow(unsigned int row, double fx, double fy)
@@ -258,7 +257,7 @@ unsigned int CMesh2d::getCols()
 
 unsigned int CMesh2d::getTotalDofs()
 {
-	return (m_rows+1)*(m_cols+1)*m_nodeDofs;
+	return m_totalDofs;
 }
 
 double CMesh2d::getWidth()
@@ -344,6 +343,12 @@ ReturnMatrix CMesh2d::getGlobalStiffnessMatrix()
 	m_K.release(); return m_K;
 }
 
+ReturnMatrix CMesh2d::getForceVector()
+{
+	m_f.release(); return m_f;
+}
+
+
 
 // ------------------------------------------------------------
 //  
@@ -371,6 +376,7 @@ void CMesh2d::assembleGlobalStiffnessMatrix()
 	m_K.resize(m_totalDofs,m_bandWidth);
 	m_K = 0.0;
 	m_f.resize(m_totalDofs);
+	m_f = 0.0;
 
 	// Setup matrices for local element matrix
 
@@ -389,9 +395,22 @@ void CMesh2d::assembleGlobalStiffnessMatrix()
 		{
 			TNodeList& nodeList = this->getNodeList(i, j);
 			topo = this->getTopo(i, j);
-			std::cout << topo << std::endl;
+			cout << topo << endl << endl;
 			Ke = this->onCreateElementMatrix(nodeList, 1.0);
 			calfem::assem(topo, m_K, Ke, m_f, fe);
 		}
+	}
+}
+
+void CMesh2d::assembleForceVector()
+{
+	TForceMapIterator fi;
+
+	for (fi=m_forceMap.begin(); fi!=m_forceMap.end(); fi++)
+	{
+		CForcePtr force = (*fi).first;
+		CNode3dPtr node = (*fi).second;
+		m_f(node->getDofs()->getDof(1)) += force->getX();
+		m_f(node->getDofs()->getDof(2)) += force->getY();
 	}
 }
