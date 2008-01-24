@@ -44,6 +44,7 @@ private:
 
 	SymmetricBandMatrix m_K;
 	ColumnVector m_f;
+	Matrix m_topo;
 
 	void initialize();
 public:
@@ -91,6 +92,7 @@ public:
 
 	ReturnMatrix getGlobalStiffnessMatrix();
 	ReturnMatrix getForceVector();
+	ReturnMatrix getTopoMatrix();
 
 	ClassInfo("CMesh2d", CBase);
 };
