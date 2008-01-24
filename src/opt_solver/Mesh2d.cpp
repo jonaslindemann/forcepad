@@ -102,19 +102,19 @@ int CMesh2d::enumerateDofs(int start)
 	unsigned int bwHor = m_nodeDofs*(m_cols+2)+1;
 	unsigned int bwVert = m_nodeDofs*(m_rows+2)+1;
 
-	if (bwHor>bwVert)
-	{
-		m_bandWidth = bwVert;
-		m_totalDofs = enumerateDofsVertical(start)-1;
-		return m_totalDofs;
-	}
-	
-	if (bwHor<bwVert)
-	{
-		m_bandWidth = bwHor;
-		m_totalDofs = enumerateDofsHorisontal(start)-1;
-		return m_totalDofs;
-	}
+	//if (bwHor>bwVert)
+	//{
+	//	m_bandWidth = bwVert;
+	//	m_totalDofs = enumerateDofsVertical(start)-1;
+	//	return m_totalDofs;
+	//}
+	//
+	//if (bwHor<bwVert)
+	//{
+	//	m_bandWidth = bwHor;
+	//	m_totalDofs = enumerateDofsHorisontal(start)-1;
+	//	return m_totalDofs;
+	//}
 
 	m_bandWidth = bwHor;	
 
@@ -325,6 +325,7 @@ ReturnMatrix CMesh2d::getTopo(unsigned int row, unsigned int col)
 	TNodeList& nodeList = this->getNodeList(row, col);
 	RowVector Topo;
 	Topo.resize(this->onGetElementMatrixSize());
+	Topo = 0.0;
 
 	unsigned int i;
 
@@ -335,6 +336,7 @@ ReturnMatrix CMesh2d::getTopo(unsigned int row, unsigned int col)
 		Topo(1+i*2+1) = (double)nodeList[i]->getDofs()->getDof(2);
 	}
 
+	cout << Topo << endl;
 	Topo.release(); return Topo;
 }
 
@@ -347,6 +349,12 @@ ReturnMatrix CMesh2d::getForceVector()
 {
 	m_f.release(); return m_f;
 }
+
+ReturnMatrix CMesh2d::getTopoMatrix()
+{
+	m_topo.release(); return m_topo;
+}
+
 
 
 
@@ -385,9 +393,14 @@ void CMesh2d::assembleGlobalStiffnessMatrix()
 	ColumnVector fe(elementSize);
 	fe = 0.0;
 
+	// Setup topology matrix
+
+	m_topo.resize(m_rows*m_cols, elementSize);
+
 	// Assemble system matrix
 
 	RowVector topo(8);
+	int rowCount = 1;
 
 	for (i=0; i<m_rows; i++)
 	{
@@ -395,7 +408,8 @@ void CMesh2d::assembleGlobalStiffnessMatrix()
 		{
 			TNodeList& nodeList = this->getNodeList(i, j);
 			topo = this->getTopo(i, j);
-			cout << topo << endl << endl;
+			m_topo.row(rowCount++) = topo;
+			//cout << topo << endl << endl;
 			Ke = this->onCreateElementMatrix(nodeList, 1.0);
 			calfem::assem(topo, m_K, Ke, m_f, fe);
 		}

@@ -63,6 +63,7 @@ void CPlani4Mesh2d::setYoungsModulus(double E)
 void CPlani4Mesh2d::setPoissonsRatio(double v)
 {
 	m_v = v;
+	this->updateDMatrix();
 }
 
 void CPlani4Mesh2d::setThickness(double t)
@@ -76,7 +77,9 @@ ReturnMatrix CPlani4Mesh2d::onCreateElementMatrix(TNodeList& nodes, double relat
 	m_plani4->setNode(2, nodes[1]);
 	m_plani4->setNode(3, nodes[2]);
 	m_plani4->setNode(4, nodes[3]);
+	m_plani4->setThickness(m_t);
 	this->updateDMatrix(relativeStiffness);
+	m_plani4->setConstitutiveMatrix(m_D);
 	m_Ke = m_plani4->getStiffnessMatrix();
 	m_Ke.release(); return m_Ke;
 }
