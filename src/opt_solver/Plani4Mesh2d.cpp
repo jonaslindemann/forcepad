@@ -8,7 +8,7 @@ CPlani4Mesh2d::CPlani4Mesh2d(unsigned int rows, unsigned int cols, double width,
 	m_t = 1.0;
 
 	m_elementType = CPlani4::ET_PLANE_STRESS;
-	m_integrationScheme = CPlani4::IS_GAUSS_1;
+	m_integrationScheme = CPlani4::IS_GAUSS_4;
 
 	m_plani4 = new CPlani4();
 
@@ -81,7 +81,12 @@ ReturnMatrix CPlani4Mesh2d::onCreateElementMatrix(TNodeList& nodes, double relat
 	this->updateDMatrix(relativeStiffness);
 	m_plani4->setConstitutiveMatrix(m_D);
 	m_Ke = m_plani4->getStiffnessMatrix();
-	m_Ke.release(); return m_Ke;
+	return m_Ke;
+}
+
+ReturnMatrix CPlani4Mesh2d::getElementMatrix()
+{
+	return m_Ke;
 }
 
 int CPlani4Mesh2d::onGetElementMatrixSize()

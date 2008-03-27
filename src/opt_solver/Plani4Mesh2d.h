@@ -27,6 +27,8 @@ public:
 	void setPoissonsRatio(double v);
 	void setThickness(double t);
 
+	ReturnMatrix getElementMatrix();
+
 	virtual ReturnMatrix onCreateElementMatrix(TNodeList& nodes, double relativeStiffness);
 	virtual int onGetElementMatrixSize();
 

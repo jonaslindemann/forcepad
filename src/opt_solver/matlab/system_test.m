@@ -29,12 +29,13 @@ E=2.1e9;
 v=0.35;
 t=0.1;
 ptype=1;
-ep=[ptype t 1];
+
+ep=[ptype t 2];
 ex = [0 0.25 0.25 0];
 ey = [0 0 0.25 0.25];
 
 D=hooke(ptype,E,v);
-Ke=plani4e(ex, ey, ep, D);
+Kep=plani4e(ex, ey, ep, D);
 
 nElements = size(topo,1);
 nDofs = max(max(topo));
@@ -49,7 +50,7 @@ edof = [ zeros(nElements,1) topo];
 Kp=zeros(nDofs+1, nDofs+1);
 
 for i=1:nElements
-  Kp=assem(edof(i,:),Kp,Ke);
+  Kp=assem(edof(i,:),Kp,Kep);
 end;
 
 Kp(nDofs+1,:) = []
