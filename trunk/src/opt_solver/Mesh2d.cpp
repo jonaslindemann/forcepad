@@ -329,14 +329,13 @@ ReturnMatrix CMesh2d::getTopo(unsigned int row, unsigned int col)
 
 	unsigned int i;
 
-	for (i=0; i<nodeList.size(); i++)
+	for (i=0; i<nodeList.size();   i++)
 	{
 		//nodeList[i]->print(cout);
 		Topo(1+i*2) = (double)nodeList[i]->getDofs()->getDof(1);
 		Topo(1+i*2+1) = (double)nodeList[i]->getDofs()->getDof(2);
 	}
 
-	cout << Topo << endl;
 	Topo.release(); return Topo;
 }
 
@@ -355,8 +354,15 @@ ReturnMatrix CMesh2d::getTopoMatrix()
 	m_topo.release(); return m_topo;
 }
 
+ReturnMatrix CMesh2d::getCoordMatrix()
+{
+	m_coord.release(); return m_coord;
+}
 
-
+ReturnMatrix CMesh2d::getDofMatrix()
+{
+	m_dof.release(); return m_dof;
+}
 
 // ------------------------------------------------------------
 //  
@@ -396,11 +402,28 @@ void CMesh2d::assembleGlobalStiffnessMatrix()
 	// Setup topology matrix
 
 	m_topo.resize(m_rows*m_cols, elementSize);
+	m_coord.resize((m_rows+1)*(m_cols+1), 2);
+	m_dof.resize((m_rows+1)*(m_cols+1), 2);
+
+	// Create matrices used for export.
+
+	int rowCount = 1;
+
+	for (i=0; i<=m_rows; i++)
+	{
+		for (j=0; j<=m_cols; j++)
+		{
+			m_coord(rowCount,1) = this->getNode(i, j)->getX();
+			m_coord(rowCount,2) = this->getNode(i, j)->getY();
+			m_dof(rowCount,1) = this->getNode(i, j)->getDofs()->getDof(1);
+			m_dof(rowCount++,2) = this->getNode(i, j)->getDofs()->getDof(2);
+		}
+	}
 
 	// Assemble system matrix
 
 	RowVector topo(8);
-	int rowCount = 1;
+	rowCount = 1;
 
 	for (i=0; i<m_rows; i++)
 	{
@@ -428,3 +451,4 @@ void CMesh2d::assembleForceVector()
 		m_f(node->getDofs()->getDof(2)) += force->getY();
 	}
 }
+

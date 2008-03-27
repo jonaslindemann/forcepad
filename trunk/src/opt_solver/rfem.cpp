@@ -20,16 +20,14 @@ int main(int argc, char* argv[])
 	//   |x,x   |1,2   |3,4
 	//   o------o------o
 
-	CPlani4Mesh2dPtr mesh = new CPlani4Mesh2d(2, 2, 1.0, 1.0);
+	CPlani4Mesh2dPtr mesh = new CPlani4Mesh2d(10, 10, 1.0, 1.0);
 
 	cout << "Setting up boundary conditions." << endl;
 
 	mesh->constrainNode(0, 0, 1, 0.0);
 	mesh->constrainNode(0, 0, 2, 0.0);
-	mesh->constrainNode(2, 0, 1, 0.0);
-	mesh->constrainNode(2, 0, 2, 0.0);
-	//mesh->constrainNode(mesh->getRows(), 0, 1, 0.0);
-	//mesh->constrainNode(mesh->getRows(), 0, 2, 0.0);
+	mesh->constrainNode(mesh->getRows(), 0, 1, 0.0);
+	mesh->constrainNode(mesh->getRows(), 0, 2, 0.0);
 	mesh->applyForceNode(0, mesh->getCols(), 0.0, -1e4);
 
 	cout << "Enumerating dofs... ";
@@ -52,32 +50,31 @@ int main(int argc, char* argv[])
 	SymmetricBandMatrix K = mesh->getGlobalStiffnessMatrix();
 	ColumnVector f = mesh->getForceVector();
 	Matrix topo = mesh->getTopoMatrix();
+	Matrix Ke = mesh->getElementMatrix();
+	Matrix coord = mesh->getCoordMatrix();
+	Matrix dof = mesh->getDofMatrix();
 
 	using namespace std;
 
 	cout << "Writing global stiffness matrix to disk." << endl;
 	
 	fstream cf;
-	cf.open("D:\\dev\\forcepad\\src\\opt_solver\\matlab\\calfem.m", ios::out);
+	cf.open("c:\\users\\jonas\\documents\\development\\forcepad\\src\\opt_solver\\matlab\\calfem.m", ios::out);
 
 	Matrix fullK = K;
 	calfem::writeMatrix("K", fullK, cf);
 	calfem::writeColVector("f", f, cf);
 	calfem::writeMatrix("topo", topo, cf);
+	calfem::writeMatrix("coord", coord, cf);
+	calfem::writeMatrix("dof", dof, cf);
+	calfem::writeMatrix("Ke", Ke, cf);
 
 	cout << "Solve equation system." << endl;
-	//cout << fullK.determinant() << endl;
-	cout << fullK.sum() << endl;
-	cout << fullK.norm1() << endl;
 
-	//BandLUMatrix LU;
-	//LinearEquationSolver LU = fullK;
-	//ColumnVector a;
+	BandLUMatrix LU = K;
+	ColumnVector a = LU.i() * f;
 
-	//a = LU.i() * f;
-
-
-	//calfem::writeColVector("a", a, cf);
+	calfem::writeColVector("a", a, cf);
 
 	cf.close();
 	return 0;
