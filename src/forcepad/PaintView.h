@@ -43,13 +43,13 @@
 #include "Ellipse.h"
 #include "Line.h"
 #include "SgiImage.h"
-#include "ImageGrid.h"
-#include "FemGrid.h"
+#include "ImageGrid2.h"
+#include "FemGrid2.h"
 #include "Clipboard.h"
 #include "ForcePadClipboard.h"
 #include "ScreenImage.h"
 
-#include "FemGridSolver.h"
+#include "FemGridSolver2.h"
 
 #include "CGIndicator.h"
 
@@ -183,7 +183,7 @@ private:
 	double m_thickness;
 	double m_constraintStiffnessScale;
 
-	CFemGridSolverPtr m_solver;
+	CFemGridSolver2Ptr m_solver;
 
 	/*
 	 *    Drawing tools
@@ -201,7 +201,7 @@ private:
 	CClipboardPtr m_undoClipboard;
 
 	CImagePtr m_drawing;
-	CFemGridPtr m_femGrid;
+	CFemGrid2Ptr m_femGrid;
 	CScreenImagePtr m_screenImage;
 	CImagePtr m_buffer;
 
@@ -390,7 +390,7 @@ public:
 
 	// Visualisation settings
 
-	void setStressMode(CFemGrid::TStressMode mode);
+	void setStressMode(CFemGrid2::TStressMode mode);
 	void setStressStep(int step);
 	int getStressStep();
 	void setMaxIntensity(float intensity);
@@ -409,7 +409,7 @@ public:
 	void setDrawDisplacements(bool flag);
 	bool getDrawDisplacements();
 
-	void setStressType(CFemGrid::TStressType stressType);
+	void setStressType(CFemGrid2::TStressType stressType);
 	void setColorMap(int index);
 	void setInvertColorMap(bool flag);
 

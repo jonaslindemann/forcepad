@@ -778,12 +778,6 @@ void plani4e(
 
 	RowVector b = eq;
 
-	PrintMatrix(ex);
-	PrintMatrix(ey);
-	PrintMatrix(ep);
-	PrintMatrix(D);
-	PrintMatrix(eq);
-
 	double g1, g2;
 	double w1, w2;
 
@@ -805,8 +799,6 @@ void plani4e(
 
 		gp.resize(4,2);
 		w.resize(4,2);
-
-		//    gp(:,1)=[-g1; g1;-g1; g1];  gp(:,2)=[-g1;-g1; g1; g1];
 
 		gp 
 			<< -g1 << -g1
@@ -842,9 +834,6 @@ void plani4e(
 			<< g2 << g1
 			<< g1 << g1;
 
-		//gp.column(1) << -g1 << -g2 << g1 << -g1 << g2 << g1 << -g1 << g2 << g1;
-		//gp.column(2) << -g1 << -g1 << -g1 << g2 << g2 << g2 << g1 << g1 << g1;
-
 		w 
 			<< w1 << w1
 			<< w2 << w1
@@ -856,8 +845,6 @@ void plani4e(
 			<< w2 << w1
 			<< w1 << w1;
 
-		//w.column(1) << w1 << w2 << w1 << w1 << w2 << w1 << w1 << w2 << w1;
-		//w.column(2) << w1 << w1 << w1 << w2 << w2 << w2 << w1 << w1 << w1;
 	}
 
 	ColumnVector wp(gp.nrows());
@@ -943,14 +930,6 @@ void plani4e(
 
 		for (i=1; i<=(unsigned int)ngp; i++)
 		{
-      //indx=[ 2*i-1; 2*i ];
-      //detJ=det(JT(indx,:));  JT[
-      //if detJ<10*eps
-      //  disp('Jacobideterminant equal or less than zero!')
-      //end
-      //JTinv=inv(JT(indx,:));
-      //dNx=JTinv*dNr(indx,:);
-
 			Matrix J = (JT.row(2*i-1) & JT.row(2*i));
 			PrintMatrix(J);
 			double detJ = J.determinant();
@@ -981,6 +960,206 @@ void plani4e(
 
 			Ke = Ke + B.t()*Dm*B*detJ*wp(i)*t;
 			fe = fe + N2.t()*b.t()*detJ*wp(i)*t;
+		}
+	}
+	else
+	{
+
+	}
+}
+
+void plani4s(
+			RowVector &ex, 
+			RowVector &ey,
+			RowVector &ep,
+			Matrix &D,
+			RowVector &ed,
+			Matrix &es,
+			Matrix &et)
+{
+	int ptype = (int)ep(1); 
+	double t = ep(2);  
+	int ir = (int)ep(3);  
+	int ngp = ir*ir;
+
+	double g1, g2;
+	double w1, w2;
+
+	Matrix gp;
+	Matrix w;
+
+	if (ir==1)
+	{
+		g1 = 0.0; w1=2.0;
+		gp.resize(1,2);
+		w.resize(1,2);
+		gp << g1 << g1;
+		w << w1 << w1;
+	}
+	else if (ir==2)
+	{
+		g1=0.577350269189626;
+		w1=1.0;
+
+		gp.resize(4,2);
+		w.resize(4,2);
+
+		gp 
+			<< -g1 << -g1
+			<< g1 << -g1
+			<< -g1 << g1
+			<< g1 << g1;
+
+		w 
+			<< w1 << w1
+			<< w1 << w1
+			<< w1 << w1
+			<< w1 << w1;
+
+		PrintMatrix(gp);
+		PrintMatrix(w);
+	}
+	else if (ir==3)
+	{
+		g1=0.774596669241483; g2=0.;
+		w1=0.555555555555555; w2=0.888888888888888;		
+
+		gp.resize(9,2);
+		w.resize(9,2);
+
+		gp 
+			<< -g1 << -g1
+			<< -g2 << -g1
+			<< g1 << -g1
+			<< -g1 << g2
+			<< g2 << g2
+			<< g1 << g2
+			<< -g1 << g1
+			<< g2 << g1
+			<< g1 << g1;
+
+		w 
+			<< w1 << w1
+			<< w2 << w1
+			<< w1 << w1
+			<< w1 << w2
+			<< w2 << w2
+			<< w1 << w2
+			<< w1 << w1
+			<< w2 << w1
+			<< w1 << w1;
+
+	}
+
+	ColumnVector wp(gp.nrows());
+	wp = SP(w.column(1), w.column(2));
+	ColumnVector xsi = gp.column(1);
+	ColumnVector eta = gp.column(2);
+	int r2 = ngp*2;
+
+	Matrix N(gp.nrows(),4);
+	N.column(1) = SP(1-xsi,1-eta)/4.0;
+	N.column(2) = SP(1+xsi,1-eta)/4.0;
+	N.column(3) = SP(1+xsi,1+eta)/4.0;
+	N.column(4) = SP(1-xsi,1+eta)/4.0;
+
+	PrintMatrix(N);
+
+	Matrix dNr(r2,4);
+	dNr = 0.0;
+
+	ColumnVector m1 = -(1-eta)/4;
+	ColumnVector m2 =  (1-eta)/4;
+	ColumnVector m3 =  (1+eta)/4;
+	ColumnVector m4 = -(1+eta)/4;
+
+	ColumnVector n1 = -(1-xsi)/4;
+	ColumnVector n2 = -(1+xsi)/4;
+	ColumnVector n3 =  (1+xsi)/4;
+	ColumnVector n4 =  (1-xsi)/4;
+
+	unsigned int i, j;
+
+	j = 1;
+	for (i=1; i<(unsigned int)r2; i+=2)
+	{
+		dNr(i,1) = m1(j);
+		dNr(i,2) = m2(j);
+		dNr(i,3) = m3(j);
+		dNr(i,4) = m4(j);
+		j++;
+	}
+
+	j = 1;
+	for (i=2; i<(unsigned int)r2+1; i+=2)
+	{
+		dNr(i,1) = n1(j);
+		dNr(i,2) = n2(j);
+		dNr(i,3) = n3(j);
+		dNr(i,4) = n4(j);
+		j++;
+	}	
+
+	PrintMatrix(dNr);
+
+	//  JT=dNr*[ex;ey]';  [3x4]x[[2x4]'] = [3x4]x[4x2] = [3x2]
+	//           
+	Matrix JT = dNr*(ex.t()|ey.t()); // [3x4]x[[4x2] = [3x2] Ok
+
+	PrintMatrix(JT);
+
+	Matrix Dm;
+
+	if (ptype==1) 
+	{
+		if (D.ncols()>3)
+		{
+			Matrix Cm = D.i();
+			Dm.resize(3,3);
+
+			Dm << Cm(1,1) << Cm(1,2) << 0.0 << Cm(1,4);
+			Dm << Cm(2,1) << Cm(2,2) << 0.0 << Cm(2,4);
+			Dm << 0.0     << 0.0     << 0.0 << 0.0;
+			Dm << Cm(4,1) << Cm(4,2) << 0.0 << Cm(1,4);
+
+			Dm = Dm.i();		}
+		else
+		{
+			Dm = D;
+		}
+
+		PrintMatrix(Dm);
+
+		es.resize(ngp, Dm.nrows());
+		et.resize(ngp, Dm.nrows());
+
+		for (i=1; i<=(unsigned int)ngp; i++)
+		{
+			Matrix J = (JT.row(2*i-1) & JT.row(2*i));
+			PrintMatrix(J);
+			double detJ = J.determinant();
+
+			Matrix Jinv = J.i();
+			PrintMatrix(Jinv);
+
+			Matrix dNrdNr = dNr.row(2*i-1) & dNr.row(2*i);
+			PrintMatrix(dNrdNr);
+			
+			//  [2x2] x [2x4] = [2x4]
+			Matrix dNx = Jinv*(dNr.row(2*i-1) & dNr.row(2*i));
+
+			PrintMatrix(dNx);
+
+			Matrix B(3,8);
+
+			B << dNx(1,1) << 0.0      << dNx(1,2) << 0.0      << dNx(1,3) << 0.0      << dNx(1,4) << 0.0
+			  << 0.0      << dNx(2,1) << 0.0      << dNx(2,2) << 0.0      << dNx(2,3) << 0.0      << dNx(2,4)
+			  << dNx(2,1) << dNx(1,1) << dNx(2,2) << dNx(1,2) << dNx(2,3) << dNx(1,3) << dNx(2,4) << dNx(1,4);
+
+			// B[3,8] x Ed[8,1] = [3,1]
+
+			et.row(i) = (B * ed.t()).t();
+			es.row(i) = (Dm * et.row(i).t()).t();
 		}
 	}
 	else

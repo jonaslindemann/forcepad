@@ -261,7 +261,7 @@ if (btnPaste->value()==1)
         Fl_Button btnStress {
           callback {showRightToolbar(scrRightStressToolbar);
 paintView->setDrawDisplacements(false);
-paintView->setStressType(CFemGrid::ST_PRINCIPAL);
+paintView->setStressType(CFemGrid2::ST_PRINCIPAL);
 paintView->setDrawStress(true);}
           tooltip {Stress visualisation} image {../../images/stress2.xpm} xywh {117 104 42 42} type Radio down_box DOWN_BOX value 1 selection_color 51
           code0 {\#include "Fl_HoverButton.h"}
@@ -278,7 +278,7 @@ paintView->setDrawStress(false);}
         Fl_Button btnMisesStress {
           callback {showRightToolbar(scrRightMisesStressToolbar);
 paintView->setDrawDisplacements(false);
-paintView->setStressType(CFemGrid::ST_MISES);
+paintView->setStressType(CFemGrid2::ST_MISES);
 paintView->setDrawStress(true);}
           tooltip {Mises stress visualisation} image {../../images/stress_mises.xpm} xywh {117 149 42 42} type Radio down_box DOWN_BOX selection_color 51
           code0 {\#include "Fl_HoverButton.h"}
@@ -468,19 +468,19 @@ else
         xywh {332 52 53 413} box FLAT_BOX
       } {
         Fl_Button btnTensionCompression {
-          callback {paintView->setStressMode(CFemGrid::SM_ALL);}
+          callback {paintView->setStressMode(CFemGrid2::SM_ALL);}
           tooltip {Show both compression and tension} image {../../images/tension_compression.xpm} xywh {337 324 42 42} type Radio down_box DOWN_BOX value 1 selection_color 51
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
         }
         Fl_Button btnTension {
-          callback {paintView->setStressMode(CFemGrid::SM_POSITIVE);}
+          callback {paintView->setStressMode(CFemGrid2::SM_POSITIVE);}
           tooltip {Show only tension} image {../../images/tension.xpm} xywh {337 367 42 29} type Radio down_box DOWN_BOX selection_color 51
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
         }
         Fl_Button btnCompression {
-          callback {paintView->setStressMode(CFemGrid::SM_NEGATIVE);}
+          callback {paintView->setStressMode(CFemGrid2::SM_NEGATIVE);}
           tooltip {Show only compression} image {../../images/compression.xpm} xywh {337 397 42 29} type Radio down_box DOWN_BOX selection_color 51
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
@@ -1006,7 +1006,7 @@ if (self!=btnConstraint2)
 
 this->paintView->setCommandLine(argc, argv);} {}
   }
-  Function {onModeChange(CPaintView::TEditMode oldMode, CPaintView::TEditMode newMode)} {return_type void
+  Function {onModeChange(CPaintView::TEditMode oldMode, CPaintView::TEditMode newMode)} {open return_type void
   } {
     code {cout << "Edit mode = " << paintView->getEditMode() << endl;
 
@@ -1088,7 +1088,7 @@ else
 	if (btnStress->value()==1)
 	{
 		paintView->setDrawDisplacements(false);
-		paintView->setStressType(CFemGrid::ST_PRINCIPAL);
+		paintView->setStressType(CFemGrid2::ST_PRINCIPAL);
 		paintView->setDrawStress(true);
 		showRightToolbar(scrRightStressToolbar);
 	}
@@ -1096,7 +1096,7 @@ else
 	if (btnMisesStress->value()==1)
 	{
 		paintView->setDrawDisplacements(false);
-		paintView->setStressType(CFemGrid::ST_MISES);
+		paintView->setStressType(CFemGrid2::ST_MISES);
 		paintView->setDrawStress(true);
 		
 		if (btnColorMap1->value()==1)
@@ -1203,7 +1203,8 @@ if (oldMode = CPaintView::VM_PHYSICS)
   } {
     code {return wndMain;} {}
   }
-  Function {onModelChanged(const std::string& newModelName)} {} {
+  Function {onModelChanged(const std::string& newModelName)} {open
+  } {
     code {string caption = newModelName + " - ForcePAD 2";
 wndMain->label(caption.c_str());} {}
   }

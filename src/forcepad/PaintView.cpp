@@ -25,8 +25,7 @@
 #include "PaintView.h"
 
 #include "NewModelDlg.h"
-#include "FemGridSolver.h"
-#include "FemGridSolverCORBA.h"
+#include "FemGridSolver2.h"
 #include "MainFrame2.h"
 #include "LogWindow.h"
 #include "JpegImage.h"
@@ -238,7 +237,7 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 	
 	// Create image grid
 	
-	m_femGrid = new CFemGrid();
+	m_femGrid = new CFemGrid2();
 	m_femGrid->setImage(m_drawing);
 	m_femGrid->setStride(6);
 	m_femGrid->setAverageStress(true);
@@ -1641,7 +1640,7 @@ bool CPaintView::execute()
 	
 	so_print("CPaintView","\tInitiating solver.");
 	
-	m_solver = new CFemGridSolver();
+	m_solver = new CFemGridSolver2();
 	m_solver->setStatusMessageEvent(m_statusMessageEvent);
 	m_solver->setLogMessageEvent(m_logMessageEvent);
 	m_solver->setUseWeight(m_useWeight);
@@ -1668,28 +1667,28 @@ bool CPaintView::execute()
 	so_print("CPaintView","\tChecking for errors.");
 	
 	switch (m_solver->getLastError()) {
-	case CFemGridSolver::ET_NO_ERROR:
+	case CFemGridSolver2::ET_NO_ERROR:
 		errors = false;
 		break;
-	case CFemGridSolver::ET_NO_ELEMENTS:
+	case CFemGridSolver2::ET_NO_ELEMENTS:
 		fl_message("No structure to solve.");
 		break;
-	case CFemGridSolver::ET_NO_BCS:
+	case CFemGridSolver2::ET_NO_BCS:
 		fl_message("Add locks to structure.");
 		break;
-	case CFemGridSolver::ET_NO_LOADS:
+	case CFemGridSolver2::ET_NO_LOADS:
 		fl_message("No loads defined on structure.");
 		break;
-	case CFemGridSolver::ET_UNSTABLE:
+	case CFemGridSolver2::ET_UNSTABLE:
 		fl_message("Structure unstable. Try adding locks.");
 		break;
-	case CFemGridSolver::ET_INVALID_MODEL:
+	case CFemGridSolver2::ET_INVALID_MODEL:
 		fl_message("Model invalid.");
 		break;
-	case CFemGridSolver::ET_LOAD_OUTSIDE_AE:
+	case CFemGridSolver2::ET_LOAD_OUTSIDE_AE:
 		fl_message("Loads defined outside structure.");
 		break;
-	case CFemGridSolver::ET_BC_OUTSIDE_AE:
+	case CFemGridSolver2::ET_BC_OUTSIDE_AE:
 		fl_message("Locks defined outside structure.");
 		break;
 	default:
@@ -1769,77 +1768,7 @@ void CPaintView::newModel()
 
 void CPaintView::executeCorba()
 {
-	bool errors = true;
-	
-	//
-	// Initialize grid
-	//
-	
-	m_femGrid->initGrid();
-	m_femGrid->setShowGrid(true);
-	
-	//
-	// Initiate solver
-	//
-	
-	CFemGridSolverCORBA* solver = new CFemGridSolverCORBA();
-	solver->setCommandLine(m_argc, m_argv);
-	solver->setFemGrid(m_femGrid);
-	
-	//
-	// Execute calculation
-	//
-	
-	solver->execute();
-	
-	//
-	// Check for errors
-	//
-	
-	switch (solver->getLastError()) {
-	case CFemGridSolver::ET_NO_ERROR:
-		errors = false;
-		break;
-	case CFemGridSolver::ET_NO_ELEMENTS:
-		fl_message("No structure to solve.");
-		break;
-	case CFemGridSolver::ET_NO_BCS:
-		fl_message("Add locks to structure.");
-		break;
-	case CFemGridSolver::ET_NO_LOADS:
-		fl_message("No loads defined on structure.");
-		break;
-	case CFemGridSolver::ET_UNSTABLE:
-		fl_message("Structure unstable. Try adding locks.");
-		break;
-	case CFemGridSolver::ET_INVALID_MODEL:
-		fl_message("Model invalid.");
-		break;
-	case CFemGridSolver::ET_LOAD_OUTSIDE_AE:
-		fl_message("Loads defined outside structure.");
-		break;
-	case CFemGridSolver::ET_BC_OUTSIDE_AE:
-		fl_message("Locks defined outside structure.");
-		break;
-	default:
-		
-		break;
-	}
-	
-	//
-	// Clean up and redraw
-	//
-	
-	delete solver;
-	
-	if (errors)
-	{
-		m_femGrid->setShowGrid(false);
-		this->invalidate();
-	}
-	this->redraw();
 }
-
 
 void CPaintView::openImage()
 {
@@ -2589,7 +2518,7 @@ void CPaintView::setUseWeight(bool flag)
 	m_useWeight = flag;
 }
 
-void CPaintView::setStressMode(CFemGrid::TStressMode mode)
+void CPaintView::setStressMode(CFemGrid2::TStressMode mode)
 {
 	m_femGrid->setStressMode(mode);
 	this->redraw();
@@ -2921,11 +2850,11 @@ bool CPaintView::getDrawDisplacements()
 	return m_femGrid->getDrawDisplacements();
 }
 
-void CPaintView::setStressType(CFemGrid::TStressType stressType)
+void CPaintView::setStressType(CFemGrid2::TStressType stressType)
 {
 	// Make sure a colormap is loaded
 
-	if (stressType == CFemGrid::ST_MISES)
+	if (stressType == CFemGrid2::ST_MISES)
 		this->setColorMap(1);
 
 	m_femGrid->setStressType(stressType);

@@ -28,7 +28,7 @@
 #include "Clipboard.h"
 #include "ForceSelection.h"
 #include "ConstraintSelection.h"
-#include "FemGrid.h"
+#include "FemGrid2.h"
 
 IvfSmartPointer(CForcePadClipboard);
 
@@ -36,7 +36,7 @@ class CForcePadClipboard : public CClipboard {
 private:
 	CForceSelection* m_forceSelection;
 	CConstraintSelection* m_constraintSelection;
-	CFemGrid* m_grid;
+	CFemGrid2* m_grid;
 	int m_drawingOffsetX;
 	int m_drawingOffsetY;
 public:
@@ -47,7 +47,7 @@ public:
 
 	void render(int x, int y);
 
-	void setFemGrid(CFemGrid* grid);
+	void setFemGrid(CFemGrid2* grid);
 	void setDrawingOffset(int x, int y);
 
 	virtual void copy(int x1, int y1, int x2, int y2);
