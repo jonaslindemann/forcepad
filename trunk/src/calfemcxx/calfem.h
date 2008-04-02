@@ -116,6 +116,15 @@ void plani4e(
 			Matrix &Ke,
 			ColumnVector &fe);
 
+void plani4s(
+			RowVector &ex, 
+			RowVector &ey,
+			RowVector &ep,
+			Matrix &D,
+			RowVector &ed,
+			Matrix &es,
+			Matrix &et);
+
 void assem(
 	RowVector &Topo, 
 	SymmetricBandMatrix &K, 

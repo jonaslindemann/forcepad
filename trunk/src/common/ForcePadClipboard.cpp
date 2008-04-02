@@ -225,7 +225,7 @@ void CForcePadClipboard::paste(int x, int y)
 	}
 }
 
-void CForcePadClipboard::setFemGrid(CFemGrid *grid)
+void CForcePadClipboard::setFemGrid(CFemGrid2 *grid)
 {
 	m_grid = grid;
 }
