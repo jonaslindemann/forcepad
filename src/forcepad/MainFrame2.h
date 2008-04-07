@@ -18,6 +18,8 @@
 #include <FL/Fl_Roller.H>
 #include <FL/Fl_Slider.H>
 #include <FL/Fl_Check_Button.H>
+#include <FL/Fl_Value_Input.H>
+#include <FL/Fl_Value_Output.H>
 
 class CMainFrame : CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusMessageEvent, CGSLogMessageEvent, CPVViewModeErrorEvent, CPVModelChangedEvent {
   CPaintView::TEditMode m_saveEditMode; 
@@ -441,6 +443,11 @@ private:
   void cb_btnConstraintHinge_i(Fl_HoverButton*, void*);
   static void cb_btnConstraintHinge(Fl_HoverButton*, void*);
 public:
+  Fl_HoverButton *btnDimensionTools;
+private:
+  void cb_btnDimensionTools_i(Fl_HoverButton*, void*);
+  static void cb_btnDimensionTools(Fl_HoverButton*, void*);
+public:
   Fl_Scroll *scrRightBCHingeToolbar;
   Fl_HoverButton *btnAddBcHinge;
 private:
@@ -452,6 +459,9 @@ private:
   void cb_btnRemoveBcHinge_i(Fl_HoverButton*, void*);
   static void cb_btnRemoveBcHinge(Fl_HoverButton*, void*);
 public:
+  Fl_Scroll *scrRightDimensionToolbar;
+  Fl_Value_Input *metricDist;
+  Fl_Value_Output *pixelDist;
   ~CMainFrame();
   void show();
   void close();

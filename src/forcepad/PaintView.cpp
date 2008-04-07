@@ -614,7 +614,19 @@ void CPaintView::onDrag(int x, int y)
 		this->redraw();
 		break;
 	case EM_DIRECT_BRUSH:
-		m_drawing->copyFrom(m_currentBrush, m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, h()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, m_brushColor);
+		if (moveDist>1)
+		{
+			m_drawing->drawImageLine(
+				m_currentBrush, 
+				prevPos[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, 
+				h()-prevPos[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, 
+				m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, 
+				h()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, 
+				m_brushColor
+			);		
+		}
+		else
+			m_drawing->copyFrom(m_currentBrush, m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, h()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, m_brushColor);
 		this->redraw();
 		break;
 	case EM_RECTANGLE:
