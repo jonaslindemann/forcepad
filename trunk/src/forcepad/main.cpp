@@ -1,6 +1,6 @@
 //
 // ForcePAD - Educational Finite Element Software
-// Copyright (C) 2000-2007 Division of Structural Mecahnics, Lund University
+// Copyright (C) 2000-2008 Division of Structural Mecahnics, Lund University
 //
 // Written by Jonas Lindemann
 //
@@ -47,7 +47,8 @@ main(int argc, char **argv)
 	so_print("main","Setting visual to FL_SINGLE|FL_RGB|FL_ALPHA");
 
 	Fl::visual(FL_DOUBLE|FL_RGB|FL_ALPHA);
-	Fl::background(236, 233, 216);
+	Fl::get_system_colors();
+	//Fl::background(236, 233, 216);
 	#ifdef __APPLE__
 	Fl::scheme("default");
 	#else
