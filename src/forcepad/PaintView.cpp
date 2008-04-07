@@ -538,6 +538,14 @@ void CPaintView::onDrag(int x, int y)
 	//
 	
 	// Store current position
+
+	int prevPos[2];
+	prevPos[0] = m_current[0];
+	prevPos[1] = m_current[1];
+
+	double moveDist = sqrt(pow((double)prevPos[0]-(double)x,2)+pow((double)prevPos[1]-(double)y,2));
+
+	cout << moveDist << endl;
 	
 	m_current[0] = x;
 	m_current[1] = y;
