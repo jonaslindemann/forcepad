@@ -632,3 +632,46 @@ void CImage::drawImage(int x, int y, CImage *image)
 			}
 		}
 }
+
+void CImage::drawImageLine(CImage* image, int x1, int y1, int x2, int y2, float* color)
+{
+	// From http://www.geocities.com/kirentanna/c_graphics.html
+
+	int x=x1,y=y1,dx,dy,s1,s2;
+	int i,dp,temp,swap=0;
+
+	this->copyFrom(image, x1, y1, color);
+	dx=abs(x2-x1);
+	dy=abs(y2-y1);
+
+	if(x2<x1) s1=-1;
+	else if(x2>x1) s1=1;
+	else s1=0;
+
+	if(y2<y1) s2=-1;
+	else if(y2>y1) s2=1;
+	else s2=0;
+
+	dp=2*dy-dx;
+	if(dy>dx)
+	{
+		temp=dx;
+		dx=dy;
+		dy=temp;
+		swap=1;
+	}
+	for(i=1;i<=dx;i++)
+	{
+		if(dp<0)
+		{
+			 if(swap) this->copyFrom(image, x, y=y+s2, color);
+			 else this->copyFrom(image, x=x+s1, y, color);
+			 dp+=2*dy;
+		}
+		else
+		{
+			this->copyFrom(image, x=x+s1, y=y+s2, color);
+			dp=dp+2*dy-2*dx;
+		}
+	}
+}

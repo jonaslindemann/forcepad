@@ -36,7 +36,7 @@ class CMainFrame {open : {CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusM
   } {
     Fl_Window wndMain {
       label {ForcePAD 2} open
-      xywh {428 63 733 574} type Double align 80 resizable visible
+      xywh {363 154 733 574} type Double align 80 resizable visible
     } {
       Fl_Menu_Bar mainMenu {open
         xywh {0 0 730 26} box FLAT_BOX labelsize 11 textsize 11
@@ -250,7 +250,7 @@ if (btnPaste->value()==1)
         xywh {52 21 623 526} resizable
       } {
         Fl_Box paintView {
-          xywh {53 26 622 518} box FLAT_BOX color 0
+          xywh {53 25 622 519} box FLAT_BOX color 0
           code0 {\#include "PaintView.h"}
           class CPaintView
         }
@@ -861,6 +861,24 @@ m_physicsEditMode = paintView->getEditMode();}
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
         }
+        Fl_Button btnDimensionTools {
+          label {@->|}
+          callback {// Show constraints dialog
+
+showRightToolbar(scrRightDimensionToolbar);
+
+// Set the last edit mode
+
+//if (btnAddBcHinge->value()==1)
+//	paintView->setEditMode(CPaintView::EM_CONSTRAINT_HINGE);
+//if (btnRemoveBcHinge->value()==1)
+//	paintView->setEditMode(CPaintView::EM_ERASE_CONSTRAINTS_FORCES);
+
+m_physicsEditMode = paintView->getEditMode();}
+          tooltip Contraints xywh {502 271 42 42} type Radio down_box DOWN_BOX selection_color 51
+          code0 {\#include "Fl_HoverButton.h"}
+          class Fl_HoverButton
+        }
       }
       Fl_Scroll scrRightBCHingeToolbar {open
         xywh {195 51 53 304} box FLAT_BOX
@@ -878,6 +896,18 @@ m_physicsEditMode = paintView->getEditMode();}
           tooltip {Erase point contraints} image {../../images/action_remove_bchinge.xpm} xywh {200 102 42 42} type Radio down_box DOWN_BOX selection_color 51
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
+        }
+      }
+      Fl_Scroll scrRightDimensionToolbar {open
+        xywh {90 36 53 304} box FLAT_BOX
+      } {
+        Fl_Value_Input metricDist {
+          label {dist (m)}
+          xywh {95 99 43 21} labelsize 12 align 1 textsize 12
+        }
+        Fl_Value_Output pixelDist {
+          label {dist (px)} selected
+          xywh {95 56 43 21} labelsize 12 align 1 maximum 10000 textsize 12
         }
       }
     }
@@ -1006,7 +1036,7 @@ if (self!=btnConstraint2)
 
 this->paintView->setCommandLine(argc, argv);} {}
   }
-  Function {onModeChange(CPaintView::TEditMode oldMode, CPaintView::TEditMode newMode)} {open return_type void
+  Function {onModeChange(CPaintView::TEditMode oldMode, CPaintView::TEditMode newMode)} {return_type void
   } {
     code {cout << "Edit mode = " << paintView->getEditMode() << endl;
 
@@ -1025,7 +1055,7 @@ else
 	btnCopy->deactivate();
 }} {}
   }
-  Function {onViewModeChange(CPaintView::TViewMode oldMode, CPaintView::TViewMode newMode)} {open return_type void
+  Function {onViewModeChange(CPaintView::TViewMode oldMode, CPaintView::TViewMode newMode)} {return_type void
   } {
     code {if (newMode == CPaintView::VM_SKETCH)
 {
@@ -1121,8 +1151,7 @@ else
 		paintView->setDrawStress(false);
 		showRightToolbar(scrRightDisplacementToolbar);
 	}	
-}} {selected
-    }
+}} {}
   }
   Function {onStatusMessage(const std::string& message, const int progress)} {return_type void
   } {
@@ -1145,7 +1174,7 @@ scrLeftResultToolbar->deactivate();
 scrLeftPhysicsToolbar->hide();
 scrLeftPhysicsToolbar->deactivate();} {}
   }
-  Function {hideRightToolbars()} {return_type void
+  Function {hideRightToolbars()} {open return_type void
   } {
     code {scrRightForceToolbar->hide();
 scrRightForceToolbar->deactivate();
@@ -1166,7 +1195,9 @@ scrRightFillToolbar->deactivate();
 scrRightMisesStressToolbar->hide();
 scrRightMisesStressToolbar->deactivate();
 scrRightBCHingeToolbar->hide();
-scrRightBCHingeToolbar->deactivate();} {}
+scrRightBCHingeToolbar->deactivate();
+scrRightDimensionToolbar->hide();
+scrRightDimensionToolbar->deactivate();} {}
   }
   Function {showLeftToolbar(Fl_Widget* toolbar)} {return_type void
   } {
@@ -1178,7 +1209,7 @@ toolbar->show();
 toolbar->activate();
 wndMain->insert(*toolbar,0);} {}
   }
-  Function {showRightToolbar(Fl_Widget* toolbar)} {return_type void
+  Function {showRightToolbar(Fl_Widget* toolbar)} {open return_type void
   } {
     code {hideRightToolbars();
 

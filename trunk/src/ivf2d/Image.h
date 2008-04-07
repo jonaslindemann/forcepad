@@ -52,6 +52,7 @@ private:
 	bool m_ownData;
 public:
 	void drawImage(int x, int y, CImage* image);
+	void drawImageLine(CImage* image, int x1, int y1, int x2, int y2, float* color);
 	void grayscale();
 	int getChannels();
 	void setImageMap(int width, int height, GLubyte* data, bool ownData);
