@@ -107,7 +107,11 @@ namespace std {
 			if( pptr() != 0 && 0 < (nMax = epptr() - pptr()) ) {
 				if( n < nMax )
 					nMax = n;
+
+				#pragma warning (push)
+				#pragma warning (disable : 4996)				
 				traits_type::copy( pptr(), pch, nMax );
+				#pragma warning (pop)
 				
 				// Sync if string contains LF
 				bool bSync = traits_type::find( pch, nMax, traits_type::to_char_type( '\n' ) ) != NULL;

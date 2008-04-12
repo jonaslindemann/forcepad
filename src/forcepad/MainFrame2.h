@@ -21,7 +21,7 @@
 #include <FL/Fl_Value_Input.H>
 #include <FL/Fl_Value_Output.H>
 
-class CMainFrame : CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusMessageEvent, CGSLogMessageEvent, CPVViewModeErrorEvent, CPVModelChangedEvent {
+class CMainFrame : CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusMessageEvent, CGSLogMessageEvent, CPVViewModeErrorEvent, CPVModelChangedEvent, CPVRulerChangedEvent {
   CPaintView::TEditMode m_saveEditMode; 
   CPaintView::TEditMode m_sketchEditMode; 
   CPaintView::TEditMode m_physicsEditMode; 
@@ -460,8 +460,8 @@ private:
   static void cb_btnRemoveBcHinge(Fl_HoverButton*, void*);
 public:
   Fl_Scroll *scrRightDimensionToolbar;
-  Fl_Value_Input *metricDist;
-  Fl_Value_Output *pixelDist;
+  Fl_Value_Input *actualLength;
+  Fl_Value_Output *pixelLength;
   ~CMainFrame();
   void show();
   void close();
@@ -484,5 +484,6 @@ public:
   void centerWindow(Fl_Window* window);
   Fl_Window* getMainWindow();
   void onModelChanged(const std::string& newModelName);
+  void onRulerChanged(CRuler* ruler);
 };
 #endif

@@ -68,6 +68,18 @@ void CVec3d::setComponents(const double *v)
 	m_vector[2] = v[2];
 }
 
+void CVec3d::setComponents(int x, int y)
+{
+	m_vector[0] = (double)x;
+	m_vector[1] = (double)y;
+}
+
+void CVec3d::setComponents(const int* pos)
+{
+	m_vector[0] = (double)pos[0];
+	m_vector[1] = (double)pos[1];
+}
+
 void CVec3d::getComponents(double &vx, double &vy, double &vz)
 {
 	vx = m_vector[0];
