@@ -92,6 +92,12 @@ public:
 	/** Get vector components. */
 	void getComponents(double* v);
 
+	/** Set components of vector. */
+	void setComponents(int x, int y);
+
+	/** Set components of vector. */
+	void setComponents(const int* pos);
+
 	/** Calculate euler angles of vector. */
 	void getEulerAngles(double &pitch, double &heading);
 

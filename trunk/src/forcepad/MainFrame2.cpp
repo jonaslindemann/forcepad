@@ -10192,7 +10192,7 @@ void CMainFrame::cb_sldUpperMisesTreshold(Fl_Slider* o, void* v) {
 }
 
 void CMainFrame::cb_btnBrush_i(Fl_HoverButton*, void*) {
-  paintView->setEditMode(CPaintView::EM_BRUSH);
+  paintView->setEditMode(CPaintView::EM_DIRECT_BRUSH);
 m_sketchEditMode = paintView->getEditMode();
 }
 void CMainFrame::cb_btnBrush(Fl_HoverButton* o, void* v) {
@@ -13057,15 +13057,7 @@ void CMainFrame::cb_btnDimensionTools_i(Fl_HoverButton*, void*) {
   // Show constraints dialog
 
 showRightToolbar(scrRightDimensionToolbar);
-
-// Set the last edit mode
-
-//if (btnAddBcHinge->value()==1)
-//	paintView->setEditMode(CPaintView::EM_CONSTRAINT_HINGE);
-//if (btnRemoveBcHinge->value()==1)
-//	paintView->setEditMode(CPaintView::EM_ERASE_CONSTRAINTS_FORCES);
-
-m_physicsEditMode = paintView->getEditMode();
+paintView->setEditMode(CPaintView::EM_RULER);
 }
 void CMainFrame::cb_btnDimensionTools(Fl_HoverButton* o, void* v) {
   ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnDimensionTools_i(o,v);
@@ -15084,17 +15076,17 @@ CMainFrame::CMainFrame() {
     } // Fl_Scroll* scrRightBCHingeToolbar
     { scrRightDimensionToolbar = new Fl_Scroll(90, 36, 53, 304);
       scrRightDimensionToolbar->box(FL_FLAT_BOX);
-      { metricDist = new Fl_Value_Input(95, 99, 43, 21, "dist (m)");
-        metricDist->labelsize(12);
-        metricDist->textsize(12);
-        metricDist->align(FL_ALIGN_TOP);
-      } // Fl_Value_Input* metricDist
-      { pixelDist = new Fl_Value_Output(95, 56, 43, 21, "dist (px)");
-        pixelDist->labelsize(12);
-        pixelDist->maximum(10000);
-        pixelDist->textsize(12);
-        pixelDist->align(FL_ALIGN_TOP);
-      } // Fl_Value_Output* pixelDist
+      { actualLength = new Fl_Value_Input(95, 99, 43, 21, "dist (m)");
+        actualLength->labelsize(12);
+        actualLength->textsize(12);
+        actualLength->align(FL_ALIGN_TOP);
+      } // Fl_Value_Input* actualLength
+      { pixelLength = new Fl_Value_Output(95, 56, 43, 21, "dist (px)");
+        pixelLength->labelsize(12);
+        pixelLength->maximum(10000);
+        pixelLength->textsize(12);
+        pixelLength->align(FL_ALIGN_TOP);
+      } // Fl_Value_Output* pixelLength
       scrRightDimensionToolbar->end();
     } // Fl_Scroll* scrRightDimensionToolbar
     wndMain->end();
@@ -15105,6 +15097,7 @@ paintView->setStatusMessageEvent(this);
 paintView->setLogMessageEvent(this);
 paintView->setViewModeErrorEvent(this);
 paintView->setModelChangedEvent(this);
+paintView->setRulerChangedEvent(this);
 m_sketchEditMode = CPaintView::EM_BRUSH;
 m_physicsEditMode = CPaintView::EM_FORCE;
 }
@@ -15434,4 +15427,8 @@ Fl_Window* CMainFrame::getMainWindow() {
 void CMainFrame::onModelChanged(const std::string& newModelName) {
   string caption = newModelName + " - ForcePAD 2";
 wndMain->label(caption.c_str());
+}
+
+void CMainFrame::onRulerChanged(CRuler* ruler) {
+  pixelLength->value(ruler->getPixelLength());
 }

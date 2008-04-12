@@ -48,12 +48,14 @@
 #include "Clipboard.h"
 #include "ForcePadClipboard.h"
 #include "ScreenImage.h"
+#include "Ruler.h"
 
 #include "FemGridSolver2.h"
 
 #include "CGIndicator.h"
 
 #include "Fl_Cursor_Shape.H"
+
 
 
 #ifdef FORCEPAD_RIGID
@@ -64,6 +66,7 @@ class CPVModeChangeEvent;
 class CPVViewModeChangeEvent;
 class CPVViewModeErrorEvent;
 class CPVModelChangedEvent;
+class CPVRulerChangedEvent;
 
 class CPaintView : public Fl_Gl_Window {
 public:
@@ -88,7 +91,8 @@ public:
 		EM_ERASE_CONSTRAINTS_FORCES,
 		EM_SELECT_BOX,
 		EM_PASTE,
-		EM_RESULT
+		EM_RESULT,
+		EM_RULER
 	};
 
 	enum TImportMode {
@@ -205,6 +209,8 @@ private:
 	CScreenImagePtr m_screenImage;
 	CImagePtr m_buffer;
 
+	CRulerPtr m_ruler;
+
 	/*
 	 *    Dynamic force update variables
 	 */
@@ -246,6 +252,7 @@ private:
 	CPVViewModeChangeEvent* m_viewModeChangeEvent;
 	CPVViewModeErrorEvent* m_viewModeErrorEvent;
 	CPVModelChangedEvent* m_modelChangedEvent;
+	CPVRulerChangedEvent* m_rulerChangedEvent;
 
 	CGSStatusMessageEvent* m_statusMessageEvent;
 	CGSLogMessageEvent* m_logMessageEvent;
@@ -454,6 +461,7 @@ public:
 	void setStatusMessageEvent(CGSStatusMessageEvent* eventMethod);
 	void setLogMessageEvent(CGSLogMessageEvent* eventMethod);
 	void setModelChangedEvent(CPVModelChangedEvent* eventMethod);
+	void setRulerChangedEvent(CPVRulerChangedEvent* eventMethod);
 };
 
 class CPVModeChangeEvent {
@@ -479,5 +487,12 @@ public:
 	virtual ~CPVModelChangedEvent() {};
 	virtual void onModelChanged(const std::string& newModelName) = 0;
 };
+
+class CPVRulerChangedEvent {
+public:
+	virtual ~CPVRulerChangedEvent() {};
+	virtual void onRulerChanged(CRuler* ruler) = 0;
+};
+
 
 #endif 

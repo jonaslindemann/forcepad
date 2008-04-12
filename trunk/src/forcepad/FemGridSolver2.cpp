@@ -22,13 +22,13 @@
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
 
-#include "FemGridSolver2.h"
-#include "matlabgen.h"
-#include "LogWindow.h"
-
 #ifdef WIN32
 #include <windows.h>
 #endif
+
+#include "FemGridSolver2.h"
+#include "matlabgen.h"
+#include "LogWindow.h"
 
 #include <set>
 #include <fstream>
@@ -907,7 +907,7 @@ void CFemGridSolver2::execute()
 
 void CFemGridSolver2::executeUpdate()
 {
-	int i, j, k, l;
+	int i, j, l;
 	int rows, cols;
 	double ex[4];
 	double ey[4];

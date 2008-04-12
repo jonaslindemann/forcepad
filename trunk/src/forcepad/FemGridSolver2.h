@@ -37,10 +37,11 @@
 
 //#include "FemModel.h"
 
-#include "calfem.h"
-
 #include "Base.h"
 #include "FemGrid2.h"
+
+#include "calfem.h"
+
 
 class CGSStatusMessageEvent {
 public:

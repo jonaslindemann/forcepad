@@ -27,7 +27,7 @@ decl {\#include <iostream>} {}
 
 decl {\#include <string>} {} 
 
-class CMainFrame {open : {CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusMessageEvent, CGSLogMessageEvent, CPVViewModeErrorEvent, CPVModelChangedEvent}
+class CMainFrame {open : {CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusMessageEvent, CGSLogMessageEvent, CPVViewModeErrorEvent, CPVModelChangedEvent, CPVRulerChangedEvent}
 } {
   decl {CPaintView::TEditMode m_saveEditMode;} {}
   decl {CPaintView::TEditMode m_sketchEditMode;} {}
@@ -347,7 +347,7 @@ m_physicsEditMode = paintView->getEditMode();}
           class Fl_HoverButton
         }
       }
-      Fl_Scroll scrRightDrawingToolbar {
+      Fl_Scroll scrRightDrawingToolbar {open
         xywh {277 53 53 410} box FLAT_BOX
       } {
         Fl_Button btnRectangle {
@@ -683,7 +683,7 @@ else
         xywh {609 53 54 421} box FLAT_BOX
       } {
         Fl_Button btnBrush {
-          callback {paintView->setEditMode(CPaintView::EM_BRUSH);
+          callback {paintView->setEditMode(CPaintView::EM_DIRECT_BRUSH);
 m_sketchEditMode = paintView->getEditMode();}
           tooltip Brush image {../../images/paint.xpm} xywh {615 55 41 42} type Radio down_box DOWN_BOX value 1 selection_color 51
           code0 {\#include "Fl_HoverButton.h"}
@@ -866,15 +866,7 @@ m_physicsEditMode = paintView->getEditMode();}
           callback {// Show constraints dialog
 
 showRightToolbar(scrRightDimensionToolbar);
-
-// Set the last edit mode
-
-//if (btnAddBcHinge->value()==1)
-//	paintView->setEditMode(CPaintView::EM_CONSTRAINT_HINGE);
-//if (btnRemoveBcHinge->value()==1)
-//	paintView->setEditMode(CPaintView::EM_ERASE_CONSTRAINTS_FORCES);
-
-m_physicsEditMode = paintView->getEditMode();}
+paintView->setEditMode(CPaintView::EM_RULER);}
           tooltip Contraints xywh {502 271 42 42} type Radio down_box DOWN_BOX selection_color 51
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
@@ -901,12 +893,12 @@ m_physicsEditMode = paintView->getEditMode();}
       Fl_Scroll scrRightDimensionToolbar {open
         xywh {90 36 53 304} box FLAT_BOX
       } {
-        Fl_Value_Input metricDist {
+        Fl_Value_Input actualLength {
           label {dist (m)}
           xywh {95 99 43 21} labelsize 12 align 1 textsize 12
         }
-        Fl_Value_Output pixelDist {
-          label {dist (px)} selected
+        Fl_Value_Output pixelLength {
+          label {dist (px)}
           xywh {95 56 43 21} labelsize 12 align 1 maximum 10000 textsize 12
         }
       }
@@ -917,6 +909,7 @@ paintView->setStatusMessageEvent(this);
 paintView->setLogMessageEvent(this);
 paintView->setViewModeErrorEvent(this);
 paintView->setModelChangedEvent(this);
+paintView->setRulerChangedEvent(this);
 m_sketchEditMode = CPaintView::EM_BRUSH;
 m_physicsEditMode = CPaintView::EM_FORCE;} {}
   }
@@ -1174,7 +1167,7 @@ scrLeftResultToolbar->deactivate();
 scrLeftPhysicsToolbar->hide();
 scrLeftPhysicsToolbar->deactivate();} {}
   }
-  Function {hideRightToolbars()} {open return_type void
+  Function {hideRightToolbars()} {return_type void
   } {
     code {scrRightForceToolbar->hide();
 scrRightForceToolbar->deactivate();
@@ -1209,7 +1202,7 @@ toolbar->show();
 toolbar->activate();
 wndMain->insert(*toolbar,0);} {}
   }
-  Function {showRightToolbar(Fl_Widget* toolbar)} {open return_type void
+  Function {showRightToolbar(Fl_Widget* toolbar)} {return_type void
   } {
     code {hideRightToolbars();
 
@@ -1234,9 +1227,13 @@ if (oldMode = CPaintView::VM_PHYSICS)
   } {
     code {return wndMain;} {}
   }
-  Function {onModelChanged(const std::string& newModelName)} {open
-  } {
+  Function {onModelChanged(const std::string& newModelName)} {} {
     code {string caption = newModelName + " - ForcePAD 2";
 wndMain->label(caption.c_str());} {}
+  }
+  Function {onRulerChanged(CRuler* ruler)} {open
+  } {
+    code {pixelLength->value(ruler->getPixelLength());} {selected
+    }
   }
 } 

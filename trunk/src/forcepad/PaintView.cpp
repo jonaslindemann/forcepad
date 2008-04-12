@@ -194,8 +194,16 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 	m_line->setWidth(4);
 	
 	color = new CColor();
+	color->setColor(0.5f, 0.0f, 0.0f, 1.0f);
+
+	m_ruler = new CRuler();
+	m_ruler->setStartPos(100, 100);
+	m_ruler->setEndPos(150, 150);
+	m_ruler->setColor(color);
+
+	color = new CColor();
 	color->setColor(0.0f, 0.5f, 0.0f, 1.0f);
-	
+
 	// Rigid body variables
 	
 	m_cgIndicator = new CCGIndicator();
@@ -269,6 +277,7 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 	m_statusMessageEvent = NULL;
 	m_logMessageEvent = NULL;
 	m_modelChangedEvent = NULL;
+	m_rulerChangedEvent = NULL;
 
 	// Set initial model name
 	
@@ -610,7 +619,19 @@ void CPaintView::onDrag(int x, int y)
 		noColor[0] = 1.0f;
 		noColor[1] = 1.0f;
 		noColor[2] = 1.0f;
-		m_drawing->copyFrom(m_currentBrush, m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, h()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, noColor);
+		if (moveDist>1)
+		{
+			m_drawing->drawImageLine(
+				m_currentBrush, 
+				prevPos[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, 
+				h()-prevPos[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, 
+				m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, 
+				h()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, 
+				noColor
+			);		
+		}
+		else
+			m_drawing->copyFrom(m_currentBrush, m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, h()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, noColor);
 		this->redraw();
 		break;
 	case EM_DIRECT_BRUSH:
@@ -720,6 +741,19 @@ void CPaintView::onDrag(int x, int y)
 			h() - m_current[1] - m_drawingOffsetY,
 			m_line->getWidth()
 			);
+		this->redraw();
+		break;
+	case EM_RULER:
+		m_ruler->setStartPos(
+			m_start[0] - m_drawingOffsetX, 
+			h() - m_start[1] - m_drawingOffsetY
+			);
+		m_ruler->setEndPos(
+			m_current[0] - m_drawingOffsetX, 
+			h() - m_current[1] - m_drawingOffsetY
+			);
+		if (m_rulerChangedEvent!=NULL)
+			m_rulerChangedEvent->onRulerChanged(m_ruler);
 		this->redraw();
 		break;
 	case EM_FORCE:
@@ -1209,7 +1243,15 @@ void CPaintView::onDraw()
 	{
 		m_selectionBox->render();
 	}
-	
+
+	if (m_editMode==EM_RULER)
+	{
+		glPushMatrix();
+		glTranslated((double)m_drawingOffsetX, (double)m_drawingOffsetY, 0.0);
+		m_ruler->render();
+		glPopMatrix();
+	}
+
 	glDisable(GL_BLEND);
 	glPopAttrib();
 }
@@ -3054,4 +3096,9 @@ void CPaintView::setLogMessageEvent(CGSLogMessageEvent* eventMethod)
 void CPaintView::setModelChangedEvent(CPVModelChangedEvent* eventMethod)
 {
 	m_modelChangedEvent = eventMethod;
+}
+
+void CPaintView::setRulerChangedEvent(CPVRulerChangedEvent* eventMethod)
+{
+	m_rulerChangedEvent = eventMethod;
 }
