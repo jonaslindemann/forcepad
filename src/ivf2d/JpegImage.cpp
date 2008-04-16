@@ -93,7 +93,7 @@ bool CJpegImage::read()
 		unsigned int i, j;
 
 		for (i=0; i<cinfo.output_width; i++)
-			for (j=0; j<cinfo.output_components; j++)
+			for (j=0; j<(unsigned int)cinfo.output_components; j++)
 				this->setValue(i, cinfo.output_height - cinfo.output_scanline, j, (GLubyte)buffer[0][i*cinfo.output_components+j]);
 	}
 

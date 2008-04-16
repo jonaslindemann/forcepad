@@ -22,15 +22,15 @@ class CSplashFrame {open
     Fl_Window wndSplash {open
       xywh {444 111 402 302} type Double modal noborder visible
     } {
-      Fl_Box boxImage {
-        image {../../images/splash2.png} xywh {0 0 402 302}
+      Fl_Box boxImage {selected
+        image {../../images/splash.png} xywh {0 0 402 302}
       }
       Fl_Button btnClose {
         label Close
         callback {wndSplash->hide();}
         xywh {335 265 55 25} box THIN_UP_FRAME down_box THIN_DOWN_FRAME labelsize 12
       }
-      Fl_Output versionBox {selected
+      Fl_Output versionBox {
         xywh {10 107 235 52} type Multiline box THIN_DOWN_FRAME labelsize 11 align 0 textsize 11
       }
     }
