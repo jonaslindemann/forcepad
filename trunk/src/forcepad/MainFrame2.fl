@@ -256,14 +256,14 @@ if (btnPaste->value()==1)
         }
       }
       Fl_Scroll scrLeftResultToolbar {open
-        xywh {112 98 53 304} box FLAT_BOX
+        xywh {120 206 53 304} box FLAT_BOX
       } {
         Fl_Button btnStress {
           callback {showRightToolbar(scrRightStressToolbar);
 paintView->setDrawDisplacements(false);
 paintView->setStressType(CFemGrid2::ST_PRINCIPAL);
 paintView->setDrawStress(true);}
-          tooltip {Stress visualisation} image {../../images/stress2.xpm} xywh {117 104 42 42} type Radio down_box DOWN_BOX value 1 selection_color 51
+          tooltip {Stress visualisation} image {../../images/stress2.xpm} xywh {125 212 42 42} type Radio down_box DOWN_BOX value 1 selection_color 51
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
         }
@@ -271,7 +271,7 @@ paintView->setDrawStress(true);}
           callback {showRightToolbar(scrRightDisplacementToolbar);
 paintView->setDrawDisplacements(true);
 paintView->setDrawStress(false);}
-          tooltip {Displacement visualisation} image {../../images/displacements.xpm} xywh {117 194 42 42} type Radio down_box DOWN_BOX selection_color 51
+          tooltip {Displacement visualisation} image {../../images/displacements.xpm} xywh {125 302 42 42} type Radio down_box DOWN_BOX selection_color 51
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
         }
@@ -280,7 +280,17 @@ paintView->setDrawStress(false);}
 paintView->setDrawDisplacements(false);
 paintView->setStressType(CFemGrid2::ST_MISES);
 paintView->setDrawStress(true);}
-          tooltip {Mises stress visualisation} image {../../images/stress_mises.xpm} xywh {117 149 42 42} type Radio down_box DOWN_BOX selection_color 51
+          tooltip {Mises stress visualisation} image {../../images/stress_mises.xpm} xywh {125 257 42 42} type Radio down_box DOWN_BOX selection_color 51
+          code0 {\#include "Fl_HoverButton.h"}
+          class Fl_HoverButton
+        }
+        Fl_Button btnMoveLoad {
+          label {Move / Rotate}
+          callback {if (btnMoveLoad->value()>0)
+	paintView->setMoveLoad(true);
+else
+	paintView->setMoveLoad(false);} selected
+          tooltip {Toggle between moving and rotating loads} xywh {125 408 42 42} type Toggle down_box DOWN_BOX selection_color 51 labelsize 11 align 128
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
         }
@@ -570,7 +580,7 @@ m_sketchEditMode = paintView->getEditMode();}
           class Fl_HoverButton
         }
         Fl_Button btnExpandImage {
-          callback {paintView->expandImageToWindow()} selected
+          callback {paintView->expandImageToWindow()}
           tooltip {Expand image to window} image {../../images/expand_image.xpm} xywh {447 334 42 42} down_box DOWN_BOX selection_color 51
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton

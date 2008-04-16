@@ -186,6 +186,7 @@ private:
 	double m_youngsModulus;
 	double m_thickness;
 	double m_constraintStiffnessScale;
+	bool m_moveLoad;
 
 	CFemGridSolver2Ptr m_solver;
 
@@ -453,6 +454,9 @@ public:
 
 	void setWeight(double value);
 	double getWeight();
+
+	void setMoveLoad(bool flag);
+	bool getMoveLoad();
 
 	// Events
 

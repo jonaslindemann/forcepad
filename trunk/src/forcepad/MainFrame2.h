@@ -166,6 +166,11 @@ private:
   void cb_btnMisesStress_i(Fl_HoverButton*, void*);
   static void cb_btnMisesStress(Fl_HoverButton*, void*);
 public:
+  Fl_HoverButton *btnMoveLoad;
+private:
+  void cb_btnMoveLoad_i(Fl_HoverButton*, void*);
+  static void cb_btnMoveLoad(Fl_HoverButton*, void*);
+public:
   Fl_Progress *calcProgress;
   Fl_Output *statusOutput;
   Fl_Scroll *scrRightForceToolbar;
