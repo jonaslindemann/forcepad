@@ -4150,6 +4150,16 @@ static const char *idata_stress_mises[] = {
 };
 static Fl_Pixmap image_stress_mises(idata_stress_mises);
 
+void CMainFrame::cb_btnMoveLoad_i(Fl_HoverButton*, void*) {
+  if (btnMoveLoad->value()>0)
+	paintView->setMoveLoad(true);
+else
+	paintView->setMoveLoad(false);
+}
+void CMainFrame::cb_btnMoveLoad(Fl_HoverButton* o, void* v) {
+  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnMoveLoad_i(o,v);
+}
+
 void CMainFrame::cb_btnAddForce_i(Fl_HoverButton*, void*) {
   paintView->setEditMode(CPaintView::EM_FORCE);
 m_physicsEditMode = paintView->getEditMode();
@@ -14135,9 +14145,9 @@ CMainFrame::CMainFrame() {
       paintGroup->end();
       Fl_Group::current()->resizable(paintGroup);
     } // Fl_Group* paintGroup
-    { scrLeftResultToolbar = new Fl_Scroll(112, 98, 53, 304);
+    { scrLeftResultToolbar = new Fl_Scroll(120, 206, 53, 304);
       scrLeftResultToolbar->box(FL_FLAT_BOX);
-      { btnStress = new Fl_HoverButton(117, 104, 42, 42);
+      { btnStress = new Fl_HoverButton(125, 212, 42, 42);
         btnStress->tooltip("Stress visualisation");
         btnStress->type(102);
         btnStress->box(FL_UP_BOX);
@@ -14154,7 +14164,7 @@ CMainFrame::CMainFrame() {
         btnStress->align(FL_ALIGN_CENTER);
         btnStress->when(FL_WHEN_RELEASE);
       } // Fl_HoverButton* btnStress
-      { btnDisplacements = new Fl_HoverButton(117, 194, 42, 42);
+      { btnDisplacements = new Fl_HoverButton(125, 302, 42, 42);
         btnDisplacements->tooltip("Displacement visualisation");
         btnDisplacements->type(102);
         btnDisplacements->box(FL_UP_BOX);
@@ -14170,7 +14180,7 @@ CMainFrame::CMainFrame() {
         btnDisplacements->align(FL_ALIGN_CENTER);
         btnDisplacements->when(FL_WHEN_RELEASE);
       } // Fl_HoverButton* btnDisplacements
-      { btnMisesStress = new Fl_HoverButton(117, 149, 42, 42);
+      { btnMisesStress = new Fl_HoverButton(125, 257, 42, 42);
         btnMisesStress->tooltip("Mises stress visualisation");
         btnMisesStress->type(102);
         btnMisesStress->box(FL_UP_BOX);
@@ -14186,6 +14196,21 @@ CMainFrame::CMainFrame() {
         btnMisesStress->align(FL_ALIGN_CENTER);
         btnMisesStress->when(FL_WHEN_RELEASE);
       } // Fl_HoverButton* btnMisesStress
+      { btnMoveLoad = new Fl_HoverButton(125, 408, 42, 42, "Move / Rotate");
+        btnMoveLoad->tooltip("Toggle between moving and rotating loads");
+        btnMoveLoad->type(1);
+        btnMoveLoad->box(FL_UP_BOX);
+        btnMoveLoad->down_box(FL_DOWN_BOX);
+        btnMoveLoad->color(FL_BACKGROUND_COLOR);
+        btnMoveLoad->selection_color((Fl_Color)51);
+        btnMoveLoad->labeltype(FL_NORMAL_LABEL);
+        btnMoveLoad->labelfont(0);
+        btnMoveLoad->labelsize(11);
+        btnMoveLoad->labelcolor(FL_FOREGROUND_COLOR);
+        btnMoveLoad->callback((Fl_Callback*)cb_btnMoveLoad);
+        btnMoveLoad->align(FL_ALIGN_WRAP);
+        btnMoveLoad->when(FL_WHEN_RELEASE);
+      } // Fl_HoverButton* btnMoveLoad
       scrLeftResultToolbar->end();
     } // Fl_Scroll* scrLeftResultToolbar
     { Fl_Group* o = new Fl_Group(62, 543, 616, 31);

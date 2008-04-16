@@ -155,6 +155,7 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 	m_youngsModulus = 0.35;
 	m_thickness = 1.0;
 	m_constraintStiffnessScale = 1e3;
+	m_moveLoad = false;
 
 	// Test OpenGL version
 
@@ -570,7 +571,7 @@ void CPaintView::onDrag(int x, int y)
 
 		if (m_selectedForce!=NULL)
 		{	
-			if (Fl::event_key(FL_Alt_L))
+			if (Fl::event_key(FL_Alt_L)||m_moveLoad)
 			{
 				// Update the position of the force
 
@@ -3106,6 +3107,17 @@ void CPaintView::setSnapToGrid(bool flag)
 }
 
 bool getSnapToGrid();
+
+void CPaintView::setMoveLoad(bool flag)
+{
+	m_moveLoad = flag;
+}
+
+bool CPaintView::getMoveLoad()
+{
+	return m_moveLoad;
+}
+
 
 
 void CPaintView::setModeChangeEvent(CPVModeChangeEvent* eventMethod)
