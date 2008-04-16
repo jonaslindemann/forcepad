@@ -39,8 +39,8 @@ typedef deque<CForcePtr>::iterator CForceQueIter;
 typedef deque<CConstraintPtr> CConstraintQue;
 typedef deque<CConstraintPtr>::iterator CConstraintQueIter;
 
-typedef vector<vector<int>> CElementList;
-typedef vector<vector<int>>::iterator CElementListIter;
+typedef vector< vector<int> > CElementList;
+typedef vector< vector<int> >::iterator CElementListIter;
 
 #define ED_LEFT_RIGHT 0
 #define ED_BOTTOM_TOP 1

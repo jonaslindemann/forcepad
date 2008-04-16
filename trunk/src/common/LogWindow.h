@@ -3,7 +3,9 @@
 #ifndef LogWindow_h
 #define LogWindow_h
 #include <FL/Fl.H>
+#ifdef WIN32
 #include "editlog_stream.h"
+#endif
 #include "so_format.h"
 #define so_show() CLogWindow::getInstance()->show();
 #define so_print(a,b) CLogWindow::getInstance()->print(a,b);
@@ -13,8 +15,10 @@
 #include <FL/Fl_Text_Display.H>
 
 class CLogWindow {
+#ifdef WIN32
   std::basic_streambuf<char>* m_oldBuf; 
   std::basic_editstreambuf<char> m_editStrBuf; 
+#endif
   static CLogWindow* m_instance; 
   CLogWindow();
 public:

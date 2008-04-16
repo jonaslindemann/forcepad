@@ -105,7 +105,7 @@ typedef unsigned short wchar_t;
 	typedef CIvfPointer<classname> classname##Ptr; \
 	typedef classname* classname##StdPtr;
 
-#ifdef __APPLE__
+#if defined(__APPLE__) || !defined(WINDOWS)
 #define IvfClassInfo(ivfclassname,ivfparent) \
 	void getClassNameThis(char* name) { strcpy(name, ivfclassname); } \
 	const char* getClassNameThis() { return ivfclassname; } \

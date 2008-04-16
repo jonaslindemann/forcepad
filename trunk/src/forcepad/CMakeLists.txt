@@ -39,11 +39,15 @@ ENDIF(CMAKE_BUILD_TYPE STREQUAL Debug)
 	# MACOSX_PACKAGE_LOCATION MacOS/brushes
 # )
 
-IF(CMAKE_BUILD_TYPE STREQUAL Debug)
-	TARGET_LINK_LIBRARIES(forcepadd commond ivf2dd fltkd fltkgld fltkimagesd fltkformsd fltkjpegd fltkpngd calfemcxxd newmatd fltkzd wsock32 comctl32 winmm.lib )
-ELSE(CMAKE_BUILD_TYPE STREQUAL Debug)
-	TARGET_LINK_LIBRARIES(forcepad common ivf2d fltk fltkgl fltkimages fltkforms fltkjpeg fltkpng calfemcxx newmat fltkz wsock32 comctl32 winmm.lib )
-ENDIF(CMAKE_BUILD_TYPE STREQUAL Debug)
+IF(WIN32)
+	IF(CMAKE_BUILD_TYPE STREQUAL Debug)
+		TARGET_LINK_LIBRARIES(forcepadd commond ivf2dd fltkd fltkgld fltkimagesd fltkformsd fltkjpegd fltkpngd calfemcxxd newmatd fltkzd wsock32 comctl32 winmm.lib )
+	ELSE(CMAKE_BUILD_TYPE STREQUAL Debug)
+		TARGET_LINK_LIBRARIES(forcepad common ivf2d fltk fltkgl fltkimages fltkforms fltkjpeg fltkpng calfemcxx newmat fltkz wsock32 comctl32 winmm.lib )
+	ENDIF(CMAKE_BUILD_TYPE STREQUAL Debug)
+ELSE(WIN32)
+	TARGET_LINK_LIBRARIES(forcepad common ivf2d fltk fltk_gl fltk_images fltk_forms jpeg png calfemcxx newmat z GLU GL)
+ENDIF(WIN32)
 
 #TARGET_LINK_LIBRARIES(forcepad common ivf2d fltk fltk_gl fltk_images fltk_forms fltk_jpeg fltk_png calfemcxx newmat "-framework Carbon" "-framework Cocoa" "-framework ApplicationServices" "-framework AGL" "-framework OpenGL" z)
 

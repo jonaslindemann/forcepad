@@ -33,8 +33,8 @@ IvfSmartPointer(CElementGrid);
 
 class CElementGrid : public CBase {
 private:
-	std::vector<std::vector<CNodePtr>> m_nodes;
-	std::vector<std::vector<CElementGridCellPtr>> m_elementGrid;
+	std::vector< std::vector<CNodePtr> > m_nodes;
+	std::vector< std::vector<CElementGridCellPtr> > m_elementGrid;
 	int m_rows;
 	int m_cols;
 
