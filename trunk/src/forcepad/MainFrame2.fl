@@ -524,7 +524,7 @@ else
           tooltip {Displacement scalefactor} xywh {398 60 30 165} labelsize 10 align 1 minimum 0.1 maximum 100 step 0.1 value 0.1
         }
       }
-      Fl_Scroll scrRightSelectToolbar {
+      Fl_Scroll scrRightSelectToolbar {open
         xywh {442 81 53 304} box FLAT_BOX
       } {
         Fl_Button btnSelect {
@@ -566,6 +566,12 @@ m_sketchEditMode = paintView->getEditMode();}
 paintView->setEditMode(CPaintView::EM_PASTE);
 m_sketchEditMode = paintView->getEditMode();}
           tooltip {Paste from Windows clipboard} image {../../images/paste_win.xpm} xywh {447 281 42 42} type Radio down_box DOWN_BOX selection_color 51
+          code0 {\#include "Fl_HoverButton.h"}
+          class Fl_HoverButton
+        }
+        Fl_Button btnExpandImage {
+          callback {paintView->expandImageToWindow()} selected
+          tooltip {Expand image to window} image {../../images/expand_image.xpm} xywh {447 334 42 42} down_box DOWN_BOX selection_color 51
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
         }
@@ -903,7 +909,7 @@ m_physicsEditMode = paintView->getEditMode();}
           xywh {95 56 43 21} labelsize 12 align 1 maximum 10000 textsize 12
         }
         Fl_Button btnSetRulerDistance {
-          label Set selected
+          label Set
           tooltip {Set ruler distance} xywh {95 126 42 29} down_box DOWN_BOX selection_color 51 labelsize 12
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton

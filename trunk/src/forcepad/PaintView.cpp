@@ -554,8 +554,6 @@ void CPaintView::onDrag(int x, int y)
 
 	double moveDist = sqrt(pow((double)prevPos[0]-(double)x,2)+pow((double)prevPos[1]-(double)y,2));
 
-	cout << moveDist << endl;
-	
 	m_current[0] = x;
 	m_current[1] = y;
 	
@@ -1957,8 +1955,6 @@ void CPaintView::saveModelAs()
 	f.open(m_modelName.c_str(), ios::out);
 	m_femGrid->saveToStream(f);
 	f.close();
-
-	cout << "Model saved as: " << m_modelName << endl;
 }
 
 void CPaintView::saveModel()
@@ -1991,8 +1987,53 @@ void CPaintView::saveModel()
 	f.open(m_modelName.c_str(), ios::out);
 	m_femGrid->saveToStream(f);
 	f.close();
+}
 
-	cout << "Model saved as: " << m_modelName << endl;
+void CPaintView::expandImageToWindow()
+{
+	disableDrawing();
+
+	m_drawing = new CSgiImage();
+	m_drawing->setChannels(3);
+
+	int i, width, height;
+
+	width = this->w()-50;
+	height = this->h()-50;
+
+	for (i=width; i>0; i--)
+	{
+		if (i % 8 == 0)
+		{
+			width = i;
+			break;
+		}
+	}
+
+	for (i=height; i>0; i--)
+	{
+		if (i % 8 == 0)
+		{
+			height = i;
+			break;
+		}
+	}
+
+	m_drawing->setSize(width, height);
+	m_drawing->fillColor(255, 255 ,255);
+	
+	// Create image grid
+	
+	m_femGrid->setImage(m_drawing);
+	m_femGrid->setShowGrid(false);
+	m_clipboard->setImage(m_drawing);
+	m_undoClipboard->setImage(m_drawing);
+	m_screenImage->setImage(m_drawing);
+
+	this->invalidate();
+	this->redraw();
+
+	enableDrawing();
 }
 
 void CPaintView::openModel()
@@ -2952,7 +2993,6 @@ void CPaintView::setColorMap(int index)
 		else
 			filename = "colormaps/colormap" + filenameIndex + ".map";
 		
-		cout << "Loading colormap: " << filename << endl;
 		m_femGrid->getColorMap()->open(filename.c_str());
 		this->redraw();
 	}
