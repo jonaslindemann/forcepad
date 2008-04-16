@@ -2,7 +2,13 @@
 version 1.0108 
 header_name {.h} 
 code_name {.cpp}
+decl {\#ifdef WIN32} {public global
+} 
+
 decl {\#include "editlog_stream.h"} {public
+} 
+
+decl {\#endif} {public global
 } 
 
 decl {\#include "so_format.h"} {public global
@@ -20,14 +26,21 @@ decl {\#define so_println() CLogWindow::getInstance()->print("");} {public globa
 decl {\#define so_hide() CLogWindow::getInstance()->hide();} {public global
 } 
 
-decl {CLogWindow* CLogWindow::m_instance = NULL;} {global
+decl {\#include <iostream>} {selected
+} 
+
+decl {CLogWindow* CLogWindow::m_instance = 0;} {global
 } 
 
 class CLogWindow {open
 } {
+  decl {\#ifdef WIN32} {public global
+  }
   decl {std::basic_streambuf<char>* m_oldBuf;} {global
   }
   decl {std::basic_editstreambuf<char> m_editStrBuf;} {global
+  }
+  decl {\#endif} {public global
   }
   decl {static CLogWindow* m_instance;} {}
   Function {CLogWindow()} {open private
@@ -42,9 +55,10 @@ class CLogWindow {open
     }
     code {textDisplay->buffer(new Fl_Text_Buffer(0));
 textDisplay->scrollbar_align(FL_ALIGN_RIGHT);
+\#ifdef WIN32
 m_editStrBuf.setLog(textDisplay);
-m_oldBuf = std::cout.rdbuf( &m_editStrBuf );} {selected
-    }
+m_oldBuf = std::cout.rdbuf( &m_editStrBuf );
+\#endif} {}
   }
   Function {hide()} {} {
     code {mainWindow->hide();} {}
@@ -53,9 +67,9 @@ m_oldBuf = std::cout.rdbuf( &m_editStrBuf );} {selected
   } {
     code {mainWindow->show();} {}
   }
-  Function {getInstance()} {return_type {static CLogWindow*}
+  Function {getInstance()} {open return_type {static CLogWindow*}
   } {
-    code {if(m_instance==NULL)
+    code {if(m_instance==0)
 {
 	m_instance = new CLogWindow();
         return m_instance;
@@ -65,10 +79,14 @@ else
 	return m_instance;
 }} {}
   }
-  Function {print(const char* txt)} {} {
-    code {std::cout << txt << std::endl;} {}
+  Function {print(const char* txt)} {open
+  } {
+    code {using namespace std;
+cout << txt << endl;} {}
   }
-  Function {print(const char* context, const char* txt)} {} {
-    code {std::cout << context << ": " << txt << std::endl;} {}
+  Function {print(const char* context, const char* txt)} {open
+  } {
+    code {using namespace std;
+cout << context << ": " << txt << endl;} {}
   }
 } 
