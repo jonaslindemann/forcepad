@@ -318,6 +318,11 @@ private:
   void cb_btnPasteWin_i(Fl_HoverButton*, void*);
   static void cb_btnPasteWin(Fl_HoverButton*, void*);
 public:
+  Fl_HoverButton *btnExpandImage;
+private:
+  void cb_btnExpandImage_i(Fl_HoverButton*, void*);
+  static void cb_btnExpandImage(Fl_HoverButton*, void*);
+public:
   Fl_Scroll *scrRightFillToolbar;
 private:
   void cb_c_i(Fl_HoverButton*, void*);

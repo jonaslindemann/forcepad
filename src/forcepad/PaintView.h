@@ -340,6 +340,7 @@ public:
 	void saveModelAs();
 	void openImage();
 	void openModel();
+	void expandImageToWindow();
 
 	void showAbout();
 	void updateModel();
