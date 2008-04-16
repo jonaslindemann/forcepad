@@ -133,7 +133,7 @@ bool CPngImage::read()
 
 	for (i=0; i<height; i++)
 		for (j=0; j<width; j++)
-			for (k=0; k<getChannels(); k++)
+			for (k=0; k<(unsigned int)getChannels(); k++)
 				setValue(j, height-i-1, k, row_pointers[i][j*getChannels()+k]);
 
 	

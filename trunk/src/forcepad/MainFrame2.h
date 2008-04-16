@@ -462,6 +462,7 @@ public:
   Fl_Scroll *scrRightDimensionToolbar;
   Fl_Value_Input *actualLength;
   Fl_Value_Output *pixelLength;
+  Fl_HoverButton *btnSetRulerDistance;
   ~CMainFrame();
   void show();
   void close();

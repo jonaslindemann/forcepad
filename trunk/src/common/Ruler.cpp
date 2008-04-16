@@ -28,17 +28,17 @@ void CRuler::doGeometry()
 	glLineWidth(2);
 
 	glBegin(GL_LINES);
-	glVertex2i(m_startPos[0], m_startPos[1]-20);
-	glVertex2i(m_startPos[0], m_startPos[1]+20);
-	glVertex2i(m_startPos[0]-20, m_startPos[1]);
-	glVertex2i(m_startPos[0]+20, m_startPos[1]);
-	glVertex2i(m_endPos[0], m_endPos[1]-20);
-	glVertex2i(m_endPos[0], m_endPos[1]+20);
-	glVertex2i(m_endPos[0]-20, m_endPos[1]);
-	glVertex2i(m_endPos[0]+20, m_endPos[1]);
+	glVertex2i(m_startPos[0], m_startPos[1]-10);
+	glVertex2i(m_startPos[0], m_startPos[1]+10);
+	glVertex2i(m_startPos[0]-10, m_startPos[1]);
+	glVertex2i(m_startPos[0]+10, m_startPos[1]);
+	glVertex2i(m_endPos[0], m_endPos[1]-10);
+	glVertex2i(m_endPos[0], m_endPos[1]+10);
+	glVertex2i(m_endPos[0]-10, m_endPos[1]);
+	glVertex2i(m_endPos[0]+10, m_endPos[1]);
 	glEnd();
 
-	glLineStipple(1, 0x00FF);
+	glLineStipple(1, 0x3333);
 	glEnable(GL_LINE_STIPPLE);
 	glBegin(GL_LINES);
 		glVertex2iv(m_startPos);

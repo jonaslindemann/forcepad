@@ -2272,7 +2272,7 @@ void CFemGrid::moveForce(CForce* force, int x, int y)
 	m_pointForces[fys].erase(eraseForce);
 
 
-	if ((int)y>=m_pointForces.size())
+	if ((int)y>=(int)m_pointForces.size())
 	{
 		force->setPosition((double)x, (double)m_pointForces.size()-1);
 		m_pointForces[m_pointForces.size()-1].push_back(force);

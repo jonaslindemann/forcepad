@@ -13058,6 +13058,7 @@ void CMainFrame::cb_btnDimensionTools_i(Fl_HoverButton*, void*) {
 
 showRightToolbar(scrRightDimensionToolbar);
 paintView->setEditMode(CPaintView::EM_RULER);
+m_physicsEditMode = paintView->getEditMode();
 }
 void CMainFrame::cb_btnDimensionTools(Fl_HoverButton* o, void* v) {
   ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnDimensionTools_i(o,v);
@@ -15087,6 +15088,19 @@ CMainFrame::CMainFrame() {
         pixelLength->textsize(12);
         pixelLength->align(FL_ALIGN_TOP);
       } // Fl_Value_Output* pixelLength
+      { btnSetRulerDistance = new Fl_HoverButton(95, 126, 42, 29, "Set");
+        btnSetRulerDistance->tooltip("Set ruler distance");
+        btnSetRulerDistance->box(FL_UP_BOX);
+        btnSetRulerDistance->down_box(FL_DOWN_BOX);
+        btnSetRulerDistance->color(FL_BACKGROUND_COLOR);
+        btnSetRulerDistance->selection_color((Fl_Color)51);
+        btnSetRulerDistance->labeltype(FL_NORMAL_LABEL);
+        btnSetRulerDistance->labelfont(0);
+        btnSetRulerDistance->labelsize(12);
+        btnSetRulerDistance->labelcolor(FL_FOREGROUND_COLOR);
+        btnSetRulerDistance->align(FL_ALIGN_CENTER);
+        btnSetRulerDistance->when(FL_WHEN_RELEASE);
+      } // Fl_HoverButton* btnSetRulerDistance
       scrRightDimensionToolbar->end();
     } // Fl_Scroll* scrRightDimensionToolbar
     wndMain->end();
@@ -15285,6 +15299,8 @@ else if (newMode == CPaintView::VM_PHYSICS)
 		showRightToolbar(scrRightBCToolbar);
 	if (btnConstraintHinge->value()==1)
 		showRightToolbar(scrRightBCHingeToolbar);
+	if (btnDimensionTools->value()==1)
+		showRightToolbar(scrRightDimensionToolbar);
 
 	paintView->setEditMode(m_physicsEditMode);
 }
@@ -15430,5 +15446,6 @@ wndMain->label(caption.c_str());
 }
 
 void CMainFrame::onRulerChanged(CRuler* ruler) {
-  pixelLength->value(ruler->getPixelLength());
+  pixelLength->precision(1);
+pixelLength->value(ruler->getPixelLength());
 }

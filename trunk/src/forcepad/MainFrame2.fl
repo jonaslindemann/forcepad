@@ -158,7 +158,7 @@ delete splashFrame;}
           }
         }
       }
-      Fl_Scroll scrRightToolbar {
+      Fl_Scroll scrRightToolbar {open
         xywh {678 404 52 139} box DOWN_BOX selection_color 51
       } {
         Fl_Group {} {open
@@ -570,7 +570,7 @@ m_sketchEditMode = paintView->getEditMode();}
           class Fl_HoverButton
         }
       }
-      Fl_Scroll scrRightFillToolbar {
+      Fl_Scroll scrRightFillToolbar {open
         xywh {57 98 53 304} box FLAT_BOX
       } {
         Fl_Group {} {open
@@ -866,7 +866,8 @@ m_physicsEditMode = paintView->getEditMode();}
           callback {// Show constraints dialog
 
 showRightToolbar(scrRightDimensionToolbar);
-paintView->setEditMode(CPaintView::EM_RULER);}
+paintView->setEditMode(CPaintView::EM_RULER);
+m_physicsEditMode = paintView->getEditMode();}
           tooltip Contraints xywh {502 271 42 42} type Radio down_box DOWN_BOX selection_color 51
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
@@ -900,6 +901,12 @@ m_physicsEditMode = paintView->getEditMode();}
         Fl_Value_Output pixelLength {
           label {dist (px)}
           xywh {95 56 43 21} labelsize 12 align 1 maximum 10000 textsize 12
+        }
+        Fl_Button btnSetRulerDistance {
+          label Set selected
+          tooltip {Set ruler distance} xywh {95 126 42 29} down_box DOWN_BOX selection_color 51 labelsize 12
+          code0 {\#include "Fl_HoverButton.h"}
+          class Fl_HoverButton
         }
       }
     }
@@ -1048,7 +1055,7 @@ else
 	btnCopy->deactivate();
 }} {}
   }
-  Function {onViewModeChange(CPaintView::TViewMode oldMode, CPaintView::TViewMode newMode)} {return_type void
+  Function {onViewModeChange(CPaintView::TViewMode oldMode, CPaintView::TViewMode newMode)} {open return_type void
   } {
     code {if (newMode == CPaintView::VM_SKETCH)
 {
@@ -1091,6 +1098,8 @@ else if (newMode == CPaintView::VM_PHYSICS)
 		showRightToolbar(scrRightBCToolbar);
 	if (btnConstraintHinge->value()==1)
 		showRightToolbar(scrRightBCHingeToolbar);
+	if (btnDimensionTools->value()==1)
+		showRightToolbar(scrRightDimensionToolbar);
 
 	paintView->setEditMode(m_physicsEditMode);
 }
@@ -1233,7 +1242,7 @@ wndMain->label(caption.c_str());} {}
   }
   Function {onRulerChanged(CRuler* ruler)} {open
   } {
-    code {pixelLength->value(ruler->getPixelLength());} {selected
-    }
+    code {pixelLength->precision(1);
+pixelLength->value(ruler->getPixelLength());} {}
   }
 } 
