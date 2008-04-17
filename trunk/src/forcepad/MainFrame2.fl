@@ -23,9 +23,11 @@ decl {\#include "SplashFrame.h"} {public global
 decl {\#include "CalcSettings.h"} {global
 } 
 
-decl {\#include <iostream>} {} 
+decl {\#include <iostream>} {public global
+} 
 
-decl {\#include <string>} {} 
+decl {\#include <string>} {public global
+} 
 
 class CMainFrame {open : {CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusMessageEvent, CGSLogMessageEvent, CPVViewModeErrorEvent, CPVModelChangedEvent, CPVRulerChangedEvent}
 } {
@@ -36,7 +38,7 @@ class CMainFrame {open : {CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusM
   } {
     Fl_Window wndMain {
       label {ForcePAD 2} open
-      xywh {363 154 733 574} type Double align 80 resizable visible
+      xywh {420 207 733 574} type Double align 80 resizable visible
     } {
       Fl_Menu_Bar mainMenu {open
         xywh {0 0 730 26} box FLAT_BOX labelsize 11 textsize 11
@@ -289,7 +291,7 @@ paintView->setDrawStress(true);}
           callback {if (btnMoveLoad->value()>0)
 	paintView->setMoveLoad(true);
 else
-	paintView->setMoveLoad(false);} selected
+	paintView->setMoveLoad(false);}
           tooltip {Toggle between moving and rotating loads} xywh {125 408 42 42} type Toggle down_box DOWN_BOX selection_color 51 labelsize 11 align 128
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
@@ -1171,13 +1173,17 @@ else
 	}	
 }} {}
   }
-  Function {onStatusMessage(const std::string& message, const int progress)} {return_type void
+  Function {onStatusMessage(const std::string& message, const int progress)} {open return_type void
   } {
-    code {statusOutput->value(message.c_str());
+    code {\#ifndef __APPLE__
+using namespace std;
+statusOutput->value(message.c_str());
 calcProgress->value(progress);
-std::cout << message << std::endl;
+cout << message << endl;
 Fl::check();
-Fl::flush();} {}
+Fl::flush();
+\#endif} {selected
+    }
   }
   Function {onLogMessage(const std::string& context, const std::string& message)} {return_type void
   } {

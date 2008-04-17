@@ -5,6 +5,8 @@
 #include <FL/Fl.H>
 /** Main window class generated from FLTK. */
 #include "SplashFrame.h"
+#include <iostream>
+#include <string>
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Menu_Bar.H>
 #include <FL/Fl_Scroll.H>
