@@ -3,7 +3,7 @@
 
 [Setup]
 AppName=ForcePAD
-AppVerName=ForcePAD 2.3.0-BETA10
+AppVerName=ForcePAD 2.4.0-BETA1
 AppPublisher=Division of Structural Mechanics
 AppPublisherURL=http://www.byggmek.lth.se
 AppSupportURL=http://www.byggmek.lth.se/resources/forcepad/forcepad.htm
@@ -23,7 +23,7 @@ Name: "desktopicon"; Description: "Create a &desktop icon"; GroupDescription: "A
 Filename: {tmp}\vcredist_x86-sp1.exe; Flags: hidewizard;
 
 [Files]
-Source: "..\..\..\forcepad-redist\vcredist_x86-sp1.exe"; DestDir: {tmp}; Flags: deleteafterinstall
+Source: "..\..\..\forcepad-redist\vcredist_x86.exe"; DestDir: {tmp}; Flags: deleteafterinstall
 Source: "..\..\bin\release\forcepad.exe"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 Source: "..\..\bin\release\brushes\*.*"; DestDir: "{app}\brushes"; CopyMode: alwaysoverwrite
 Source: "..\..\bin\release\samples\*.*"; DestDir: "{app}\samples"; CopyMode: alwaysoverwrite
