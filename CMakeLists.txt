@@ -1,6 +1,6 @@
 PROJECT(forcepad)
 
-SET(FLTK_ROOT "/usr/local")
+SET(FLTK_ROOT "/Users/lindemann/Documents/dev/fltk-1.1.8")
 
 ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
 

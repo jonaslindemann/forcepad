@@ -41,8 +41,8 @@ void CRuler::doGeometry()
 	glLineStipple(1, 0x3333);
 	glEnable(GL_LINE_STIPPLE);
 	glBegin(GL_LINES);
-		glVertex2iv(m_startPos);
-		glVertex2iv(m_endPos);
+		glVertex2iv((GLint*)m_startPos);
+		glVertex2iv((GLint*)m_endPos);
 	glEnd();
 	glPopAttrib();
 }
