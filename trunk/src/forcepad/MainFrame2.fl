@@ -280,8 +280,8 @@ paintView->setDrawStress(false);}
         Fl_Button btnMisesStress {
           callback {showRightToolbar(scrRightMisesStressToolbar);
 paintView->setDrawDisplacements(false);
-paintView->setStressType(CFemGrid2::ST_MISES);
-paintView->setDrawStress(true);}
+paintView->setStressType(CFemGrid2::ST_MISES_SMOOTH);
+paintView->setDrawStress(true);} selected
           tooltip {Mises stress visualisation} image {../../images/stress_mises.xpm} xywh {125 257 42 42} type Radio down_box DOWN_BOX selection_color 51
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
@@ -1182,8 +1182,7 @@ calcProgress->value(progress);
 cout << message << endl;
 Fl::check();
 Fl::flush();
-\#endif} {selected
-    }
+\#endif} {}
   }
   Function {onLogMessage(const std::string& context, const std::string& message)} {return_type void
   } {

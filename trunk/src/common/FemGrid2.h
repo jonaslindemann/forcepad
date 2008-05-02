@@ -56,7 +56,8 @@ public:
 	};
 	enum TStressType {
 		ST_PRINCIPAL,
-		ST_MISES
+		ST_MISES, 
+		ST_MISES_SMOOTH
 	};
 private:
 	vector<CForceQue> m_pointForces;
@@ -122,6 +123,7 @@ private:
 	int m_stressStep;
 
 	double*** m_results;
+	double** m_nodeResults;
 
 	double m_arrowSize;
 
@@ -138,6 +140,7 @@ private:
 	void drawForces();
 	void drawStress();
 	void drawMisesStress();
+	void drawMisesStressSmooth();
 	void drawDebugPoints();
 	void drawStressArrow(double x, double y, const double* values);
 	void drawDoubleDofs();
@@ -195,6 +198,9 @@ public:
 	void initDofs();
 	void clearDofs();
 
+	void zeroNodeResults();
+	void averageNodeResults();
+
 	void addPoint(int x, int y);
 	void clearPoints();
 
@@ -229,6 +235,10 @@ public:
 	void setResult(int i, int j, const double* values);
 	void setResult(int i, int j, int index, double value);
 	void getResult(int i, int j, double* values);
+
+	void setNodeResult(int i, int j, const double value);
+	void addNodeResult(int i, int j, const double value);
+	double getResult(int i, int j);
 
 	double getMaxNodeValue();
 	void setMaxNodeValue(double value);
