@@ -45,7 +45,7 @@ CFemGridSolver2::CFemGridSolver2()
 	m_weight = 0.0;
 	m_useWeight = false;
 	m_outputMatlab = false;
-	m_stiffnessScalefactor = 1000.0;
+	m_stiffnessScalefactor = 1.0;
 	m_elasticModulus = 2.1e9;
 	m_youngsModulus = 0.35;
 	m_thickness = 1.0;
@@ -730,6 +730,8 @@ void CFemGridSolver2::execute()
 
 	so_print("CFemGridSolver2:","\tCalculating element forces.");
 
+	m_femGrid->zeroNodeResults();
+
 	for (i=0; i<rows; i++)
 	{
 		for (j=0; j<cols; j++)
@@ -778,6 +780,43 @@ void CFemGridSolver2::execute()
 				//
 				
 				calfem::plani4s(Ex, Ey, Ep, D, Ed, Es, Et);
+
+				// 
+				// Calculate mises stresses for the integration points and store in 
+				// nodes.
+				//
+
+				int ip;
+
+				double ipStress[4];
+
+				for (ip=1; ip<=4; ip++)
+				{
+					sigx=Es(ip,1);
+					sigy=Es(ip,2);
+					tau=Es(ip,3);
+
+					double ds = (sigx-sigy)/2.0;
+					double R = sqrt(pow(ds,2)+pow(tau,2));						
+
+					double sig1 = (sigx+sigy)/2.0+R; 
+					double sig2 = (sigx+sigy)/2.0-R; 
+					double alfa = atan2(tau,ds)/2.0;
+
+					ipStress[ip-1] = sqrt( pow(sig1,2) - sig1*sig2 + pow(sig2,2) );
+				}
+
+				//     i,j    i,j+1
+				//     o-----o
+				//     |     |
+				//     |     |
+				//     o-----o
+				//     i+1,j  j+1,i+1
+
+				m_femGrid->addNodeResult(i+1,j,ipStress[0]);
+				m_femGrid->addNodeResult(i+1,j+1,ipStress[1]);
+				m_femGrid->addNodeResult(i,j+1,ipStress[2]);
+				m_femGrid->addNodeResult(i,j,ipStress[3]);
 
 				//
 				// Average stresses from integration points. Is this correct?? CHECK!
@@ -834,6 +873,8 @@ void CFemGridSolver2::execute()
 			}
 		}
 	}
+
+	m_femGrid->averageNodeResults();
 
 	cout << "Max misses stress = " << m_maxMisesStressValue << endl;
 

@@ -44,6 +44,7 @@ CFemGrid2::CFemGrid2()
 	m_displacementScale = 1.0;
 	m_displacements = NULL;
 	m_results = NULL;
+	m_nodeResults = NULL;
 
 	m_elementTreshold = 0.02;
 
@@ -119,9 +120,10 @@ void CFemGrid2::doGeometry()
 	{
 		if (m_stressType == ST_PRINCIPAL)
 			drawStress();
-	
-		else
+		else if (m_stressType == ST_MISES)
 			drawMisesStress();
+		else
+			drawMisesStressSmooth();
 	}
 
 	if (m_drawForcesAndConstraints)
@@ -882,7 +884,7 @@ void CFemGrid2::initResults()
 
 	clearResults();
 
-	// Create new results grid
+	// Create new results grid (element)
 
 	m_results = new double** [m_rows];
 
@@ -895,6 +897,17 @@ void CFemGrid2::initResults()
 			for (k=0; k<8; k++)
 				m_results[i][j][k]=0.0;
 		}
+	}
+
+	// Create new results grid (node)
+
+	m_nodeResults = new double* [m_rows+1];
+
+	for (i=0; i<m_rows+1; i++)
+	{
+		m_nodeResults[i] = new double [m_cols+1];
+		for (j=0; j<m_cols+1; j++)
+			m_nodeResults[i][j] = 0.0; 
 	}
 }
 
@@ -917,6 +930,80 @@ void CFemGrid2::clearResults()
 	}
 
 	m_results = NULL;
+
+	// Delete old node results grid, if any.
+
+	if (m_nodeResults!=NULL)
+	{
+		for (i=0; i<m_rows+1; i++)
+			delete [] m_nodeResults[i];
+		delete [] m_nodeResults;
+	}
+
+	m_nodeResults = NULL;
+}
+
+void CFemGrid2::averageNodeResults()
+{
+	//  
+	// 1----2----2----2----2----1
+	// |    |    |    |    |    | 
+	// |    |    |    |    |    |
+	// 2----4----4----4----4----2
+	// |    |    |    |    |    |
+	// |    |    |    |    |    |
+	// 2----4----4----4----4----2
+	// |    |    |    |    |    | 
+	// |    |    |    |    |    |
+	// 2----4----4----4----4----2
+	// |    |    |    |    |    |
+	// |    |    |    |    |    |
+	// 2----4----4----4----4----2
+	// |    |    |    |    |    |
+	// |    |    |    |    |    | 
+	// 1----2----2----2----2----1
+	//
+	// Node element contributions
+	//
+
+	if (m_nodeResults!=NULL)
+	{
+		int i, j;
+
+		double divisor = 4.0;
+
+		for (i=0; i<m_rows+1; i++)
+			for (j=0; j<m_cols+1; j++)
+			{
+				if ((i==0)||(i==m_rows))
+				{
+					if ((j==0)||(j==m_cols))
+						divisor = 1.0;
+					else
+						divisor = 2.0;
+				}
+				else
+				{
+					if ((j==0)||(j==m_cols))
+						divisor = 2.0;
+					else
+						divisor = 4.0;
+				}
+
+				m_nodeResults[i][j] = m_nodeResults[i][j] / divisor;
+			}
+	}
+}
+
+void CFemGrid2::zeroNodeResults()
+{
+	if (m_nodeResults!=NULL)
+	{
+		int i, j;
+		for (i=0; i<m_rows+1; i++)
+			for (j=0; j<m_cols+1; j++)
+				m_nodeResults[i][j] = 0.0;
+	}
 }
 
 void CFemGrid2::setResult(int i, int j, const double *values)
@@ -936,6 +1023,25 @@ void CFemGrid2::setResult(int i, int j, int index, double value)
 		m_results[i][j][index] = value;
 }
 
+void CFemGrid2::setNodeResult(int i, int j, const double value)
+{
+	if (m_nodeResults!=NULL)
+		m_nodeResults[i][j] = value;
+}
+
+void CFemGrid2::addNodeResult(int i, int j, const double value)
+{
+	if (m_nodeResults!=NULL)
+		m_nodeResults[i][j] += value;
+}
+
+double CFemGrid2::getResult(int i, int j)
+{
+	if (m_nodeResults!=NULL)
+		return m_nodeResults[i][j];
+	else
+		return 0.0;
+}
 
 void CFemGrid2::drawMisesStress()
 {
@@ -967,6 +1073,64 @@ void CFemGrid2::drawMisesStress()
 					glBegin(GL_QUADS);
 					for (l=0; l<4; l++)
 					{
+						dx = k*m_displacements[topo[l*2]];
+						dy = k*m_displacements[topo[l*2+1]];
+						if (m_drawDisplacements)
+							glVertex2d(ex[l] + dx, ey[l] + dy);
+						else
+							glVertex2d(ex[l], ey[l]);
+					}
+					glEnd();
+				}
+			}
+		}
+	}
+}
+
+void CFemGrid2::drawMisesStressSmooth()
+{
+	int i, j, l;
+	double dx, dy;
+	double k = m_displacementScale/m_maxNodeValue;
+	double sigm;
+	float r, g, b;
+	int topo[8];
+	double ex[4];
+	double ey[4];
+	double value;
+
+	if ((m_displacements!=NULL)&&(m_nodeResults!=NULL))
+	{
+		for (i=0; i<m_rows; i++)
+		{
+			for (j=0; j<m_cols; j++)
+			{
+				if (m_grid[i][j]>m_elementTreshold)
+				{
+
+					this->getElement(i, j, value, ex, ey, topo);
+
+					glBegin(GL_QUADS);
+					for (l=0; l<4; l++)
+					{
+						switch (l) {
+							case 0:
+								sigm = this->m_nodeResults[i+1][j];
+								break;
+							case 1:
+								sigm = this->m_nodeResults[i+1][j+1];
+								break;
+							case 2:
+								sigm = this->m_nodeResults[i][j+1];
+								break;
+							case 3:
+								sigm = this->m_nodeResults[i][j];
+								break;
+						}
+
+						this->m_colorMap->getColor(sigm/this->m_maxMisesStressValue/m_upperMisesTreshold, r, g, b);
+						glColor3f(r, g, b);
+
 						dx = k*m_displacements[topo[l*2]];
 						dy = k*m_displacements[topo[l*2+1]];
 						if (m_drawDisplacements)
