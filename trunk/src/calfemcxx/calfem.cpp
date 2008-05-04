@@ -927,6 +927,7 @@ void plani4e(
 		PrintMatrix(Dm);
 
 		Ke = 0.0;
+		fe = 0.0;
 
 		for (i=1; i<=(unsigned int)ngp; i++)
 		{
