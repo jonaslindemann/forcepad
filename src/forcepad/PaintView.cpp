@@ -2958,7 +2958,7 @@ void CPaintView::setStressType(CFemGrid2::TStressType stressType)
 {
 	// Make sure a colormap is loaded
 
-	if (stressType == CFemGrid2::ST_MISES)
+	if ((stressType == CFemGrid2::ST_MISES)||(stressType == CFemGrid2::ST_MISES_SMOOTH))
 		this->setColorMap(1);
 
 	m_femGrid->setStressType(stressType);

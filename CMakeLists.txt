@@ -1,6 +1,6 @@
 PROJECT(forcepad)
 
-SET(FLTK_ROOT "/Users/lindemann/Documents/dev/fltk-1.1.8")
+SET(FLTK_ROOT "/Users/jonas/Libraries/fltk-1.1.9")
 
 ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
 

@@ -786,6 +786,9 @@ void CFemGridSolver2::execute()
 				// nodes.
 				//
 
+				cout << "Ex = " << Ex(1) << ", " << Ex(2) << ", " << Ex(3) << ", " << Ex(4) << endl;
+				cout << "Ey = " << Ey(1) << ", " << Ey(2) << ", " << Ey(3) << ", " << Ey(4) << endl;
+
 				int ip;
 
 				double ipStress[4];
@@ -806,17 +809,17 @@ void CFemGridSolver2::execute()
 					ipStress[ip-1] = sqrt( pow(sig1,2) - sig1*sig2 + pow(sig2,2) );
 				}
 
+				//     i,j+1    i+1,j+1
+				//     o-----o
+				//     |     |
+				//     |     |
+				//     o-----o
 				//     i,j    i,j+1
-				//     o-----o
-				//     |     |
-				//     |     |
-				//     o-----o
-				//     i+1,j  j+1,i+1
 
-				m_femGrid->addNodeResult(i+1,j,ipStress[0]);
-				m_femGrid->addNodeResult(i+1,j+1,ipStress[1]);
-				m_femGrid->addNodeResult(i,j+1,ipStress[2]);
-				m_femGrid->addNodeResult(i,j,ipStress[3]);
+				m_femGrid->addNodeResult(i,j,ipStress[0]);
+				m_femGrid->addNodeResult(i,j+1,ipStress[1]);
+				m_femGrid->addNodeResult(i+1,j+1,ipStress[2]);
+				m_femGrid->addNodeResult(i,j+1,ipStress[3]);
 
 				//
 				// Average stresses from integration points. Is this correct?? CHECK!
@@ -1147,6 +1150,8 @@ void CFemGridSolver2::executeUpdate()
 	m_maxPosStressValue = -1.0e300;
 	m_maxNegStressValue = -1.0e300;
 
+	m_femGrid->zeroNodeResults();
+
 	for (i=0; i<rows; i++)
 	{
 		for (j=0; j<cols; j++)
@@ -1191,6 +1196,38 @@ void CFemGridSolver2::executeUpdate()
 				//
 				
 				calfem::plani4s(Ex, Ey, Ep, D, Ed, Es, Et);
+
+				int ip;
+
+				double ipStress[4];
+
+				for (ip=1; ip<=4; ip++)
+				{
+					sigx=Es(ip,1);
+					sigy=Es(ip,2);
+					tau=Es(ip,3);
+
+					double ds = (sigx-sigy)/2.0;
+					double R = sqrt(pow(ds,2)+pow(tau,2));						
+
+					double sig1 = (sigx+sigy)/2.0+R; 
+					double sig2 = (sigx+sigy)/2.0-R; 
+					double alfa = atan2(tau,ds)/2.0;
+
+					ipStress[ip-1] = sqrt( pow(sig1,2) - sig1*sig2 + pow(sig2,2) );
+				}
+
+				//     i,j+1    i+1,j+1
+				//     o-----o
+				//     |     |
+				//     |     |
+				//     o-----o
+				//     i,j    i,j+1
+
+				m_femGrid->addNodeResult(i,j,ipStress[0]);
+				m_femGrid->addNodeResult(i,j+1,ipStress[1]);
+				m_femGrid->addNodeResult(i+1,j+1,ipStress[2]);
+				m_femGrid->addNodeResult(i,j+1,ipStress[3]);
 
 				//
 				// Average stresses from integration points. Is this correct?? CHECK!
@@ -1247,6 +1284,8 @@ void CFemGridSolver2::executeUpdate()
 			}
 		}
 	}
+
+	m_femGrid->averageNodeResults();
 
 	//
 	// Calculate reaction forces from vector constraints

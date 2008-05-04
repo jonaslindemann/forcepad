@@ -1064,13 +1064,13 @@ void CFemGrid2::drawMisesStress()
 			{
 				if (m_grid[i][j]>m_elementTreshold)
 				{
-					sigm = this->m_results[i][j][3];
+ 					sigm = this->m_results[i][j][3];
 					this->m_colorMap->getColor(sigm/this->m_maxMisesStressValue/m_upperMisesTreshold, r, g, b);
-					glColor3f(r, g, b);
 
 					this->getElement(i, j, value, ex, ey, topo);
 
 					glBegin(GL_QUADS);
+					glColor3f(r, g, b);
 					for (l=0; l<4; l++)
 					{
 						dx = k*m_displacements[topo[l*2]];
@@ -1115,16 +1115,16 @@ void CFemGrid2::drawMisesStressSmooth()
 					{
 						switch (l) {
 							case 0:
-								sigm = this->m_nodeResults[i+1][j];
+								sigm = this->m_nodeResults[i][j];
 								break;
 							case 1:
-								sigm = this->m_nodeResults[i+1][j+1];
-								break;
-							case 2:
 								sigm = this->m_nodeResults[i][j+1];
 								break;
+							case 2:
+								sigm = this->m_nodeResults[i+1][j+1];
+								break;
 							case 3:
-								sigm = this->m_nodeResults[i][j];
+								sigm = this->m_nodeResults[i+1][j];
 								break;
 						}
 
