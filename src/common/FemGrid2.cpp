@@ -902,12 +902,17 @@ void CFemGrid2::initResults()
 	// Create new results grid (node)
 
 	m_nodeResults = new double* [m_rows+1];
+	m_nodeUsage = new int* [m_rows+1];
 
 	for (i=0; i<m_rows+1; i++)
 	{
 		m_nodeResults[i] = new double [m_cols+1];
+		m_nodeUsage[i] = new int [m_cols+1];
 		for (j=0; j<m_cols+1; j++)
+		{
 			m_nodeResults[i][j] = 0.0; 
+			m_nodeUsage[i][j] = 0;
+		}
 	}
 }
 
@@ -936,36 +941,20 @@ void CFemGrid2::clearResults()
 	if (m_nodeResults!=NULL)
 	{
 		for (i=0; i<m_rows+1; i++)
+		{
+			delete [] m_nodeUsage[i];
 			delete [] m_nodeResults[i];
+		}
 		delete [] m_nodeResults;
+		delete [] m_nodeUsage;
 	}
 
 	m_nodeResults = NULL;
+	m_nodeUsage = NULL;
 }
 
 void CFemGrid2::averageNodeResults()
 {
-	//  
-	// 1----2----2----2----2----1
-	// |    |    |    |    |    | 
-	// |    |    |    |    |    |
-	// 2----4----4----4----4----2
-	// |    |    |    |    |    |
-	// |    |    |    |    |    |
-	// 2----4----4----4----4----2
-	// |    |    |    |    |    | 
-	// |    |    |    |    |    |
-	// 2----4----4----4----4----2
-	// |    |    |    |    |    |
-	// |    |    |    |    |    |
-	// 2----4----4----4----4----2
-	// |    |    |    |    |    |
-	// |    |    |    |    |    | 
-	// 1----2----2----2----2----1
-	//
-	// Node element contributions
-	//
-
 	if (m_nodeResults!=NULL)
 	{
 		int i, j;
@@ -975,22 +964,8 @@ void CFemGrid2::averageNodeResults()
 		for (i=0; i<m_rows+1; i++)
 			for (j=0; j<m_cols+1; j++)
 			{
-				if ((i==0)||(i==m_rows))
-				{
-					if ((j==0)||(j==m_cols))
-						divisor = 1.0;
-					else
-						divisor = 2.0;
-				}
-				else
-				{
-					if ((j==0)||(j==m_cols))
-						divisor = 2.0;
-					else
-						divisor = 4.0;
-				}
-
-				m_nodeResults[i][j] = m_nodeResults[i][j] / divisor;
+				if (m_nodeUsage[i][j]>0)
+					m_nodeResults[i][j] = m_nodeResults[i][j] / m_nodeUsage[i][j];
 			}
 	}
 }
@@ -1002,7 +977,10 @@ void CFemGrid2::zeroNodeResults()
 		int i, j;
 		for (i=0; i<m_rows+1; i++)
 			for (j=0; j<m_cols+1; j++)
+			{
 				m_nodeResults[i][j] = 0.0;
+				m_nodeUsage[i][j] = 0;
+			}
 	}
 }
 
@@ -1026,13 +1004,19 @@ void CFemGrid2::setResult(int i, int j, int index, double value)
 void CFemGrid2::setNodeResult(int i, int j, const double value)
 {
 	if (m_nodeResults!=NULL)
+	{
 		m_nodeResults[i][j] = value;
+		m_nodeUsage[i][j] = 1;
+	}
 }
 
 void CFemGrid2::addNodeResult(int i, int j, const double value)
 {
 	if (m_nodeResults!=NULL)
+	{
 		m_nodeResults[i][j] += value;
+		m_nodeUsage[i][j] += 1;
+	}
 }
 
 double CFemGrid2::getResult(int i, int j)

@@ -124,6 +124,7 @@ private:
 
 	double*** m_results;
 	double** m_nodeResults;
+	int** m_nodeUsage;
 
 	double m_arrowSize;
 
