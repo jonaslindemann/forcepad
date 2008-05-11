@@ -582,7 +582,7 @@ m_sketchEditMode = paintView->getEditMode();}
           class Fl_HoverButton
         }
         Fl_Button btnExpandImage {
-          callback {paintView->expandImageToWindow()}
+          callback {paintView->expandImageToWindow()} selected
           tooltip {Expand image to window} image {../../images/expand_image.xpm} xywh {447 334 42 42} down_box DOWN_BOX selection_color 51
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
@@ -1171,8 +1171,7 @@ else
 		paintView->setDrawStress(false);
 		showRightToolbar(scrRightDisplacementToolbar);
 	}	
-}} {selected
-    }
+}} {}
   }
   Function {onStatusMessage(const std::string& message, const int progress)} {open return_type void
   } {
