@@ -38,6 +38,7 @@ private:
 	bool m_averageOverGridSquare;
 protected:
 	double** m_grid;
+	double*** m_fields;
 	bool** m_specialElement;
 	int m_width;
 	int m_height;
@@ -45,6 +46,7 @@ protected:
 	int m_cols;
 	int m_stride;
 	double m_elementScaleFactor;
+	int m_fieldLayers;
 public:
 	CImageGrid2();
 	virtual ~CImageGrid2();
@@ -67,6 +69,14 @@ public:
 
 	void setGridValue(int row, int col, double value);
 	double getGridValue(int row, int col);
+
+	void setFieldValue(int layer, int row, int col, double value);
+	double getFieldValue(int layer, int row, int col);
+
+	void copyField(int fromLayer, int toLayer);
+	void copyFromGrid(int toLayer, double factor);
+
+	double maxAbsDiff(int l1, int l2);
 
 	void getElementTopo(int row, int col, int* dx, int* dy);
 	void getElementCoords(int row, int col, double* ex, double* ey);

@@ -26,9 +26,11 @@
 
 CImageGrid2::CImageGrid2()
 {
+	m_fieldLayers = 2;
 	m_image = NULL;
 	m_stride = 8;
 	m_grid = NULL;
+	m_fields = NULL;
 	m_specialElement = NULL;
 	m_rows = -1;
 	m_cols = -1;
@@ -45,7 +47,7 @@ CImageGrid2::~CImageGrid2()
 
 void CImageGrid2::clearGrid()
 {
-	int i;
+	int i, j;
 
 	// Delete old grid, if any.
 
@@ -59,6 +61,18 @@ void CImageGrid2::clearGrid()
 
 		delete [] m_grid;
 		delete [] m_specialElement;
+	}
+
+	if (m_fields!=NULL)
+	{
+		for (i=0; i<m_fieldLayers; i++)
+		{
+			for (j=0; j<m_rows; j++)
+				delete [] m_fields[i][j];
+
+			delete [] m_fields[i];
+		}
+		delete [] m_fields;
 	}
 }
 
@@ -147,6 +161,22 @@ void CImageGrid2::initGrid()
 		}
 	}
 
+	// Create field layers
+
+	m_fields = new double**[m_fieldLayers];
+	
+	for (i=0; i<m_fieldLayers; i++)
+	{
+		m_fields[i] = new double*[m_rows];
+		for (j=0; j<m_rows; j++)
+		{
+			m_fields[i][j] = new double [m_cols];
+
+			for (k=0; k<m_cols; k++)
+				m_fields[i][j][k] = 0.0;
+		}
+	}
+
 	// Fill grid
 
 	if (m_useImage)
@@ -211,6 +241,80 @@ double CImageGrid2::getGridValue(int row, int col)
 	}
 	else
 		return 0.0;
+}
+
+void CImageGrid2::setFieldValue(int layer, int row, int col, double value)
+{
+	if (m_fields!=NULL)
+		if ((row>=0)&&(row<m_rows)&&(col>=0)&&(col<m_cols)&&(layer>=0)&&(layer<m_fieldLayers))
+			m_fields[layer][row][col] = value;
+}
+
+double CImageGrid2::getFieldValue(int layer, int row, int col)
+{
+	if (m_fields!=NULL)
+	{
+		if ((row>=0)&&(row<m_rows)&&(col>=0)&&(col<m_cols)&&(layer>=0)&&(layer<m_fieldLayers))
+			return m_fields[layer][row][col];
+		else
+			return 0.0;
+	}
+	else
+		return 0.0;
+}
+
+void CImageGrid2::copyField(int fromLayer, int toLayer)
+{
+	int i, j;
+
+	if (m_fields!=NULL)
+	{
+		if ((fromLayer>=0)&&(fromLayer<m_fieldLayers)&&(toLayer>=0)&&(toLayer<m_fieldLayers))
+		{
+			for (i=0; i<m_rows; i++)
+				for (j=0; j<m_cols; j++)
+					m_fields[toLayer][i][j] = m_fields[fromLayer][i][j];
+		}
+	}
+}
+
+void CImageGrid2::copyFromGrid(int toLayer, double factor)
+{
+	int i, j;
+
+	if ((m_fields!=NULL)&&(m_grid!=NULL))
+	{
+		if ((toLayer>=0)&&(toLayer<m_fieldLayers))
+		{
+			for (i=0; i<m_rows; i++)
+				for (j=0; j<m_cols; j++)
+					m_fields[toLayer][i][j] = m_grid[i][j]*factor;
+		}
+	}
+}
+
+double CImageGrid2::maxAbsDiff(int l1, int l2)
+{
+	int i, j;
+
+	double maxValue = -1e300;
+	double diff;
+
+	if (m_fields!=NULL)
+	{
+		if ((l1>=0)&&(l1<m_fieldLayers)&&(l2>=0)&&(l2<m_fieldLayers))
+		{
+			for (i=0; i<m_rows; i++)
+				for (j=0; j<m_cols; j++)
+				{
+					diff = abs(m_fields[l1][i][j]-m_fields[l2][i][j]);
+					if (diff>maxValue)
+						maxValue = diff;
+				}
+		}
+		return maxValue;
+	}
+	return 0.0;
 }
 
 bool CImageGrid2::isSpecialElement(int row, int col)
