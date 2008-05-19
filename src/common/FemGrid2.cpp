@@ -1539,7 +1539,7 @@ void CFemGrid2::readFromStream(istream &in)
 		// Set image size
 		//
 
-		image->setChannels(3);
+		//image->setChannels(4);
 		image->setSize(width, height);
 
 		// 

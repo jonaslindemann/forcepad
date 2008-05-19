@@ -181,7 +181,7 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 	m_selectionBox->setPosition(50.0, 50.0);
 	
 	CColorPtr color = new CColor();
-	color->setColor(0.0f, 0.0f, 0.0f, 1.0f);
+	color->setColor(0.0f, 0.0f, 0.0f, 0.5f);
 	
 	m_rectangle = new CRectangle();
 	m_rectangle->setColor(color);
@@ -2012,6 +2012,8 @@ void CPaintView::expandImageToWindow()
 
 void CPaintView::openModel()
 {
+	using namespace std;
+	
 	disableDrawing();
 	
 	so_print("CPaintView", "openModel()");
@@ -2023,23 +2025,26 @@ void CPaintView::openModel()
 	{
 		setModelName(fname);
 		
-		m_drawing = new CSgiImage();
-		m_drawing->setChannels(3);
-		m_drawing->setSize(20, 20);
-		m_drawing->fillColor(255,255,0);
-		
+		m_drawing = new CImage(2);
+		m_drawing->setSize(640,480);
+		m_drawing->setChannels(4);
 		m_femGrid->setImage(m_drawing);
-		m_clipboard->setImage(m_drawing);
-		m_undoClipboard->setImage(m_drawing);
-		m_screenImage->setImage(m_drawing);
-		
-		using namespace std;
-		
+
 		fstream f;
 		f.open(m_modelName.c_str(), ios::in);
 		m_femGrid->readFromStream(f);
 		f.close();
+
+		m_drawing->setLayer(1);
+		m_drawing->fillColor(255,255,255);
+		m_drawing->fillAlpha(128);
+		m_drawing->setAlpha(128);
+		m_drawing->setLayer(0);
 		
+		m_clipboard->setImage(m_drawing);
+		m_undoClipboard->setImage(m_drawing);
+		m_screenImage->setImage(m_drawing);
+
 		m_femGrid->setShowGrid(false);
 		m_showMesh = false;
 		

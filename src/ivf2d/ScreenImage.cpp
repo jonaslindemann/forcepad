@@ -204,7 +204,7 @@ void CScreenImage::update(int x1, int y1, int x2, int y2)
 		glPixelStorei(GL_PACK_SKIP_PIXELS, 0);
 		glPixelStorei(GL_PACK_SKIP_ROWS, 0);
 
-		m_image->fillRectAlpha(x1, y1, x2, y2, m_image->getAlpha());
+		m_image->fillRectAlpha(x1, y1, x2, y2, 128);
 	}
 }
 
