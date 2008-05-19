@@ -230,18 +230,32 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 	m_validReactions = false;
 	m_calcCG = true;
 #endif
+
+	// Optimisation constraints
+
+	m_optLayerActive = false;
+	m_optConstraintColor[0] = 1.0;
+	m_optConstraintColor[1] = 0.0;
+	m_optConstraintColor[2] = 0.0;
 	
 	// Create drawing area
 	
-	m_drawing = new CSgiImage();
-	m_drawing->setChannels(3);
+	m_drawing = new CImage(2);
+	m_drawing->setChannels(4);
 	m_drawing->setSize(640,480);
 	m_drawing->fillColor(255,255,255);
-	
+
+	m_drawing->setLayer(1);
+	m_drawing->fillColor(255,255,255);
+	m_drawing->fillAlpha(128);
+	m_drawing->fillRectAlpha(50,50,200,200, 128);
+	m_drawing->setAlpha(128);
+	m_drawing->setLayer(0);
+
 	// Create a buffer for reading pixels back
 	
 	m_buffer = new CImage();
-	m_buffer->setChannels(3);
+	m_buffer->setChannels(4);
 	m_buffer->setSize(64,64);
 	
 	// Create image grid
@@ -283,6 +297,8 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 	// Set initial model name
 	
 	setModelName("noname.fp2");
+
+	m_runOnce = true;
 }
 
 
@@ -312,6 +328,22 @@ CPaintView::~CPaintView()
 void CPaintView::draw()
 {
 	// Clear screen
+
+	if (m_runOnce)
+	{
+		//
+		// Initialise GLEW
+		//
+
+		GLenum err = glewInit();
+		if (GLEW_OK != err)
+		{
+			/* Problem: glewInit failed, something is seriously wrong. */
+			fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
+		}
+		fprintf(stdout, "Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
+		m_runOnce = false;
+	}
 	
 	onClear(); 
 	
@@ -522,7 +554,6 @@ void CPaintView::onPush(int x, int y)
 		m_clipboard->paste(x-m_drawingOffsetX-ww/2, h()-y-m_drawingOffsetY-hh/2);
 		this->redraw();
 		break;
-	case EM_BRUSH:
 	case EM_DIRECT_BRUSH:
 		
 		// Update undo area
@@ -552,6 +583,9 @@ void CPaintView::onDrag(int x, int y)
 	int prevPos[2];
 	prevPos[0] = m_current[0];
 	prevPos[1] = m_current[1];
+
+	float eraseColor[3];
+	eraseColor[0] = eraseColor[1] = eraseColor[2] = 1.0;
 
 	double moveDist = sqrt(pow((double)prevPos[0]-(double)x,2)+pow((double)prevPos[1]-(double)y,2));
 
@@ -595,64 +629,71 @@ void CPaintView::onDrag(int x, int y)
 		}
 
 		break;
-	case EM_BRUSH:
-	case EM_ERASE:
-		
-		// Update undo area
-		
-		glReadPixels(
-			x-32,
-			h() - m_current[1] - 32,
-			m_buffer->getWidth(),
-			m_buffer->getHeight(),
-			GL_RGB, GL_UNSIGNED_BYTE,
-			m_buffer->getImageMap()
-			);
-		
-		m_drawing->drawImage(m_current[0]-m_drawingOffsetX-32 , h() - m_current[1]-m_drawingOffsetY-32, m_buffer);
-		
-		this->redraw();
-		break;
 	case EM_DIRECT_ERASE:
-		float noColor[3];
-		noColor[0] = 1.0f;
-		noColor[1] = 1.0f;
-		noColor[2] = 1.0f;
-		if (moveDist>1)
-		{
-			m_drawing->drawImageLine(
-				m_currentBrush, 
-				prevPos[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, 
-				h()-prevPos[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, 
-				m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, 
-				h()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, 
-				noColor
-			);		
-		}
-		else
-			m_drawing->copyFrom(m_currentBrush, m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, h()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, noColor);
-		this->redraw();
-		break;
 	case EM_DIRECT_BRUSH:
 		if (moveDist>1)
 		{
-			m_drawing->drawImageLine(
-				m_currentBrush, 
-				prevPos[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, 
-				h()-prevPos[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, 
-				m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, 
-				h()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, 
-				m_brushColor
-			);		
+			if (m_optLayerActive)
+			{
+				if (m_editMode == EM_DIRECT_ERASE)
+					m_drawing->drawImageLine(
+						m_currentBrush, 
+						prevPos[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, 
+						h()-prevPos[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, 
+						m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, 
+						h()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, 
+						eraseColor
+					);		
+				else
+					m_drawing->drawImageLine(
+						m_currentBrush, 
+						prevPos[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, 
+						h()-prevPos[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, 
+						m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, 
+						h()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, 
+						m_optConstraintColor
+					);		
+			}
+			else
+			{
+				if (m_editMode == EM_DIRECT_ERASE)
+					m_drawing->drawImageLine(
+						m_currentBrush, 
+						prevPos[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, 
+						h()-prevPos[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, 
+						m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, 
+						h()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, 
+						eraseColor
+					);		
+				else
+					m_drawing->drawImageLine(
+						m_currentBrush, 
+						prevPos[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, 
+						h()-prevPos[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, 
+						m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, 
+						h()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, 
+						m_brushColor
+					);		
+			}
 		}
 		else
-			m_drawing->copyFrom(m_currentBrush, m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, h()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, m_brushColor);
+		{
+			if (m_optLayerActive)
+				m_drawing->copyFrom(m_currentBrush, m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, h()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, m_optConstraintColor);
+			else
+				m_drawing->copyFrom(m_currentBrush, m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, h()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, m_brushColor);
+		}
 		this->redraw();
 		break;
 	case EM_RECTANGLE:
 		resetUndoArea();
 		
 		// Update the rectangle primitive
+
+		if (this->m_optLayerActive)
+			m_rectangle->getColor()->setColor(m_optConstraintColor);
+		else
+			m_rectangle->getColor()->setColor(m_brushColor);
 		
 		m_rectangle->setPosition(m_start[0], h() - m_start[1]);
 		m_rectangle->setSize(m_current[0]-m_start[0], -m_current[1]+m_start[1]);
@@ -677,6 +718,11 @@ void CPaintView::onDrag(int x, int y)
 		
 		// Update the ellipse primitive
 		
+		if (this->m_optLayerActive)
+			m_ellipse->getColor()->setColor(m_optConstraintColor);
+		else
+			m_ellipse->getColor()->setColor(m_brushColor);
+
 		m_ellipse->setPosition(m_start[0], h() - m_start[1]);
 		m_ellipse->setSize(m_current[0]-m_start[0], -m_current[1]+m_start[1]);
 		
@@ -724,6 +770,11 @@ void CPaintView::onDrag(int x, int y)
 		
 		// Update line primitive
 		
+		if (this->m_optLayerActive)
+			m_line->getColor()->setColor(m_optConstraintColor);
+		else
+			m_line->getColor()->setColor(m_brushColor);
+
 		m_line->setStartPos(m_start[0], h() - m_start[1]);
 		m_line->setEndPos(m_current[0], h() - m_current[1]);
 		
@@ -862,9 +913,6 @@ void CPaintView::onRelease(int x, int y)
 		// For the following modes the image has to be read
 		// back from video memory using glReadPixels
 		
-	case EM_BRUSH:
-	case EM_ERASE:
-		break;
 	case EM_ELLIPSE:
 	case EM_RECTANGLE:
 	case EM_LINE:
@@ -1037,6 +1085,8 @@ void CPaintView::onDraw()
 	glVertex2i(shadowWidth,shadowWidth2);
 	glEnd();
 
+	// Disable drawing outside the image.
+
 	glEnable(GL_SCISSOR_TEST);
 	
 	if (m_lockDrawing)
@@ -1047,46 +1097,23 @@ void CPaintView::onDraw()
 	if (!m_femGrid->getShowGrid())
 	{
 		m_screenImage->setPosition((double)m_drawingOffsetX, (double)m_drawingOffsetY);
-		m_screenImage->render();
+		if (m_optLayerActive)
+		{
+			m_drawing->setLayer(0);
+			m_screenImage->render();
+			m_drawing->setLayer(1);
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			m_screenImage->render();
+			glDisable(GL_BLEND);
+		}
+		else
+		{
+			m_drawing->setLayer(0);
+			m_screenImage->render();
+		}
 		
 		switch (m_editMode) {
-		case EM_BRUSH:
-			if (m_leftMouseDown)
-			{
-				glEnable(GL_BLEND);
-				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-				
-				// Set brush magnification
-				
-				glPixelZoom(m_brushScale, m_brushScale);
-				
-				// Set brush color
-				
-				glPixelTransferf(GL_RED_BIAS, m_brushColor[0]);
-				glPixelTransferf(GL_GREEN_BIAS, m_brushColor[1]);
-				glPixelTransferf(GL_BLUE_BIAS, m_brushColor[2]);
-				
-				// Draw brush
-				
-				glRasterPos2i(m_current[0]-m_currentBrush->getWidth()*m_brushScale/2, h()-m_current[1]-m_currentBrush->getHeight()*m_brushScale/2);
-				glDrawPixels(m_currentBrush->getWidth(), m_currentBrush->getHeight(), GL_RGBA, GL_UNSIGNED_BYTE, m_currentBrush->getImageMap());
-				
-				// Reset brush color
-				
-				glPixelTransferf(GL_RED_BIAS, 0.0f);
-				glPixelTransferf(GL_GREEN_BIAS, 0.0f);
-				glPixelTransferf(GL_BLUE_BIAS, 0.0f);
-				
-				// Disable blending
-				
-				glDisable(GL_BLEND);
-			}
-			break;
-
-		case EM_DIRECT_BRUSH:
-
-			break;
-			
 		case EM_PASTE:
 			
 			// Xor clipboard
@@ -1095,81 +1122,27 @@ void CPaintView::onDraw()
 			glPixelZoom(m_brushScale, m_brushScale);
 			glLogicOp(GL_AND);
 			glRasterPos2i(m_current[0]-m_clipboard->getClipboard()->getWidth()*m_brushScale/2, h()-m_current[1]-m_clipboard->getClipboard()->getHeight()*m_brushScale/2);
-			glDrawPixels(m_clipboard->getClipboard()->getWidth(), m_clipboard->getClipboard()->getHeight(), GL_RGB, GL_UNSIGNED_BYTE, m_clipboard->getClipboard()->getImageMap());
+			glDrawPixels(m_clipboard->getClipboard()->getWidth(), m_clipboard->getClipboard()->getHeight(), GL_RGBA, GL_UNSIGNED_BYTE, m_clipboard->getClipboard()->getImageMap());
 			glDisable(GL_COLOR_LOGIC_OP);
 			m_clipboard->render(m_current[0]-m_clipboard->getClipboard()->getWidth()*m_brushScale/2, h()-m_current[1]-m_clipboard->getClipboard()->getHeight()*m_brushScale/2);
 			glPixelZoom(1.0, 1.0);
 			break;
-			
-		case EM_ERASE:
-			
-			if (m_leftMouseDown)
-			{
-				// Set blending
-				
-				glEnable(GL_BLEND);
-				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-				
-				// Set brush magnification
-				
-				glPixelZoom(m_brushScale, m_brushScale);
-				
-				// Set brush color
-				
-				glPixelTransferf(GL_RED_BIAS, 1.0f);
-				glPixelTransferf(GL_GREEN_BIAS, 1.0f);
-				glPixelTransferf(GL_BLUE_BIAS, 1.0f);
-				
-				// Draw brush
-				
-				glRasterPos2i(m_current[0]-m_currentBrush->getWidth()*m_brushScale/2, h()-m_current[1]-m_currentBrush->getHeight()*m_brushScale/2);
-				glDrawPixels(m_currentBrush->getWidth(), m_currentBrush->getHeight(), GL_RGBA, GL_UNSIGNED_BYTE, m_currentBrush->getImageMap());
-				
-				// Reset brush color
-				
-				glPixelTransferf(GL_RED_BIAS, 0.0f);
-				glPixelTransferf(GL_GREEN_BIAS, 0.0f);
-				glPixelTransferf(GL_BLUE_BIAS, 0.0f);
-				
-				// Disable blending
-				
-				glDisable(GL_BLEND);
-			}
-			break;
 		case EM_RECTANGLE:
 			if (m_leftMouseDown)
 			{
-				glEnable(GL_BLEND);
-				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-				glPixelZoom(1.0, 1.0);
-				glRasterPos2i(m_drawingOffsetX, m_drawingOffsetY);
-				glDrawPixels(m_drawing->getWidth(), m_drawing->getHeight(), GL_RGB, GL_UNSIGNED_BYTE, m_drawing->getImageMap());
 				m_rectangle->render();
-				glDisable(GL_BLEND);
 			}
 			break;
 		case EM_ELLIPSE:
 			if (m_leftMouseDown)
 			{
-				glEnable(GL_BLEND);
-				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-				glPixelZoom(1.0, 1.0);
-				glRasterPos2i(m_drawingOffsetX, m_drawingOffsetY);
-				glDrawPixels(m_drawing->getWidth(), m_drawing->getHeight(), GL_RGB, GL_UNSIGNED_BYTE, m_drawing->getImageMap());
 				m_ellipse->render();
-				glDisable(GL_BLEND);
 			}
 			break;
 		case EM_LINE:
 			if (m_leftMouseDown)
 			{
-				glPixelZoom(1.0, 1.0);
-				glRasterPos2i(m_drawingOffsetX, m_drawingOffsetY);
-				glDrawPixels(m_drawing->getWidth(), m_drawing->getHeight(), GL_RGB, GL_UNSIGNED_BYTE, m_drawing->getImageMap());
-				glEnable(GL_BLEND);
-				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 				m_line->render();
-				glDisable(GL_BLEND);
 			}
 			break;
 		case EM_FLOODFILL:
@@ -1181,7 +1154,7 @@ void CPaintView::onDraw()
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			glPixelZoom(1.0, 1.0);
 			glRasterPos2i(m_drawingOffsetX, m_drawingOffsetY);
-			glDrawPixels(m_drawing->getWidth(), m_drawing->getHeight(), GL_RGB, GL_UNSIGNED_BYTE, m_drawing->getImageMap());
+			glDrawPixels(m_drawing->getWidth(), m_drawing->getHeight(), GL_RGBA, GL_UNSIGNED_BYTE, m_drawing->getImageMap());
 			glDisable(GL_BLEND);
 			break;
 		default:
@@ -1204,8 +1177,6 @@ void CPaintView::onDraw()
 	{
 		m_femGrid->resetStressDrawing();
 		switch (m_editMode) {
-		case EM_BRUSH:
-		case EM_ERASE:
 		case EM_ELLIPSE:
 		case EM_RECTANGLE:
 		case EM_LINE:
@@ -1269,9 +1240,7 @@ void CPaintView::onMove(int x, int y)
 	updateCursor();
 	
 	switch (m_editMode) {
-	case EM_BRUSH:
 	case EM_DIRECT_BRUSH:
-	case EM_ERASE:
 		this->redraw();
 		break;
 	case EM_PASTE:
@@ -1586,9 +1555,9 @@ void CPaintView::updateModel()
 void CPaintView::updateCursor()
 {
 	switch (m_editMode) {
-	case EM_BRUSH:
+	//case EM_BRUSH:
 	case EM_DIRECT_BRUSH:
-	case EM_ERASE:
+	//case EM_ERASE:
 	case EM_DIRECT_ERASE:
 		fl_cursor_ex( m_cursors[m_currentBrushIdx] );
 		break;
@@ -1707,6 +1676,10 @@ bool CPaintView::execute()
 	m_solver->setUseWeight(m_useWeight);
 	m_solver->setConstraintStiffnessScale(m_constraintStiffnessScale);
 	m_solver->setForceMagnitude(m_forceMagnitude);
+
+	m_solver->setThickness(this->getThickness());
+	m_solver->setElasticModulus(this->getElasticModulus());
+	m_solver->setYoungsModulus(this->getYoungsModulus());
 
 	if (m_useWeight)
 		m_solver->setWeight(m_weight);
@@ -2273,7 +2246,7 @@ void CPaintView::copyToWindows()
 		y1+m_drawingOffsetY,
 		w,
 		h,
-		GL_RGB,GL_UNSIGNED_BYTE,
+		GL_RGBA,GL_UNSIGNED_BYTE,
 		pPixelData
 		);
 	
@@ -2787,6 +2760,20 @@ void CPaintView::setMaxIntensity(float intensity)
 	this->redraw();
 }
 
+void CPaintView::applyElementScale()
+{
+	this->m_femGrid->setElementScaleFactor(m_ruler->getActualLength()/m_ruler->getPixelLength());
+}
+
+void CPaintView::setRulerLength(double actualLength)
+{
+	if (actualLength>0.0)
+	{
+		m_ruler->setActualLength(actualLength);
+		this->m_femGrid->setElementScaleFactor(m_ruler->getActualLength()/m_ruler->getPixelLength());
+	}
+}
+
 
 void CPaintView::setCommandLine(int argc, char **argv)
 {
@@ -3063,7 +3050,8 @@ double CPaintView::getElasticModulus()
 
 void CPaintView::setYoungsModulus(double value)
 {
-	m_youngsModulus = value;
+	if (value>0.0)
+		m_youngsModulus = value;
 }
 
 double CPaintView::getYoungsModulus()
@@ -3073,7 +3061,8 @@ double CPaintView::getYoungsModulus()
 
 void CPaintView::setThickness(double value)
 {
-	m_thickness = value;
+	if (value>0.0)
+		m_thickness = value;
 }
 
 double CPaintView::getThickness()
@@ -3083,7 +3072,8 @@ double CPaintView::getThickness()
 
 void CPaintView::setConstraintStiffnessScale(double value)
 {
-	m_constraintStiffnessScale = value;
+	if (value>0.0)
+		m_constraintStiffnessScale = value;
 }
 
 double CPaintView::getConstraintStiffnessScale()
@@ -3093,7 +3083,8 @@ double CPaintView::getConstraintStiffnessScale()
 
 void CPaintView::setWeight(double value)
 {
-	m_weight = value;
+	if (value>0.0)
+		m_weight = value;
 }
 
 double CPaintView::getWeight()
@@ -3118,7 +3109,15 @@ bool CPaintView::getMoveLoad()
 	return m_moveLoad;
 }
 
-
+void CPaintView::setOptLayer(bool active)
+{
+	m_optLayerActive = active;
+	if (active)
+		m_drawing->setLayer(1);
+	else
+		m_drawing->setLayer(0);
+	this->redraw();
+}
 
 void CPaintView::setModeChangeEvent(CPVModeChangeEvent* eventMethod)
 {

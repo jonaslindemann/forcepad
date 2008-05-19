@@ -150,6 +150,11 @@ private:
   void cb_btnSelectTools_i(Fl_HoverButton*, void*);
   static void cb_btnSelectTools(Fl_HoverButton*, void*);
 public:
+  Fl_HoverButton *btnOptLayer;
+private:
+  void cb_btnOptLayer_i(Fl_HoverButton*, void*);
+  static void cb_btnOptLayer(Fl_HoverButton*, void*);
+public:
   Fl_Group *paintGroup;
   CPaintView *paintView;
   Fl_Scroll *scrLeftResultToolbar;
@@ -172,6 +177,11 @@ public:
 private:
   void cb_btnMoveLoad_i(Fl_HoverButton*, void*);
   static void cb_btnMoveLoad(Fl_HoverButton*, void*);
+public:
+  Fl_HoverButton *btnRotateLoad;
+private:
+  void cb_btnRotateLoad_i(Fl_HoverButton*, void*);
+  static void cb_btnRotateLoad(Fl_HoverButton*, void*);
 public:
   Fl_Progress *calcProgress;
   Fl_Output *statusOutput;
@@ -460,6 +470,11 @@ private:
   void cb_btnDimensionTools_i(Fl_HoverButton*, void*);
   static void cb_btnDimensionTools(Fl_HoverButton*, void*);
 public:
+  Fl_HoverButton *btnThickness;
+private:
+  void cb_btnThickness_i(Fl_HoverButton*, void*);
+  static void cb_btnThickness(Fl_HoverButton*, void*);
+public:
   Fl_Scroll *scrRightBCHingeToolbar;
   Fl_HoverButton *btnAddBcHinge;
 private:
@@ -471,10 +486,19 @@ private:
   void cb_btnRemoveBcHinge_i(Fl_HoverButton*, void*);
   static void cb_btnRemoveBcHinge(Fl_HoverButton*, void*);
 public:
+  Fl_Scroll *scrRightThicknessToolbar;
+  Fl_Value_Input *thickness;
+private:
+  void cb_thickness_i(Fl_Value_Input*, void*);
+  static void cb_thickness(Fl_Value_Input*, void*);
+public:
   Fl_Scroll *scrRightDimensionToolbar;
   Fl_Value_Input *actualLength;
+private:
+  void cb_actualLength_i(Fl_Value_Input*, void*);
+  static void cb_actualLength(Fl_Value_Input*, void*);
+public:
   Fl_Value_Output *pixelLength;
-  Fl_HoverButton *btnSetRulerDistance;
   ~CMainFrame();
   void show();
   void close();

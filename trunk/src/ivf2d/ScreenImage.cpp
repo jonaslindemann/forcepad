@@ -54,13 +54,13 @@ void CScreenImage::doGeometry()
 			glPixelStorei(GL_UNPACK_ROW_LENGTH, m_image->getWidth());
 			glPixelStorei(GL_UNPACK_SKIP_PIXELS, m_subImagePos[0]);
 			glPixelStorei(GL_UNPACK_SKIP_ROWS, m_subImagePos[1]);
-			glDrawPixels(m_subImageSize[0], m_subImageSize[1], GL_RGB, GL_UNSIGNED_BYTE, m_image->getImageMap());
+			glDrawPixels(m_subImageSize[0], m_subImageSize[1], GL_RGBA, GL_UNSIGNED_BYTE, m_image->getImageMap());
 			glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 			glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
 			glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
 			break;
 		case RM_NORMAL:
-			glDrawPixels(m_image->getWidth(), m_image->getHeight(), GL_RGB, GL_UNSIGNED_BYTE, m_image->getImageMap());
+			glDrawPixels(m_image->getWidth(), m_image->getHeight(), GL_RGBA, GL_UNSIGNED_BYTE, m_image->getImageMap());
 			break;
 		case RM_TILED:
 			double x, y;
@@ -73,7 +73,7 @@ void CScreenImage::doGeometry()
 					glPixelStorei(GL_UNPACK_SKIP_PIXELS, j*m_tileSpacing[0]);
 					glPixelStorei(GL_UNPACK_SKIP_ROWS, i*m_tileSpacing[1]);
 					glRasterPos2i((int)x + j*m_tileSpacing[0], (int)y + i*m_tileSpacing[1]);
-					glDrawPixels(m_tileSpacing[0], m_tileSpacing[1], GL_RGB, GL_UNSIGNED_BYTE, m_image->getImageMap());
+					glDrawPixels(m_tileSpacing[0], m_tileSpacing[1], GL_RGBA, GL_UNSIGNED_BYTE, m_image->getImageMap());
 					glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 					glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
 					glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
@@ -199,10 +199,12 @@ void CScreenImage::update(int x1, int y1, int x2, int y2)
 		glPixelStorei(GL_PACK_ROW_LENGTH, m_image->getWidth());
 		glPixelStorei(GL_PACK_SKIP_PIXELS, xmin);
 		glPixelStorei(GL_PACK_SKIP_ROWS, ymin);
-		glReadPixels((int)x + xmin, (int)y + ymin, xmax-xmin, ymax-ymin, GL_RGB, GL_UNSIGNED_BYTE, m_image->getImageMap());
+		glReadPixels((int)x + xmin, (int)y + ymin, xmax-xmin, ymax-ymin, GL_RGBA, GL_UNSIGNED_BYTE, m_image->getImageMap());
 		glPixelStorei(GL_PACK_ROW_LENGTH, 0);
 		glPixelStorei(GL_PACK_SKIP_PIXELS, 0);
 		glPixelStorei(GL_PACK_SKIP_ROWS, 0);
+
+		m_image->fillRectAlpha(x1, y1, x2, y2, m_image->getAlpha());
 	}
 }
 

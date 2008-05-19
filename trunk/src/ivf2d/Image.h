@@ -38,9 +38,12 @@ IvfSmartPointer(CImage);
  */
 class CImage : public CBase {
 private:
+	int m_layers;
+	int m_currentLayer;
 	int m_size[2];
 	double m_ratio;
 	GLubyte* m_imageMap;
+	GLubyte** m_imageMaps;
 	int m_channels;
 	GLubyte m_currentAlpha;
 	GLubyte m_startColor[3];
@@ -50,33 +53,13 @@ private:
 	deque<int> m_processListX;
 	deque<int> m_processListY;
 	bool m_ownData;
-public:
-	void drawImage(int x, int y, CImage* image);
-	void drawImageLine(CImage* image, int x1, int y1, int x2, int y2, float* color);
-	void grayscale();
-	int getChannels();
-	void setImageMap(int width, int height, GLubyte* data, bool ownData);
-	void* getData();
-	void copyFrom(CImage* image);
-	void copyFrom(CImage* image, int startx, int starty);
-	void copyFrom(CImage* image, int startx, int starty, const float* color);
-	void setFillColor(GLubyte red, GLubyte green, GLubyte blue);
-	bool validPixel(int x, int y);
-	void floodFill(int x, int y);
-	bool popNextPixel(int &x, int &y);
-	void pushNextPixel(int x, int y);
-	bool popPixel(int &x, int &y);
-	void pushPixel(int x, int y);
-	void doFloodFill(int x, int y);
-	void invert();
-	void colorAlpha(GLubyte red, GLubyte green, GLubyte blue);
-	void createAlphaMask(GLubyte min, GLubyte max);
-	void createMask(GLubyte comp, GLubyte treshold, GLubyte over, GLubyte under);
-	void fillAlpha(GLubyte alpha);
-	void getValue(int x, int y, int channel, GLubyte &value);
-	void createAlphaAll(GLubyte max, GLubyte min);
 
+	void initLayers();
+	void clearLayers();
+	void destroyLayers();
+public:
 	CImage();
+	CImage(int nLayers);
 	virtual ~CImage();
 
 	IvfClassInfo("CImage",CBase);
@@ -101,10 +84,37 @@ public:
 	/** Sets the pixel at position (\c x, \c y) to a specified color. */
 	void setPixel(int x, int y, GLubyte red, GLubyte green, GLubyte blue);
 	void addPixel(int x, int y, GLubyte red, GLubyte green, GLubyte blue);
+	void setPixelAlpha(int x, int y, GLubyte alpha);
 	void subtractPixel(int x, int y, GLubyte red, GLubyte green, GLubyte blue);
 
 	/** Retrieve pixel color at position (\c x, \c y). */
 	void getPixel(int x, int y, GLubyte &red, GLubyte &green, GLubyte &blue);
+
+	void drawImage(int x, int y, CImage* image);
+	void drawImageLine(CImage* image, int x1, int y1, int x2, int y2, float* color);
+	void grayscale();
+	int getChannels();
+	void setImageMap(int width, int height, GLubyte* data, bool ownData);
+	void* getData();
+	void copyFrom(CImage* image);
+	void copyFrom(CImage* image, int startx, int starty);
+	void copyFrom(CImage* image, int startx, int starty, const float* color);
+	void setFillColor(GLubyte red, GLubyte green, GLubyte blue);
+	bool validPixel(int x, int y);
+	void floodFill(int x, int y);
+	bool popNextPixel(int &x, int &y);
+	void pushNextPixel(int x, int y);
+	bool popPixel(int &x, int &y);
+	void pushPixel(int x, int y);
+	void doFloodFill(int x, int y);
+	void invert();
+	void colorAlpha(GLubyte red, GLubyte green, GLubyte blue);
+	void createAlphaMask(GLubyte min, GLubyte max);
+	void createMask(GLubyte comp, GLubyte treshold, GLubyte over, GLubyte under);
+	void fillAlpha(GLubyte alpha);
+	void getValue(int x, int y, int channel, GLubyte &value);
+	void createAlphaAll(GLubyte max, GLubyte min);
+	void fillRectAlpha(int x1, int y1, int x2, int y2, GLubyte alpha);
 
 	// Get/set methods
 
@@ -120,6 +130,9 @@ public:
 	/** Return image ratio width/height. */
 	double getRatio();
 
+	void setLayer(int layer);
+	int getLayer();
+
 	/** 
 	 * Return pointer to image map. 
 	 * 
@@ -128,6 +141,7 @@ public:
 	GLubyte* getImageMap();
 
 	void setAlpha(GLubyte alpha);
+	GLubyte getAlpha();
 	void setChannels(int number);
 	void setValue(int x, int y, int channel, GLubyte value);
 	void addValue(int x, int y, int channel, GLubyte value);

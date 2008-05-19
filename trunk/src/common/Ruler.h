@@ -30,11 +30,9 @@
 IvfSmartPointer(CRuler);
 
 /**
- * Constraint class
+ * Ruler class
  *
- * Implemenets a two-dimensional node constraint. The constraint
- * is visualised with vertical and horisontal lines for x and y 
- * constraints.
+ * Implements a visual ruler for setting the size of the model.
  */
 class CRuler : public CShape {
 private:

@@ -44,6 +44,7 @@ protected:
 	int m_rows;
 	int m_cols;
 	int m_stride;
+	double m_elementScaleFactor;
 public:
 	CImageGrid2();
 	virtual ~CImageGrid2();
@@ -78,6 +79,8 @@ public:
 
 	bool isSpecialElement(int row, int col);
 	void setSpecialElement(int row, int col, bool special);
+
+	void setElementScaleFactor(double factor);
 
 	virtual void doGeometry();
 };

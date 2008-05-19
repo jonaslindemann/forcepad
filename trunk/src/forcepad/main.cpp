@@ -49,11 +49,11 @@ main(int argc, char **argv)
 	Fl::visual(FL_DOUBLE|FL_RGB|FL_ALPHA);
 	Fl::get_system_colors();
 	//Fl::background(236, 233, 216);
-	#ifdef __APPLE__
+#ifdef __APPLE__
 	Fl::scheme("default");
-	#else
+#else
 	Fl::scheme("GTK+");
-	#endif
+#endif
 
 	//
 	// Create main window

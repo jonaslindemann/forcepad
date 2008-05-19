@@ -192,7 +192,7 @@ void CFemGridSolver2::execute()
 	}
 
 	//
-	// Assemble system
+	// Setup system matrices
 	//
 
 	SymmetricBandMatrix K(m_nDof,maxBandwidth);
@@ -210,6 +210,8 @@ void CFemGridSolver2::execute()
 	double t = m_thickness;
 	int ptype = m_ptype;    // Plane stress
 	int ir = 2; // Integration rule
+	int elementsWithWeight = 0;
+	int nElements;
 
 	RowVector Ex(4);
 	RowVector Ey(4);
@@ -219,20 +221,19 @@ void CFemGridSolver2::execute()
 		m_Eq(2)=-1.0;
 	else
 		m_Eq(2)=0.0;
-	int elementsWithWeight = 0;
 
 	RowVector Ep(3);
 	Ep << ptype << t << ir;
-
 	Matrix Ke(8,8);
 	ColumnVector fe(8);
 	m_f.ReSize(m_nDof,1);
 	m_f = 0.0;
 	RowVector DofTopo(8);
-
 	Matrix D;
 
-	int nElements = 0;
+	// 
+	// Setup matrices for MATLAB output
+	//
 
 	Matrix Ex_out;
 	Matrix Ey_out;
@@ -241,13 +242,26 @@ void CFemGridSolver2::execute()
 	if (m_outputMatlab)
 	{
 		nElements = m_femGrid->getElementCount();
-
 		Ex_out.ReSize(nElements, 4);
 		Ey_out.ReSize(nElements, 4);
 		Topo_out.ReSize(nElements, 8);
 	}
 
+	//
+	// Setup variables for assemblation
+	//
+
 	nElements = 0;
+	m_minX = 1e300;
+	m_maxX = -1e300;
+	m_minY = 1e300;
+	m_maxY = -1e300;
+
+	///////////////////////////////////////////////////////////////////////////
+	//
+	// Element assemblation
+	//
+	///////////////////////////////////////////////////////////////////////////
 
 	for (i=0; i<rows; i++)
 	{
@@ -264,6 +278,19 @@ void CFemGridSolver2::execute()
 				Ex(3) = ex[2]; Ey(3) = ey[2];
 				Ex(4) = ex[3]; Ey(4) = ey[3];
 
+				//
+				// Determine the size of the model
+				//
+
+				if (Ex.Maximum()>m_maxX)
+					m_maxX = Ex.Maximum();
+				if (Ex.Minimum()<m_minX)
+					m_minX = Ex.Minimum();
+
+				if (Ey.Maximum()>m_maxY)
+					m_maxY = Ey.Maximum();
+				if (Ey.Minimum()<m_minY)
+					m_minY = Ey.Minimum();
 				//
 				// Store element coordinates
 				//
@@ -321,11 +348,20 @@ void CFemGridSolver2::execute()
 		}
 	}
 
+	//
+	// If no elements where assembled something was wrong return 
+	// with error.
+	//
+
 	if (nElements==0)
 	{
 		m_errorStatus = ET_NO_ELEMENTS;
 		return;
 	}
+
+	//
+	// Export Ex, Ey, and Topo matrices to MATLAB m-file
+	//
 
 	if (m_outputMatlab)
 	{
@@ -343,10 +379,21 @@ void CFemGridSolver2::execute()
 	}
 
 	so_print("CFemGridSolver2",so_format("%d elements assembled.",nElements));
+	cout << "Model size" << endl;
+	cout << "\t x,max = " << m_maxX << endl;
+	cout << "\t x,min = " << m_minX << endl;
+	cout << "\t y,max = " << m_maxY << endl;
+	cout << "\t y,min = " << m_minY << endl;
 
 	///////////////////////////////////////////////////////////////////////////
-	// Scale load vector for body weight
+	//
+	// Setup forces and constraints
+	//
 	///////////////////////////////////////////////////////////////////////////
+
+	//
+	// Scale load vector for body weight
+	//
 
 	if (m_useWeight)
 	{
@@ -361,12 +408,11 @@ void CFemGridSolver2::execute()
 			m_f(i) = -m_weight*m_f(i)/Fsum;
 	}
 
-	///////////////////////////////////////////////////////////////////////////
+	//
 	// Setup load vector
-	///////////////////////////////////////////////////////////////////////////
+	//
 
 	so_print("CFemGridSolver2","Defining load vector.");
-
 	progressMessage("Defining load vector.", 30);
 
 	bool loadsDefined = false;
@@ -407,6 +453,10 @@ void CFemGridSolver2::execute()
 
 	if ((m_Eq(1)!=0.0)||(m_Eq(2)!=0.0))
 		loadsDefined = true;
+
+	//
+	// If no loads have been defined return with an error.
+	//
 
 	if (!loadsDefined)
 	{
@@ -557,125 +607,31 @@ void CFemGridSolver2::execute()
 
 	SymmetricBandMatrix Ksys;
 
-	if (m_reduceSystemMatrix)
-	{
-		///////////////////////////////////////////////////////////////////////////
-		// Remove boundary conditions from full system matrix
-		///////////////////////////////////////////////////////////////////////////
-		// 
-		// This is not very effective!
-		// WARNING!! routine does not handle prescribed displacements!=0.0
-		//
 
-		so_print("CFemGridSolver2","Removing boundary conditions from system matrix.");
-		progressMessage("Removing bc:s from system matrix.", 50);
-
-
-		for (i=1; i<=Bc.Nrows(); i++)
-			Idx((int)Bc(i,1)) = 1.0;
-
-		nVars = K.Nrows() - Bc.Nrows();
-
-		so_print("CFemGridSolver2",so_format("\tFree variables = %d",nVars));
-
-		if (maxBandwidth>nVars)
-			maxBandwidth = nVars;
-
-		so_print("CFemGridSolver2","\tCreating reduced system matrix.");
-		Ksys.ReSize(nVars,maxBandwidth);
-
-		fsys.ReSize(K.Nrows()-Bc.Nrows(),1);
-		gdof.ReSize(K.Nrows() - Bc.Nrows(),1);
-		ldof.ReSize(K.Nrows(),1);
-
-		so_print("CFemGridSolver2","\tZeroing matrices.");
-		Ksys = 0.0;
-		fsys = 0.0;
-		gdof = 0.0;
-		ldof = 0.0;
-
-		int row = 1;
-		int col = 1;
-
-		so_print("CFemGridSolver2","\tCopying K into Ksys.");
-		for (i=1; i<=K.Nrows(); i++)
-		{
-			if (Idx(i)<1.0)
-			{
-				col=row;
-				for (j=i; j<=K.Ncols(); j++)
-				{
-					if (Idx(j)<1.0)
-					{
-						if (abs(row-col)<=maxBandwidth)
-							if (abs(i-j)<=maxBandwidth)
-								Ksys(row, col) = K(i,j);	
-						col++;
-					}
-				}
-				fsys(row) = m_f(i);
-				gdof(row) = i;
-				ldof(i) = row;
-				row++;
-			}
-			else
-			{
-				ldof(i) = -1.0;
-			}
-		}
-
-		so_print("CFemGridSolver2","\tRemoving K.");
-		K.CleanUp();
-	}
-
+	///////////////////////////////////////////////////////////////////////////
 	//
 	// Solve system
 	//
+	///////////////////////////////////////////////////////////////////////////
 
-	if (m_reduceSystemMatrix)
+	m_a.ReSize(m_nDof,1);
+	m_a = 0.0;
+
+	so_print("CFemGridSolver2","Solving system.");
+	progressMessage("Solving.", 60);
+
+	Try 
 	{
-		m_a.ReSize(nVars,1);
-		m_a = 0.0;
-
-		so_print("CFemGridSolver2","Solving reduced system.");
-		progressMessage("Solving.", 60);
-
-		Try 
-		{
-			LinearEquationSolver X = Ksys;
-			m_a = X.i() * fsys;
-		}
-		CatchAll 
-		{
-			m_errorStatus = ET_INVALID_MODEL;
-			return;
-		}
-
-		so_print("CFemGridSolver2","Done.");
+		m_X = K; // LU decomposition
+		m_a = m_X.i() * m_f;
 	}
-	else
+	CatchAll 
 	{
-		m_a.ReSize(m_nDof,1);
-		m_a = 0.0;
-
-		so_print("CFemGridSolver2","Solving system.");
-		progressMessage("Solving.", 60);
-
-		Try 
-		{
-			m_X = K; // LU decomposition
-			m_a = m_X.i() * m_f;
-		}
-		CatchAll 
-		{
-			m_errorStatus = ET_INVALID_MODEL;
-			return;
-		}
-
-		so_print("CFemGridSolver2","Done.");
+		m_errorStatus = ET_INVALID_MODEL;
+		return;
 	}
 
-	so_print("CFemGridSolver2","Calculating results.");
+	so_print("CFemGridSolver2","Done.");
 
 	//
 	// Create global displacement vector
@@ -685,40 +641,25 @@ void CFemGridSolver2::execute()
 
 	progressMessage("Storing results.", 80);
 
-	if (m_reduceSystemMatrix)
+	m_maxNodeValue = -1.0e300;
+
+	m_femGrid->setDisplacementSize(m_nDof);
+
+	for (i=1; i<=K.Nrows(); i++)
 	{
-		GlobalA.ReSize(m_nDof);
-		GlobalA = 0.0;
-		m_maxNodeValue = -1.0e300;
-
-		m_femGrid->setDisplacementSize(m_nDof);
-
-		for (i=1; i<=Ksys.Nrows(); i++)
-		{
-			GlobalA((int)gdof(i)) = m_a(i);
-			m_femGrid->setDisplacement((int)gdof(i), m_a(i));
-			if (fabs(m_a(i))>m_maxNodeValue)
-				m_maxNodeValue = fabs(m_a(i));
-		}
-	}
-	else
-	{
-		m_maxNodeValue = -1.0e300;
-
-		m_femGrid->setDisplacementSize(m_nDof);
-
-		for (i=1; i<=K.Nrows(); i++)
-		{
-			m_femGrid->setDisplacement(i, m_a(i));
-			if (fabs(m_a(i))>m_maxNodeValue)
-				m_maxNodeValue = fabs(m_a(i));
-		}
+		m_femGrid->setDisplacement(i, m_a(i));
+		if (fabs(m_a(i))>m_maxNodeValue)
+			m_maxNodeValue = fabs(m_a(i));
 	}
 
+	///////////////////////////////////////////////////////////////////////////
 	//
 	// Store element forces in elements
 	//
+	///////////////////////////////////////////////////////////////////////////
 	
+	so_print("CFemGridSolver2","Calculating results.");
+
 	RowVector Ed(8);
 	Matrix Es; 
 	Matrix Et; 
@@ -786,8 +727,8 @@ void CFemGridSolver2::execute()
 				// nodes.
 				//
 
-				cout << "Ex = " << Ex(1) << ", " << Ex(2) << ", " << Ex(3) << ", " << Ex(4) << endl;
-				cout << "Ey = " << Ey(1) << ", " << Ey(2) << ", " << Ey(3) << ", " << Ey(4) << endl;
+				//cout << "Ex = " << Ex(1) << ", " << Ex(2) << ", " << Ex(3) << ", " << Ex(4) << endl;
+				//cout << "Ey = " << Ey(1) << ", " << Ey(2) << ", " << Ey(3) << ", " << Ey(4) << endl;
 
 				int ip;
 
@@ -881,9 +822,11 @@ void CFemGridSolver2::execute()
 
 	cout << "Max misses stress = " << m_maxMisesStressValue << endl;
 
+	///////////////////////////////////////////////////////////////////////////
 	//
 	// Calculate reaction forces from vector constraints
 	//
+	///////////////////////////////////////////////////////////////////////////
 
 	if (vectorBcsDefined)
 	{

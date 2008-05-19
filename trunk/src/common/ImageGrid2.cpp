@@ -35,6 +35,7 @@ CImageGrid2::CImageGrid2()
 	m_maxIntensity = 1.0;
 	m_useImage = true;
 	m_averageOverGridSquare = true;
+	m_elementScaleFactor = 1.0;
 }
 
 CImageGrid2::~CImageGrid2()
@@ -250,15 +251,15 @@ void CImageGrid2::getElementCoords(int row, int col, double *ex, double *ey)
 
 	if (m_grid!=NULL)
 	{
-		ex[0] = (double)col*m_stride;
-		ex[1] = (double)(col+1)*m_stride;
-		ex[2] = (double)(col+1)*m_stride;
-		ex[3] = (double)col*m_stride;
+		ex[0] = (double)col*m_stride*m_elementScaleFactor;
+		ex[1] = (double)(col+1)*m_stride*m_elementScaleFactor;
+		ex[2] = (double)(col+1)*m_stride*m_elementScaleFactor;
+		ex[3] = (double)col*m_stride*m_elementScaleFactor;
 
-		ey[0] = (double)row*m_stride;
-		ey[1] = (double)row*m_stride;
-		ey[2] = (double)(row+1)*m_stride;
-		ey[3] = (double)(row+1)*m_stride;
+		ey[0] = (double)row*m_stride*m_elementScaleFactor;
+		ey[1] = (double)row*m_stride*m_elementScaleFactor;
+		ey[2] = (double)(row+1)*m_stride*m_elementScaleFactor;
+		ey[3] = (double)(row+1)*m_stride*m_elementScaleFactor;
 	}
 }
 
@@ -330,4 +331,9 @@ void CImageGrid2::setImageSize(int width, int height)
 {
 	m_width = width;
 	m_height = height;
+}
+
+void CImageGrid2::setElementScaleFactor(double factor)
+{
+	m_elementScaleFactor = factor;
 }

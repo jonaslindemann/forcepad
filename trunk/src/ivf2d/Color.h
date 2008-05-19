@@ -52,6 +52,9 @@ public:
 	/** Sets color value. */
 	void setColor(float red, float green, float blue, float alpha);
 
+	/** Sets color value. */
+	void setColor(const float* color);
+
 	/** Set color alpha value. */
 	void setAlpha(float alpha);
 

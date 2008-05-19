@@ -84,6 +84,10 @@ private:
 
 	double m_maxMisesStressValue;
 
+	double m_minX;
+	double m_maxX;
+	double m_minY;
+	double m_maxY;
 
 	bool m_outputMatlab;
 	std::string m_matlabFilename;

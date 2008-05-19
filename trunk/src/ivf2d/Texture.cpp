@@ -70,8 +70,8 @@ void CTexture::bind()
 
 	if (m_image!=NULL)
 	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, (GLsizei)m_image->getWidth(), (GLsizei)m_image->getHeight(),
-			0, GL_RGB, GL_UNSIGNED_BYTE, m_image->getImageMap());
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, (GLsizei)m_image->getWidth(), (GLsizei)m_image->getHeight(),
+			0, GL_RGBA, GL_UNSIGNED_BYTE, m_image->getImageMap());
 	}
 	
 	m_bound = true;
