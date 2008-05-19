@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0108 
+version 1.0109 
 header_name {.h} 
 code_name {.cpp}
 decl {\#include "PaintView.h"} {global
@@ -19,7 +19,7 @@ class CCalcSettings {open
       } {
         Fl_Group meshGroup {
           label Mesh open
-          tooltip {tab2 tests among other things the cooperation of modal windows and tabs} xywh {12 26 294 176} labelsize 11
+          tooltip {tab2 tests among other things the cooperation of modal windows and tabs} xywh {12 26 294 176} labelsize 11 hide
         } {
           Fl_Value_Slider gridStep {
             label {Grid step:}
@@ -60,8 +60,8 @@ class CCalcSettings {open
           }
         }
         Fl_Group constraintGroup {
-          label Constraints open
-          tooltip {tab3 checks for correct keyboard navigation} xywh {12 26 294 176} labelsize 11 hide
+          label Constraints open selected
+          tooltip {tab3 checks for correct keyboard navigation} xywh {12 26 294 176} labelsize 11
         } {
           Fl_Value_Input constraintStiffnessScaleFactor {
             label {Vector constraint stiffness scale}
@@ -139,7 +139,6 @@ while (mainWindow->visible()) Fl::wait();} {}
   }
   Function {centerWindow(Fl_Window* window)} {open
   } {
-    code {mainWindow->position(window->x()+window->w()/2-mainWindow->w()/2, window->y()+window->h()/2-mainWindow->h()/2);} {selected
-    }
+    code {mainWindow->position(window->x()+window->w()/2-mainWindow->w()/2, window->y()+window->h()/2-mainWindow->h()/2);} {}
   }
 } 

@@ -29,6 +29,8 @@
 
 #include <FL/Fl.H>
 #include <FL/Fl_Gl_Window.H>
+
+#include <GL/glew.h>
 #include <FL/gl.h>
 
 #ifdef __APPLE__
@@ -51,12 +53,8 @@
 #include "Ruler.h"
 
 #include "FemGridSolver2.h"
-
 #include "CGIndicator.h"
-
 #include "Fl_Cursor_Shape.H"
-
-
 
 #ifdef FORCEPAD_RIGID
 #include "ReactionForce.h"
@@ -131,6 +129,15 @@ private:
 	int m_undoStart[2];
 	int m_undoEnd[2];
 
+	bool m_runOnce;
+
+	/*
+	 * Optimisation constraint definition
+	 */
+
+	bool m_optLayerActive;
+
+
 	/*
 	 *    Drawing surface and computational grid
 	 */
@@ -163,6 +170,7 @@ private:
 	Fl_Cursor_Shape* m_cursors[20];
 
 	float m_brushColor[3];
+	float m_optConstraintColor[3];
 	float m_backColor[3];
 	int m_brushScale;
 	int m_blendFactor;
@@ -206,9 +214,11 @@ private:
 	CClipboardPtr m_undoClipboard;
 
 	CImagePtr m_drawing;
-	CFemGrid2Ptr m_femGrid;
-	CScreenImagePtr m_screenImage;
+	CImagePtr m_optConstraintImage;
 	CImagePtr m_buffer;
+	CScreenImagePtr m_screenImage;
+
+	CFemGrid2Ptr m_femGrid;
 
 	CRulerPtr m_ruler;
 
@@ -353,6 +363,9 @@ public:
 	void copy();
 	void lockScaleFactor();
 	void unlockScaleFactor();
+	void applyElementScale();
+	void setRulerLength(double actualLength);
+	void setOptLayer(bool active);
 
 	/*
 	 *    Properties
@@ -457,6 +470,7 @@ public:
 
 	void setMoveLoad(bool flag);
 	bool getMoveLoad();
+
 
 	// Events
 

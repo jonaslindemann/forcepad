@@ -69,3 +69,10 @@ void CColor::getColor(float &r, float &g, float &b, float &a)
 	b = m_color[2];
 	a = m_color[3];
 }
+
+void CColor::setColor(const float* color)
+{
+	m_color[0] = color[0];
+	m_color[1] = color[1];
+	m_color[2] = color[2];
+}

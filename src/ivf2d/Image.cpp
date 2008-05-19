@@ -27,6 +27,9 @@
 CImage::CImage()
 {
 	m_imageMap = NULL;
+	m_imageMaps = NULL;
+	m_layers = 1;
+	m_currentLayer = 0;
 	m_size[0] = -1;
 	m_size[1] = -1;
 	m_channels = 3;
@@ -36,32 +39,87 @@ CImage::CImage()
 	m_fillColor[0] = 0;
 	m_fillColor[1] = 0;
 	m_fillColor[2] = 0;
+
+	initLayers();
+}
+
+CImage::CImage(int nLayers)
+{
+	m_imageMap = NULL;
+	m_imageMaps = NULL;
+	m_layers = nLayers;
+	m_currentLayer = 0;
+	m_size[0] = -1;
+	m_size[1] = -1;
+	m_channels = 3;
+	m_currentAlpha = 255;
+	m_ownData = true;
+
+	m_fillColor[0] = 0;
+	m_fillColor[1] = 0;
+	m_fillColor[2] = 0;
+
+	initLayers();
 }
 
 CImage::~CImage()
 {
 	if (m_ownData)
 	{
-		if (m_imageMap!=NULL)
-			delete [] m_imageMap;
+		destroyLayers();
 	}
+}
+
+void CImage::clearLayers()
+{
+	int i;
+
+	if (m_imageMaps==NULL)
+		return;
+
+	for (i=0; i<m_layers; i++)
+		if (m_imageMaps[i]!=NULL)
+			delete [] m_imageMaps[i];
+}
+
+void CImage::initLayers()
+{
+	int i;
+
+	m_imageMaps = new GLubyte*[m_layers];
+
+	for (i=0; i<m_layers; i++)
+		m_imageMaps[i] = NULL;
+
+}
+
+void CImage::destroyLayers()
+{
+	clearLayers();
+	delete [] m_imageMaps;
 }
 
 void CImage::setSize(int width, int height)
 {
 	if (m_ownData)
 	{
-		if ((width>0)&&(height>0))
+		clearLayers();
+
+		int i;
+
+		for (i=0; i<m_layers; i++)
 		{
-			m_size[0] = width;
-			m_size[1] = height;
-			m_ratio = width/height;
+			if ((width>0)&&(height>0))
+			{
+				m_size[0] = width;
+				m_size[1] = height;
+				m_ratio = width/height;
 
-			if (m_imageMap!=NULL)
-				delete [] m_imageMap;
-
-			m_imageMap = new GLubyte[m_size[0]*m_size[1]*m_channels];
+				m_imageMaps[i] = new GLubyte[m_size[0]*m_size[1]*m_channels];
+			}
 		}
+		if ((width>0)&&(height>0))
+			m_imageMap = m_imageMaps[0];
 	}
 }
 
@@ -74,6 +132,21 @@ int CImage::getHeight()
 {
 	return m_size[1];
 }
+
+void CImage::setLayer(int layer)
+{
+	if ((layer>=0)&&(layer<m_layers))
+	{
+		m_imageMap = m_imageMaps[layer];
+		m_currentLayer = layer;
+	}
+}
+
+int CImage::getLayer()
+{
+	return m_currentLayer;
+}
+
 
 GLubyte* CImage::getImageMap()
 {
@@ -89,6 +162,15 @@ void CImage::setPixel(int x, int y, GLubyte red, GLubyte green, GLubyte blue)
 		setValue(x, y, 2, blue);
 		if (m_channels==4)
 			setValue(x, y, 3, m_currentAlpha);
+	}
+}
+
+void CImage::setPixelAlpha(int x, int y, GLubyte alpha)
+{
+	if (valid(x, y))
+	{
+		if (m_channels==4)
+			setValue(x, y, 3, alpha);
 	}
 }
 
@@ -157,6 +239,18 @@ void CImage::fillRect(int x1, int y1, int x2, int y2, GLubyte red, GLubyte green
 	}
 }
 
+void CImage::fillRectAlpha(int x1, int y1, int x2, int y2, GLubyte alpha)
+{
+	if ( (valid(x1, y1))&&(valid(x2, y2)) )
+	{
+		int i, j;
+
+		for (i=x1; i<=x2; i++)
+			for (j=y1; j<=y2; j++)
+				setPixelAlpha(i, j, alpha);	
+	}
+}
+
 double CImage::getRatio()
 {
 	return m_ratio;
@@ -199,6 +293,11 @@ void CImage::setChannels(int number)
 void CImage::setAlpha(GLubyte alpha)
 {
 	m_currentAlpha = alpha;
+}
+
+GLubyte CImage::getAlpha()
+{
+	return m_currentAlpha;
 }
 
 void CImage::setValue(int x, int y, int channel, GLubyte value)
@@ -257,7 +356,11 @@ void CImage::getValue(int x, int y, int channel, GLubyte &value)
 
 void CImage::fillAlpha(GLubyte alpha)
 {
+	int i, j;
 
+	for (i=0; i<m_size[0]; i++)
+		for (j=0; j<m_size[1]; j++)
+			setPixelAlpha(i, j, alpha);
 }
 
 void CImage::createMask(GLubyte comp, GLubyte treshold, GLubyte over, GLubyte under)

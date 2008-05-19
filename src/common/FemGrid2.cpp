@@ -789,9 +789,9 @@ void CFemGrid2::drawGrid()
 						dx = k*m_displacements[topo[l*2]];
 						dy = k*m_displacements[topo[l*2+1]];
 						if (m_drawDisplacements)
-							glVertex2d(ex[l] + dx, ey[l] + dy);
+							glVertex2d(ex[l]/m_elementScaleFactor + dx, ey[l]/m_elementScaleFactor + dy);
 						else
-							glVertex2d(ex[l], ey[l]);
+							glVertex2d(ex[l]/m_elementScaleFactor, ey[l]/m_elementScaleFactor);
 					}
 					glEnd();
 				}
@@ -822,7 +822,7 @@ void CFemGrid2::drawUndeformedGrid()
 					glBegin(GL_QUADS);
 					glColor4f(1.0f-m_grid[i][j]*m_maxIntensity, 1.0f-m_grid[i][j]*m_maxIntensity, 1.0f-m_grid[i][j]*m_maxIntensity, alpha);
 					for (l=0; l<4; l++)
-						glVertex2d(ex[l], ey[l]);
+						glVertex2d(ex[l]/m_elementScaleFactor, ey[l]/m_elementScaleFactor);
 					glEnd();
 				}
 			}
@@ -1060,9 +1060,9 @@ void CFemGrid2::drawMisesStress()
 						dx = k*m_displacements[topo[l*2]];
 						dy = k*m_displacements[topo[l*2+1]];
 						if (m_drawDisplacements)
-							glVertex2d(ex[l] + dx, ey[l] + dy);
+							glVertex2d(ex[l]/m_elementScaleFactor + dx, ey[l]/m_elementScaleFactor + dy);
 						else
-							glVertex2d(ex[l], ey[l]);
+							glVertex2d(ex[l]/m_elementScaleFactor, ey[l]/m_elementScaleFactor);
 					}
 					glEnd();
 				}
@@ -1118,9 +1118,9 @@ void CFemGrid2::drawMisesStressSmooth()
 						dx = k*m_displacements[topo[l*2]];
 						dy = k*m_displacements[topo[l*2+1]];
 						if (m_drawDisplacements)
-							glVertex2d(ex[l] + dx, ey[l] + dy);
+							glVertex2d(ex[l]/m_elementScaleFactor + dx, ey[l]/m_elementScaleFactor + dy);
 						else
-							glVertex2d(ex[l], ey[l]);
+							glVertex2d(ex[l]/m_elementScaleFactor, ey[l]/m_elementScaleFactor);
 					}
 					glEnd();
 				}
