@@ -26,7 +26,7 @@
 
 CImageGrid2::CImageGrid2()
 {
-	m_fieldLayers = 2;
+	m_fieldLayers = 3;
 	m_image = NULL;
 	m_stride = 8;
 	m_grid = NULL;
@@ -316,6 +316,19 @@ double CImageGrid2::maxAbsDiff(int l1, int l2)
 	}
 	return 0.0;
 }
+
+void CImageGrid2::assignField(int layer, double value)
+{
+	int i, j;
+
+	if ((m_fields!=NULL)&&(layer>=0)&&(layer<m_fieldLayers))
+	{
+		for (i=0; i<m_rows; i++)
+			for (j=0; j<m_cols; j++)
+				m_fields[layer][i][j] = value;
+	}
+}
+
 
 bool CImageGrid2::isSpecialElement(int row, int col)
 {
