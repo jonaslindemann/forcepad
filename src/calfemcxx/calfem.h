@@ -145,6 +145,14 @@ void assem(
 	SymmetricBandMatrix &K, 
 	Matrix &Ke);
 
+ReturnMatrix matrixMax1(Matrix A, Matrix B);
+ReturnMatrix matrixMax2(double a, Matrix B);
+ReturnMatrix matrixMax3(Matrix A, double b);
+ReturnMatrix matrixMin1(Matrix A, Matrix B);
+ReturnMatrix matrixMin2(double a, Matrix B);
+ReturnMatrix matrixMin3(Matrix A, double b);
+ReturnMatrix matrixSqrt(Matrix A);
+
 double maxValue(RowVector& rowVector);
 double minValue(RowVector& rowVector);
 void printMatrix(std::string name, Matrix & A);
