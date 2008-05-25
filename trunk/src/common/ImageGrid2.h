@@ -75,6 +75,7 @@ public:
 
 	void copyField(int fromLayer, int toLayer);
 	void copyFromGrid(int toLayer, double factor);
+	void assignField(int layer, double value);
 
 	double maxAbsDiff(int l1, int l2);
 

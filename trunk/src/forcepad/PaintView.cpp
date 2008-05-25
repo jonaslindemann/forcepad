@@ -1692,7 +1692,7 @@ bool CPaintView::execute()
 	
 	so_print("CPaintView","\tExecuting solver.");
 	
-	m_solver->execute();
+	m_solver->executeOptimizer();
 	
 	//
 	// Check for errors

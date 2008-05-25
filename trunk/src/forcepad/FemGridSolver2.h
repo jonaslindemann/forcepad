@@ -127,6 +127,20 @@ public:
 
 	/** Finite element solver for solving active/inactive elements. */
 	void execute();
+	void execute_old();
+
+	/** Finite element solver for solving active/inactive elements. */
+	int assembleSystem(SymmetricBandMatrix& K);
+	int assembleSystemOpt(SymmetricBandMatrix& K, double penalty);
+	void setupHinges();
+	int calculateOptimalBandwidth();
+	void setupForcesAndConstraints(bool& loadsDefined, bool& bcsDefined, bool& vectorBcsDefined, std::set<int>& uniqueDofs, std::set<int>& uniqueVectorDofs, vector<CConstraint*>& vectorConstraints, RowVector& prescribedValues);
+	void assembleVectorConstraints(SymmetricBandMatrix& K, std::vector<CConstraint*>& vectorConstraints);
+	void removeDoubleDofs(std::set<int>& uniqueDofs, RowVector& prescribedValues, Matrix& Bc);
+	void computeElementForces();
+	void computeReactionForces(std::vector<CConstraint*>& vectorConstraints);
+	void objectiveFunctionAndSensitivity(double penalty, double& c);
+	void executeOptimizer();
 
 	void executeUpdate();
 
