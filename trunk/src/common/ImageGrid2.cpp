@@ -278,6 +278,22 @@ void CImageGrid2::copyField(int fromLayer, int toLayer)
 	}
 }
 
+void CImageGrid2::copyField(int fromLayer, Matrix& toMatrix)
+{
+	int i, j;
+
+	if (m_fields!=NULL)
+	{
+		if ((fromLayer>=0)&&(fromLayer<m_fieldLayers))
+		{
+			toMatrix.ReSize(m_rows, m_cols);
+			for (i=0; i<m_rows; i++)
+				for (j=0; j<m_cols; j++)
+					toMatrix(i+1,j+1) = m_fields[fromLayer][i][j];
+		}
+	}
+}
+
 void CImageGrid2::copyFromGrid(int toLayer, double factor)
 {
 	int i, j;
@@ -329,6 +345,50 @@ void CImageGrid2::assignField(int layer, double value)
 	}
 }
 
+void assignField(int layer, Matrix& toMatrix)
+{
+	int i, j;
+
+	if (m_fields!=NULL)
+	{
+		if ((layer>=0)&&(layer<m_fieldLayers)&&(toMatrix.nrows()==m_rows)&&(toMatrix.ncols()==m_cols))
+		{
+			for (i=0; i<m_rows; i++)
+				for (j=0; j<m_cols; j++)
+					m_fields[layer][i][j] = toMatrix(i+1,j+1)
+		}
+	}
+}
+
+void copyGrid(Matrix& toMatrix)
+{
+	int i, j;
+
+	if (this->m_grid!=NULL)
+	{
+		if ((toMatrix.nrows()==m_rows)&&(toMatrix.ncols()==m_cols))
+		{
+			for (i=0; i<m_rows; i++)
+				for (j=0; j<m_cols; j++)
+					toMatrix(i+1,j+1) = m_grid[i][j]
+		}
+	}
+}
+
+void copyGrid(Matrix& toMatrix, double scaleFactor)
+{
+	int i, j;
+
+	if (this->m_grid!=NULL)
+	{
+		if ((toMatrix.nrows()==m_rows)&&(toMatrix.ncols()==m_cols))
+		{
+			for (i=0; i<m_rows; i++)
+				for (j=0; j<m_cols; j++)
+					toMatrix(i+1,j+1) = m_grid[i][j] * scaleFactor
+		}
+	}
+}
 
 bool CImageGrid2::isSpecialElement(int row, int col)
 {

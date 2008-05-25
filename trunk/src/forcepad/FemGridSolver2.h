@@ -131,7 +131,7 @@ public:
 
 	/** Finite element solver for solving active/inactive elements. */
 	int assembleSystem(SymmetricBandMatrix& K);
-	int assembleSystemOpt(SymmetricBandMatrix& K, double penalty);
+	int assembleSystemOpt(SymmetricBandMatrix& K, Matrix& X, double penalty);
 	void setupHinges();
 	int calculateOptimalBandwidth();
 	void setupForcesAndConstraints(bool& loadsDefined, bool& bcsDefined, bool& vectorBcsDefined, std::set<int>& uniqueDofs, std::set<int>& uniqueVectorDofs, vector<CConstraint*>& vectorConstraints, RowVector& prescribedValues);
@@ -139,7 +139,10 @@ public:
 	void removeDoubleDofs(std::set<int>& uniqueDofs, RowVector& prescribedValues, Matrix& Bc);
 	void computeElementForces();
 	void computeReactionForces(std::vector<CConstraint*>& vectorConstraints);
-	void objectiveFunctionAndSensitivity(double penalty, double& c);
+
+	void objectiveFunctionAndSensitivity(Matrix& X, Matrix& dC, double penalty, double& c);
+	ReturnMatrix optimalityCriteriaUpdate(Matrix& X, Matrix& dC, double volfrac);
+
 	void executeOptimizer();
 
 	void executeUpdate();

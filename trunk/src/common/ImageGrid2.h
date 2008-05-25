@@ -28,6 +28,11 @@
 #include "Image.h"
 #include "Shape.h"
 
+#include <include.h>
+#include <newmat.h>
+#include <newmatio.h>
+#include <newmatap.h>
+
 IvfSmartPointer(CImageGrid2);
 
 class CImageGrid2 : public CShape {
@@ -70,12 +75,16 @@ public:
 	void setGridValue(int row, int col, double value);
 	double getGridValue(int row, int col);
 
+	void copyGrid(Matrix& toMatrix);
+	void copyGrid(Matrix& toMatrix, double scaleFactor);
+
 	void setFieldValue(int layer, int row, int col, double value);
 	double getFieldValue(int layer, int row, int col);
 
 	void copyField(int fromLayer, int toLayer);
 	void copyFromGrid(int toLayer, double factor);
 	void assignField(int layer, double value);
+	void copyField(int fromLayer, Matrix& toMatrix);
 
 	double maxAbsDiff(int l1, int l2);
 

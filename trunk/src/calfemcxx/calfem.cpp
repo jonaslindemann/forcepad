@@ -1169,6 +1169,142 @@ void plani4s(
 	}
 }
 
+ReturnMatrix matrixMax(Matrix A, double b)
+{
+	Matrix C;
+	int i, j;
+	int rows = A.nrows();
+	int cols = A.ncols();
+
+	C.ReSize(A.nrows(), A.ncols());
+
+	for (i=1; i<=rows; i++)
+		for (j=1; j<=cols; j++)
+			if (A(i,j)>b)
+				C(i,j) = A(i,j);
+			else
+				C(i,j) = b;
+	
+	C.release(); return C;
+}
+
+ReturnMatrix matrixMax(double a, Matrix B)
+{
+	Matrix C;
+	int i, j;
+	int rows = B.nrows();
+	int cols = B.ncols();
+
+	C.ReSize(B.nrows(), B.ncols());
+
+	for (i=1; i<=rows; i++)
+		for (j=1; j<=cols; j++)
+			if (a>B(i,j))
+				C(i,j) = a;
+			else
+				C(i,j) = B(i,j);
+	
+	C.release(); return C;
+}
+
+ReturnMatrix matrixMax(Matrix A, Matrix B)
+{
+	Matrix C;
+	int i, j;
+	int rows = A.nrows();
+	int cols = A.ncols();
+
+	if ((A.nrows()==B.nrows())&&(A.ncols()==B.ncols()))
+	{
+		C.ReSize(A.nrows(), A.ncols());
+
+		for (i=1; i<=rows; i++)
+			for (j=1; j<=cols; j++)
+				if (A(i,j)>B(i,j))
+					C(i,j) = A(i,j);
+				else
+					C(i,j) = B(i,j);
+	}
+	
+	C.release(); return C;
+}
+
+ReturnMatrix matrixMin(Matrix A, double b)
+{
+	Matrix C;
+	int i, j;
+	int rows = A.nrows();
+	int cols = A.ncols();
+
+	C.ReSize(A.nrows(), A.ncols());
+
+	for (i=1; i<=rows; i++)
+		for (j=1; j<=cols; j++)
+			if (A(i,j)<b)
+				C(i,j) = A(i,j);
+			else
+				C(i,j) = b;
+	
+	C.release(); return C;
+}
+
+ReturnMatrix matrixMin(double a, Matrix B)
+{
+	Matrix C;
+	int i, j;
+	int rows = B.nrows();
+	int cols = B.ncols();
+
+	C.ReSize(B.nrows(), B.ncols());
+
+	for (i=1; i<=rows; i++)
+		for (j=1; j<=cols; j++)
+			if (a<B(i,j))
+				C(i,j) = a;
+			else
+				C(i,j) = B(i,j);
+	
+	C.release(); return C;
+}
+
+ReturnMatrix matrixMin(Matrix A, Matrix B)
+{
+	Matrix C;
+	int i, j;
+	int rows = A.nrows();
+	int cols = A.ncols();
+
+	if ((A.nrows()==B.nrows())&&(A.ncols()==B.ncols()))
+	{
+		C.ReSize(A.nrows(), A.ncols());
+
+		for (i=1; i<=rows; i++)
+			for (j=1; j<=cols; j++)
+				if (A(i,j)<B(i,j))
+					C(i,j) = A(i,j);
+				else
+					C(i,j) = B(i,j);
+	}
+	
+	C.release(); return C;
+}
+
+ReturnMatrix matrixSqrt(Matrix A)
+{
+	Matrix C;
+	int i, j;
+	int rows = A.nrows();
+	int cols = A.ncols();
+
+	C.ReSize(A.nrows(), A.ncols());
+
+	for (i=1; i<=rows; i++)
+		for (j=1; j<=cols; j++)
+			C(i,j) = sqrt(A(i,j));
+	
+	C.release(); return C;
+}
+
 void writeRowVector(const char* name, RowVector &v, std::ostream &out)
 {
 	out << name << " = [" << std::endl;
