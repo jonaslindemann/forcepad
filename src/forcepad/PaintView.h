@@ -343,6 +343,7 @@ public:
 
 	void executeCorba();
 	bool execute();
+	bool executeOpt();
 
 	void undoToDrawing();
 

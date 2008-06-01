@@ -4763,6 +4763,13 @@ static const char *idata_action_rotate_force[] = {
 };
 static Fl_Pixmap image_action_rotate_force(idata_action_rotate_force);
 
+void CMainFrame::cb_btnOptimize_i(Fl_HoverButton*, void*) {
+  paintView->executeOpt();
+}
+void CMainFrame::cb_btnOptimize(Fl_HoverButton* o, void* v) {
+  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnOptimize_i(o,v);
+}
+
 void CMainFrame::cb_btnAddForce_i(Fl_HoverButton*, void*) {
   paintView->setEditMode(CPaintView::EM_FORCE);
 m_physicsEditMode = paintView->getEditMode();
@@ -15513,11 +15520,11 @@ CMainFrame::CMainFrame() {
       mainMenu->textsize(11);
       mainMenu->menu(menu_mainMenu);
     } // Fl_Menu_Bar* mainMenu
-    { scrRightToolbar = new Fl_Scroll(803, 494, 52, 156);
+    { scrRightToolbar = new Fl_Scroll(803, 492, 52, 156);
       scrRightToolbar->box(FL_DOWN_BOX);
       scrRightToolbar->selection_color((Fl_Color)51);
-      { Fl_Group* o = new Fl_Group(806, 497, 47, 132);
-        { btnPhysical = new Fl_HoverButton(808, 541, 42, 42);
+      { Fl_Group* o = new Fl_Group(806, 495, 47, 132);
+        { btnPhysical = new Fl_HoverButton(808, 539, 42, 42);
           btnPhysical->tooltip("Physics mode");
           btnPhysical->type(102);
           btnPhysical->box(FL_UP_BOX);
@@ -15534,7 +15541,7 @@ CMainFrame::CMainFrame() {
           btnPhysical->align(FL_ALIGN_CENTER);
           btnPhysical->when(FL_WHEN_RELEASE);
         } // Fl_HoverButton* btnPhysical
-        { btnAction = new Fl_HoverButton(808, 583, 42, 42);
+        { btnAction = new Fl_HoverButton(808, 581, 42, 42);
           btnAction->tooltip("Action mode");
           btnAction->type(102);
           btnAction->box(FL_UP_BOX);
@@ -15551,7 +15558,7 @@ CMainFrame::CMainFrame() {
           btnAction->align(FL_ALIGN_CENTER);
           btnAction->when(FL_WHEN_RELEASE);
         } // Fl_HoverButton* btnAction
-        { btnSketch = new Fl_HoverButton(807, 499, 42, 42);
+        { btnSketch = new Fl_HoverButton(807, 497, 42, 42);
           btnSketch->tooltip("Sketch mode");
           btnSketch->type(102);
           btnSketch->box(FL_UP_BOX);
@@ -15766,6 +15773,20 @@ CMainFrame::CMainFrame() {
         } // Fl_HoverButton* btnRotateLoad
         o->end();
       } // Fl_Group* o
+      { btnOptimize = new Fl_HoverButton(370, 398, 42, 42, "OPT");
+        btnOptimize->tooltip("Displacement visualisation");
+        btnOptimize->box(FL_UP_BOX);
+        btnOptimize->down_box(FL_DOWN_BOX);
+        btnOptimize->color(FL_BACKGROUND_COLOR);
+        btnOptimize->selection_color((Fl_Color)51);
+        btnOptimize->labeltype(FL_NORMAL_LABEL);
+        btnOptimize->labelfont(0);
+        btnOptimize->labelsize(11);
+        btnOptimize->labelcolor(FL_FOREGROUND_COLOR);
+        btnOptimize->callback((Fl_Callback*)cb_btnOptimize);
+        btnOptimize->align(FL_ALIGN_CENTER);
+        btnOptimize->when(FL_WHEN_RELEASE);
+      } // Fl_HoverButton* btnOptimize
       scrLeftResultToolbar->end();
     } // Fl_Scroll* scrLeftResultToolbar
     { Fl_Group* o = new Fl_Group(53, 653, 754, 31);

@@ -1692,6 +1692,115 @@ bool CPaintView::execute()
 	
 	so_print("CPaintView","\tExecuting solver.");
 	
+	m_solver->execute();
+	
+	//
+	// Check for errors
+	//
+	
+	so_print("CPaintView","\tChecking for errors.");
+	
+	switch (m_solver->getLastError()) {
+	case CFemGridSolver2::ET_NO_ERROR:
+		errors = false;
+		break;
+	case CFemGridSolver2::ET_NO_ELEMENTS:
+		fl_message("No structure to solve.");
+		break;
+	case CFemGridSolver2::ET_NO_BCS:
+		fl_message("Add locks to structure.");
+		break;
+	case CFemGridSolver2::ET_NO_LOADS:
+		fl_message("No loads defined on structure.");
+		break;
+	case CFemGridSolver2::ET_UNSTABLE:
+		fl_message("Structure unstable. Try adding locks.");
+		break;
+	case CFemGridSolver2::ET_INVALID_MODEL:
+		fl_message("Model invalid.");
+		break;
+	case CFemGridSolver2::ET_LOAD_OUTSIDE_AE:
+		fl_message("Loads defined outside structure.");
+		break;
+	case CFemGridSolver2::ET_BC_OUTSIDE_AE:
+		fl_message("Locks defined outside structure.");
+		break;
+	default:
+		
+		break;
+	}
+	
+	//
+	// Clean up and redraw
+	//
+	
+	so_print("CPaintView","\tDestroying solver.");
+	
+	// delete solver;
+	
+	if (errors)
+	{
+		m_femGrid->setShowGrid(false);
+		this->invalidate();
+	}
+	else
+		m_femGrid->setShowGrid(true);
+	
+	so_print("CPaintView","\tRedraw.");
+	
+	this->redraw();
+
+	return !errors;
+}
+
+bool CPaintView::executeOpt()
+{
+	bool errors = true;
+	
+	so_print("CPaintView","execute()");
+	
+	//
+	// Initialize grid
+	//
+	
+	m_femGrid->initGrid();
+	
+	//
+	// Check for long computational times >10000 dofs. (today...)
+	//
+	
+	if (m_femGrid->enumerateDofs(ED_BOTTOM_TOP)>10000)
+		if (fl_ask("Model contains >10000 degrees of freedom.\nCalculation can take a long time.\nContinue?")==0)	
+			return false;
+		
+	//
+	// Initiate solver
+	//
+	
+	so_print("CPaintView","\tInitiating solver.");
+	
+	m_solver = new CFemGridSolver2();
+	m_solver->setStatusMessageEvent(m_statusMessageEvent);
+	m_solver->setLogMessageEvent(m_logMessageEvent);
+	m_solver->setUseWeight(m_useWeight);
+	m_solver->setConstraintStiffnessScale(m_constraintStiffnessScale);
+	m_solver->setForceMagnitude(m_forceMagnitude);
+
+	m_solver->setThickness(this->getThickness());
+	m_solver->setElasticModulus(this->getElasticModulus());
+	m_solver->setYoungsModulus(this->getYoungsModulus());
+
+	if (m_useWeight)
+		m_solver->setWeight(m_weight);
+
+	m_solver->setFemGrid(m_femGrid);
+	
+	//
+	// Execute calculation
+	//
+	
+	so_print("CPaintView","\tExecuting solver.");
+	
 	m_solver->executeOptimizer();
 	
 	//

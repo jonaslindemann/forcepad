@@ -38,7 +38,7 @@ class CMainFrame {open : {CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusM
   } {
     Fl_Window wndMain {
       label {ForcePAD 2} open
-      xywh {471 132 858 684} type Double align 80 resizable visible
+      xywh {399 221 858 684} type Double align 80 resizable visible
     } {
       Fl_Menu_Bar mainMenu {open
         xywh {0 0 858 26} box FLAT_BOX labelsize 11 textsize 11
@@ -103,7 +103,7 @@ editMenuCopy->deactivate();}
           }
         }
         Submenu modeMenu {
-          label {&Mode} open
+          label {&Mode} open selected
           xywh {0 0 62 20} labelsize 12
         } {
           MenuItem modeMenuSketch {
@@ -161,26 +161,26 @@ delete splashFrame;}
         }
       }
       Fl_Scroll scrRightToolbar {open
-        xywh {803 494 52 156} box DOWN_BOX selection_color 51
+        xywh {803 492 52 156} box DOWN_BOX selection_color 51
       } {
         Fl_Group {} {open
-          xywh {806 497 47 132}
+          xywh {806 495 47 132}
         } {
           Fl_Button btnPhysical {
             callback {paintView->setViewMode(CPaintView::VM_PHYSICS);}
-            tooltip {Physics mode} image {../../images/physics_mode.xpm} deimage {../../images/physics_mode_inactive.xpm} xywh {808 541 42 42} type Radio down_box DOWN_BOX selection_color 51 labelsize 10
+            tooltip {Physics mode} image {../../images/physics_mode.xpm} deimage {../../images/physics_mode_inactive.xpm} xywh {808 539 42 42} type Radio down_box DOWN_BOX selection_color 51 labelsize 10
             code0 {\#include "Fl_HoverButton.h"}
             class Fl_HoverButton
           }
           Fl_Button btnAction {
             callback {paintView->setViewMode(CPaintView::VM_ACTION);}
-            tooltip {Action mode} image {../../images/action_mode.xpm} deimage {../../images/action_mode_inactive.xpm} xywh {808 583 42 42} type Radio down_box DOWN_BOX selection_color 51 labelsize 10
+            tooltip {Action mode} image {../../images/action_mode.xpm} deimage {../../images/action_mode_inactive.xpm} xywh {808 581 42 42} type Radio down_box DOWN_BOX selection_color 51 labelsize 10
             code0 {\#include "Fl_HoverButton.h"}
             class Fl_HoverButton
           }
           Fl_Button btnSketch {
             callback {paintView->setViewMode(CPaintView::VM_SKETCH);}
-            tooltip {Sketch mode} image {../../images/sketch_mode.xpm} deimage {../../images/sketch_mode_inactive.xpm} xywh {807 499 42 42} type Radio down_box DOWN_BOX value 1 selection_color 51 labelsize 10
+            tooltip {Sketch mode} image {../../images/sketch_mode.xpm} deimage {../../images/sketch_mode_inactive.xpm} xywh {807 497 42 42} type Radio down_box DOWN_BOX value 1 selection_color 51 labelsize 10
             code0 {\#include "Fl_HoverButton.h"}
             class Fl_HoverButton
           }
@@ -251,7 +251,7 @@ if (btnPaste->value()==1)
           xywh {2 223 49 58}
         } {
           Fl_Button btnOptLayer {
-            callback {paintView->setOptLayer(btnOptLayer->value());} selected
+            callback {paintView->setOptLayer(btnOptLayer->value());}
             tooltip {Flood fill tool} image {../../images/floodfill.xpm} xywh {5 226 42 42} type Toggle down_box DOWN_BOX selection_color 51
             code0 {\#include "Fl_HoverButton.h"}
             class Fl_HoverButton
@@ -311,6 +311,13 @@ paintView->setDrawStress(true);}
             code0 {\#include "Fl_HoverButton.h"}
             class Fl_HoverButton
           }
+        }
+        Fl_Button btnOptimize {
+          label OPT
+          callback {paintView->executeOpt();}
+          tooltip {Displacement visualisation} xywh {370 398 42 42} down_box DOWN_BOX selection_color 51 labelsize 11
+          code0 {\#include "Fl_HoverButton.h"}
+          class Fl_HoverButton
         }
       }
       Fl_Group {} {

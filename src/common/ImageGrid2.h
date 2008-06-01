@@ -84,6 +84,7 @@ public:
 	void copyField(int fromLayer, int toLayer);
 	void copyFromGrid(int toLayer, double factor);
 	void assignField(int layer, double value);
+	void assignField(int layer, Matrix& toMatrix);
 	void copyField(int fromLayer, Matrix& toMatrix);
 
 	double maxAbsDiff(int l1, int l2);

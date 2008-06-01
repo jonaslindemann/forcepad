@@ -183,6 +183,11 @@ private:
   void cb_btnRotateLoad_i(Fl_HoverButton*, void*);
   static void cb_btnRotateLoad(Fl_HoverButton*, void*);
 public:
+  Fl_HoverButton *btnOptimize;
+private:
+  void cb_btnOptimize_i(Fl_HoverButton*, void*);
+  static void cb_btnOptimize(Fl_HoverButton*, void*);
+public:
   Fl_Progress *calcProgress;
   Fl_Output *statusOutput;
   Fl_Scroll *scrRightForceToolbar;
