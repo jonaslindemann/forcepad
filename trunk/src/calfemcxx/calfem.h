@@ -152,6 +152,7 @@ ReturnMatrix matrixMin1(Matrix A, Matrix B);
 ReturnMatrix matrixMin2(double a, Matrix B);
 ReturnMatrix matrixMin3(Matrix A, double b);
 ReturnMatrix matrixSqrt(Matrix A);
+ReturnMatrix elementMultiply(Matrix A, Matrix B);
 
 double maxValue(RowVector& rowVector);
 double minValue(RowVector& rowVector);

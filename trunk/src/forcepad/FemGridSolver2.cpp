@@ -379,11 +379,11 @@ void CFemGridSolver2::execute_old()
 	}
 
 	so_print("CFemGridSolver2",so_format("%d elements assembled.",nElements));
-	cout << "Model size" << endl;
-	cout << "\t x,max = " << m_maxX << endl;
-	cout << "\t x,min = " << m_minX << endl;
-	cout << "\t y,max = " << m_maxY << endl;
-	cout << "\t y,min = " << m_minY << endl;
+	//cout << "Model size" << endl;
+	//cout << "\t x,max = " << m_maxX << endl;
+	//cout << "\t x,min = " << m_minX << endl;
+	//cout << "\t y,max = " << m_maxY << endl;
+	//cout << "\t y,min = " << m_minY << endl;
 
 	///////////////////////////////////////////////////////////////////////////
 	//
@@ -1161,7 +1161,8 @@ int CFemGridSolver2::assembleSystemOpt(SymmetricBandMatrix& K, Matrix& X, double
 				//
 
 
-				calfem::hooke(ptype, pow(E*X(i,j),penalty), v, D);
+				calfem::hooke(ptype, E, v, D);
+				//calfem::hooke(ptype, pow(E*X(i,j),penalty), v, D);
 
 				// 
 				// Get element topology
@@ -1174,7 +1175,11 @@ int CFemGridSolver2::assembleSystemOpt(SymmetricBandMatrix& K, Matrix& X, double
 				// Create element matrix
 				//
 				
+				Ke = 0.0;
 				calfem::plani4e(Ex, Ey, Ep, D, m_Eq, Ke, fe);
+				Ke = Ke * pow(X(i+1,j+1),penalty);
+				
+				//cout << "pow(X(i+1,j+1),penalty) = " << pow(X(i+1,j+1),penalty) << endl;
 
 				//
 				// Assemble element matrix
@@ -1679,7 +1684,7 @@ void CFemGridSolver2::objectiveFunctionAndSensitivity(Matrix& X, Matrix& dC, dou
 				// Get element properties
 				//
 				
-				calfem::hooke(ptype, pow(E*X(i,j),penalty), v, D);
+				calfem::hooke(ptype, E, v, D);
 
 				// 
 				// Get element topology
@@ -1700,11 +1705,12 @@ void CFemGridSolver2::objectiveFunctionAndSensitivity(Matrix& X, Matrix& dC, dou
 				//
 
 				calfem::plani4e(Ex, Ey, Ep, D, m_Eq, Ke, fe);
+				Ke = Ke * pow(E*X(i+1,j+1),penalty);
 
 				// [1x8][8x8][8x1] = [1x1]
 
 				double W = (Ed * Ke * Ed.t()).as_scalar();
-				c += pow(X(i,j),penalty)*W;
+				c += pow(X(i+1,j+1),penalty)*W;
 				dC(i+1,j+1) = -penalty*pow(X(i+1,j+1),penalty-1)*W;
 			}
 		}
@@ -1737,20 +1743,21 @@ ReturnMatrix CFemGridSolver2::optimalityCriteriaUpdate(Matrix& X, Matrix& dC, do
 
 	Matrix Xnew;
 
-	m_femGrid->copyField(0, X);
-
 	while (l2-l1 > 1e-4)
 	{
 		lmid = 0.5*(l2+l1);
 		Matrix X1 = X - move;
 		Matrix X2 = X + move;
 		Matrix X3 = -dC/lmid;
-		Matrix X4 = X * matrixSqrt(X3);
-		Xnew = matrixMax2( 0.001, matrixMax1( X1, matrixMin1( X2, X4 )));
+		Matrix X4 = elementMultiply(X,matrixSqrt(X3));
+		Xnew = matrixMax2(0.001, matrixMax1(X1, matrixMin2( 1.0, matrixMin1(X2, X4))));
+		//Xnew = matrixMax2( 0.001, matrixMax1( X1, matrixMin1( X2, X4 )));
 		if (Xnew.Sum() - volfrac * rows * cols > 0.0)
 			l1 = lmid;
 		else
 			l2 = lmid;
+
+		cout << "l1 = " << l1 << ", l2 = " << l2 << endl;
 	}
 
 	Xnew.release(); return Xnew;
@@ -1831,13 +1838,13 @@ void CFemGridSolver2::executeOptimizer()
 	Xold.ReSize(rows, cols);
 	dC.ReSize(rows, cols);
 
-	m_femGrid->copyGrid(X, volfrac);
+	m_femGrid->copyGrid(X, volfrac); // Copy grid values to X multiplied with volfrac
 
 	///////////////////////////////////////////////////////////////////////////
 	// Start optimisation loop
 	//
 
-	while ((change<0.01)&&(loop<100))
+	while ((change>0.01)&&(loop<100))
 	{
 		loop++;
 		Xold = X;
@@ -1868,7 +1875,7 @@ void CFemGridSolver2::executeOptimizer()
 			return;
 		}
 
-		so_print("CFemGridSolver2",so_format("%d elements assembled.",nElements));
+		//so_print("CFemGridSolver2",so_format("%d elements assembled.",nElements));
 
 		///////////////////////////////////////////////////////////////////////////
 		// Setup forces and constraints
@@ -1917,7 +1924,7 @@ void CFemGridSolver2::executeOptimizer()
 		m_a.ReSize(m_nDof,1);
 		m_a = 0.0;
 
-		so_print("CFemGridSolver2","Solving system.");
+		//so_print("CFemGridSolver2","Solving system.");
 		progressMessage("Solving.", 60);
 
 		Try 
@@ -1931,12 +1938,16 @@ void CFemGridSolver2::executeOptimizer()
 			return;
 		}
 
-		so_print("CFemGridSolver2","Done.");
+		//so_print("CFemGridSolver2","Done.");
 
+		c = 0.0;
 		this->objectiveFunctionAndSensitivity(X, dC, penalty, c);
-		this->optimalityCriteriaUpdate(X, dC, volfrac);
+		Matrix Xnew = this->optimalityCriteriaUpdate(X, dC, volfrac);
+		Matrix Diff = Xnew-Xold;
+		change = Diff.maximum_absolute_value();
+		X = Xnew;
 
-		change = (X-Xold).maximum_absolute_value();
+		cout << "loop = " << loop << ", change = " << change << ", c = " << c << endl;
 
 	}
 

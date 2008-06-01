@@ -18,8 +18,8 @@ CLogWindow::CLogWindow() {
   textDisplay->buffer(new Fl_Text_Buffer(0));
 textDisplay->scrollbar_align(FL_ALIGN_RIGHT);
 #ifdef WIN32
-m_editStrBuf.setLog(textDisplay);
-m_oldBuf = std::cout.rdbuf( &m_editStrBuf );
+//m_editStrBuf.setLog(textDisplay);
+//m_oldBuf = std::cout.rdbuf( &m_editStrBuf );
 #endif
 }
 

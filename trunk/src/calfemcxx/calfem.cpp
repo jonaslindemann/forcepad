@@ -1169,7 +1169,7 @@ void plani4s(
 	}
 }
 
-ReturnMatrix matrixMax(Matrix A, double b)
+ReturnMatrix matrixMax3(Matrix A, double b)
 {
 	Matrix C;
 	int i, j;
@@ -1188,7 +1188,7 @@ ReturnMatrix matrixMax(Matrix A, double b)
 	C.release(); return C;
 }
 
-ReturnMatrix matrixMax(double a, Matrix B)
+ReturnMatrix matrixMax2(double a, Matrix B)
 {
 	Matrix C;
 	int i, j;
@@ -1207,7 +1207,7 @@ ReturnMatrix matrixMax(double a, Matrix B)
 	C.release(); return C;
 }
 
-ReturnMatrix matrixMax(Matrix A, Matrix B)
+ReturnMatrix matrixMax1(Matrix A, Matrix B)
 {
 	Matrix C;
 	int i, j;
@@ -1229,7 +1229,7 @@ ReturnMatrix matrixMax(Matrix A, Matrix B)
 	C.release(); return C;
 }
 
-ReturnMatrix matrixMin(Matrix A, double b)
+ReturnMatrix matrixMin3(Matrix A, double b)
 {
 	Matrix C;
 	int i, j;
@@ -1248,7 +1248,7 @@ ReturnMatrix matrixMin(Matrix A, double b)
 	C.release(); return C;
 }
 
-ReturnMatrix matrixMin(double a, Matrix B)
+ReturnMatrix matrixMin2(double a, Matrix B)
 {
 	Matrix C;
 	int i, j;
@@ -1267,7 +1267,7 @@ ReturnMatrix matrixMin(double a, Matrix B)
 	C.release(); return C;
 }
 
-ReturnMatrix matrixMin(Matrix A, Matrix B)
+ReturnMatrix matrixMin1(Matrix A, Matrix B)
 {
 	Matrix C;
 	int i, j;
@@ -1301,6 +1301,22 @@ ReturnMatrix matrixSqrt(Matrix A)
 	for (i=1; i<=rows; i++)
 		for (j=1; j<=cols; j++)
 			C(i,j) = sqrt(A(i,j));
+	
+	C.release(); return C;
+}
+
+ReturnMatrix elementMultiply(Matrix A, Matrix B)
+{
+	Matrix C;
+	int i, j;
+	int rows = A.nrows();
+	int cols = A.ncols();
+
+	C.ReSize(A.nrows(), A.ncols());
+
+	for (i=1; i<=rows; i++)
+		for (j=1; j<=cols; j++)
+			C(i,j) = A(i,j) * B(i,j);
 	
 	C.release(); return C;
 }

@@ -345,7 +345,7 @@ void CImageGrid2::assignField(int layer, double value)
 	}
 }
 
-void assignField(int layer, Matrix& toMatrix)
+void CImageGrid2::assignField(int layer, Matrix& toMatrix)
 {
 	int i, j;
 
@@ -355,12 +355,12 @@ void assignField(int layer, Matrix& toMatrix)
 		{
 			for (i=0; i<m_rows; i++)
 				for (j=0; j<m_cols; j++)
-					m_fields[layer][i][j] = toMatrix(i+1,j+1)
+					m_fields[layer][i][j] = toMatrix(i+1,j+1);
 		}
 	}
 }
 
-void copyGrid(Matrix& toMatrix)
+void CImageGrid2::copyGrid(Matrix& toMatrix)
 {
 	int i, j;
 
@@ -370,12 +370,12 @@ void copyGrid(Matrix& toMatrix)
 		{
 			for (i=0; i<m_rows; i++)
 				for (j=0; j<m_cols; j++)
-					toMatrix(i+1,j+1) = m_grid[i][j]
+					toMatrix(i+1,j+1) = m_grid[i][j];
 		}
 	}
 }
 
-void copyGrid(Matrix& toMatrix, double scaleFactor)
+void CImageGrid2::copyGrid(Matrix& toMatrix, double scaleFactor)
 {
 	int i, j;
 
@@ -385,7 +385,7 @@ void copyGrid(Matrix& toMatrix, double scaleFactor)
 		{
 			for (i=0; i<m_rows; i++)
 				for (j=0; j<m_cols; j++)
-					toMatrix(i+1,j+1) = m_grid[i][j] * scaleFactor
+					toMatrix(i+1,j+1) = m_grid[i][j] * scaleFactor;
 		}
 	}
 }
