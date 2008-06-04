@@ -1877,16 +1877,36 @@ void CPaintView::newModel()
 	if (dlg->getModalResult()!=MR_CANCEL)
 	{
 		int width, height, initialStiffness;
-		
+
 		dlg->getSize(width, height);
 		initialStiffness = dlg->getInitialStiffness();
 		
 		this->setModelName("noname.fp2");
 		
 		// Create drawing area
-		
-		m_drawing = new CSgiImage();
-		m_drawing->setChannels(3);
+
+		int i;
+
+		for (i=width; i>0; i--)
+		{
+			if (i % 8 == 0)
+			{
+				width = i;
+				break;
+			}
+		}
+
+		for (i=height; i>0; i--)
+		{
+			if (i % 8 == 0)
+			{
+				height = i;
+				break;
+			}
+		}
+
+		m_drawing = new CImage(2);
+		m_drawing->setChannels(4);
 		m_drawing->setSize(width, height);
 		m_drawing->fillColor(255-initialStiffness,255-initialStiffness,255-initialStiffness);
 		
@@ -2077,8 +2097,8 @@ void CPaintView::expandImageToWindow()
 {
 	disableDrawing();
 
-	m_drawing = new CSgiImage();
-	m_drawing->setChannels(3);
+	m_drawing = new CImage(2);
+	m_drawing->setChannels(4);
 
 	int i, width, height;
 

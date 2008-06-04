@@ -23,7 +23,7 @@ Name: "desktopicon"; Description: "Create a &desktop icon"; GroupDescription: "A
 Filename: {tmp}\vcredist_x86-sp1.exe; Flags: hidewizard;
 
 [Files]
-Source: "..\..\..\forcepad-redist\vcredist_x86.exe"; DestDir: {tmp}; Flags: deleteafterinstall
+Source: "..\..\..\forcepad-redist\vcredist_x86-sp1.exe"; DestDir: {tmp}; Flags: deleteafterinstall
 Source: "..\..\bin\release\forcepad.exe"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 Source: "..\..\bin\release\brushes\*.*"; DestDir: "{app}\brushes"; CopyMode: alwaysoverwrite
 Source: "..\..\bin\release\samples\*.*"; DestDir: "{app}\samples"; CopyMode: alwaysoverwrite
