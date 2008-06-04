@@ -1,0 +1,80 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0108 
+header_name {.h} 
+code_name {.cpp}
+decl {\#define MR_OK 0} {public
+} 
+
+decl {\#define MR_CANCEL 1} {public
+} 
+
+class CNewModelDlg {open
+} {
+  decl {int m_modalResult} {}
+  Function {CNewModelDlg()} {open
+  } {
+    Fl_Window wndNewModel {
+      label {New model} open
+      xywh {351 57 309 142} type Double modal visible
+    } {
+      Fl_Button btnOk {
+        label OK
+        callback {m_modalResult = MR_OK;
+wndNewModel->hide();}
+        xywh {236 6 67 25} down_box DOWN_BOX labelsize 12
+      }
+      Fl_Button btnCancel {
+        label Cancel
+        callback {m_modalResult = MR_CANCEL;
+wndNewModel->hide();}
+        xywh {236 37 67 25} down_box DOWN_BOX labelsize 12
+      }
+      Fl_Group grpNewModel {open
+        xywh {5 6 223 129} box DOWN_FRAME
+      } {
+        Fl_Value_Slider sldImageWidth {
+          label {Image width (pixels)}
+          xywh {17 28 201 20} type Horizontal labelsize 12 align 5 minimum 160 maximum 1280 step 20 value 640
+        }
+        Fl_Value_Slider sldImageHeight {
+          label {Image height (pixels)}
+          xywh {17 68 201 20} type Horizontal labelsize 12 align 5 minimum 160 maximum 1280 step 20 value 480
+        }
+        Fl_Value_Slider sldInitialStiffness {
+          label {Initial stiffness (0 = no stiffness)}
+          xywh {17 107 201 20} type Horizontal labelsize 12 align 5 maximum 255 step 1
+        }
+      }
+    }
+  }
+  Function {~CNewModelDlg()} {} {
+    code {wndNewModel->hide();
+delete wndNewModel;} {}
+  }
+  Function {show()} {open
+  } {
+    code {wndNewModel->show();
+while (wndNewModel->visible()) Fl::wait();} {}
+  }
+  Function {getModalResult()} {return_type int
+  } {
+    code {return m_modalResult;} {}
+  }
+  Function {setSize(int width, int height)} {} {
+    code {sldImageWidth->value(width);
+sldImageHeight->value(height);} {}
+  }
+  Function {getSize(int &width, int &height)} {} {
+    code {width = sldImageWidth->value();
+height = sldImageHeight->value();} {}
+  }
+  Function {getInitialStiffness()} {return_type int
+  } {
+    code {return sldInitialStiffness->value();} {}
+  }
+  Function {centerWindow(Fl_Window* window)} {open
+  } {
+    code {wndNewModel->position(window->x()+window->w()/2-wndNewModel->w()/2, window->y()+window->h()/2-wndNewModel->h()/2);} {selected
+    }
+  }
+} 

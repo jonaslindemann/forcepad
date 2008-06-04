@@ -1,0 +1,58 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0100 
+header_name {.h} 
+code_name {.cpp}
+decl {/** Status window class */} {public
+} 
+
+class CStatusDlg {open
+} {
+  decl {/** Status window class constrcutor. */} {public
+  }
+  Function {CStatusDlg()} {} {
+    Fl_Window wndStatus {
+      label {Calculating...} open
+      xywh {424 129 309 100} modal visible
+    } {
+      Fl_Value_Slider sldProgress {
+        xywh {4 66 302 28} type {Horz Fill} box PLASTIC_DOWN_BOX maximum 99 step 1
+      }
+      Fl_Output outStatus {
+        xywh {4 6 301 54} box PLASTIC_DOWN_BOX
+      }
+    }
+  }
+  decl {/** StatusDlg class constructor. */} {selected public
+  }
+  Function {~CStatusDlg()} {} {
+    code {delete wndStatus;} {}
+  }
+  decl {/** Show window. */} {public
+  }
+  Function {show()} {} {
+    code {wndStatus->show();} {}
+  }
+  decl {/** Set status text. */} {public
+  }
+  Function {setStatusText(const char* text)} {} {
+    code {outStatus->value(text);
+this->refresh();} {}
+  }
+  decl {/** Set progress value in percent. */} {public
+  }
+  Function {setProgress(int percent)} {} {
+    code {sldProgress->value(percent);
+this->refresh();} {}
+  }
+  decl {/** Hide window. */} {public
+  }
+  Function {hide()} {} {
+    code {wndStatus->hide();} {}
+  }
+  decl {/** Refresh window */} {public
+  }
+  Function {refresh()} {} {
+    code {Fl::check();
+Fl::flush();} {}
+  }
+} 
