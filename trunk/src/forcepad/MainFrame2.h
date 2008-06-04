@@ -16,11 +16,11 @@
 #include "PaintView.h"
 #include <FL/Fl_Progress.H>
 #include <FL/Fl_Output.H>
+#include <FL/Fl_Value_Input.H>
 #include <FL/Fl_Value_Slider.H>
 #include <FL/Fl_Roller.H>
 #include <FL/Fl_Slider.H>
 #include <FL/Fl_Check_Button.H>
-#include <FL/Fl_Value_Input.H>
 #include <FL/Fl_Value_Output.H>
 
 class CMainFrame : CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusMessageEvent, CGSLogMessageEvent, CPVViewModeErrorEvent, CPVModelChangedEvent, CPVRulerChangedEvent {
@@ -200,6 +200,11 @@ public:
 private:
   void cb_btnEraseForces_i(Fl_HoverButton*, void*);
   static void cb_btnEraseForces(Fl_HoverButton*, void*);
+public:
+  Fl_Value_Input *forceMagnitude;
+private:
+  void cb_forceMagnitude_i(Fl_Value_Input*, void*);
+  static void cb_forceMagnitude(Fl_Value_Input*, void*);
 public:
   Fl_HoverButton *btnUseWeight;
 private:

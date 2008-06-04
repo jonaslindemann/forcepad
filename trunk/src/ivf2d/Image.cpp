@@ -91,6 +91,7 @@ void CImage::initLayers()
 	for (i=0; i<m_layers; i++)
 		m_imageMaps[i] = NULL;
 
+	m_imageMap = m_imageMaps[m_currentLayer];
 }
 
 void CImage::destroyLayers()

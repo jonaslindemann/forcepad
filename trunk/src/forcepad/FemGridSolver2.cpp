@@ -935,7 +935,7 @@ int CFemGridSolver2::calculateOptimalBandwidth()
 
 	m_femGrid->getGridSize(rows, cols);
 
-	logMessage("CFemGridSolver2","Enumerating dofs and calculating bandwidth.");
+	//logMessage("CFemGridSolver2","Enumerating dofs and calculating bandwidth.");
 
 	m_femGrid->resetDofs();
 	m_nDof =  m_femGrid->enumerateDofs(ED_LEFT_RIGHT);
@@ -954,8 +954,8 @@ int CFemGridSolver2::calculateOptimalBandwidth()
 	else
 		maxBandwidth = bwBottomTop;
 
-	so_print("CFemGridSolver2",so_format("Total dofs = %d",m_nDof));
-	so_print("CFemGridSolver2",so_format("Bandwidth  = %d",maxBandwidth));
+	//so_print("CFemGridSolver2",so_format("Total dofs = %d",m_nDof));
+	//so_print("CFemGridSolver2",so_format("Bandwidth  = %d",maxBandwidth));
 
 	return maxBandwidth;
 }
@@ -1216,7 +1216,7 @@ void CFemGridSolver2::setupForcesAndConstraints(bool& loadsDefined, bool& bcsDef
 
 	if (m_useWeight)
 	{
-		so_print("CFemGridSolver2","Applying weight.");
+		//so_print("CFemGridSolver2","Applying weight.");
 		
 		double Fsum = 0.0;
 		
@@ -1231,7 +1231,7 @@ void CFemGridSolver2::setupForcesAndConstraints(bool& loadsDefined, bool& bcsDef
 	// Setup load vector
 	//
 
-	so_print("CFemGridSolver2","Defining load vector.");
+	//so_print("CFemGridSolver2","Defining load vector.");
 	progressMessage("Defining load vector.", 30);
 
 	m_femGrid->clearPoints();
@@ -1247,7 +1247,7 @@ void CFemGridSolver2::setupForcesAndConstraints(bool& loadsDefined, bool& bcsDef
 
 		if (dofs[0]>0)
 		{
-			so_print("CFemGridSolver2",so_format("\tLoad found at [ %g, %g ], dofs = [ %d, %d ]",x, y, dofs[0], dofs[1]));
+			//so_print("CFemGridSolver2",so_format("\tLoad found at [ %g, %g ], dofs = [ %d, %d ]",x, y, dofs[0], dofs[1]));
 
 			m_f(dofs[0]) += vx*value*m_forceMagnitude;
 			m_f(dofs[1]) += vy*value*m_forceMagnitude;
@@ -1265,7 +1265,7 @@ void CFemGridSolver2::setupForcesAndConstraints(bool& loadsDefined, bool& bcsDef
 	// Define constraints
 	//
 
-	so_print("CFemGridSolver2","Defining constraints.");
+	//so_print("CFemGridSolver2","Defining constraints.");
 	progressMessage("Setting up boundary conditions.", 40);
 
 	int nConstraints = m_femGrid->getPointConstraintsSize();
@@ -1288,7 +1288,7 @@ void CFemGridSolver2::setupForcesAndConstraints(bool& loadsDefined, bool& bcsDef
 
 		if (dofs[0]>0)
 		{
-			so_print("CFemGridSolver2",so_format("\tConstraint found at [ %g, %g ], dofs = [ %d, %d ]",x, y, dofs[0], dofs[1]));
+			//so_print("CFemGridSolver2",so_format("\tConstraint found at [ %g, %g ], dofs = [ %d, %d ]",x, y, dofs[0], dofs[1]));
 
 			switch (pointConstraint->getConstraintType()) {
 			case CConstraint::CT_XY:
@@ -1366,7 +1366,7 @@ void CFemGridSolver2::removeDoubleDofs(set<int>& uniqueDofs, RowVector& prescrib
 	// Remove doubly defined dofs
 	//
 
-	so_print("CFemGridSolver2","\tUnique dofs:\n");
+	//so_print("CFemGridSolver2","\tUnique dofs:\n");
 
 	Bc = 0.0;
 	int bcCount = 1;
@@ -1375,7 +1375,7 @@ void CFemGridSolver2::removeDoubleDofs(set<int>& uniqueDofs, RowVector& prescrib
 	for (si=uniqueDofs.begin(); si!=uniqueDofs.end(); si++)
 	{
 		int dof = (*si);
-		so_print("CFemGridSolver2",so_format("\t%d",dof));
+		//so_print("CFemGridSolver2",so_format("\t%d",dof));
 		
 		Bc(bcCount,1) = dof;
 		Bc(bcCount,2) = prescribedValues(dof);
@@ -1387,7 +1387,7 @@ void CFemGridSolver2::removeDoubleDofs(set<int>& uniqueDofs, RowVector& prescrib
 
 void CFemGridSolver2::computeElementForces()
 {
-	so_print("CFemGridSolver2","Calculating results.");
+	//so_print("CFemGridSolver2","Calculating results.");
 
 	int i, j, l;
 	int rows, cols;
@@ -1423,7 +1423,7 @@ void CFemGridSolver2::computeElementForces()
 	m_maxPosStressValue = -1.0e300;
 	m_maxNegStressValue = -1.0e300;
 
-	so_print("CFemGridSolver2:","\tCalculating element forces.");
+	//so_print("CFemGridSolver2:","\tCalculating element forces.");
 
 	m_femGrid->zeroNodeResults();
 
@@ -1622,7 +1622,7 @@ void CFemGridSolver2::computeReactionForces(std::vector<CConstraint*>& vectorCon
 
 void CFemGridSolver2::objectiveFunctionAndSensitivity(Matrix& X, Matrix& dC, double penalty, double& c)
 {
-	so_print("CFemGridSolver2","Calculating results.");
+	//so_print("CFemGridSolver2","Calculating results.");
 
 	int i, j, l;
 	int rows, cols;
@@ -1661,9 +1661,9 @@ void CFemGridSolver2::objectiveFunctionAndSensitivity(Matrix& X, Matrix& dC, dou
 	m_maxPosStressValue = -1.0e300;
 	m_maxNegStressValue = -1.0e300;
 
-	so_print("CFemGridSolver2:","\tCalculating element forces.");
+	//so_print("CFemGridSolver2:","\tCalculating element forces.");
 
-	m_femGrid->assignField(2, 0.0);
+	c = 0.0;
 
 	for (i=0; i<rows; i++)
 	{
@@ -1704,20 +1704,23 @@ void CFemGridSolver2::objectiveFunctionAndSensitivity(Matrix& X, Matrix& dC, dou
 				// Calculate strain energy 
 				//
 
+				Ke = 0.0;
 				calfem::plani4e(Ex, Ey, Ep, D, m_Eq, Ke, fe);
-				Ke = Ke * pow(E*X(i+1,j+1),penalty);
+				Ke = Ke * pow(X(i+1,j+1),penalty);
 
 				// [1x8][8x8][8x1] = [1x1]
 
 				double W = (Ed * Ke * Ed.t()).as_scalar();
 				c += pow(X(i+1,j+1),penalty)*W;
 				dC(i+1,j+1) = -penalty*pow(X(i+1,j+1),penalty-1)*W;
+
+				//cout << "W = " << W << ", pow(X(i+1,j+1),penalty) = " << pow(X(i+1,j+1),penalty) << endl;
 			}
 		}
 	}
 }
 
-ReturnMatrix CFemGridSolver2::optimalityCriteriaUpdate(Matrix& X, Matrix& dC, double volfrac)
+ReturnMatrix CFemGridSolver2::optimalityCriteriaUpdate(Matrix& X, Matrix& dC, double volfrac, int nElements)
 {
 	using namespace calfem;
 
@@ -1751,15 +1754,12 @@ ReturnMatrix CFemGridSolver2::optimalityCriteriaUpdate(Matrix& X, Matrix& dC, do
 		Matrix X3 = -dC/lmid;
 		Matrix X4 = elementMultiply(X,matrixSqrt(X3));
 		Xnew = matrixMax2(0.001, matrixMax1(X1, matrixMin2( 1.0, matrixMin1(X2, X4))));
-		//Xnew = matrixMax2( 0.001, matrixMax1( X1, matrixMin1( X2, X4 )));
-		if (Xnew.Sum() - volfrac * rows * cols > 0.0)
+		//m_femGrid->assignNonElements(Xnew, 0.0);
+		if (Xnew.Sum() - volfrac * nElements > 0.0)
 			l1 = lmid;
 		else
 			l2 = lmid;
-
-		cout << "l1 = " << l1 << ", l2 = " << l2 << endl;
 	}
-
 	Xnew.release(); return Xnew;
 }
 
@@ -1839,6 +1839,8 @@ void CFemGridSolver2::executeOptimizer()
 	dC.ReSize(rows, cols);
 
 	m_femGrid->copyGrid(X, volfrac); // Copy grid values to X multiplied with volfrac
+
+	cout << "Initial sum of X = " << X.Sum() << endl;
 
 	///////////////////////////////////////////////////////////////////////////
 	// Start optimisation loop
@@ -1941,11 +1943,14 @@ void CFemGridSolver2::executeOptimizer()
 		//so_print("CFemGridSolver2","Done.");
 
 		c = 0.0;
+		dC = 0.0;
 		this->objectiveFunctionAndSensitivity(X, dC, penalty, c);
-		Matrix Xnew = this->optimalityCriteriaUpdate(X, dC, volfrac);
+		Matrix Xnew = this->optimalityCriteriaUpdate(X, dC, volfrac, nElements);
 		Matrix Diff = Xnew-Xold;
 		change = Diff.maximum_absolute_value();
 		X = Xnew;
+
+		m_femGrid->assignField(0, X);
 
 		cout << "loop = " << loop << ", change = " << change << ", c = " << c << endl;
 
@@ -1955,7 +1960,7 @@ void CFemGridSolver2::executeOptimizer()
 	// Create global displacement vector
 	//
 
-	so_print("CFemGridSolver2","\tCreating global displacement vector.");
+	//so_print("CFemGridSolver2","\tCreating global displacement vector.");
 
 	progressMessage("Storing results.", 80);
 
@@ -1974,7 +1979,7 @@ void CFemGridSolver2::executeOptimizer()
 	// Store element forces in elements
 	//
 
-	this->computeElementForces();
+	//this->computeElementForces();
 	
 	///////////////////////////////////////////////////////////////////////////
 	// Calculate reaction forces from vector constraints
@@ -2570,7 +2575,7 @@ void CFemGridSolver2::execute()
 		return;
 	}
 
-	so_print("CFemGridSolver2",so_format("%d elements assembled.",nElements));
+	//so_print("CFemGridSolver2",so_format("%d elements assembled.",nElements));
 
 	///////////////////////////////////////////////////////////////////////////
 	// Setup forces and constraints
@@ -2619,7 +2624,7 @@ void CFemGridSolver2::execute()
 	m_a.ReSize(m_nDof,1);
 	m_a = 0.0;
 
-	so_print("CFemGridSolver2","Solving system.");
+	//so_print("CFemGridSolver2","Solving system.");
 	progressMessage("Solving.", 60);
 
 	Try 
@@ -2633,13 +2638,13 @@ void CFemGridSolver2::execute()
 		return;
 	}
 
-	so_print("CFemGridSolver2","Done.");
+	//so_print("CFemGridSolver2","Done.");
 
 	///////////////////////////////////////////////////////////////////////////
 	// Create global displacement vector
 	//
 
-	so_print("CFemGridSolver2","\tCreating global displacement vector.");
+	//so_print("CFemGridSolver2","\tCreating global displacement vector.");
 
 	progressMessage("Storing results.", 80);
 

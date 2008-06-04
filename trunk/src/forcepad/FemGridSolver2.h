@@ -141,7 +141,7 @@ public:
 	void computeReactionForces(std::vector<CConstraint*>& vectorConstraints);
 
 	void objectiveFunctionAndSensitivity(Matrix& X, Matrix& dC, double penalty, double& c);
-	ReturnMatrix optimalityCriteriaUpdate(Matrix& X, Matrix& dC, double volfrac);
+	ReturnMatrix optimalityCriteriaUpdate(Matrix& X, Matrix& dC, double volfrac, int nElements);
 
 	void executeOptimizer();
 
