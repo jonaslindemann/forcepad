@@ -68,6 +68,7 @@ CFemGrid2::CFemGrid2()
 	m_drawForcesAndConstraints = true;
 	m_dimmedConstraints = false;
 	m_undeformedGrid = false;
+	m_drawDensity = false;
 
 	m_pixelArea = -1.0;
 
@@ -109,9 +110,14 @@ void CFemGrid2::doGeometry()
 	//drawGridPoints();
 	if (m_showGrid)
 	{
-		if (m_undeformedGrid)
-			drawUndeformedGrid();
-		drawGrid();
+		if (m_drawDensity)
+			drawDensity();
+		else
+		{
+			if (m_undeformedGrid)
+				drawUndeformedGrid();
+			drawGrid();
+		}
 	}
 
 	// Draw forces
@@ -799,6 +805,35 @@ void CFemGrid2::drawGrid()
 		}
 	}
 }
+
+void CFemGrid2::drawDensity()
+{
+	int i, j, l;
+	//double k = m_displacementScale/m_maxNodeValue;
+	double alpha = 0.7;
+	int topo[8];
+	double ex[4];
+	double ey[4];
+	double value;
+
+	for (i=0; i<m_rows; i++)
+	{
+		for (j=0; j<m_cols; j++)
+		{
+			this->getElement(i, j, value, ex, ey, topo);
+
+			if (m_grid[i][j]>m_elementTreshold)
+			{
+				glBegin(GL_QUADS);
+				glColor4f(1.0f-this->getFieldValue(0,i,j), 1.0f-this->getFieldValue(0,i,j), 1.0f-this->getFieldValue(0,i,j), 1.0);
+				for (l=0; l<4; l++)
+						glVertex2d(ex[l]/m_elementScaleFactor, ey[l]/m_elementScaleFactor);
+				glEnd();
+			}
+		}
+	}
+}
+
 
 void CFemGrid2::drawUndeformedGrid()
 {
@@ -2338,4 +2373,32 @@ void CFemGrid2::setUndeformedGrid(bool flag)
 bool CFemGrid2::getUndeformedGrid()
 {
 	return m_undeformedGrid;
+}
+
+void CFemGrid2::setShowDensity(bool flag)
+{
+	m_drawDensity = flag;
+}
+
+bool CFemGrid2::getShowDensity()
+{
+	return m_drawDensity;
+}
+
+
+void CFemGrid2::assignNonElements(Matrix& M, double value)
+{
+	int rows, cols, i, j;
+
+	this->getGridSize(rows, cols);
+
+	if ((M.ncols() == cols)&&(M.nrows() == rows))
+	{
+		for (i=0; i<rows; i++)
+			for (j=0; j<cols; j++)
+			{
+				if (this->getGridValue(i,j)<m_elementTreshold)
+					M(i+1,j+1) = value;
+			}
+	}
 }

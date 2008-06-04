@@ -5380,6 +5380,13 @@ static const char *idata_action_remove_force[] = {
 };
 static Fl_Pixmap image_action_remove_force(idata_action_remove_force);
 
+void CMainFrame::cb_forceMagnitude_i(Fl_Value_Input*, void*) {
+  paintView->setForceMagnitude(forceMagnitude->value());
+}
+void CMainFrame::cb_forceMagnitude(Fl_Value_Input* o, void* v) {
+  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_forceMagnitude_i(o,v);
+}
+
 void CMainFrame::cb_btnUseWeight_i(Fl_HoverButton*, void*) {
   if (btnUseWeight->value()==1)
 	paintView->setUseWeight(true);
@@ -15511,7 +15518,7 @@ void CMainFrame::cb_actualLength(Fl_Value_Input* o, void* v) {
 }
 
 CMainFrame::CMainFrame() {
-  { wndMain = new Fl_Double_Window(858, 684, "ForcePAD 2");
+  { wndMain = new Fl_Double_Window(861, 684, "ForcePAD 2");
     wndMain->user_data((void*)(this));
     wndMain->align(FL_ALIGN_CLIP|FL_ALIGN_INSIDE);
     { mainMenu = new Fl_Menu_Bar(0, 0, 858, 26);
@@ -15837,6 +15844,12 @@ CMainFrame::CMainFrame() {
         btnEraseForces->align(FL_ALIGN_CENTER);
         btnEraseForces->when(FL_WHEN_RELEASE);
       } // Fl_HoverButton* btnEraseForces
+      { forceMagnitude = new Fl_Value_Input(260, 156, 41, 21, "F (N)");
+        forceMagnitude->labelsize(12);
+        forceMagnitude->textsize(12);
+        forceMagnitude->callback((Fl_Callback*)cb_forceMagnitude);
+        forceMagnitude->align(FL_ALIGN_TOP);
+      } // Fl_Value_Input* forceMagnitude
       { btnUseWeight = new Fl_HoverButton(260, 192, 42, 42);
         btnUseWeight->tooltip("Use weight");
         btnUseWeight->type(1);
@@ -17113,6 +17126,7 @@ showRightToolbar(scrRightDrawToolbar);
 
 paintView->setModelName("noname.fp2");
 thickness->value(paintView->getThickness());
+forceMagnitude->value(paintView->getForceMagnitude());
 }
 
 void CMainFrame::close() {
@@ -17299,6 +17313,7 @@ void CMainFrame::onStatusMessage(const std::string& message, const int progress)
 using namespace std;
 statusOutput->value(message.c_str());
 calcProgress->value(progress);
+paintView->redraw();
 cout << message << endl;
 Fl::check();
 Fl::flush();

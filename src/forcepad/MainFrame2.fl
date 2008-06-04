@@ -38,7 +38,7 @@ class CMainFrame {open : {CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusM
   } {
     Fl_Window wndMain {
       label {ForcePAD 2} open
-      xywh {399 221 858 684} type Double align 80 resizable visible
+      xywh {333 221 861 684} type Double align 80 resizable visible
     } {
       Fl_Menu_Bar mainMenu {open
         xywh {0 0 858 26} box FLAT_BOX labelsize 11 textsize 11
@@ -103,7 +103,7 @@ editMenuCopy->deactivate();}
           }
         }
         Submenu modeMenu {
-          label {&Mode} open selected
+          label {&Mode} open
           xywh {0 0 62 20} labelsize 12
         } {
           MenuItem modeMenuSketch {
@@ -330,7 +330,7 @@ paintView->setDrawStress(true);}
           xywh {60 659 246 19} box THIN_DOWN_BOX labelsize 12 textsize 12
         }
       }
-      Fl_Scroll scrRightForceToolbar {
+      Fl_Scroll scrRightForceToolbar {open
         xywh {255 41 53 250} box FLAT_BOX
       } {
         Fl_Button btnAddForce {
@@ -346,6 +346,11 @@ m_physicsEditMode = paintView->getEditMode();}
           tooltip {Erase point forces} image {../../images/action_remove_force.xpm} xywh {260 92 42 42} type Radio down_box DOWN_BOX selection_color 51
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
+        }
+        Fl_Value_Input forceMagnitude {
+          label {F (N)}
+          callback {paintView->setForceMagnitude(forceMagnitude->value());}
+          xywh {260 156 41 21} labelsize 12 align 1 textsize 12
         }
         Fl_Button btnUseWeight {
           callback {if (btnUseWeight->value()==1)
@@ -1030,7 +1035,9 @@ showLeftToolbar(scrLeftToolbar);
 showRightToolbar(scrRightDrawToolbar);
 
 paintView->setModelName("noname.fp2");
-thickness->value(paintView->getThickness());} {}
+thickness->value(paintView->getThickness());
+forceMagnitude->value(paintView->getForceMagnitude());} {selected
+    }
   }
   Function {close()} {} {
     code {wndMain->hide();
@@ -1106,7 +1113,7 @@ else
 	btnCopy->deactivate();
 }} {}
   }
-  Function {onViewModeChange(CPaintView::TViewMode oldMode, CPaintView::TViewMode newMode)} {open return_type void
+  Function {onViewModeChange(CPaintView::TViewMode oldMode, CPaintView::TViewMode newMode)} {return_type void
   } {
     code {if (newMode == CPaintView::VM_SKETCH)
 {
@@ -1206,12 +1213,13 @@ else
 	}	
 }} {}
   }
-  Function {onStatusMessage(const std::string& message, const int progress)} {open return_type void
+  Function {onStatusMessage(const std::string& message, const int progress)} {return_type void
   } {
     code {\#ifndef __APPLE__
 using namespace std;
 statusOutput->value(message.c_str());
 calcProgress->value(progress);
+paintView->redraw();
 cout << message << endl;
 Fl::check();
 Fl::flush();
@@ -1230,7 +1238,7 @@ scrLeftResultToolbar->deactivate();
 scrLeftPhysicsToolbar->hide();
 scrLeftPhysicsToolbar->deactivate();} {}
   }
-  Function {hideRightToolbars()} {open return_type void
+  Function {hideRightToolbars()} {return_type void
   } {
     code {scrRightForceToolbar->hide();
 scrRightForceToolbar->deactivate();
@@ -1267,7 +1275,7 @@ toolbar->show();
 toolbar->activate();
 wndMain->insert(*toolbar,0);} {}
   }
-  Function {showRightToolbar(Fl_Widget* toolbar)} {open return_type void
+  Function {showRightToolbar(Fl_Widget* toolbar)} {return_type void
   } {
     code {hideRightToolbars();
 
@@ -1296,8 +1304,7 @@ if (oldMode = CPaintView::VM_PHYSICS)
     code {string caption = newModelName + " - ForcePAD 2";
 wndMain->label(caption.c_str());} {}
   }
-  Function {onRulerChanged(CRuler* ruler)} {open
-  } {
+  Function {onRulerChanged(CRuler* ruler)} {} {
     code {pixelLength->precision(1);
 pixelLength->value(ruler->getPixelLength());} {}
   }

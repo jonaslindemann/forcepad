@@ -1794,6 +1794,7 @@ bool CPaintView::executeOpt()
 		m_solver->setWeight(m_weight);
 
 	m_solver->setFemGrid(m_femGrid);
+	m_femGrid->setShowDensity(true);
 	
 	//
 	// Execute calculation
@@ -1853,7 +1854,7 @@ bool CPaintView::executeOpt()
 		this->invalidate();
 	}
 	else
-		m_femGrid->setShowGrid(true);
+		m_femGrid->setShowDensity(true);
 	
 	so_print("CPaintView","\tRedraw.");
 	
@@ -1865,6 +1866,8 @@ bool CPaintView::executeOpt()
 void CPaintView::newModel()
 {
 	disableDrawing();
+	Fl::flush();
+	Fl::wait();
 	
 	so_print("CPaintView","newModel()");
 	

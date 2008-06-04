@@ -115,6 +115,7 @@ private:
 	bool m_lockScaleFactor;
 	bool m_dimmedConstraints;
 	bool m_undeformedGrid;
+	bool m_drawDensity;
 
 	double m_maxStressFactor;
 	double m_maxPosStressFactor;
@@ -146,6 +147,7 @@ private:
 	void drawStressArrow(double x, double y, const double* values);
 	void drawDoubleDofs();
 	void drawGridPoints();
+	void drawDensity();
 public:
 	CFemGrid2();
 	virtual ~CFemGrid2();
@@ -285,6 +287,11 @@ public:
 
 	void setGridSpacing(int spacing);
 	int getGridSpacing();
+
+	void assignNonElements(Matrix& M, double value);
+
+	void setShowDensity(bool flag);
+	bool getShowDensity();
 
 	virtual void setImage(CImage* image);
 	virtual void initGrid();
