@@ -1866,9 +1866,7 @@ bool CPaintView::executeOpt()
 void CPaintView::newModel()
 {
 	disableDrawing();
-	Fl::flush();
-	Fl::wait();
-	
+
 	so_print("CPaintView","newModel()");
 	
 	CNewModelDlg* dlg = new CNewModelDlg();
