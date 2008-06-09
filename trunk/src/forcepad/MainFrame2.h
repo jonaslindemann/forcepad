@@ -16,6 +16,7 @@
 #include "PaintView.h"
 #include <FL/Fl_Progress.H>
 #include <FL/Fl_Output.H>
+#include <FL/Fl_Button.H>
 #include <FL/Fl_Value_Input.H>
 #include <FL/Fl_Value_Slider.H>
 #include <FL/Fl_Roller.H>
@@ -23,7 +24,8 @@
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Value_Output.H>
 
-class CMainFrame : CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusMessageEvent, CGSLogMessageEvent, CPVViewModeErrorEvent, CPVModelChangedEvent, CPVRulerChangedEvent {
+class CMainFrame : CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusMessageEvent, CGSLogMessageEvent, CGSContinueCalcEvent, CPVViewModeErrorEvent, CPVModelChangedEvent, CPVRulerChangedEvent {
+  bool m_continueCalc; 
   CPaintView::TEditMode m_saveEditMode; 
   CPaintView::TEditMode m_sketchEditMode; 
   CPaintView::TEditMode m_physicsEditMode; 
@@ -190,6 +192,11 @@ private:
 public:
   Fl_Progress *calcProgress;
   Fl_Output *statusOutput;
+  Fl_Button *btnStopCalculation;
+private:
+  void cb_btnStopCalculation_i(Fl_Button*, void*);
+  static void cb_btnStopCalculation(Fl_Button*, void*);
+public:
   Fl_Scroll *scrRightForceToolbar;
   Fl_HoverButton *btnAddForce;
 private:
@@ -532,5 +539,6 @@ public:
   Fl_Window* getMainWindow();
   void onModelChanged(const std::string& newModelName);
   void onRulerChanged(CRuler* ruler);
+  bool onContinueCalc();
 };
 #endif

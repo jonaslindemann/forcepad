@@ -23,14 +23,17 @@ decl {\#include "SplashFrame.h"} {public global
 decl {\#include "CalcSettings.h"} {global
 } 
 
+decl {\#include "OptSettings.h"} {} 
+
 decl {\#include <iostream>} {public global
 } 
 
 decl {\#include <string>} {public global
 } 
 
-class CMainFrame {open : {CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusMessageEvent, CGSLogMessageEvent, CPVViewModeErrorEvent, CPVModelChangedEvent, CPVRulerChangedEvent}
+class CMainFrame {open : {CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusMessageEvent, CGSLogMessageEvent, CGSContinueCalcEvent, CPVViewModeErrorEvent, CPVModelChangedEvent, CPVRulerChangedEvent}
 } {
+  decl {bool m_continueCalc;} {}
   decl {CPaintView::TEditMode m_saveEditMode;} {}
   decl {CPaintView::TEditMode m_sketchEditMode;} {}
   decl {CPaintView::TEditMode m_physicsEditMode;} {}
@@ -133,7 +136,7 @@ calcSettings->setView(paintView);
 calcSettings->centerWindow(wndMain);
 calcSettings->show();
 delete calcSettings;
-paintView->setViewMode(CPaintView::VM_SKETCH);}
+paintView->setViewMode(CPaintView::VM_SKETCH);} selected
             xywh {0 0 30 20} labelsize 12
           }
         }
@@ -173,7 +176,8 @@ delete splashFrame;}
             class Fl_HoverButton
           }
           Fl_Button btnAction {
-            callback {paintView->setViewMode(CPaintView::VM_ACTION);}
+            callback {m_continueCalc = true;
+paintView->setViewMode(CPaintView::VM_ACTION);}
             tooltip {Action mode} image {../../images/action_mode.xpm} deimage {../../images/action_mode_inactive.xpm} xywh {808 581 42 42} type Radio down_box DOWN_BOX selection_color 51 labelsize 10
             code0 {\#include "Fl_HoverButton.h"}
             class Fl_HoverButton
@@ -314,20 +318,33 @@ paintView->setDrawStress(true);}
         }
         Fl_Button btnOptimize {
           label OPT
-          callback {paintView->executeOpt();}
+          callback {m_continueCalc = true;
+
+COptSettings* optSettings = new COptSettings();
+optSettings->setView(paintView);
+optSettings->centerWindow(wndMain);
+optSettings->show();
+delete optSettings;
+
+paintView->executeOpt();}
           tooltip {Displacement visualisation} xywh {370 398 42 42} down_box DOWN_BOX selection_color 51 labelsize 11
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
         }
       }
-      Fl_Group {} {
-        xywh {53 653 754 31} box FLAT_BOX
+      Fl_Group {} {open
+        xywh {53 653 747 31} box FLAT_BOX
       } {
         Fl_Progress calcProgress {
-          xywh {480 659 319 19} box THIN_DOWN_BOX selection_color 4
+          xywh {432 659 319 19} box THIN_DOWN_BOX selection_color 4
         }
         Fl_Output statusOutput {
           xywh {60 659 246 19} box THIN_DOWN_BOX labelsize 12 textsize 12
+        }
+        Fl_Button btnStopCalculation {
+          label Stop
+          callback {m_continueCalc = false;}
+          xywh {754 659 42 19} labelsize 12
         }
       }
       Fl_Scroll scrRightForceToolbar {open
@@ -972,6 +989,7 @@ paintView->setLogMessageEvent(this);
 paintView->setViewModeErrorEvent(this);
 paintView->setModelChangedEvent(this);
 paintView->setRulerChangedEvent(this);
+paintView->setContinueCalcEvent(this);
 m_sketchEditMode = CPaintView::EM_BRUSH;
 m_physicsEditMode = CPaintView::EM_FORCE;} {}
   }
@@ -1036,8 +1054,7 @@ showRightToolbar(scrRightDrawToolbar);
 
 paintView->setModelName("noname.fp2");
 thickness->value(paintView->getThickness());
-forceMagnitude->value(paintView->getForceMagnitude());} {selected
-    }
+forceMagnitude->value(paintView->getForceMagnitude());} {}
   }
   Function {close()} {} {
     code {wndMain->hide();
@@ -1213,7 +1230,7 @@ else
 	}	
 }} {}
   }
-  Function {onStatusMessage(const std::string& message, const int progress)} {return_type void
+  Function {onStatusMessage(const std::string& message, const int progress)} {open return_type void
   } {
     code {\#ifndef __APPLE__
 using namespace std;
@@ -1307,5 +1324,11 @@ wndMain->label(caption.c_str());} {}
   Function {onRulerChanged(CRuler* ruler)} {} {
     code {pixelLength->precision(1);
 pixelLength->value(ruler->getPixelLength());} {}
+  }
+  Function {onContinueCalc()} {open return_type bool
+  } {
+    code {Fl::check();
+Fl::flush();
+return m_continueCalc;} {}
   }
 } 

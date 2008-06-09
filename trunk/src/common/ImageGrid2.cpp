@@ -390,6 +390,21 @@ void CImageGrid2::copyGrid(Matrix& toMatrix, double scaleFactor)
 	}
 }
 
+void CImageGrid2::assignGrid(Matrix& toMatrix)
+{
+	int i, j;
+
+	if (m_grid!=NULL)
+	{
+		if ((toMatrix.nrows()==m_rows)&&(toMatrix.ncols()==m_cols))
+		{
+			for (i=0; i<m_rows; i++)
+				for (j=0; j<m_cols; j++)
+					m_grid[i][j] = toMatrix(i+1,j+1);
+		}
+	}
+}
+
 bool CImageGrid2::isSpecialElement(int row, int col)
 {
 	if (m_specialElement!=NULL)

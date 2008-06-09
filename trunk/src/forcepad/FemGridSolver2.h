@@ -55,6 +55,12 @@ public:
 	virtual void onLogMessage(const std::string& context, const std::string& message) = 0;
 };
 
+class CGSContinueCalcEvent {
+public:
+	virtual ~CGSContinueCalcEvent() {};
+	virtual bool onContinueCalc() = 0;
+};
+
 IvfSmartPointer(CFemGridSolver2);
 
 /** 
@@ -74,6 +80,11 @@ public:
 		ET_INVALID_MODEL,
 		ET_LOAD_OUTSIDE_AE,
 		ET_BC_OUTSIDE_AE
+	};
+	enum TFilterType {
+		FT_NO_FILTER,
+		FT_OLE_SIGMUND,
+		FT_BACK_PEDERSEN
 	};
 private:
 	double m_maxNodeValue;
@@ -113,9 +124,19 @@ private:
 	RowVector				m_Eq;
 	int						m_nDof;
 
+	// Optimisation parameters
+
+	double m_optVolfrac;
+	double m_optRmin;
+	double m_optPenalty;
+	double m_optMinChange;
+	int m_optMaxLoops;
+	TFilterType m_filterType;
+
 
 	CGSStatusMessageEvent* m_statusMessageEvent;
 	CGSLogMessageEvent* m_logMessageEvent;
+	CGSContinueCalcEvent* m_continueCalcEvent;
 public:
 	/** FemInternalSolver class constructor. */
 	CFemGridSolver2();
@@ -138,6 +159,7 @@ public:
 	void assembleVectorConstraints(SymmetricBandMatrix& K, std::vector<CConstraint*>& vectorConstraints);
 	void removeDoubleDofs(std::set<int>& uniqueDofs, RowVector& prescribedValues, Matrix& Bc);
 	void computeElementForces();
+	void computeElementForcesOpt(Matrix& X, double penalty);
 	void computeReactionForces(std::vector<CConstraint*>& vectorConstraints);
 
 	void objectiveFunctionAndSensitivity(Matrix& X, Matrix& dC, double penalty, double& c);
@@ -151,6 +173,7 @@ public:
 
 	void progressMessage(const std::string message, const int progress);
 	void logMessage(const std::string context, const std::string message);
+	bool continueCalc();
 
 	/* ----- Get/set methods ----- */
 
@@ -201,8 +224,26 @@ public:
 	void setConstraintStiffnessScale(const double scalefactor);
 	double getConstraintStiffnessScale();
 
+	// Optimisation properties
+
+	void setOptVolumeFraction(double fraction);
+	double getOptVolumeFraction();
+
+	void setOptRmin(double rmin);
+	double getOptRmin();
+
+	void setOptMinChange(double minChange);
+	double getOptMinChange();
+
+	void setOptMaxLoops(int loops);
+	int getOptMaxLoops();
+
+	void setOptFilterType(TFilterType filterType);
+	TFilterType getOptFilterType();
+
 	void setStatusMessageEvent(CGSStatusMessageEvent* eventMethod);
 	void setLogMessageEvent(CGSLogMessageEvent* eventMethod);
+	void setContinueCalcEvent(CGSContinueCalcEvent* eventMethod);
 };
 
 #endif 

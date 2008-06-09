@@ -77,6 +77,7 @@ public:
 
 	void copyGrid(Matrix& toMatrix);
 	void copyGrid(Matrix& toMatrix, double scaleFactor);
+	void assignGrid(Matrix& toMatrix);
 
 	void setFieldValue(int layer, int row, int col, double value);
 	double getFieldValue(int layer, int row, int col);
