@@ -1,0 +1,92 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0108 
+header_name {.h} 
+code_name {.cpp}
+decl {\#ifdef WIN32} {public global
+} 
+
+decl {\#include "editlog_stream.h"} {public
+} 
+
+decl {\#endif} {public global
+} 
+
+decl {\#include "so_format.h"} {public global
+} 
+
+decl {\#define so_show() CLogWindow::getInstance()->show();} {public global
+} 
+
+decl {\#define so_print(a,b) CLogWindow::getInstance()->print(a,b);} {public global
+} 
+
+decl {\#define so_println() CLogWindow::getInstance()->print("");} {public global
+} 
+
+decl {\#define so_hide() CLogWindow::getInstance()->hide();} {public global
+} 
+
+decl {\#include <iostream>} {selected
+} 
+
+decl {CLogWindow* CLogWindow::m_instance = 0;} {global
+} 
+
+class CLogWindow {open
+} {
+  decl {\#ifdef WIN32} {public global
+  }
+  decl {std::basic_streambuf<char>* m_oldBuf;} {global
+  }
+  decl {std::basic_editstreambuf<char> m_editStrBuf;} {global
+  }
+  decl {\#endif} {public global
+  }
+  decl {static CLogWindow* m_instance;} {}
+  Function {CLogWindow()} {open private
+  } {
+    Fl_Window mainWindow {
+      label {Log output window} open
+      xywh {525 339 576 166} type Double hide resizable non_modal
+    } {
+      Fl_Text_Display textDisplay {
+        xywh {5 5 565 155} textfont 4 textsize 10
+      }
+    }
+    code {textDisplay->buffer(new Fl_Text_Buffer(0));
+textDisplay->scrollbar_align(FL_ALIGN_RIGHT);
+\#ifdef WIN32
+m_editStrBuf.setLog(textDisplay);
+m_oldBuf = std::cout.rdbuf( &m_editStrBuf );
+\#endif} {}
+  }
+  Function {hide()} {} {
+    code {mainWindow->hide();} {}
+  }
+  Function {show()} {open
+  } {
+    code {mainWindow->show();} {}
+  }
+  Function {getInstance()} {open return_type {static CLogWindow*}
+  } {
+    code {if(m_instance==0)
+{
+	m_instance = new CLogWindow();
+        return m_instance;
+}
+else
+{
+	return m_instance;
+}} {}
+  }
+  Function {print(const char* txt)} {open
+  } {
+    code {using namespace std;
+cout << txt << endl;} {}
+  }
+  Function {print(const char* context, const char* txt)} {open
+  } {
+    code {using namespace std;
+cout << context << ": " << txt << endl;} {}
+  }
+} 

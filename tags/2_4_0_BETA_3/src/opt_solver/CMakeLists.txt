@@ -1,0 +1,15 @@
+INCLUDE_DIRECTORIES(../common ../ivf2d)
+FILE(GLOB SOURCE_FILES *.cpp)
+FILE(GLOB INCLUDE_FILES *.h)
+
+IF(CMAKE_BUILD_TYPE STREQUAL Debug)
+	ADD_EXECUTABLE(opt_solverd ${INCLUDE_FILES} ${SOURCE_FILES})
+ELSE(CMAKE_BUILD_TYPE STREQUAL Debug)
+	ADD_EXECUTABLE(opt_solver ${INCLUDE_FILES} ${SOURCE_FILES})
+ENDIF(CMAKE_BUILD_TYPE STREQUAL Debug)
+
+IF(CMAKE_BUILD_TYPE STREQUAL Debug)
+	TARGET_LINK_LIBRARIES(opt_solverd commond ivf2dd fltkd fltkgld fltkimagesd fltkformsd fltkjpegd fltkpngd calfemcxxd newmatd fltkzd wsock32 comctl32 )
+ELSE(CMAKE_BUILD_TYPE STREQUAL Debug)
+	TARGET_LINK_LIBRARIES(opt_solver common ivf2d fltk fltkgl fltkimages fltkforms fltkjpeg fltkpng calfemcxx newmat fltkz wsock32 comctl32 )
+ENDIF(CMAKE_BUILD_TYPE STREQUAL Debug)
