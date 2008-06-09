@@ -196,6 +196,12 @@ private:
 	double m_constraintStiffnessScale;
 	bool m_moveLoad;
 
+	double m_optVolfrac;
+	double m_optRmin;
+	double m_optMinChange;
+	int m_optMaxLoops;
+	CFemGridSolver2::TFilterType m_optFilterType;
+
 	CFemGridSolver2Ptr m_solver;
 
 	/*
@@ -267,6 +273,7 @@ private:
 
 	CGSStatusMessageEvent* m_statusMessageEvent;
 	CGSLogMessageEvent* m_logMessageEvent;
+	CGSContinueCalcEvent* m_continueCalcEvent;
 
 	/*
 	 *    Private event handlers
@@ -472,6 +479,22 @@ public:
 	void setMoveLoad(bool flag);
 	bool getMoveLoad();
 
+	// Optmisation properties
+
+	void setOptVolumeFraction(double fraction);
+	double getOptVolumeFraction();
+
+	void setOptRmin(double rmin);
+	double getOptRmin();
+
+	void setOptMinChange(double minChange);
+	double getOptMinChange();
+
+	void setOptMaxLoops(int loops);
+	int getOptMaxLoops();
+
+	void setOptFilterType(CFemGridSolver2::TFilterType filterType);
+	CFemGridSolver2::TFilterType getOptFilterType();
 
 	// Events
 
@@ -480,6 +503,7 @@ public:
 	void setViewModeErrorEvent(CPVViewModeErrorEvent* eventMethod);
 	void setStatusMessageEvent(CGSStatusMessageEvent* eventMethod);
 	void setLogMessageEvent(CGSLogMessageEvent* eventMethod);
+	void setContinueCalcEvent(CGSContinueCalcEvent* eventMethod);
 	void setModelChangedEvent(CPVModelChangedEvent* eventMethod);
 	void setRulerChangedEvent(CPVRulerChangedEvent* eventMethod);
 };

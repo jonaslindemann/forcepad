@@ -8,6 +8,7 @@
 #include "forcepad_config.h"
 #include "LogWindow.h"
 #include "CalcSettings.h"
+#include "OptSettings.h"
 
 void CMainFrame::cb_fileMenuNew_i(Fl_Menu_*, void*) {
   paintView->newModel();
@@ -780,7 +781,8 @@ static const char *idata_physics_mode_inactive[] = {
 static Fl_Pixmap image_physics_mode_inactive(idata_physics_mode_inactive);
 
 void CMainFrame::cb_btnAction_i(Fl_HoverButton*, void*) {
-  paintView->setViewMode(CPaintView::VM_ACTION);
+  m_continueCalc = true;
+paintView->setViewMode(CPaintView::VM_ACTION);
 }
 void CMainFrame::cb_btnAction(Fl_HoverButton* o, void* v) {
   ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_btnAction_i(o,v);
@@ -4764,10 +4766,25 @@ static const char *idata_action_rotate_force[] = {
 static Fl_Pixmap image_action_rotate_force(idata_action_rotate_force);
 
 void CMainFrame::cb_btnOptimize_i(Fl_HoverButton*, void*) {
-  paintView->executeOpt();
+  m_continueCalc = true;
+
+COptSettings* optSettings = new COptSettings();
+optSettings->setView(paintView);
+optSettings->centerWindow(wndMain);
+optSettings->show();
+delete optSettings;
+
+paintView->executeOpt();
 }
 void CMainFrame::cb_btnOptimize(Fl_HoverButton* o, void* v) {
   ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnOptimize_i(o,v);
+}
+
+void CMainFrame::cb_btnStopCalculation_i(Fl_Button*, void*) {
+  m_continueCalc = false;
+}
+void CMainFrame::cb_btnStopCalculation(Fl_Button* o, void* v) {
+  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnStopCalculation_i(o,v);
 }
 
 void CMainFrame::cb_btnAddForce_i(Fl_HoverButton*, void*) {
@@ -15796,9 +15813,9 @@ CMainFrame::CMainFrame() {
       } // Fl_HoverButton* btnOptimize
       scrLeftResultToolbar->end();
     } // Fl_Scroll* scrLeftResultToolbar
-    { Fl_Group* o = new Fl_Group(53, 653, 754, 31);
+    { Fl_Group* o = new Fl_Group(53, 653, 747, 31);
       o->box(FL_FLAT_BOX);
-      { calcProgress = new Fl_Progress(480, 659, 319, 19);
+      { calcProgress = new Fl_Progress(432, 659, 319, 19);
         calcProgress->box(FL_THIN_DOWN_BOX);
         calcProgress->selection_color((Fl_Color)4);
       } // Fl_Progress* calcProgress
@@ -15807,6 +15824,10 @@ CMainFrame::CMainFrame() {
         statusOutput->labelsize(12);
         statusOutput->textsize(12);
       } // Fl_Output* statusOutput
+      { btnStopCalculation = new Fl_Button(754, 659, 42, 19, "Stop");
+        btnStopCalculation->labelsize(12);
+        btnStopCalculation->callback((Fl_Callback*)cb_btnStopCalculation);
+      } // Fl_Button* btnStopCalculation
       o->end();
     } // Fl_Group* o
     { scrRightForceToolbar = new Fl_Scroll(255, 41, 53, 250);
@@ -17061,6 +17082,7 @@ paintView->setLogMessageEvent(this);
 paintView->setViewModeErrorEvent(this);
 paintView->setModelChangedEvent(this);
 paintView->setRulerChangedEvent(this);
+paintView->setContinueCalcEvent(this);
 m_sketchEditMode = CPaintView::EM_BRUSH;
 m_physicsEditMode = CPaintView::EM_FORCE;
 }
@@ -17405,4 +17427,10 @@ wndMain->label(caption.c_str());
 void CMainFrame::onRulerChanged(CRuler* ruler) {
   pixelLength->precision(1);
 pixelLength->value(ruler->getPixelLength());
+}
+
+bool CMainFrame::onContinueCalc() {
+  Fl::check();
+Fl::flush();
+return m_continueCalc;
 }

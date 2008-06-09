@@ -53,10 +53,20 @@ CFemGridSolver2::CFemGridSolver2()
 	m_constraintStiffnessScale = 1e6;
 	m_reduceSystemMatrix = false;
 
+	// Optimisation parameters
+
+	m_optPenalty = 3.0;
+	m_optVolfrac = 0.2;
+	m_optMinChange = 0.01;
+	m_optMaxLoops = 100;
+	m_optRmin = 2.75;
+	m_filterType = FT_BACK_PEDERSEN;
+
 	// Events
 
 	m_statusMessageEvent = NULL;
 	m_logMessageEvent = NULL;
+	m_continueCalcEvent = NULL;
 }
 
 CFemGridSolver2::~CFemGridSolver2()
@@ -64,12 +74,18 @@ CFemGridSolver2::~CFemGridSolver2()
 	so_print("CFemGridSolver2","Destroyed.");
 }
 
+bool CFemGridSolver2::continueCalc()
+{
+	if (m_continueCalcEvent!=NULL)
+		return m_continueCalcEvent->onContinueCalc();
+	else
+		return true;
+}
+
 void CFemGridSolver2::progressMessage(const std::string message, const int progress)
 {
 	if (m_statusMessageEvent!=NULL)
-	{
 		m_statusMessageEvent->onStatusMessage(message, progress);
-	}
 }
 
 void CFemGridSolver2::logMessage(const std::string context, const std::string message)
@@ -1573,6 +1589,194 @@ void CFemGridSolver2::computeElementForces()
 	cout << "Max misses stress = " << m_maxMisesStressValue << endl;
 }
 
+void CFemGridSolver2::computeElementForcesOpt(Matrix& X, double penalty)
+{
+	//so_print("CFemGridSolver2","Calculating results.");
+
+	int i, j, l;
+	int rows, cols;
+	double elementValue;
+	double ex[4];
+	double ey[4];
+	int topo[8];
+	int ptype = m_ptype;    // Plane stress
+	int ir = 2; // Integration rule
+	int elementsWithWeight = 0;
+
+	double E = m_elasticModulus;
+	double v = m_youngsModulus;
+	double t = m_thickness;
+
+	RowVector Ep(3);
+	RowVector Ex(4);
+	RowVector Ey(4);
+	RowVector DofTopo(8);
+
+	Ep << ptype << t << ir;
+
+	m_femGrid->getGridSize(rows, cols);
+
+	RowVector Ed(8);
+	Matrix Es; 
+	Matrix Et; 
+	Matrix D;
+
+	Ed = 0.0;
+	m_maxStressValue = -1.0e300;
+	m_maxMisesStressValue = -1.0e300;
+	m_maxPosStressValue = -1.0e300;
+	m_maxNegStressValue = -1.0e300;
+
+	//so_print("CFemGridSolver2:","\tCalculating element forces.");
+
+	m_femGrid->zeroNodeResults();
+
+	for (i=0; i<rows; i++)
+	{
+		for (j=0; j<cols; j++)
+		{
+			double sigx;
+			double sigy;
+			double tau;
+
+			if (m_femGrid->getElement(i, j, elementValue, ex, ey, topo))
+			{
+				//
+				// Get element coordinates
+				//
+
+				Ex(1) = ex[0]; Ey(1) = ey[0];
+				Ex(2) = ex[1]; Ey(2) = ey[1];
+				Ex(3) = ex[2]; Ey(3) = ey[2];
+				Ex(4) = ex[3]; Ey(4) = ey[3];
+				
+				// 
+				// Get element properties
+				//
+				
+				calfem::hooke(ptype, E*pow(X(i+1,j+1),penalty), v, D);
+
+				// 
+				// Get element topology
+				//
+				
+				for (l=0; l<8; l++)
+					DofTopo(l+1) = topo[l];
+
+				//
+				// Get element displacements
+				//
+				
+				for (l=1; l<=8; l++)
+					Ed(l) = m_a(DofTopo(l));
+
+				// 
+				// Calculate element forces 
+				//
+				
+				calfem::plani4s(Ex, Ey, Ep, D, Ed, Es, Et);
+
+				// 
+				// Calculate mises stresses for the integration points and store in 
+				// nodes.
+				//
+
+				//cout << "Ex = " << Ex(1) << ", " << Ex(2) << ", " << Ex(3) << ", " << Ex(4) << endl;
+				//cout << "Ey = " << Ey(1) << ", " << Ey(2) << ", " << Ey(3) << ", " << Ey(4) << endl;
+
+				int ip;
+
+				double ipStress[4];
+
+				for (ip=1; ip<=4; ip++)
+				{
+					sigx=Es(ip,1);
+					sigy=Es(ip,2);
+					tau=Es(ip,3);
+
+					double ds = (sigx-sigy)/2.0;
+					double R = sqrt(pow(ds,2)+pow(tau,2));						
+
+					double sig1 = (sigx+sigy)/2.0+R; 
+					double sig2 = (sigx+sigy)/2.0-R; 
+					double alfa = atan2(tau,ds)/2.0;
+
+					ipStress[ip-1] = sqrt( pow(sig1,2) - sig1*sig2 + pow(sig2,2) );
+				}
+
+				//     i,j+1    i+1,j+1
+				//     o-----o
+				//     |     |
+				//     |     |
+				//     o-----o
+				//     i,j    i,j+1
+
+				m_femGrid->addNodeResult(i,j,ipStress[0]);
+				m_femGrid->addNodeResult(i,j+1,ipStress[1]);
+				m_femGrid->addNodeResult(i+1,j+1,ipStress[2]);
+				m_femGrid->addNodeResult(i,j+1,ipStress[3]);
+
+				//
+				// Average stresses from integration points. Is this correct?? CHECK!
+				//
+
+				RowVector Es_avg = Es.sum_columns() / 4.0;
+				
+				//
+				// Calculate principal stresses
+				//
+
+				sigx=Es_avg(1);
+				sigy=Es_avg(2);
+				tau=Es_avg(3);
+
+				double ds = (sigx-sigy)/2.0;
+				double R = sqrt(pow(ds,2)+pow(tau,2));						
+
+				double sig1 = (sigx+sigy)/2.0+R; 
+				double sig2 = (sigx+sigy)/2.0-R; 
+				double alfa = atan2(tau,ds)/2.0;
+
+				double misesStress = sqrt(	pow(sig1,2) - sig1*sig2 + pow(sig2,2) );
+
+				m_femGrid->setResult(i, j, 0, sig1);
+				m_femGrid->setResult(i, j, 1, sig2);
+				m_femGrid->setResult(i, j, 2, alfa);
+				m_femGrid->setResult(i, j, 3, misesStress);
+
+				if (misesStress>m_maxMisesStressValue)
+					m_maxMisesStressValue = misesStress;
+				
+				if (fabs(sig1)>m_maxStressValue)
+					m_maxStressValue = fabs(sig1);
+				
+				if (fabs(sig2)>m_maxStressValue)
+					m_maxStressValue = fabs(sig2);
+				
+				if (sig1<0.0)
+					if (fabs(sig1)>m_maxNegStressValue)
+						m_maxNegStressValue = fabs(sig1);
+					
+				if (sig1>0.0)
+					if (fabs(sig1)>m_maxPosStressValue)
+						m_maxPosStressValue = sig1;
+						
+				if (sig2<0.0)
+					if (fabs(sig2)>m_maxNegStressValue)
+						m_maxNegStressValue = fabs(sig2);
+							
+				if (sig2>0.0)
+					if (fabs(sig2)>m_maxPosStressValue)
+						m_maxPosStressValue = sig2;
+			}
+		}
+	}
+
+	m_femGrid->averageNodeResults();
+
+	cout << "Max misses stress = " << m_maxMisesStressValue << endl;
+}
+
 void CFemGridSolver2::computeReactionForces(std::vector<CConstraint*>& vectorConstraints)
 {
 	double x1, y1, x2, y2, ex, ey, es;
@@ -1920,10 +2124,11 @@ void CFemGridSolver2::executeOptimizer()
 	Matrix dC;
 
 	double change = 1.0;
-	double penalty = 3.0;
-	double volfrac = 0.2;
+	double penalty = m_optPenalty;
+	double volfrac = m_optVolfrac;
 	double c = 0.0;
 	int loop = 0;
+	bool terminated = false;
 
 	m_femGrid->getGridSize(rows, cols);
 	X.ReSize(rows, cols);
@@ -1932,13 +2137,11 @@ void CFemGridSolver2::executeOptimizer()
 
 	m_femGrid->copyGrid(X, volfrac); // Copy grid values to X multiplied with volfrac
 
-	cout << "Initial sum of X = " << X.Sum() << endl;
-
 	///////////////////////////////////////////////////////////////////////////
 	// Start optimisation loop
 	//
 
-	while ((change>0.01)&&(loop<100))
+	while ((change>m_optMinChange)&&(loop<m_optMaxLoops)&&(this->continueCalc()))
 	{
 		loop++;
 		Xold = X;
@@ -1969,8 +2172,6 @@ void CFemGridSolver2::executeOptimizer()
 			return;
 		}
 
-		//so_print("CFemGridSolver2",so_format("%d elements assembled.",nElements));
-
 		///////////////////////////////////////////////////////////////////////////
 		// Setup forces and constraints
 		//
@@ -1987,6 +2188,7 @@ void CFemGridSolver2::executeOptimizer()
 			return;
 		}
 
+		this->progressMessage("Setting up forces and constraints.", 30);
 		setupForcesAndConstraints(loadsDefined, bcsDefined, vectorBcsDefined, uniqueDofs, uniqueVectorDofs, vectorConstraints, prescribedValues);
 
 		if ((!bcsDefined)&&(!vectorBcsDefined))
@@ -2018,8 +2220,7 @@ void CFemGridSolver2::executeOptimizer()
 		m_a.ReSize(m_nDof,1);
 		m_a = 0.0;
 
-		//so_print("CFemGridSolver2","Solving system.");
-		progressMessage("Solving.", 60);
+		progressMessage("Solving system.", 50);
 
 		Try 
 		{
@@ -2032,26 +2233,45 @@ void CFemGridSolver2::executeOptimizer()
 			return;
 		}
 
-		//so_print("CFemGridSolver2","Done.");
-
 		// Objective functions
 
 		c = 0.0;
 		dC = 0.0;
 
 		cout << "objectiveFunctionAndSensitivity()" << endl;
-		this->objectiveFunctionAndSensitivity(X, dC, penalty, c);
+		this->progressMessage("Objective function and sensitivity.", 60);
+		this->objectiveFunctionAndSensitivity(X, dC, m_optPenalty, c);
 
 		// Filter sensitivities
 
+		if (!this->continueCalc())
+		{
+			terminated = true;
+			break;
+		}
+
 		cout << "sensitivityFilter1()" << endl;
-		//Matrix dCnew = this->sensitivityFilter1(X, dC, 2.75);
-		Matrix dCnew = this->sensitivityFilter2(dC, 2.75);
-		dC = dCnew;
+		this->progressMessage("Applying sensitivity filter.", 70);
+
+		Matrix dCnew;
+
+		switch (m_filterType) {
+			case FT_NO_FILTER:
+				break;
+			case FT_OLE_SIGMUND:
+				dCnew = this->sensitivityFilter1(X, dC, m_optRmin);
+				dC = dCnew;
+				break;
+			case FT_BACK_PEDERSEN:
+				dCnew = this->sensitivityFilter2(dC, m_optRmin);
+				dC = dCnew;
+				break;
+		}
 
 		// Design update by the optimality criteria method
-		
+
 		cout << "optimalityCriteriaUpdate()" << endl;
+		this->progressMessage("Design update.", 100);
 		Matrix Xnew = this->optimalityCriteriaUpdate(X, dC, volfrac, nElements);
 		Matrix Diff = Xnew-Xold;
 		change = Diff.maximum_absolute_value();
@@ -2065,11 +2285,17 @@ void CFemGridSolver2::executeOptimizer()
 
 	}
 
+	// Copy optimised shape to original grid
+
+	m_femGrid->assignGrid(X);
+
+	this->execute();
+
+	return;
+
 	///////////////////////////////////////////////////////////////////////////
 	// Create global displacement vector
 	//
-
-	//so_print("CFemGridSolver2","\tCreating global displacement vector.");
 
 	progressMessage("Storing results.", 80);
 
@@ -2088,7 +2314,7 @@ void CFemGridSolver2::executeOptimizer()
 	// Store element forces in elements
 	//
 
-	//this->computeElementForces();
+	this->computeElementForcesOpt(X, m_optPenalty);
 	
 	///////////////////////////////////////////////////////////////////////////
 	// Calculate reaction forces from vector constraints
@@ -2605,7 +2831,60 @@ void CFemGridSolver2::setLogMessageEvent(CGSLogMessageEvent* eventMethod)
 	m_logMessageEvent = eventMethod;
 }
 
+void CFemGridSolver2::setContinueCalcEvent(CGSContinueCalcEvent* eventMethod)
+{
+	m_continueCalcEvent = eventMethod;
+}
 
+void CFemGridSolver2::setOptVolumeFraction(double fraction)
+{
+	m_optVolfrac = fraction;
+}
+
+double CFemGridSolver2::getOptVolumeFraction()
+{
+	return m_optVolfrac;
+}
+
+void CFemGridSolver2::setOptRmin(double rmin)
+{
+	m_optRmin = rmin;
+}
+
+double CFemGridSolver2::getOptRmin()
+{
+	return m_optRmin;
+}
+
+void CFemGridSolver2::setOptMinChange(double minChange)
+{
+	m_optMinChange = minChange;
+}
+
+double CFemGridSolver2::getOptMinChange()
+{
+	return m_optMinChange;
+}
+
+void CFemGridSolver2::setOptMaxLoops(int loops)
+{
+	m_optMaxLoops = loops;
+}
+
+int CFemGridSolver2::getOptMaxLoops()
+{
+	return m_optMaxLoops;
+}
+
+void CFemGridSolver2::setOptFilterType(TFilterType filterType)
+{
+	m_filterType = filterType;
+}
+
+CFemGridSolver2::TFilterType CFemGridSolver2::getOptFilterType()
+{
+	return m_filterType;
+}
 
 void CFemGridSolver2::execute()
 {

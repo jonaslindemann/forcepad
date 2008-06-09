@@ -157,6 +157,12 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 	m_constraintStiffnessScale = 1e3;
 	m_moveLoad = false;
 
+	m_optVolfrac = 0.2;
+	m_optMinChange = 0.01;
+	m_optMaxLoops = 100;
+	m_optRmin = 2.75;
+	m_optFilterType = CFemGridSolver2::FT_BACK_PEDERSEN;
+
 	// Test OpenGL version
 
 	m_checkOpenGL = true;
@@ -1782,9 +1788,16 @@ bool CPaintView::executeOpt()
 	m_solver = new CFemGridSolver2();
 	m_solver->setStatusMessageEvent(m_statusMessageEvent);
 	m_solver->setLogMessageEvent(m_logMessageEvent);
+	m_solver->setContinueCalcEvent(m_continueCalcEvent);
 	m_solver->setUseWeight(m_useWeight);
 	m_solver->setConstraintStiffnessScale(m_constraintStiffnessScale);
 	m_solver->setForceMagnitude(m_forceMagnitude);
+
+	m_solver->setOptVolumeFraction(m_optVolfrac);
+	m_solver->setOptRmin(m_optRmin);
+	m_solver->setOptMinChange(m_optMinChange);
+	m_solver->setOptMaxLoops(m_optMaxLoops);
+	m_solver->setOptFilterType(m_optFilterType);
 
 	m_solver->setThickness(this->getThickness());
 	m_solver->setElasticModulus(this->getElasticModulus());
@@ -1851,10 +1864,11 @@ bool CPaintView::executeOpt()
 	if (errors)
 	{
 		m_femGrid->setShowGrid(false);
+		m_femGrid->setShowDensity(false);
 		this->invalidate();
 	}
 	else
-		m_femGrid->setShowDensity(true);
+		m_femGrid->setShowDensity(false);
 	
 	so_print("CPaintView","\tRedraw.");
 	
@@ -3254,6 +3268,56 @@ void CPaintView::setOptLayer(bool active)
 	this->redraw();
 }
 
+void CPaintView::setOptVolumeFraction(double fraction)
+{
+	m_optVolfrac = fraction;
+}
+
+double CPaintView::getOptVolumeFraction()
+{
+	return m_optVolfrac;
+}
+
+void CPaintView::setOptRmin(double rmin)
+{
+	m_optRmin = rmin;
+}
+
+double CPaintView::getOptRmin()
+{
+	return m_optRmin;
+}
+
+void CPaintView::setOptMinChange(double minChange)
+{
+	m_optMinChange = minChange;
+}
+
+double CPaintView::getOptMinChange()
+{
+	return m_optMinChange;
+}
+
+void CPaintView::setOptMaxLoops(int loops)
+{
+	m_optMaxLoops = loops;
+}
+
+int CPaintView::getOptMaxLoops()
+{
+	return m_optMaxLoops;
+}
+
+void CPaintView::setOptFilterType(CFemGridSolver2::TFilterType filterType)
+{
+	m_optFilterType = filterType;
+}
+
+CFemGridSolver2::TFilterType CPaintView::getOptFilterType()
+{
+	return m_optFilterType;
+}
+
 void CPaintView::setModeChangeEvent(CPVModeChangeEvent* eventMethod)
 {
 	m_modeChangeEvent = eventMethod;
@@ -3277,6 +3341,11 @@ void CPaintView::setStatusMessageEvent(CGSStatusMessageEvent* eventMethod)
 void CPaintView::setLogMessageEvent(CGSLogMessageEvent* eventMethod)
 {
 	m_logMessageEvent = eventMethod;
+}
+
+void CPaintView::setContinueCalcEvent(CGSContinueCalcEvent* eventMethod)
+{
+	m_continueCalcEvent = eventMethod;
 }
 
 void CPaintView::setModelChangedEvent(CPVModelChangedEvent* eventMethod)
