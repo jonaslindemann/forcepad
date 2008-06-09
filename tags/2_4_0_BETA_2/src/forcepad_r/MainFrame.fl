@@ -1,0 +1,562 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0104 
+header_name {.h} 
+code_name {.cpp}
+decl {/** Main window class generated from FLTK. */} {public
+} 
+
+decl {\#include <FL/Fl_Color_Chooser.H>} {selected
+} 
+
+decl {\#ifdef WIN32} {} 
+
+decl {\#include "resource.h"} {} 
+
+decl {\#endif} {} 
+
+decl {\#include "forcepad_config.h"} {} 
+
+decl {\#include "StatusOutput.h"} {} 
+
+class CMainFrame {open
+} {
+  Function {CMainFrame()} {open
+  } {
+    Fl_Window wndMain {
+      label {ForcePAD 2}
+      xywh {407 141 672 586} type Double resizable visible
+    } {
+      Fl_Box boxWorkspace {
+        xywh {60 0 552 492} box DOWN_FRAME resizable
+      }
+      Fl_Group {} {open
+        xywh {-1 0 61 493}
+      } {
+        Fl_Group {} {open
+          xywh {-1 0 61 493}
+        } {
+          Fl_Scroll scrLeftToolbar {open
+            xywh {0 0 60 493} box FLAT_BOX color 51 selection_color 51
+          } {
+            Fl_Button btnBrush {
+              callback {paintView->hideDialogs();
+paintView->setEditMode(CPaintView::EM_BRUSH);
+resetButtons(btnBrush);}
+              tooltip {Brush tool} image {../../images/paint.xpm} xywh {3 4 42 42} type Radio box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX value 1 color 51 selection_color 51
+              code0 {\#include "Fl_HoverButton.h"}
+              class Fl_HoverButton
+            }
+            Fl_Button btnFloodFill {
+              callback {paintView->hideDialogs();
+
+paintView->setEditMode(CPaintView::EM_FLOODFILL);
+resetButtons(btnFloodFill);}
+              tooltip {Flood fill tool} image {../../images/floodfill.xpm} xywh {4 90 42 42} type Radio box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 51 selection_color 51
+              code0 {\#include "Fl_HoverButton.h"}
+              class Fl_HoverButton
+            }
+            Fl_Button btnErase {
+              callback {paintView->hideDialogs();
+paintView->setEditMode(CPaintView::EM_ERASE);
+resetButtons(btnErase);}
+              tooltip {Erase stiffness} image {../../images/erase.xpm} xywh {4 282 42 42} type Radio box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 51 selection_color 51
+              code0 {\#include "Fl_HoverButton.h"}
+              class Fl_HoverButton
+            }
+            Fl_Button btnForce {
+              callback {paintView->hideDialogs();
+paintView->setEditMode(CPaintView::EM_FORCE);
+resetButtons(btnForce);}
+              tooltip {Create point force} image {../../images/force.xpm} xywh {4 142 42 42} type Radio box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 51 selection_color 51
+              code0 {\#include "Fl_HoverButton.h"}
+              class Fl_HoverButton
+            }
+            Fl_Button btnConstraint {
+              callback {paintView->hideDialogs();
+
+btnConstraint->value(1);
+btnBrush->value(0);
+btnFloodFill->value(0);
+btnErase->value(0);
+btnForce->value(0);
+btnConstraint->value(0);
+btnEraseFem->value(0);
+btnConstraint->value(1);
+
+resetButtons(btnConstraint);
+
+paintView->showBcTypes(wndMain->x()+btnConstraint->x()+btnConstraint->w(),wndMain->y()+btnConstraint->y());}
+              tooltip {Create locks} image {../../images/bc.xpm} xywh {4 185 42 42} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 51 selection_color 51
+              code0 {\#include "Fl_HoverButton.h"}
+              class Fl_HoverButton
+            }
+            Fl_Button btnEraseFem {
+              callback {resetButtons(btnEraseFem);
+paintView->hideDialogs();
+paintView->setEditMode(CPaintView::EM_ERASE_CONSTRAINTS_FORCES);}
+              tooltip {Erase locks and forces} image {../../images/erase2.xpm} xywh {4 239 42 42} type Radio box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 51 selection_color 51
+              code0 {\#include "Fl_HoverButton.h"}
+              class Fl_HoverButton
+            }
+            Fl_Button btnBrushExtra {
+              callback {//m_brushPropsDlg->setBlendFactor(paintView->getBlendFactor());
+//m_brushPropsDlg->setBrush(paintView->getCurrentBrushIdx());
+//m_brushPropsDlg->setPosition(wndMain->x()+btnBrushExtra->x(),wndMain->y()+btnBrushExtra->y());
+//m_brushPropsDlg->show();
+//paintView->setBlendFactor(dlg->getBlendFactor());
+//paintView->setCurrentBrush(dlg->getBrush());
+//delete dlg;
+
+paintView->showBrushProps(wndMain->x()+btnBrushExtra->x(),wndMain->y()+btnBrushExtra->y());}
+              tooltip {Brush properties} image {../../images/additional.xpm} xywh {48 4 10 42} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 29 selection_color 29 labelsize 10 labelcolor 28 align 128
+              code0 {\#include "Fl_HoverButton.h"}
+              class Fl_HoverButton
+            }
+            Fl_Button btnDrawingTools {
+              callback {paintView->hideDialogs();
+
+btnBrush->value(0);
+btnFloodFill->value(0);
+btnErase->value(0);
+btnForce->value(0);
+btnConstraint->value(0);
+btnEraseFem->value(0);
+btnDrawingTools->value(1);
+
+resetButtons(btnDrawingTools);
+
+paintView->showDrawingTools(wndMain->x()+btnDrawingTools->x()+btnDrawingTools->w(),wndMain->y()+btnDrawingTools->y());}
+              tooltip {Geometric drawing tools} image {../../images/drawing_tools.xpm} xywh {4 47 42 42} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 51 selection_color 51
+              code0 {\#include "Fl_HoverButton.h"}
+              class Fl_HoverButton
+            }
+            Fl_Button btnDrawingExtra {
+              callback {paintView->showDrawingProps(wndMain->x()+btnDrawingExtra->x()+btnDrawingExtra->w(),wndMain->y()+btnDrawingExtra->y());}
+              tooltip {Drawing tools properties} image {../../images/additional.xpm} xywh {48 47 10 42} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 29 selection_color 29 labelsize 10 labelcolor 28 align 128
+              code0 {\#include "Fl_HoverButton.h"}
+              class Fl_HoverButton
+            }
+            Fl_Button btnCG {
+              callback {if (btnCG->value()==1)
+	paintView->setCalcCG(true);
+else
+	paintView->setCalcCG(false);}
+              tooltip {Enable/disable center of gravity calculation} image {../../images/cg.xpm} xywh {4 384 42 45} type Toggle box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 51 selection_color 51
+              code0 {\#include "Fl_HoverButton.h"}
+              class Fl_HoverButton
+            }
+            Fl_Button btnConstraint2 {
+              callback {paintView->hideDialogs();
+paintView->setEditMode(CPaintView::EM_CONSTRAINT_VECTOR);
+resetButtons(btnConstraint2);}
+              tooltip {Create point force} image {../../images/bc2.xpm} xywh {4 185 42 42} type Radio box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 51 selection_color 51
+              code0 {\#include "Fl_HoverButton.h"}
+              class Fl_HoverButton
+            }
+            Fl_Button btnCalc {
+              callback {/*
+btnBrush->value(0);
+btnFloodFill->value(0);
+btnErase->value(0);
+btnForce->value(0);
+btnConstraint->value(0);
+btnEraseFem->value(0);
+*/
+paintView->hideDialogs();
+resetButtons(btnCalc);
+paintView->execute();
+paintView->setEditMode(CPaintView::EM_RESULT);}
+              tooltip {Execute calculation} image {../../images/calc.xpm} xywh {4 336 42 42} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 51 selection_color 51
+              code0 {\#include "Fl_HoverButton.h"}
+              class Fl_HoverButton
+            }
+            Fl_Button btnCalcSettings {
+              callback {paintView->showCalcProps(wndMain->x()+btnCalcSettings->x()+btnCalcSettings->w(),wndMain->y()+btnCalcSettings->y());}
+              tooltip {Calculation properties} image {../../images/additional.xpm} xywh {48 336 10 42} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 29 selection_color 29 labelsize 10 labelcolor 28 align 128
+              code0 {\#include "Fl_HoverButton.h"}
+              class Fl_HoverButton
+            }
+            Fl_Box {} {
+              xywh {4 136 42 2} box ENGRAVED_FRAME
+            }
+            Fl_Box {} {
+              xywh {4 232 42 2} box ENGRAVED_FRAME
+            }
+            Fl_Box {} {
+              xywh {4 329 42 2} box ENGRAVED_FRAME
+            }
+          }
+        }
+      }
+      Fl_Group grpBottomToolbar {open
+        xywh {0 493 672 92} box THIN_DOWN_BOX color 31
+      } {
+        Fl_Tabs tabsProperties {open
+          xywh {118 498 548 81} box PLASTIC_UP_BOX color 31 selection_color 12
+        } {
+          Fl_Scroll scrForces {
+            label Forces
+            xywh {127 527 518 46} labelsize 12 hide
+          } {
+            Fl_Value_Output lblPixelWeight {
+              label {Total weight (kpix)}
+              xywh {244 528 99 19} box PLASTIC_DOWN_BOX labelsize 12 textsize 12
+            }
+            Fl_Value_Slider sldRelativeForce {
+              label {Weight ratio}
+              callback {paintView->setRelativeForceSize(sldRelativeForce->value());}
+              xywh {427 552 212 18} type Horizontal box PLASTIC_DOWN_BOX labelsize 12 align 4 minimum 0.05 maximum 100 step 0.05 value 0.1 textsize 12
+            }
+            Fl_Value_Output lblExternalForce {
+              label {External force (kpix)}
+              xywh {244 552 99 19} box PLASTIC_DOWN_BOX labelsize 12 textsize 12
+            }
+          }
+          Fl_Scroll scrDisplacements {
+            label Displacements
+            xywh {125 528 513 41} labelsize 12 hide
+          } {
+            Fl_Slider sldDisplacementScale {
+              label {Displ. scale}
+              callback {paintView->setDisplacementScale(sldDisplacementScale->value());}
+              xywh {135 544 204 20} type {Horz Knob} box PLASTIC_DOWN_BOX labelsize 10 align 5 minimum 0.1 maximum 100 step 0.1 value 1
+            }
+          }
+          Fl_Scroll scrStress {
+            label Stress
+            xywh {124 526 534 49} labelsize 12 hide
+          } {
+            Fl_Roller rolStressAlpha {
+              label Transparency
+              callback {paintView->setStressAlpha(rolStressAlpha->value());}
+              xywh {129 543 65 19} type Horizontal box PLASTIC_UP_BOX labelsize 10 align 1 step 0.01 value 0.49
+            }
+            Fl_Roller rolStressSize {
+              label Size
+              callback {paintView->setStressSize(rolStressSize->value());}
+              xywh {201 543 65 19} type Horizontal box PLASTIC_UP_BOX labelsize 10 align 1 maximum 200 step 1 value 50
+            }
+            Fl_Roller rolLineWidth {
+              label {Line width}
+              callback {paintView->setStressWidth(rolLineWidth->value());}
+              xywh {273 543 65 19} type Horizontal box PLASTIC_UP_BOX labelsize 10 align 1 minimum 1 maximum 30 step 1 value 1
+            }
+            Fl_Button btnClearResults {
+              label Clear
+              callback {paintView->clearResults();}
+              xywh {617 526 33 22} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX labelsize 10
+            }
+            Fl_Round_Button btnStressAll {
+              label All
+              callback {paintView->setStressMode(CFemGrid::SM_ALL);}
+              xywh {535 526 67 20} type Radio down_box PLASTIC_DOWN_BOX value 1 labelsize 10
+            }
+            Fl_Round_Button btnStressNegative {
+              label Compressive
+              callback {paintView->setStressMode(CFemGrid::SM_NEGATIVE);}
+              xywh {535 539 79 21} type Radio down_box PLASTIC_DOWN_BOX labelsize 10
+            }
+            Fl_Round_Button btnPositiveStress {
+              label Tensile
+              callback {paintView->setStressMode(CFemGrid::SM_POSITIVE);}
+              xywh {535 555 79 18} type Radio down_box PLASTIC_DOWN_BOX labelsize 10
+            }
+            Fl_Roller rolStressStep {
+              label Step
+              callback {paintView->setStressStep(rolStressStep->value());}
+              xywh {345 543 65 19} type Horizontal box PLASTIC_UP_BOX labelsize 10 align 1 minimum 1 maximum 20 step 1 value 1
+            }
+            Fl_Group {} {
+              label Treshold open
+              xywh {494 539 30 29} labelsize 10
+            } {
+              Fl_Slider sldLowerStressTreshold {
+                callback {paintView->setStressTreshold(1.0-sldLowerStressTreshold->value(),1.0-sldUpperStressTreshold->value());}
+                xywh {495 540 14 26} box PLASTIC_DOWN_BOX step 0.01 value 1
+              }
+              Fl_Slider sldUpperStressTreshold {
+                callback {paintView->setStressTreshold(1.0-sldLowerStressTreshold->value(),1.0-sldUpperStressTreshold->value());}
+                xywh {508 540 15 26} box PLASTIC_DOWN_BOX step 0.01
+              }
+            }
+            Fl_Roller rolMeshIntensity {
+              label {Mesh int.}
+              callback {paintView->setMaxIntensity(rolMeshIntensity->value());}
+              xywh {417 543 65 19} type Horizontal box PLASTIC_UP_BOX labelsize 10 align 1 step 0.01 value 1
+            }
+          }
+          Fl_Scroll scrVersion {
+            label About
+            xywh {125 519 526 52} labelsize 12
+          } {
+            Fl_Group grpVersion {
+              label Version open
+              xywh {131 537 198 25} box PLASTIC_DOWN_BOX labelsize 12 align 0
+            } {}
+            Fl_Group grpBuildTime {open
+              xywh {445 537 89 25} box PLASTIC_DOWN_BOX labelsize 12 align 0
+            } {}
+            Fl_Group grpBuildDate {open
+              xywh {334 537 107 25} box PLASTIC_DOWN_BOX labelsize 12 align 0
+            } {}
+            Fl_Button {} {
+              label Log
+              callback {so_show();}
+              xywh {609 538 35 24} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX labelsize 12
+            }
+            Fl_Button btnAbout {
+              label Webpage
+              callback {paintView->showAbout();}
+              xywh {539 538 64 24} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX labelsize 12
+            }
+          }
+        }
+        Fl_Group {} {open
+          xywh {2 497 112 82} box FLAT_BOX color 31
+        } {
+          Fl_Button {} {
+            callback {paintView->setStiffness(1.0);}
+            xywh {9 514 25 19} type Radio box THIN_UP_BOX down_box THIN_DOWN_BOX color 32 selection_color 32
+            code0 {\#include "Fl_HoverButton.h"}
+            class Fl_HoverButton
+          }
+          Fl_Button {} {
+            callback {paintView->setStiffness(0.6364);}
+            xywh {9 533 25 19} type Radio box THIN_UP_BOX down_box THIN_DOWN_BOX color 40 selection_color 40
+            code0 {\#include "Fl_HoverButton.h"}
+            class Fl_HoverButton
+          }
+          Fl_Button {} {
+            callback {paintView->setStiffness(0.2727);}
+            xywh {9 552 25 19} type Radio box THIN_UP_BOX down_box THIN_DOWN_BOX color 48 selection_color 48
+            code0 {\#include "Fl_HoverButton.h"}
+            class Fl_HoverButton
+          }
+          Fl_Button {} {
+            callback {paintView->setStiffness(0.9091);}
+            xywh {34 514 25 19} type Radio box THIN_UP_BOX down_box THIN_DOWN_BOX color 34 selection_color 34
+            code0 {\#include "Fl_HoverButton.h"}
+            class Fl_HoverButton
+          }
+          Fl_Button {} {
+            callback {paintView->setStiffness(0.5455);}
+            xywh {34 533 25 19} type Radio box THIN_UP_BOX down_box THIN_DOWN_BOX color 42 selection_color 42
+            code0 {\#include "Fl_HoverButton.h"}
+            class Fl_HoverButton
+          }
+          Fl_Button {} {
+            callback {paintView->setStiffness(0.1818);}
+            xywh {34 552 25 19} type Radio box THIN_UP_BOX down_box THIN_DOWN_BOX color 50 selection_color 50
+            code0 {\#include "Fl_HoverButton.h"}
+            class Fl_HoverButton
+          }
+          Fl_Button {} {
+            callback {paintView->setStiffness(0.8182);}
+            xywh {59 514 25 19} type Radio box THIN_UP_BOX down_box THIN_DOWN_BOX color 36 selection_color 36
+            code0 {\#include "Fl_HoverButton.h"}
+            class Fl_HoverButton
+          }
+          Fl_Button {} {
+            callback {paintView->setStiffness(0.4545);}
+            xywh {59 533 25 19} type Radio box THIN_UP_BOX down_box THIN_DOWN_BOX color 44 selection_color 44
+            code0 {\#include "Fl_HoverButton.h"}
+            class Fl_HoverButton
+          }
+          Fl_Button {} {
+            callback {paintView->setStiffness(0.0909);}
+            xywh {59 552 25 19} type Radio box THIN_UP_BOX down_box THIN_DOWN_BOX color 52 selection_color 52
+            code0 {\#include "Fl_HoverButton.h"}
+            class Fl_HoverButton
+          }
+          Fl_Button {} {
+            callback {paintView->setStiffness(0.7273);}
+            xywh {84 514 26 19} type Radio box THIN_UP_BOX down_box THIN_DOWN_BOX color 38 selection_color 38
+            code0 {\#include "Fl_HoverButton.h"}
+            class Fl_HoverButton
+          }
+          Fl_Button {} {
+            callback {paintView->setStiffness(0.3636);}
+            xywh {84 533 26 19} type Radio box THIN_UP_BOX down_box THIN_DOWN_BOX color 46 selection_color 46
+            code0 {\#include "Fl_HoverButton.h"}
+            class Fl_HoverButton
+          }
+          Fl_Button {} {
+            callback {paintView->setStiffness(0.0);}
+            xywh {84 552 26 19} type Radio box THIN_UP_BOX down_box THIN_DOWN_BOX color 55 selection_color 55
+            code0 {\#include "Fl_HoverButton.h"}
+            class Fl_HoverButton
+          }
+          Fl_Button btnStiffness {
+            callback {paintView->showStiffnessProps(wndMain->x()+btnStiffness->x(),wndMain->y()+btnStiffness->y()-45);}
+            tooltip {Change stiffness} image {../../images/additional2.xpm} xywh {9 505 101 9} box THIN_UP_BOX down_box THIN_DOWN_BOX color 51 selection_color 51 labelfont 1 labelsize 6
+            code0 {\#include "Fl_HoverButton.h"}
+            class Fl_HoverButton
+          }
+        }
+      }
+      Fl_Scroll scrRightToolbar {
+        xywh {613 0 59 492} box FLAT_BOX color 51 selection_color 51
+      } {
+        Fl_Button btnNew {
+          callback {paintView->newModel();}
+          tooltip {New model} image {../../images/new.xpm} xywh {627 5 42 42} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 51 selection_color 51
+          code0 {\#include "Fl_HoverButton.h"}
+          class Fl_HoverButton
+        }
+        Fl_Button btnOpen {
+          callback {paintView->openModel();}
+          tooltip {Open model} image {../../images/open.xpm} xywh {627 48 42 42} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 51 selection_color 51
+          code0 {\#include "Fl_HoverButton.h"}
+          class Fl_HoverButton
+        }
+        Fl_Button btnSave {
+          callback {paintView->saveModel();}
+          tooltip {Save model} image {../../images/save.xpm} xywh {627 134 42 42} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 51 selection_color 51
+          code0 {\#include "Fl_HoverButton.h"}
+          class Fl_HoverButton
+        }
+        Fl_Button btnOpenImage {
+          callback {paintView->openImage();}
+          tooltip {Open image} image {../../images/saveimage.xpm} xywh {627 91 42 42} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 51 selection_color 51
+          code0 {\#include "Fl_HoverButton.h"}
+          class Fl_HoverButton
+        }
+        Fl_Box bvl3 {
+          xywh {628 181 39 2} box ENGRAVED_FRAME
+        }
+        Fl_Button btnUndo {
+          callback {paintView->undo();}
+          tooltip Undo image {../../images/undo.xpm} xywh {627 187 42 42} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 51 selection_color 51
+          code0 {\#include "Fl_HoverButton.h"}
+          class Fl_HoverButton
+        }
+        Fl_Button btnSelect {
+          callback {resetButtons(btnSelect);
+paintView->setEditMode(CPaintView::EM_SELECT_BOX);}
+          tooltip {Select area} image {../../images/select.xpm} xywh {627 241 42 42} type Radio box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 51 selection_color 51
+          code0 {\#include "Fl_HoverButton.h"}
+          class Fl_HoverButton
+        }
+        Fl_Button btnCut {
+          callback {paintView->cut();}
+          tooltip Cut image {../../images/cut.xpm} xywh {627 284 42 42} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 51 selection_color 51
+          code0 {\#include "Fl_HoverButton.h"}
+          class Fl_HoverButton
+        }
+        Fl_Button btnCopy {
+          callback {paintView->copy();}
+          tooltip Copy image {../../images/copy.xpm} xywh {627 327 42 42} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 51 selection_color 51
+          code0 {\#include "Fl_HoverButton.h"}
+          class Fl_HoverButton
+        }
+        Fl_Button btnPaste {
+          callback {resetButtons(btnPaste);
+paintView->setEditMode(CPaintView::EM_PASTE);}
+          tooltip Paste image {../../images/paste.xpm} xywh {627 370 42 42} type Radio box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 51 selection_color 51
+          code0 {\#include "Fl_HoverButton.h"}
+          class Fl_HoverButton
+        }
+        Fl_Box bvl6 {
+          xywh {628 234 39 2} box ENGRAVED_FRAME
+        }
+        Fl_Button btnPasteWin {
+          callback {resetButtons(btnPasteWin);
+paintView->pasteFromWindows();
+paintView->setEditMode(CPaintView::EM_PASTE);}
+          tooltip {Paste from windows clipboard} image {../../images/paste_win.xpm} xywh {627 413 42 42} type Radio box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 51 selection_color 51
+          code0 {\#include "Fl_HoverButton.h"}
+          class Fl_HoverButton
+        }
+        Fl_Button btnImportProps {
+          callback {paintView->showImportProps(
+	wndMain->x()+btnImportProps->x()-184,
+	wndMain->y()+btnOpenImage->y()
+);}
+          tooltip {Import options} image {../../images/additional_close.xpm} xywh {615 91 10 42} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 29 selection_color 29 labelsize 10 labelcolor 28 align 128
+          code0 {\#include "Fl_HoverButton.h"}
+          class Fl_HoverButton
+        }
+      }
+      Fl_Box paintView {
+        xywh {62 2 548 489} color 1
+        code0 {\#include "PaintView.h"}
+        class CPaintView
+      }
+    }
+  }
+  Function {~CMainFrame()} {} {
+    code {delete paintView;} {}
+  }
+  Function {show()} {} {
+    code {\#ifdef WIN32
+extern HINSTANCE fl_display;
+wndMain->icon((char *)LoadIcon(fl_display, MAKEINTRESOURCE(IDI_FORCEPAD)));
+\#endif
+
+grpVersion->label(FORCEPAD_VERSION_STRING);
+grpBuildDate->label(__DATE__);
+grpBuildTime->label(__TIME__);
+
+wndMain->label(FORCEPAD_NAME);
+
+\#ifdef FORCEPAD_RIGID
+btnCG->hide();
+btnCalc->hide();
+btnConstraint->hide();
+btnCalcSettings->hide();
+//tabsProperties->remove(scrCalcProperties);
+//tabsProperties->remove(scrDrawingSurface);
+tabsProperties->remove(scrDisplacements);
+tabsProperties->remove(scrStress);
+\#else
+btnConstraint2->hide();
+//tabsProperties->remove(scrForces);
+\#endif
+
+wndMain->position(Fl::w() / 2 - wndMain->w() / 2, Fl::h() / 2 - wndMain->h() / 2);
+wndMain->show();
+paintView->setMainFrame(this);
+paintView->show();} {}
+  }
+  Function {close()} {} {
+    code {wndMain->hide();
+so_hide();} {}
+  }
+  Function {resetButtons()} {private
+  } {
+    code {btnDrawingTools->value(0);
+btnConstraint->value(0);
+btnConstraint2->value(0);} {}
+  }
+  Function {resetButtons(Fl_HoverButton* self)} {open
+  } {
+    code {if (self!=btnBrush)
+	btnBrush->value(0);
+if (self!=btnFloodFill)
+	btnFloodFill->value(0);
+if (self!=btnErase)
+	btnErase->value(0);
+if (self!=btnForce)
+	btnForce->value(0);
+if (self!=btnConstraint)
+	btnConstraint->value(0);
+if (self!=btnEraseFem)
+	btnEraseFem->value(0);
+if (self!=btnDrawingTools)
+	btnDrawingTools->value(0);
+if (self!=btnSelect)
+	btnSelect->value(0);
+if (self!=btnPaste)
+	btnPaste->value(0);
+if (self!=btnPasteWin)
+	btnPasteWin->value(0);
+if (self!=btnConstraint2)
+	btnConstraint2->value(0);} {}
+  }
+  Function {setPixelWeight(double weight)} {} {
+    code {lblPixelWeight->value(weight);} {}
+  }
+  Function {setExternalForce(double force)} {} {
+    code {lblExternalForce->value(force);} {}
+  }
+} 
