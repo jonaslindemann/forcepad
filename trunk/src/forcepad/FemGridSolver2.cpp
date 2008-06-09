@@ -1664,6 +1664,7 @@ void CFemGridSolver2::objectiveFunctionAndSensitivity(Matrix& X, Matrix& dC, dou
 	//so_print("CFemGridSolver2:","\tCalculating element forces.");
 
 	c = 0.0;
+	dC = 0.0;
 
 	for (i=0; i<rows; i++)
 	{
@@ -1754,7 +1755,7 @@ ReturnMatrix CFemGridSolver2::optimalityCriteriaUpdate(Matrix& X, Matrix& dC, do
 		Matrix X3 = -dC/lmid;
 		Matrix X4 = elementMultiply(X,matrixSqrt(X3));
 		Xnew = matrixMax2(0.001, matrixMax1(X1, matrixMin2( 1.0, matrixMin1(X2, X4))));
-		//m_femGrid->assignNonElements(Xnew, 0.0);
+		m_femGrid->assignNonElements(Xnew, 0.0);
 		if (Xnew.Sum() - volfrac * nElements > 0.0)
 			l1 = lmid;
 		else
@@ -1763,6 +1764,97 @@ ReturnMatrix CFemGridSolver2::optimalityCriteriaUpdate(Matrix& X, Matrix& dC, do
 	Xnew.release(); return Xnew;
 }
 
+ReturnMatrix CFemGridSolver2::sensitivityFilter1(Matrix& X, Matrix& dC, double rmin)
+{
+	//function [dcn]=Ole_Sigmund(nelx,nely,rmin,x,dc)                                   % ved rmin<1 deaktiveres filtreringen
+	//dcn=zeros(nely,nelx);
+	//for i = 1:nelx
+	//  for j = 1:nely
+	//    sum=0.0; 
+	//    for k = max(i-floor(rmin),1):min(i+floor(rmin),nelx)
+	//      for l = max(j-floor(rmin),1):min(j+floor(rmin),nely)
+	//        fac = rmin-sqrt((i-k)^2+(j-l)^2);
+	//        sum = sum+max(0,fac);
+	//        dcn(j,i) = dcn(j,i) + max(0,fac)*x(l,k)*dc(l,k);
+	//      end
+	//    end
+	//    dcn(j,i) = dcn(j,i)/(x(j,i)*sum);
+	//  end
+	//end	
+	int i, j, k, l;
+	int rows = X.nrows();
+	int cols = X.ncols();
+	double sum, fac;
+	Matrix dCnew;
+
+	dCnew = Matrix(rows, cols);
+	dCnew = 0.0;
+
+	for (i=1; i<=cols; i++)
+	{
+		for (j=1; j<=rows; j++)
+		{
+			sum = 0.0;
+
+			for (k=max(i-floor(rmin),1); k<=min(i+floor(rmin),cols); k++)
+				for (l=max(j-floor(rmin),1); l<=min(j+floor(rmin),rows); l++)
+				{
+					fac = rmin - sqrt(pow((double)(i-k),2.0)+pow((double)(j-l),2.0));
+					sum += max(0.0,fac);
+					dCnew(j,i) += max(0.0,fac)*X(l,k)*dC(l,k);
+				}
+			dCnew(j,i) = dCnew(j,i)/(X(j,i)*sum);
+		}
+	}
+	dCnew.release(); return dCnew;
+}
+
+ReturnMatrix CFemGridSolver2::sensitivityFilter2(Matrix& dC, double rmin)
+{
+	//function [dcn]=Back_Pedersen(nelx,nely,rmin,dc)         
+	//A(1:nely, 1:nelx)=1;  % Volumen for each element
+	//dcn=zeros(nely,nelx);
+	//for i = 1:nelx
+	//  for j = 1:nely
+	//    sum=0.0; 
+	//    for k = max(i-floor(rmin),1):min(i+floor(rmin),nelx);
+	//      for l = max(j-floor(rmin),1):min(j+floor(rmin),nely);
+	//        fac = rmin-sqrt((i-k)^2+(j-l)^2);
+	//        sum = sum+max(0,fac)*A(l,k);
+	//        dcn(j,i) = dcn(j,i) + max(0,fac)*dc(l,k);
+	//      end
+	//    end
+	//    dcn(j,i) = dcn(j,i)/sum;% FE-ANALYSIS
+	//
+	//  end
+	//end
+	int i, j, k, l;
+	int rows = dC.nrows();
+	int cols = dC.ncols();
+	double sum, fac;
+	Matrix dCnew;
+
+	dCnew = Matrix(rows, cols);
+	dCnew = 0.0;
+
+	for (i=1; i<=cols; i++)
+	{
+		for (j=1; j<=rows; j++)
+		{
+			sum = 0.0;
+
+			for (k=max(i-floor(rmin),1); k<=min(i+floor(rmin),cols); k++)
+				for (l=max(j-floor(rmin),1); l<=min(j+floor(rmin),rows); l++)
+				{
+					fac = rmin - sqrt(pow((double)(i-k),2.0)+pow((double)(j-l),2.0));
+					sum += max(0.0,fac);
+					dCnew(j,i) += max(0.0,fac)*dC(l,k);
+				}
+			dCnew(j,i) = dCnew(j,i)/sum;
+		}
+	}
+	dCnew.release(); return dCnew;
+}
 
 void CFemGridSolver2::executeOptimizer()
 {
@@ -1829,7 +1921,7 @@ void CFemGridSolver2::executeOptimizer()
 
 	double change = 1.0;
 	double penalty = 3.0;
-	double volfrac = 0.5;
+	double volfrac = 0.2;
 	double c = 0.0;
 	int loop = 0;
 
@@ -1942,13 +2034,30 @@ void CFemGridSolver2::executeOptimizer()
 
 		//so_print("CFemGridSolver2","Done.");
 
+		// Objective functions
+
 		c = 0.0;
 		dC = 0.0;
+
+		cout << "objectiveFunctionAndSensitivity()" << endl;
 		this->objectiveFunctionAndSensitivity(X, dC, penalty, c);
+
+		// Filter sensitivities
+
+		cout << "sensitivityFilter1()" << endl;
+		//Matrix dCnew = this->sensitivityFilter1(X, dC, 2.75);
+		Matrix dCnew = this->sensitivityFilter2(dC, 2.75);
+		dC = dCnew;
+
+		// Design update by the optimality criteria method
+		
+		cout << "optimalityCriteriaUpdate()" << endl;
 		Matrix Xnew = this->optimalityCriteriaUpdate(X, dC, volfrac, nElements);
 		Matrix Diff = Xnew-Xold;
 		change = Diff.maximum_absolute_value();
 		X = Xnew;
+
+		// Assign current X to field 0 for visualisation purposes
 
 		m_femGrid->assignField(0, X);
 

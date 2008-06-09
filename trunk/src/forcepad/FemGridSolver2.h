@@ -142,6 +142,8 @@ public:
 
 	void objectiveFunctionAndSensitivity(Matrix& X, Matrix& dC, double penalty, double& c);
 	ReturnMatrix optimalityCriteriaUpdate(Matrix& X, Matrix& dC, double volfrac, int nElements);
+	ReturnMatrix sensitivityFilter1(Matrix& X, Matrix& dC, double rmin);
+	ReturnMatrix sensitivityFilter2(Matrix& dC, double rmin);
 
 	void executeOptimizer();
 
