@@ -5,6 +5,7 @@
 #include <FL/Fl.H>
 /** Main window class generated from FLTK. */
 #include "SplashFrame.h"
+#include "TabletToolbar.h"
 #include <iostream>
 #include <string>
 #include <FL/Fl_Double_Window.H>
@@ -29,6 +30,7 @@ class CMainFrame : CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusMessageE
   CPaintView::TEditMode m_saveEditMode; 
   CPaintView::TEditMode m_sketchEditMode; 
   CPaintView::TEditMode m_physicsEditMode; 
+  CTabletToolbar* m_tabletToolbar; 
 public:
   CMainFrame();
   Fl_Double_Window *wndMain;

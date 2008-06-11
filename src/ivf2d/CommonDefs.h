@@ -55,9 +55,10 @@
 /* GLUT 3.7 now tries to avoid including <windows.h>
    to avoid name space pollution, but Win32's <GL/gl.h> 
    needs APIENTRY and WINGDIAPI defined properly. */
-# if 0
+# if 1
 #  define  WIN32_LEAN_AND_MEAN
 #  include <windows.h>
+#  include <mmsystem.h>
 # else
    /* XXX This is from Win32's <windef.h> */
 #  ifndef APIENTRY
