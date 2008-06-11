@@ -58,7 +58,7 @@ COptSettings::COptSettings() {
       maxLoops->type(5);
       maxLoops->labelsize(11);
       maxLoops->minimum(1);
-      maxLoops->maximum(100);
+      maxLoops->maximum(1000);
       maxLoops->step(1);
       maxLoops->value(50);
       maxLoops->textsize(11);

@@ -2,15 +2,16 @@
 
 #include "TabletToolbar.h"
 #include "PaintView.h"
+#include "CalcSettings.h"
 
-void CTabletToolbar::cb_btnOpen_i(Fl_Button*, void*) {
+void CTabletToolbar::cb_btnOpen_i(Fl_HoverButton*, void*) {
   if (m_paintView!=NULL)
 {
 	CPaintView* view = (CPaintView*)m_paintView;
 	view->openModel();
 };
 }
-void CTabletToolbar::cb_btnOpen(Fl_Button* o, void* v) {
+void CTabletToolbar::cb_btnOpen(Fl_HoverButton* o, void* v) {
   ((CTabletToolbar*)(o->parent()->user_data()))->cb_btnOpen_i(o,v);
 }
 
@@ -184,14 +185,14 @@ static const char *idata_open[] = {
 };
 static Fl_Pixmap image_open(idata_open);
 
-void CTabletToolbar::cb_btnNew_i(Fl_Button*, void*) {
+void CTabletToolbar::cb_btnNew_i(Fl_HoverButton*, void*) {
   if (m_paintView!=NULL)
 {
 	CPaintView* view = (CPaintView*)m_paintView;
 	view->newModel();
 };
 }
-void CTabletToolbar::cb_btnNew(Fl_Button* o, void* v) {
+void CTabletToolbar::cb_btnNew(Fl_HoverButton* o, void* v) {
   ((CTabletToolbar*)(o->parent()->user_data()))->cb_btnNew_i(o,v);
 }
 
@@ -264,14 +265,14 @@ static const char *idata_new[] = {
 };
 static Fl_Pixmap image_new(idata_new);
 
-void CTabletToolbar::cb_btnSaveAs_i(Fl_Button*, void*) {
+void CTabletToolbar::cb_btnSaveAs_i(Fl_HoverButton*, void*) {
   if (m_paintView!=NULL)
 {
 	CPaintView* view = (CPaintView*)m_paintView;
 	view->saveModelAs();
 };
 }
-void CTabletToolbar::cb_btnSaveAs(Fl_Button* o, void* v) {
+void CTabletToolbar::cb_btnSaveAs(Fl_HoverButton* o, void* v) {
   ((CTabletToolbar*)(o->parent()->user_data()))->cb_btnSaveAs_i(o,v);
 }
 
@@ -425,14 +426,14 @@ static const char *idata_save[] = {
 };
 static Fl_Pixmap image_save(idata_save);
 
-void CTabletToolbar::cb_btnUndo_i(Fl_Button*, void*) {
+void CTabletToolbar::cb_btnUndo_i(Fl_HoverButton*, void*) {
   if (m_paintView!=NULL)
 {
 	CPaintView* view = (CPaintView*)m_paintView;
 	view->undo();
 };
 }
-void CTabletToolbar::cb_btnUndo(Fl_Button* o, void* v) {
+void CTabletToolbar::cb_btnUndo(Fl_HoverButton* o, void* v) {
   ((CTabletToolbar*)(o->parent()->user_data()))->cb_btnUndo_i(o,v);
 }
 
@@ -733,6 +734,23 @@ static const char *idata_undo[] = {
 };
 static Fl_Pixmap image_undo(idata_undo);
 
+void CTabletToolbar::cb_btnSettings_i(Fl_HoverButton*, void*) {
+  if (m_paintView!=NULL)
+{
+	CPaintView* view = (CPaintView*)m_paintView;
+	
+	CCalcSettings* calcSettings = new CCalcSettings();
+	calcSettings->setView(view);
+	calcSettings->centerWindow(mainWindow);
+	calcSettings->show();
+	delete calcSettings;
+	view->setViewMode(CPaintView::VM_SKETCH);
+};
+}
+void CTabletToolbar::cb_btnSettings(Fl_HoverButton* o, void* v) {
+  ((CTabletToolbar*)(o->parent()->user_data()))->cb_btnSettings_i(o,v);
+}
+
 static const char *idata_calc[] = {
 "    36    36      128            2",
 "`` c #717d6d",
@@ -905,25 +923,76 @@ static Fl_Pixmap image_calc(idata_calc);
 CTabletToolbar::CTabletToolbar() {
   { mainWindow = new Fl_Double_Window(232, 49, "Tablet Toolbar");
     mainWindow->user_data((void*)(this));
-    { btnOpen = new Fl_Button(50, 3, 42, 42);
+    { btnOpen = new Fl_HoverButton(50, 3, 42, 42);
+      btnOpen->tooltip("Open model");
+      btnOpen->box(FL_UP_BOX);
+      btnOpen->color(FL_BACKGROUND_COLOR);
+      btnOpen->selection_color(FL_BACKGROUND_COLOR);
       btnOpen->image(image_open);
+      btnOpen->labeltype(FL_NORMAL_LABEL);
+      btnOpen->labelfont(0);
+      btnOpen->labelsize(14);
+      btnOpen->labelcolor(FL_FOREGROUND_COLOR);
       btnOpen->callback((Fl_Callback*)cb_btnOpen);
-    } // Fl_Button* btnOpen
-    { btnNew = new Fl_Button(5, 3, 42, 42);
+      btnOpen->align(FL_ALIGN_CENTER);
+      btnOpen->when(FL_WHEN_RELEASE);
+    } // Fl_HoverButton* btnOpen
+    { btnNew = new Fl_HoverButton(5, 3, 42, 42);
+      btnNew->tooltip("New model");
+      btnNew->box(FL_UP_BOX);
+      btnNew->color(FL_BACKGROUND_COLOR);
+      btnNew->selection_color(FL_BACKGROUND_COLOR);
       btnNew->image(image_new);
+      btnNew->labeltype(FL_NORMAL_LABEL);
+      btnNew->labelfont(0);
+      btnNew->labelsize(14);
+      btnNew->labelcolor(FL_FOREGROUND_COLOR);
       btnNew->callback((Fl_Callback*)cb_btnNew);
-    } // Fl_Button* btnNew
-    { btnSaveAs = new Fl_Button(95, 3, 42, 42);
+      btnNew->align(FL_ALIGN_CENTER);
+      btnNew->when(FL_WHEN_RELEASE);
+    } // Fl_HoverButton* btnNew
+    { btnSaveAs = new Fl_HoverButton(95, 3, 42, 42);
+      btnSaveAs->tooltip("Save model as...");
+      btnSaveAs->box(FL_UP_BOX);
+      btnSaveAs->color(FL_BACKGROUND_COLOR);
+      btnSaveAs->selection_color(FL_BACKGROUND_COLOR);
       btnSaveAs->image(image_save);
+      btnSaveAs->labeltype(FL_NORMAL_LABEL);
+      btnSaveAs->labelfont(0);
+      btnSaveAs->labelsize(14);
+      btnSaveAs->labelcolor(FL_FOREGROUND_COLOR);
       btnSaveAs->callback((Fl_Callback*)cb_btnSaveAs);
-    } // Fl_Button* btnSaveAs
-    { btnUndo = new Fl_Button(140, 3, 42, 42);
+      btnSaveAs->align(FL_ALIGN_CENTER);
+      btnSaveAs->when(FL_WHEN_RELEASE);
+    } // Fl_HoverButton* btnSaveAs
+    { btnUndo = new Fl_HoverButton(140, 3, 42, 42);
+      btnUndo->tooltip("Undo");
+      btnUndo->box(FL_UP_BOX);
+      btnUndo->color(FL_BACKGROUND_COLOR);
+      btnUndo->selection_color(FL_BACKGROUND_COLOR);
       btnUndo->image(image_undo);
+      btnUndo->labeltype(FL_NORMAL_LABEL);
+      btnUndo->labelfont(0);
+      btnUndo->labelsize(14);
+      btnUndo->labelcolor(FL_FOREGROUND_COLOR);
       btnUndo->callback((Fl_Callback*)cb_btnUndo);
-    } // Fl_Button* btnUndo
-    { btnSettings = new Fl_Button(185, 3, 42, 42);
+      btnUndo->align(FL_ALIGN_CENTER);
+      btnUndo->when(FL_WHEN_RELEASE);
+    } // Fl_HoverButton* btnUndo
+    { btnSettings = new Fl_HoverButton(185, 3, 42, 42);
+      btnSettings->tooltip("Calculation settings");
+      btnSettings->box(FL_UP_BOX);
+      btnSettings->color(FL_BACKGROUND_COLOR);
+      btnSettings->selection_color(FL_BACKGROUND_COLOR);
       btnSettings->image(image_calc);
-    } // Fl_Button* btnSettings
+      btnSettings->labeltype(FL_NORMAL_LABEL);
+      btnSettings->labelfont(0);
+      btnSettings->labelsize(14);
+      btnSettings->labelcolor(FL_FOREGROUND_COLOR);
+      btnSettings->callback((Fl_Callback*)cb_btnSettings);
+      btnSettings->align(FL_ALIGN_CENTER);
+      btnSettings->when(FL_WHEN_RELEASE);
+    } // Fl_HoverButton* btnSettings
     mainWindow->set_non_modal();
     mainWindow->end();
   } // Fl_Double_Window* mainWindow
@@ -940,4 +1009,8 @@ void CTabletToolbar::setView(void* view) {
 
 void CTabletToolbar::centerWindow(Fl_Window* window) {
   mainWindow->position(window->x()+window->w()/2-mainWindow->w()/2, window->y()+window->h()/2-mainWindow->h()/2);
+}
+
+void CTabletToolbar::placeWindow(Fl_Window* window) {
+  mainWindow->position(window->x()+window->w()-mainWindow->w()-100, window->y()+window->h()-mainWindow->h()-100);
 }

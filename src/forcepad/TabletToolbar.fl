@@ -5,13 +5,16 @@ code_name {.cpp}
 decl {\#include "PaintView.h"} {global
 } 
 
+decl {\#include "CalcSettings.h"} {global
+} 
+
 class CTabletToolbar {open
 } {
   decl {void* m_paintView;} {}
   Function {CTabletToolbar()} {open
   } {
     Fl_Window mainWindow {
-      label {Tablet Toolbar} open selected
+      label {Tablet Toolbar} open
       xywh {363 245 232 49} type Double non_modal visible
     } {
       Fl_Button btnOpen {
@@ -20,7 +23,9 @@ class CTabletToolbar {open
 	CPaintView* view = (CPaintView*)m_paintView;
 	view->openModel();
 }}
-        image {../../images/open.xpm} xywh {50 3 42 42}
+        tooltip {Open model} image {../../images/open.xpm} xywh {50 3 42 42}
+        code0 {\#include "Fl_HoverButton.h"}
+        class Fl_HoverButton
       }
       Fl_Button btnNew {
         callback {if (m_paintView!=NULL)
@@ -28,7 +33,9 @@ class CTabletToolbar {open
 	CPaintView* view = (CPaintView*)m_paintView;
 	view->newModel();
 }}
-        image {../../images/new.xpm} xywh {5 3 42 42}
+        tooltip {New model} image {../../images/new.xpm} xywh {5 3 42 42}
+        code0 {\#include "Fl_HoverButton.h"}
+        class Fl_HoverButton
       }
       Fl_Button btnSaveAs {
         callback {if (m_paintView!=NULL)
@@ -36,7 +43,9 @@ class CTabletToolbar {open
 	CPaintView* view = (CPaintView*)m_paintView;
 	view->saveModelAs();
 }}
-        image {../../images/save.xpm} xywh {95 3 42 42}
+        tooltip {Save model as...} image {../../images/save.xpm} xywh {95 3 42 42}
+        code0 {\#include "Fl_HoverButton.h"}
+        class Fl_HoverButton
       }
       Fl_Button btnUndo {
         callback {if (m_paintView!=NULL)
@@ -44,10 +53,25 @@ class CTabletToolbar {open
 	CPaintView* view = (CPaintView*)m_paintView;
 	view->undo();
 }}
-        image {../../images/undo.xpm} xywh {140 3 42 42}
+        tooltip Undo image {../../images/undo.xpm} xywh {140 3 42 42}
+        code0 {\#include "Fl_HoverButton.h"}
+        class Fl_HoverButton
       }
       Fl_Button btnSettings {
-        image {../../images/calc.xpm} xywh {185 3 42 42}
+        callback {if (m_paintView!=NULL)
+{
+	CPaintView* view = (CPaintView*)m_paintView;
+	
+	CCalcSettings* calcSettings = new CCalcSettings();
+	calcSettings->setView(view);
+	calcSettings->centerWindow(mainWindow);
+	calcSettings->show();
+	delete calcSettings;
+	view->setViewMode(CPaintView::VM_SKETCH);
+}}
+        tooltip {Calculation settings} image {../../images/calc.xpm} xywh {185 3 42 42}
+        code0 {\#include "Fl_HoverButton.h"}
+        class Fl_HoverButton
       }
     }
     code {m_paintView = NULL;} {}
@@ -63,5 +87,10 @@ class CTabletToolbar {open
   Function {centerWindow(Fl_Window* window)} {open
   } {
     code {mainWindow->position(window->x()+window->w()/2-mainWindow->w()/2, window->y()+window->h()/2-mainWindow->h()/2);} {}
+  }
+  Function {placeWindow(Fl_Window* window)} {open
+  } {
+    code {mainWindow->position(window->x()+window->w()-mainWindow->w()-100, window->y()+window->h()-mainWindow->h()-100);} {selected
+    }
   }
 } 

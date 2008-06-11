@@ -153,7 +153,7 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 	m_stiffnessScalefactor = 1000.0;
 	m_elasticModulus = 2.1e9;
 	m_youngsModulus = 0.35;
-	m_thickness = 1.0;
+	m_thickness = 0.1;
 	m_constraintStiffnessScale = 1e3;
 	m_moveLoad = false;
 
@@ -202,11 +202,6 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 	
 	color = new CColor();
 	color->setColor(0.5f, 0.0f, 0.0f, 1.0f);
-
-	m_ruler = new CRuler();
-	m_ruler->setStartPos(100, 100);
-	m_ruler->setEndPos(150, 150);
-	m_ruler->setColor(color);
 
 	color = new CColor();
 	color->setColor(0.0f, 0.5f, 0.0f, 1.0f);
@@ -257,6 +252,12 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 	m_drawing->fillRectAlpha(50,50,200,200, 128);
 	m_drawing->setAlpha(128);
 	m_drawing->setLayer(0);
+
+	m_ruler = new CRuler();
+	m_ruler->setStartPos(0,0);
+	m_ruler->setEndPos(m_drawing->getWidth(), 0);
+	m_ruler->setActualLength(1.0);
+	m_ruler->setColor(color);
 
 	// Create a buffer for reading pixels back
 	
@@ -2921,6 +2922,11 @@ void CPaintView::setRulerLength(double actualLength)
 		m_ruler->setActualLength(actualLength);
 		this->m_femGrid->setElementScaleFactor(m_ruler->getActualLength()/m_ruler->getPixelLength());
 	}
+}
+
+double CPaintView::getRulerLength()
+{
+	return m_ruler->getActualLength();
 }
 
 
