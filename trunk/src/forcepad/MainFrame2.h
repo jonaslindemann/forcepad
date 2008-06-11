@@ -199,6 +199,11 @@ private:
   void cb_btnStopCalculation_i(Fl_Button*, void*);
   static void cb_btnStopCalculation(Fl_Button*, void*);
 public:
+  Fl_Button *btnTabletToolbar;
+private:
+  void cb_btnTabletToolbar_i(Fl_Button*, void*);
+  static void cb_btnTabletToolbar(Fl_Button*, void*);
+public:
   Fl_Scroll *scrRightForceToolbar;
   Fl_HoverButton *btnAddForce;
 private:

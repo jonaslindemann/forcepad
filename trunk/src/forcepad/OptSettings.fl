@@ -11,7 +11,7 @@ class COptSettings {open
   Function {COptSettings()} {open
   } {
     Fl_Window mainWindow {
-      label {Optimisation Settings} open selected
+      label {Optimisation Settings} open
       xywh {635 229 318 291} type Double modal visible
     } {
       Fl_Button cancelButton {
@@ -38,8 +38,8 @@ mainWindow->hide();}
         xywh {15 105 286 20} type {Horz Knob} labelsize 11 align 5 minimum 0.01 maximum 0.1 value 0.01 textsize 11
       }
       Fl_Value_Slider maxLoops {
-        label {Max loops stop criteria}
-        xywh {15 147 286 20} type {Horz Knob} labelsize 11 align 5 minimum 1 maximum 100 step 1 value 50 textsize 11
+        label {Max loops stop criteria} selected
+        xywh {15 147 286 20} type {Horz Knob} labelsize 11 align 5 minimum 1 maximum 1000 step 1 value 50 textsize 11
       }
       Fl_Group {} {
         label {Sensitivity filter} open

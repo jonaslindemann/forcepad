@@ -373,6 +373,7 @@ public:
 	void unlockScaleFactor();
 	void applyElementScale();
 	void setRulerLength(double actualLength);
+	double getRulerLength();
 	void setOptLayer(bool active);
 
 	/*

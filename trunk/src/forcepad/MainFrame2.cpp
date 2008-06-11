@@ -4788,6 +4788,14 @@ void CMainFrame::cb_btnStopCalculation(Fl_Button* o, void* v) {
   ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnStopCalculation_i(o,v);
 }
 
+void CMainFrame::cb_btnTabletToolbar_i(Fl_Button*, void*) {
+  m_tabletToolbar->show();
+m_tabletToolbar->placeWindow(wndMain);
+}
+void CMainFrame::cb_btnTabletToolbar(Fl_Button* o, void* v) {
+  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnTabletToolbar_i(o,v);
+}
+
 void CMainFrame::cb_btnAddForce_i(Fl_HoverButton*, void*) {
   paintView->setEditMode(CPaintView::EM_FORCE);
 m_physicsEditMode = paintView->getEditMode();
@@ -14304,6 +14312,7 @@ void CMainFrame::cb_btnDimensionTools_i(Fl_HoverButton*, void*) {
 
 showRightToolbar(scrRightDimensionToolbar);
 paintView->setEditMode(CPaintView::EM_RULER);
+actualLength->value(paintView->getRulerLength());
 m_physicsEditMode = paintView->getEditMode();
 }
 void CMainFrame::cb_btnDimensionTools(Fl_HoverButton* o, void* v) {
@@ -15826,9 +15835,13 @@ CMainFrame::CMainFrame() {
         statusOutput->textsize(12);
       } // Fl_Output* statusOutput
       { btnStopCalculation = new Fl_Button(754, 659, 42, 19, "Stop");
-        btnStopCalculation->labelsize(12);
+        btnStopCalculation->labelsize(11);
         btnStopCalculation->callback((Fl_Callback*)cb_btnStopCalculation);
       } // Fl_Button* btnStopCalculation
+      { btnTabletToolbar = new Fl_Button(348, 659, 42, 19, "Tablet");
+        btnTabletToolbar->labelsize(11);
+        btnTabletToolbar->callback((Fl_Callback*)cb_btnTabletToolbar);
+      } // Fl_Button* btnTabletToolbar
       o->end();
     } // Fl_Group* o
     { scrRightForceToolbar = new Fl_Scroll(255, 42, 53, 249);
@@ -17116,6 +17129,11 @@ CSystemInfoPtr sysInfo = CSystemInfo::getInstance();
 if (sysInfo->isTabletPC())
 {
 	m_tabletToolbar->show();
+	m_tabletToolbar->placeWindow(wndMain);
+}
+else
+{
+	btnTabletToolbar->hide();
 }
 
 // Initialise toolbars

@@ -4,36 +4,41 @@
 #define TabletToolbar_h
 #include <FL/Fl.H>
 #include <FL/Fl_Double_Window.H>
-#include <FL/Fl_Button.H>
+#include "Fl_HoverButton.h"
 
 class CTabletToolbar {
   void* m_paintView; 
 public:
   CTabletToolbar();
   Fl_Double_Window *mainWindow;
-  Fl_Button *btnOpen;
+  Fl_HoverButton *btnOpen;
 private:
-  void cb_btnOpen_i(Fl_Button*, void*);
-  static void cb_btnOpen(Fl_Button*, void*);
+  void cb_btnOpen_i(Fl_HoverButton*, void*);
+  static void cb_btnOpen(Fl_HoverButton*, void*);
 public:
-  Fl_Button *btnNew;
+  Fl_HoverButton *btnNew;
 private:
-  void cb_btnNew_i(Fl_Button*, void*);
-  static void cb_btnNew(Fl_Button*, void*);
+  void cb_btnNew_i(Fl_HoverButton*, void*);
+  static void cb_btnNew(Fl_HoverButton*, void*);
 public:
-  Fl_Button *btnSaveAs;
+  Fl_HoverButton *btnSaveAs;
 private:
-  void cb_btnSaveAs_i(Fl_Button*, void*);
-  static void cb_btnSaveAs(Fl_Button*, void*);
+  void cb_btnSaveAs_i(Fl_HoverButton*, void*);
+  static void cb_btnSaveAs(Fl_HoverButton*, void*);
 public:
-  Fl_Button *btnUndo;
+  Fl_HoverButton *btnUndo;
 private:
-  void cb_btnUndo_i(Fl_Button*, void*);
-  static void cb_btnUndo(Fl_Button*, void*);
+  void cb_btnUndo_i(Fl_HoverButton*, void*);
+  static void cb_btnUndo(Fl_HoverButton*, void*);
 public:
-  Fl_Button *btnSettings;
+  Fl_HoverButton *btnSettings;
+private:
+  void cb_btnSettings_i(Fl_HoverButton*, void*);
+  static void cb_btnSettings(Fl_HoverButton*, void*);
+public:
   void show();
   void setView(void* view);
   void centerWindow(Fl_Window* window);
+  void placeWindow(Fl_Window* window);
 };
 #endif
