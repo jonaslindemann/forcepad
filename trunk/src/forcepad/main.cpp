@@ -25,7 +25,7 @@
 #include "forcepad_config.h"
 
 #include <FL/Fl.H>
-#include <FL/fl_message.h>
+#include "fl_message_win.h"
 
 #ifdef FORCEPAD_NEW_UI
 #include "MainFrame2.h"

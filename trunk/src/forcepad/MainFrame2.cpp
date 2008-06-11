@@ -6,6 +6,7 @@
 #include "resource.h"
 #endif
 #include "forcepad_config.h"
+#include "SystemInfo.h"
 #include "LogWindow.h"
 #include "CalcSettings.h"
 #include "OptSettings.h"
@@ -15830,7 +15831,7 @@ CMainFrame::CMainFrame() {
       } // Fl_Button* btnStopCalculation
       o->end();
     } // Fl_Group* o
-    { scrRightForceToolbar = new Fl_Scroll(255, 41, 53, 250);
+    { scrRightForceToolbar = new Fl_Scroll(255, 42, 53, 249);
       scrRightForceToolbar->box(FL_FLAT_BOX);
       { btnAddForce = new Fl_HoverButton(260, 47, 42, 42);
         btnAddForce->tooltip("Create point force");
@@ -16633,9 +16634,9 @@ CMainFrame::CMainFrame() {
       } // Fl_Slider* sldUpperMisesTreshold
       scrRightMisesStressToolbar->end();
     } // Fl_Scroll* scrRightMisesStressToolbar
-    { scrRightDrawToolbar = new Fl_Scroll(747, 39, 54, 421);
+    { scrRightDrawToolbar = new Fl_Scroll(745, 39, 54, 421);
       scrRightDrawToolbar->box(FL_FLAT_BOX);
-      { btnBrush = new Fl_HoverButton(753, 41, 41, 42);
+      { btnBrush = new Fl_HoverButton(751, 41, 41, 42);
         btnBrush->tooltip("Brush");
         btnBrush->type(102);
         btnBrush->box(FL_UP_BOX);
@@ -16652,7 +16653,7 @@ CMainFrame::CMainFrame() {
         btnBrush->align(FL_ALIGN_CENTER);
         btnBrush->when(FL_WHEN_RELEASE);
       } // Fl_HoverButton* btnBrush
-      { btnErase = new Fl_HoverButton(753, 86, 41, 42);
+      { btnErase = new Fl_HoverButton(751, 86, 41, 42);
         btnErase->tooltip("Eraser");
         btnErase->type(102);
         btnErase->box(FL_UP_BOX);
@@ -16668,9 +16669,9 @@ CMainFrame::CMainFrame() {
         btnErase->align(FL_ALIGN_CENTER);
         btnErase->when(FL_WHEN_RELEASE);
       } // Fl_HoverButton* btnErase
-      { grpBrushTypes = new Fl_Group(750, 255, 47, 161);
+      { grpBrushTypes = new Fl_Group(748, 255, 47, 161);
         grpBrushTypes->box(FL_FLAT_BOX);
-        { btnBrush4 = new Fl_HoverButton(753, 255, 41, 29);
+        { btnBrush4 = new Fl_HoverButton(751, 255, 41, 29);
           btnBrush4->tooltip("Create point force");
           btnBrush4->type(102);
           btnBrush4->box(FL_UP_BOX);
@@ -16686,7 +16687,7 @@ CMainFrame::CMainFrame() {
           btnBrush4->align(FL_ALIGN_CENTER);
           btnBrush4->when(FL_WHEN_RELEASE);
         } // Fl_HoverButton* btnBrush4
-        { btnBrush8 = new Fl_HoverButton(753, 285, 41, 29);
+        { btnBrush8 = new Fl_HoverButton(751, 285, 41, 29);
           btnBrush8->tooltip("Create point force");
           btnBrush8->type(102);
           btnBrush8->box(FL_UP_BOX);
@@ -16702,7 +16703,7 @@ CMainFrame::CMainFrame() {
           btnBrush8->align(FL_ALIGN_CENTER);
           btnBrush8->when(FL_WHEN_RELEASE);
         } // Fl_HoverButton* btnBrush8
-        { btnBrush16 = new Fl_HoverButton(753, 315, 41, 29);
+        { btnBrush16 = new Fl_HoverButton(751, 315, 41, 29);
           btnBrush16->tooltip("Create point force");
           btnBrush16->type(102);
           btnBrush16->box(FL_UP_BOX);
@@ -16718,7 +16719,7 @@ CMainFrame::CMainFrame() {
           btnBrush16->align(FL_ALIGN_CENTER);
           btnBrush16->when(FL_WHEN_RELEASE);
         } // Fl_HoverButton* btnBrush16
-        { btnBrush32 = new Fl_HoverButton(753, 345, 41, 29);
+        { btnBrush32 = new Fl_HoverButton(751, 345, 41, 29);
           btnBrush32->tooltip("Create point force");
           btnBrush32->type(102);
           btnBrush32->box(FL_UP_BOX);
@@ -16734,7 +16735,7 @@ CMainFrame::CMainFrame() {
           btnBrush32->align(FL_ALIGN_CENTER);
           btnBrush32->when(FL_WHEN_RELEASE);
         } // Fl_HoverButton* btnBrush32
-        { btnBrush64 = new Fl_HoverButton(753, 375, 41, 29);
+        { btnBrush64 = new Fl_HoverButton(751, 375, 41, 29);
           btnBrush64->tooltip("Create point force");
           btnBrush64->type(102);
           btnBrush64->box(FL_UP_BOX);
@@ -16752,8 +16753,8 @@ CMainFrame::CMainFrame() {
         } // Fl_HoverButton* btnBrush64
         grpBrushTypes->end();
       } // Fl_Group* grpBrushTypes
-      { Fl_Group* o = new Fl_Group(753, 128, 41, 127);
-        { Fl_HoverButton* o = new Fl_HoverButton(753, 137, 20, 19);
+      { Fl_Group* o = new Fl_Group(751, 128, 41, 127);
+        { Fl_HoverButton* o = new Fl_HoverButton(751, 137, 20, 19);
           o->type(102);
           o->box(FL_THIN_UP_BOX);
           o->down_box(FL_THIN_DOWN_BOX);
@@ -16767,7 +16768,7 @@ CMainFrame::CMainFrame() {
           o->align(FL_ALIGN_CENTER);
           o->when(FL_WHEN_RELEASE);
         } // Fl_HoverButton* o
-        { Fl_HoverButton* o = new Fl_HoverButton(753, 175, 20, 19);
+        { Fl_HoverButton* o = new Fl_HoverButton(751, 175, 20, 19);
           o->type(102);
           o->box(FL_THIN_UP_BOX);
           o->down_box(FL_THIN_DOWN_BOX);
@@ -16781,7 +16782,7 @@ CMainFrame::CMainFrame() {
           o->align(FL_ALIGN_CENTER);
           o->when(FL_WHEN_RELEASE);
         } // Fl_HoverButton* o
-        { Fl_HoverButton* o = new Fl_HoverButton(753, 213, 20, 19);
+        { Fl_HoverButton* o = new Fl_HoverButton(751, 213, 20, 19);
           o->type(102);
           o->box(FL_THIN_UP_BOX);
           o->down_box(FL_THIN_DOWN_BOX);
@@ -16795,7 +16796,7 @@ CMainFrame::CMainFrame() {
           o->align(FL_ALIGN_CENTER);
           o->when(FL_WHEN_RELEASE);
         } // Fl_HoverButton* o
-        { Fl_HoverButton* o = new Fl_HoverButton(773, 137, 20, 19);
+        { Fl_HoverButton* o = new Fl_HoverButton(771, 137, 20, 19);
           o->type(102);
           o->box(FL_THIN_UP_BOX);
           o->down_box(FL_THIN_DOWN_BOX);
@@ -16809,7 +16810,7 @@ CMainFrame::CMainFrame() {
           o->align(FL_ALIGN_CENTER);
           o->when(FL_WHEN_RELEASE);
         } // Fl_HoverButton* o
-        { Fl_HoverButton* o = new Fl_HoverButton(773, 175, 20, 19);
+        { Fl_HoverButton* o = new Fl_HoverButton(771, 175, 20, 19);
           o->type(102);
           o->box(FL_THIN_UP_BOX);
           o->down_box(FL_THIN_DOWN_BOX);
@@ -16823,7 +16824,7 @@ CMainFrame::CMainFrame() {
           o->align(FL_ALIGN_CENTER);
           o->when(FL_WHEN_RELEASE);
         } // Fl_HoverButton* o
-        { Fl_HoverButton* o = new Fl_HoverButton(773, 213, 20, 19);
+        { Fl_HoverButton* o = new Fl_HoverButton(771, 213, 20, 19);
           o->type(102);
           o->box(FL_THIN_UP_BOX);
           o->down_box(FL_THIN_DOWN_BOX);
@@ -16837,7 +16838,7 @@ CMainFrame::CMainFrame() {
           o->align(FL_ALIGN_CENTER);
           o->when(FL_WHEN_RELEASE);
         } // Fl_HoverButton* o
-        { Fl_HoverButton* o = new Fl_HoverButton(753, 156, 20, 19);
+        { Fl_HoverButton* o = new Fl_HoverButton(751, 156, 20, 19);
           o->type(102);
           o->box(FL_THIN_UP_BOX);
           o->down_box(FL_THIN_DOWN_BOX);
@@ -16851,7 +16852,7 @@ CMainFrame::CMainFrame() {
           o->align(FL_ALIGN_CENTER);
           o->when(FL_WHEN_RELEASE);
         } // Fl_HoverButton* o
-        { Fl_HoverButton* o = new Fl_HoverButton(753, 194, 20, 19);
+        { Fl_HoverButton* o = new Fl_HoverButton(751, 194, 20, 19);
           o->type(102);
           o->box(FL_THIN_UP_BOX);
           o->down_box(FL_THIN_DOWN_BOX);
@@ -16865,7 +16866,7 @@ CMainFrame::CMainFrame() {
           o->align(FL_ALIGN_CENTER);
           o->when(FL_WHEN_RELEASE);
         } // Fl_HoverButton* o
-        { Fl_HoverButton* o = new Fl_HoverButton(753, 232, 20, 19);
+        { Fl_HoverButton* o = new Fl_HoverButton(751, 232, 20, 19);
           o->type(102);
           o->box(FL_THIN_UP_BOX);
           o->down_box(FL_THIN_DOWN_BOX);
@@ -16879,7 +16880,7 @@ CMainFrame::CMainFrame() {
           o->align(FL_ALIGN_CENTER);
           o->when(FL_WHEN_RELEASE);
         } // Fl_HoverButton* o
-        { Fl_HoverButton* o = new Fl_HoverButton(773, 156, 20, 19);
+        { Fl_HoverButton* o = new Fl_HoverButton(771, 156, 20, 19);
           o->type(102);
           o->box(FL_THIN_UP_BOX);
           o->down_box(FL_THIN_DOWN_BOX);
@@ -16893,7 +16894,7 @@ CMainFrame::CMainFrame() {
           o->align(FL_ALIGN_CENTER);
           o->when(FL_WHEN_RELEASE);
         } // Fl_HoverButton* o
-        { Fl_HoverButton* o = new Fl_HoverButton(773, 194, 20, 19);
+        { Fl_HoverButton* o = new Fl_HoverButton(771, 194, 20, 19);
           o->type(102);
           o->box(FL_THIN_UP_BOX);
           o->down_box(FL_THIN_DOWN_BOX);
@@ -16907,7 +16908,7 @@ CMainFrame::CMainFrame() {
           o->align(FL_ALIGN_CENTER);
           o->when(FL_WHEN_RELEASE);
         } // Fl_HoverButton* o
-        { Fl_HoverButton* o = new Fl_HoverButton(773, 232, 20, 19);
+        { Fl_HoverButton* o = new Fl_HoverButton(771, 232, 20, 19);
           o->type(102);
           o->box(FL_THIN_UP_BOX);
           o->down_box(FL_THIN_DOWN_BOX);
@@ -17083,12 +17084,17 @@ paintView->setViewModeErrorEvent(this);
 paintView->setModelChangedEvent(this);
 paintView->setRulerChangedEvent(this);
 paintView->setContinueCalcEvent(this);
+
+m_tabletToolbar = new CTabletToolbar();
+m_tabletToolbar->setView(paintView);
+
 m_sketchEditMode = CPaintView::EM_BRUSH;
 m_physicsEditMode = CPaintView::EM_FORCE;
 }
 
 CMainFrame::~CMainFrame() {
-  delete paintView;
+  delete m_tabletToolbar;
+delete paintView;
 }
 
 void CMainFrame::show() {
@@ -17097,32 +17103,20 @@ extern HINSTANCE fl_display;
 wndMain->icon((char *)LoadIcon(fl_display, MAKEINTRESOURCE(IDI_FORCEPAD)));
 #endif
 
-//grpVersion->label(FORCEPAD_VERSION_STRING);
-//grpBuildDate->label(__DATE__);
-//grpBuildTime->label(__TIME__);
-
 wndMain->label(FORCEPAD_NAME);
-
-#ifdef FORCEPAD_RIGID
-btnCG->hide();
-btnCalc->hide();
-btnConstraint->hide();
-btnCalcSettings->hide();
-//tabsProperties->remove(scrCalcProperties);
-//tabsProperties->remove(scrDrawingSurface);
-tabsProperties->remove(scrDisplacements);
-tabsProperties->remove(scrStress);
-#else
-//btnConstraint2->hide();
-//tabsProperties->remove(scrForces);
-#endif
-
 wndMain->position(Fl::w() / 2 - wndMain->w() / 2, Fl::h() / 2 - wndMain->h() / 2);
-//wndMain->fullscreen();
-//wndMain->size(8,620);
 wndMain->show();
+
 paintView->setMainFrame(this);
 paintView->show();
+
+// Show tablet toolbar
+
+CSystemInfoPtr sysInfo = CSystemInfo::getInstance();
+if (sysInfo->isTabletPC())
+{
+	m_tabletToolbar->show();
+}
 
 // Initialise toolbars
 

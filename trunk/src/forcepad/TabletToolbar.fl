@@ -1,0 +1,67 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0109 
+header_name {.h} 
+code_name {.cpp}
+decl {\#include "PaintView.h"} {global
+} 
+
+class CTabletToolbar {open
+} {
+  decl {void* m_paintView;} {}
+  Function {CTabletToolbar()} {open
+  } {
+    Fl_Window mainWindow {
+      label {Tablet Toolbar} open selected
+      xywh {363 245 232 49} type Double non_modal visible
+    } {
+      Fl_Button btnOpen {
+        callback {if (m_paintView!=NULL)
+{
+	CPaintView* view = (CPaintView*)m_paintView;
+	view->openModel();
+}}
+        image {../../images/open.xpm} xywh {50 3 42 42}
+      }
+      Fl_Button btnNew {
+        callback {if (m_paintView!=NULL)
+{
+	CPaintView* view = (CPaintView*)m_paintView;
+	view->newModel();
+}}
+        image {../../images/new.xpm} xywh {5 3 42 42}
+      }
+      Fl_Button btnSaveAs {
+        callback {if (m_paintView!=NULL)
+{
+	CPaintView* view = (CPaintView*)m_paintView;
+	view->saveModelAs();
+}}
+        image {../../images/save.xpm} xywh {95 3 42 42}
+      }
+      Fl_Button btnUndo {
+        callback {if (m_paintView!=NULL)
+{
+	CPaintView* view = (CPaintView*)m_paintView;
+	view->undo();
+}}
+        image {../../images/undo.xpm} xywh {140 3 42 42}
+      }
+      Fl_Button btnSettings {
+        image {../../images/calc.xpm} xywh {185 3 42 42}
+      }
+    }
+    code {m_paintView = NULL;} {}
+  }
+  Function {show()} {open
+  } {
+    code {mainWindow->show();} {}
+  }
+  Function {setView(void* view)} {open
+  } {
+    code {m_paintView = view;} {}
+  }
+  Function {centerWindow(Fl_Window* window)} {open
+  } {
+    code {mainWindow->position(window->x()+window->w()/2-mainWindow->w()/2, window->y()+window->h()/2-mainWindow->h()/2);} {}
+  }
+} 
