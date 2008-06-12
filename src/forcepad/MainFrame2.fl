@@ -47,7 +47,7 @@ class CMainFrame {open : {CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusM
   } {
     Fl_Window wndMain {
       label {ForcePAD 2} open
-      xywh {385 83 861 684} type Double align 80 resizable visible
+      xywh {564 181 861 684} type Double align 80 resizable visible
     } {
       Fl_Menu_Bar mainMenu {open
         xywh {0 0 858 26} box FLAT_BOX labelsize 11 textsize 11
@@ -143,7 +143,15 @@ calcSettings->centerWindow(wndMain);
 calcSettings->show();
 delete calcSettings;
 paintView->setViewMode(CPaintView::VM_SKETCH);}
-            xywh {0 0 30 20} labelsize 12
+            xywh {0 0 30 20} labelsize 12 divider
+          }
+          MenuItem settingsMenuSnapToGrid {
+            label {&Snap to grid}
+            callback {if (settingsMenuSnapToGrid->value()>0)
+	paintView->setSnapToGrid(true);
+else
+	paintView->setSnapToGrid(false);}
+            xywh {10 10 30 20} type Toggle shortcut 0x40067 labelsize 12
           }
         }
         Submenu helpMenu {
@@ -262,7 +270,7 @@ if (btnPaste->value()==1)
         } {
           Fl_Button btnOptLayer {
             callback {paintView->setOptLayer(btnOptLayer->value());}
-            tooltip {Flood fill tool} image {../../images/floodfill.xpm} xywh {5 226 42 42} type Toggle down_box DOWN_BOX selection_color 51
+            tooltip {Flood fill tool} image {../../images/no_opt.xpm} xywh {5 226 42 42} type Toggle down_box DOWN_BOX selection_color 51
             code0 {\#include "Fl_HoverButton.h"}
             class Fl_HoverButton
           }
@@ -271,7 +279,7 @@ if (btnPaste->value()==1)
       Fl_Group paintGroup {open
         xywh {52 26 750 627} resizable
       } {
-        Fl_Box paintView {
+        Fl_Box paintView {selected
           xywh {53 27 747 625} box FLAT_BOX color 0
           code0 {\#include "PaintView.h"}
           class CPaintView
@@ -323,7 +331,6 @@ paintView->setDrawStress(true);}
           }
         }
         Fl_Button btnOptimize {
-          label OPT
           callback {m_continueCalc = true;
 
 COptSettings* optSettings = new COptSettings();
@@ -333,7 +340,7 @@ optSettings->show();
 delete optSettings;
 
 paintView->executeOpt();}
-          tooltip {Displacement visualisation} xywh {370 398 42 42} down_box DOWN_BOX selection_color 51 labelsize 11
+          tooltip Optimisation image {../../images/optimise.xpm} xywh {370 398 42 42} down_box DOWN_BOX selection_color 51 labelsize 11
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
         }
@@ -521,16 +528,7 @@ sldLineWidth->activate();}
         Fl_Value_Slider sldLineWidth {
           label Width
           callback {paintView->setLineWidth(sldLineWidth->value());}
-          xywh {436 325 22 75} labelsize 10 align 129 minimum 1 maximum 30 step 1 value 5 deactivate
-        }
-        Fl_Button btnGridSnap {
-          callback {if (btnGridSnap->value()>0)
-	paintView->setSnapToGrid(true);
-else
-	paintView->setSnapToGrid(false);}
-          tooltip {Snap to grid} image {../../images/grid.xpm} xywh {426 405 42 42} type Toggle down_box DOWN_BOX selection_color 51
-          code0 {\#include "Fl_HoverButton.h"}
-          class Fl_HoverButton
+          xywh {436 325 22 95} labelsize 10 align 129 minimum 1 maximum 30 step 1 value 5 deactivate
         }
       }
       Fl_Scroll scrRightStressToolbar {open
@@ -942,7 +940,7 @@ m_physicsEditMode = paintView->getEditMode();}
 showRightToolbar(scrRightDimensionToolbar);
 paintView->setEditMode(CPaintView::EM_RULER);
 actualLength->value(paintView->getRulerLength());
-m_physicsEditMode = paintView->getEditMode();} selected
+m_physicsEditMode = paintView->getEditMode();}
           tooltip Contraints image {../../images/ruler.xpm} xywh {641 190 42 42} type Radio down_box DOWN_BOX selection_color 51
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
