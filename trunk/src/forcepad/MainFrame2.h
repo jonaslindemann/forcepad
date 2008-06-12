@@ -105,6 +105,11 @@ private:
   void cb_settingsMenuCalculation_i(Fl_Menu_*, void*);
   static void cb_settingsMenuCalculation(Fl_Menu_*, void*);
 public:
+  static Fl_Menu_Item *settingsMenuSnapToGrid;
+private:
+  void cb_settingsMenuSnapToGrid_i(Fl_Menu_*, void*);
+  static void cb_settingsMenuSnapToGrid(Fl_Menu_*, void*);
+public:
   static Fl_Menu_Item *helpMenu;
   static Fl_Menu_Item *helpMenuContents;
   static Fl_Menu_Item *helpMenuAbout;
@@ -285,11 +290,6 @@ public:
 private:
   void cb_sldLineWidth_i(Fl_Value_Slider*, void*);
   static void cb_sldLineWidth(Fl_Value_Slider*, void*);
-public:
-  Fl_HoverButton *btnGridSnap;
-private:
-  void cb_btnGridSnap_i(Fl_HoverButton*, void*);
-  static void cb_btnGridSnap(Fl_HoverButton*, void*);
 public:
   Fl_Scroll *scrRightStressToolbar;
   Fl_HoverButton *btnTensionCompression;
