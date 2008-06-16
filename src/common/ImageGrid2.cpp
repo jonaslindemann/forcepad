@@ -26,7 +26,7 @@
 
 CImageGrid2::CImageGrid2()
 {
-	m_fieldLayers = 3;
+	m_fieldLayers = 2;
 	m_image = NULL;
 	m_stride = 8;
 	m_grid = NULL;
@@ -402,6 +402,71 @@ void CImageGrid2::assignGrid(Matrix& toMatrix)
 				for (j=0; j<m_cols; j++)
 					m_grid[i][j] = toMatrix(i+1,j+1);
 		}
+	}
+}
+
+void CImageGrid2::assignFieldFromImage(int imageLayer, int toFieldLayer)
+{
+	if (m_useImage)
+	{
+
+		if ((imageLayer>=m_image->getLayerCount())||(imageLayer<0))
+			return;
+
+		if ((toFieldLayer>=m_fieldLayers)||(toFieldLayer<0))
+			return;
+
+		int prevLayer = m_image->getLayer();
+		m_image->setLayer(imageLayer);
+
+		int i, j, k, l;
+		double gridSum1;
+		double nGridValues1;
+		GLubyte gridValue;
+
+		int nNonZeroValues = 0;
+
+		for (i=0; i<m_rows; i++)
+		{
+			for (j=0; j<m_cols; j++)
+			{
+				// Calculate average of grid square
+
+				gridSum1 = 0.0;
+				nGridValues1 = 0;
+				for (k=0; k<m_stride; k++)
+				{
+					for (l=0; l<m_stride; l++)
+					{
+						nGridValues1++;
+						if ((i*m_stride+k<m_height)&&(j*m_stride+l<m_width))
+							m_image->getValue(j*m_stride+l, i*m_stride+k, 0, gridValue);
+						else
+							gridValue = 0.0;
+						gridSum1 += (double)gridValue;
+					}
+				}
+
+				m_fields[toFieldLayer][i][j] = 1.0 - gridSum1/(double)nGridValues1/255.0f;
+
+				if (m_fields[toFieldLayer][i][j]>0.0)
+					nNonZeroValues++;
+			}
+		}
+
+		m_image->setLayer(prevLayer);
+	}
+}
+
+int CImageGrid2::fieldGreaterThan(int layer, double value, double valueTrue, double valueFalse)
+{
+	int i, j;
+
+	if ((m_fields!=NULL)&&(layer>=0)&&(layer<m_fieldLayers))
+	{
+		for (i=0; i<m_rows; i++)
+			for (j=0; j<m_cols; j++)
+				m_fields[layer][i][j] = value;
 	}
 }
 

@@ -148,6 +148,11 @@ int CImage::getLayer()
 	return m_currentLayer;
 }
 
+int CImage::getLayerCount()
+{
+	return m_layers;
+}
+
 
 GLubyte* CImage::getImageMap()
 {

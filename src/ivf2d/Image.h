@@ -133,6 +133,8 @@ public:
 	void setLayer(int layer);
 	int getLayer();
 
+	int getLayerCount();
+
 	/** 
 	 * Return pointer to image map. 
 	 * 
