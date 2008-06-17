@@ -162,7 +162,7 @@ public:
 	void computeElementForcesOpt(Matrix& X, double penalty);
 	void computeReactionForces(std::vector<CConstraint*>& vectorConstraints);
 
-	void objectiveFunctionAndSensitivity(Matrix& X, Matrix& dC, double penalty, double& c);
+	void objectiveFunctionAndSensitivity(Matrix& X, Matrix& dC, Matrix& L, double penalty, double& c);
 	ReturnMatrix optimalityCriteriaUpdate(Matrix& X, Matrix& dC, double volfrac, int nElements);
 	ReturnMatrix sensitivityFilter1(Matrix& X, Matrix& dC, double rmin);
 	ReturnMatrix sensitivityFilter2(Matrix& dC, double rmin);

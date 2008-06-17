@@ -1824,7 +1824,7 @@ void CFemGridSolver2::computeReactionForces(std::vector<CConstraint*>& vectorCon
 	}
 }
 
-void CFemGridSolver2::objectiveFunctionAndSensitivity(Matrix& X, Matrix& dC, double penalty, double& c)
+void CFemGridSolver2::objectiveFunctionAndSensitivity(Matrix& X, Matrix& dC, Matrix& L, double penalty, double& c)
 {
 	//so_print("CFemGridSolver2","Calculating results.");
 
@@ -1916,9 +1916,18 @@ void CFemGridSolver2::objectiveFunctionAndSensitivity(Matrix& X, Matrix& dC, dou
 				// [1x8][8x8][8x1] = [1x1]
 
 				double W = (Ed * Ke * Ed.t()).as_scalar();
-				c += pow(X(i+1,j+1),penalty)*W;
-				dC(i+1,j+1) = -penalty*pow(X(i+1,j+1),penalty-1)*W;
 
+				if (L(i+1,j+1)<0.1)
+				{
+					c += pow(X(i+1,j+1),penalty)*W;
+					dC(i+1,j+1) = -penalty*pow(X(i+1,j+1),penalty-1)*W;
+				}
+				else
+				{
+					cout << "No change." << endl;
+					c += 0.0;
+					dC(i+1,j+1) = 0.0;
+				}
 				//cout << "W = " << W << ", pow(X(i+1,j+1),penalty) = " << pow(X(i+1,j+1),penalty) << endl;
 			}
 		}
@@ -2122,6 +2131,7 @@ void CFemGridSolver2::executeOptimizer()
 	Matrix X;
 	Matrix Xold;
 	Matrix dC;
+	Matrix L;
 
 	double change = 1.0;
 	double penalty = m_optPenalty;
@@ -2134,8 +2144,11 @@ void CFemGridSolver2::executeOptimizer()
 	X.ReSize(rows, cols);
 	Xold.ReSize(rows, cols);
 	dC.ReSize(rows, cols);
+	L.ReSize(rows, cols);
 
 	m_femGrid->copyGrid(X, volfrac); // Copy grid values to X multiplied with volfrac
+	m_femGrid->assignFieldFromImage(1, 1);
+	m_femGrid->copyField(1, L);
 
 	///////////////////////////////////////////////////////////////////////////
 	// Start optimisation loop
@@ -2240,7 +2253,7 @@ void CFemGridSolver2::executeOptimizer()
 
 		cout << "objectiveFunctionAndSensitivity()" << endl;
 		this->progressMessage("Objective function and sensitivity.", 60);
-		this->objectiveFunctionAndSensitivity(X, dC, m_optPenalty, c);
+		this->objectiveFunctionAndSensitivity(X, dC, L, m_optPenalty, c);
 
 		// Filter sensitivities
 
