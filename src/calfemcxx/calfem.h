@@ -153,6 +153,9 @@ ReturnMatrix matrixMin2(double a, Matrix B);
 ReturnMatrix matrixMin3(Matrix A, double b);
 ReturnMatrix matrixSqrt(Matrix A);
 ReturnMatrix elementMultiply(Matrix A, Matrix B);
+void assignWhereLessThan(Matrix& toMatrix, Matrix& condMatrix, Matrix& valueMatrix, double lessThanValue);
+void assignWhereGreaterThan(Matrix& toMatrix, Matrix& condMatrix, Matrix& valueMatrix, double greaterThanValue);
+void assignWhereGreaterThan(Matrix& toMatrix, Matrix& condMatrix, double value, double greaterThanValue);
 
 double maxValue(RowVector& rowVector);
 double minValue(RowVector& rowVector);

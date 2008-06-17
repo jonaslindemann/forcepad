@@ -1321,6 +1321,54 @@ ReturnMatrix elementMultiply(Matrix A, Matrix B)
 	C.release(); return C;
 }
 
+void assignWhereLessThan(Matrix& toMatrix, Matrix& condMatrix, Matrix& valueMatrix, double lessThanValue)
+{
+	Matrix C;
+	int i, j;
+	int rows = toMatrix.nrows();
+	int cols = toMatrix.ncols();
+
+	for (i=1; i<=rows; i++)
+		for (j=1; j<=cols; j++)
+		{
+			if (condMatrix(i,j)<lessThanValue)
+				toMatrix(i,j) = valueMatrix(i,j);
+		}
+	
+}
+
+void assignWhereGreaterThan(Matrix& toMatrix, Matrix& condMatrix, Matrix& valueMatrix, double greaterThanValue)
+{
+	Matrix C;
+	int i, j;
+	int rows = toMatrix.nrows();
+	int cols = toMatrix.ncols();
+
+	for (i=1; i<=rows; i++)
+		for (j=1; j<=cols; j++)
+		{
+			if (condMatrix(i,j)>greaterThanValue)
+				toMatrix(i,j) = valueMatrix(i,j);
+		}
+	
+}
+
+void assignWhereGreaterThan(Matrix& toMatrix, Matrix& condMatrix, double value, double greaterThanValue)
+{
+	Matrix C;
+	int i, j;
+	int rows = toMatrix.nrows();
+	int cols = toMatrix.ncols();
+
+	for (i=1; i<=rows; i++)
+		for (j=1; j<=cols; j++)
+		{
+			if (condMatrix(i,j)>greaterThanValue)
+				toMatrix(i,j) = value;
+		}
+	
+}
+
 void writeRowVector(const char* name, RowVector &v, std::ostream &out)
 {
 	out << name << " = [" << std::endl;
