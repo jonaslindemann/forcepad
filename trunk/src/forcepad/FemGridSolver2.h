@@ -152,7 +152,7 @@ public:
 
 	/** Finite element solver for solving active/inactive elements. */
 	int assembleSystem(SymmetricBandMatrix& K);
-	int assembleSystemOpt(SymmetricBandMatrix& K, Matrix& X, double penalty);
+	int assembleSystemOpt(SymmetricBandMatrix& K, Matrix& X, Matrix& L, double penalty);
 	void setupHinges();
 	int calculateOptimalBandwidth();
 	void setupForcesAndConstraints(bool& loadsDefined, bool& bcsDefined, bool& vectorBcsDefined, std::set<int>& uniqueDofs, std::set<int>& uniqueVectorDofs, vector<CConstraint*>& vectorConstraints, RowVector& prescribedValues);
@@ -163,7 +163,7 @@ public:
 	void computeReactionForces(std::vector<CConstraint*>& vectorConstraints);
 
 	void objectiveFunctionAndSensitivity(Matrix& X, Matrix& dC, Matrix& L, double penalty, double& c);
-	ReturnMatrix optimalityCriteriaUpdate(Matrix& X, Matrix& dC, double volfrac, int nElements);
+	ReturnMatrix optimalityCriteriaUpdate(Matrix& X, Matrix& dC, Matrix& L, double volfrac, int nElements);
 	ReturnMatrix sensitivityFilter1(Matrix& X, Matrix& dC, double rmin);
 	ReturnMatrix sensitivityFilter2(Matrix& dC, double rmin);
 

@@ -1093,7 +1093,7 @@ int CFemGridSolver2::assembleSystem(SymmetricBandMatrix& K)
 	return nElements;
 }
 
-int CFemGridSolver2::assembleSystemOpt(SymmetricBandMatrix& K, Matrix& X, double penalty)
+int CFemGridSolver2::assembleSystemOpt(SymmetricBandMatrix& K, Matrix& X, Matrix& L, double penalty)
 {
 	int i, j, l;
 	int rows, cols;
@@ -1193,10 +1193,12 @@ int CFemGridSolver2::assembleSystemOpt(SymmetricBandMatrix& K, Matrix& X, double
 				
 				Ke = 0.0;
 				calfem::plani4e(Ex, Ey, Ep, D, m_Eq, Ke, fe);
-				Ke = Ke * pow(X(i+1,j+1),penalty);
-				
-				//cout << "pow(X(i+1,j+1),penalty) = " << pow(X(i+1,j+1),penalty) << endl;
 
+				// Only apply density of L<1.0 
+
+				if (L(i+1,j+1)<1.0)
+					Ke = Ke * pow(X(i+1,j+1),penalty);
+				
 				//
 				// Assemble element matrix
 				//
@@ -1915,18 +1917,11 @@ void CFemGridSolver2::objectiveFunctionAndSensitivity(Matrix& X, Matrix& dC, Mat
 
 				// [1x8][8x8][8x1] = [1x1]
 
-				double W = (Ed * Ke * Ed.t()).as_scalar();
-
-				if (L(i+1,j+1)<0.1)
+				if (L(i+1,j+1)<1.0)
 				{
+					double W = (Ed * Ke * Ed.t()).as_scalar();
 					c += pow(X(i+1,j+1),penalty)*W;
 					dC(i+1,j+1) = -penalty*pow(X(i+1,j+1),penalty-1)*W;
-				}
-				else
-				{
-					cout << "No change." << endl;
-					c += 0.0;
-					dC(i+1,j+1) = 0.0;
 				}
 				//cout << "W = " << W << ", pow(X(i+1,j+1),penalty) = " << pow(X(i+1,j+1),penalty) << endl;
 			}
@@ -1934,7 +1929,7 @@ void CFemGridSolver2::objectiveFunctionAndSensitivity(Matrix& X, Matrix& dC, Mat
 	}
 }
 
-ReturnMatrix CFemGridSolver2::optimalityCriteriaUpdate(Matrix& X, Matrix& dC, double volfrac, int nElements)
+ReturnMatrix CFemGridSolver2::optimalityCriteriaUpdate(Matrix& X, Matrix& dC, Matrix& L, double volfrac, int nElements)
 {
 	using namespace calfem;
 
@@ -1960,6 +1955,10 @@ ReturnMatrix CFemGridSolver2::optimalityCriteriaUpdate(Matrix& X, Matrix& dC, do
 
 	Matrix Xnew;
 
+	int rigidElements = (int)L.Sum();
+
+	cout << "rigidElements = " << rigidElements << endl;
+
 	while (l2-l1 > 1e-4)
 	{
 		lmid = 0.5*(l2+l1);
@@ -1969,11 +1968,12 @@ ReturnMatrix CFemGridSolver2::optimalityCriteriaUpdate(Matrix& X, Matrix& dC, do
 		Matrix X4 = elementMultiply(X,matrixSqrt(X3));
 		Xnew = matrixMax2(0.001, matrixMax1(X1, matrixMin2( 1.0, matrixMin1(X2, X4))));
 		m_femGrid->assignNonElements(Xnew, 0.0);
-		if (Xnew.Sum() - volfrac * nElements > 0.0)
+		if (Xnew.Sum() - volfrac * (nElements-rigidElements) > 0.0)
 			l1 = lmid;
 		else
 			l2 = lmid;
 	}
+	assignWhereGreaterThan(Xnew, L, X, 0.0);
 	Xnew.release(); return Xnew;
 }
 
@@ -2146,9 +2146,16 @@ void CFemGridSolver2::executeOptimizer()
 	dC.ReSize(rows, cols);
 	L.ReSize(rows, cols);
 
+	L = 1.0;
+
+	cout << "Sum L = " << L.Sum() << endl;
+
 	m_femGrid->copyGrid(X, volfrac); // Copy grid values to X multiplied with volfrac
 	m_femGrid->assignFieldFromImage(1, 1);
 	m_femGrid->copyField(1, L);
+
+	calfem::assignWhereGreaterThan(L, L, 1.0, 0.0);
+	calfem::assignWhereGreaterThan(X, L, 1.0, 0.0);
 
 	///////////////////////////////////////////////////////////////////////////
 	// Start optimisation loop
@@ -2172,7 +2179,7 @@ void CFemGridSolver2::executeOptimizer()
 		// Assemble system
 		//
 
-		nElements = this->assembleSystemOpt(K, X, penalty);
+		nElements = this->assembleSystemOpt(K, X, L, penalty);
 
 		//
 		// If no elements where assembled something was wrong return 
@@ -2285,7 +2292,7 @@ void CFemGridSolver2::executeOptimizer()
 
 		cout << "optimalityCriteriaUpdate()" << endl;
 		this->progressMessage("Design update.", 100);
-		Matrix Xnew = this->optimalityCriteriaUpdate(X, dC, volfrac, nElements);
+		Matrix Xnew = this->optimalityCriteriaUpdate(X, dC, L, volfrac, nElements);
 		Matrix Diff = Xnew-Xold;
 		change = Diff.maximum_absolute_value();
 		X = Xnew;

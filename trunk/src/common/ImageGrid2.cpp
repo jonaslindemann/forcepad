@@ -422,7 +422,7 @@ void CImageGrid2::assignFieldFromImage(int imageLayer, int toFieldLayer)
 		int i, j, k, l;
 		double gridSum1;
 		double nGridValues1;
-		GLubyte gridValue;
+		GLubyte gridValue, red, green, blue;
 
 		int nNonZeroValues = 0;
 
@@ -439,18 +439,18 @@ void CImageGrid2::assignFieldFromImage(int imageLayer, int toFieldLayer)
 					for (l=0; l<m_stride; l++)
 					{
 						nGridValues1++;
+						red = 0; green = 0; blue = 0;
 						if ((i*m_stride+k<m_height)&&(j*m_stride+l<m_width))
-							m_image->getValue(j*m_stride+l, i*m_stride+k, 0, gridValue);
-						else
-							gridValue = 0.0;
-						gridSum1 += (double)gridValue;
-	
-						if (gridValue!=255)
-							cout << (double)gridValue << endl;
+							m_image->getPixel(j*m_stride+l, i*m_stride+k, red, green, blue);
+							//m_image->getValue(j*m_stride+l, i*m_stride+k, 0, gridValue);
+
+						gridSum1 += (double)red;
+						gridSum1 += (double)green;
+						gridSum1 += (double)blue;
 					}
 				}
 
-				m_fields[toFieldLayer][i][j] = 1.0 - gridSum1/(double)nGridValues1/255.0f;
+				m_fields[toFieldLayer][i][j] = 1.0 - gridSum1/(double)nGridValues1/255.0f/3.0f;
 
 				if (m_fields[toFieldLayer][i][j]>0.0)
 					nNonZeroValues++;
