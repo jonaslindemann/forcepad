@@ -444,6 +444,9 @@ void CImageGrid2::assignFieldFromImage(int imageLayer, int toFieldLayer)
 						else
 							gridValue = 0.0;
 						gridSum1 += (double)gridValue;
+	
+						if (gridValue!=255)
+							cout << (double)gridValue << endl;
 					}
 				}
 
@@ -455,18 +458,6 @@ void CImageGrid2::assignFieldFromImage(int imageLayer, int toFieldLayer)
 		}
 
 		m_image->setLayer(prevLayer);
-	}
-}
-
-int CImageGrid2::fieldGreaterThan(int layer, double value, double valueTrue, double valueFalse)
-{
-	int i, j;
-
-	if ((m_fields!=NULL)&&(layer>=0)&&(layer<m_fieldLayers))
-	{
-		for (i=0; i<m_rows; i++)
-			for (j=0; j<m_cols; j++)
-				m_fields[layer][i][j] = value;
 	}
 }
 

@@ -88,7 +88,6 @@ public:
 	void assignField(int layer, Matrix& toMatrix);
 	void copyField(int fromLayer, Matrix& toMatrix);
 	void assignFieldFromImage(int imageLayer, int toLayer);
-	int fieldGreaterThan(int layer, double value, double valueTrue, double valueFalse);
 
 	double maxAbsDiff(int l1, int l2);
 
