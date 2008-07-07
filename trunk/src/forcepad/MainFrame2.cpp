@@ -3552,6 +3552,7 @@ void CMainFrame::cb_btnStress_i(Fl_HoverButton*, void*) {
 paintView->setDrawDisplacements(false);
 paintView->setStressType(CFemGrid2::ST_PRINCIPAL);
 paintView->setDrawStress(true);
+paintView->setDrawForcesAndConstraints(true);
 }
 void CMainFrame::cb_btnStress(Fl_HoverButton* o, void* v) {
   ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnStress_i(o,v);
@@ -3858,6 +3859,7 @@ void CMainFrame::cb_btnDisplacements_i(Fl_HoverButton*, void*) {
   showRightToolbar(scrRightDisplacementToolbar);
 paintView->setDrawDisplacements(true);
 paintView->setDrawStress(false);
+paintView->setDrawForcesAndConstraints(true);
 }
 void CMainFrame::cb_btnDisplacements(Fl_HoverButton* o, void* v) {
   ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnDisplacements_i(o,v);
@@ -4165,6 +4167,7 @@ void CMainFrame::cb_btnMisesStress_i(Fl_HoverButton*, void*) {
 paintView->setDrawDisplacements(false);
 paintView->setStressType(CFemGrid2::ST_MISES_SMOOTH);
 paintView->setDrawStress(true);
+paintView->setDrawForcesAndConstraints(true);
 }
 void CMainFrame::cb_btnMisesStress(Fl_HoverButton* o, void* v) {
   ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnMisesStress_i(o,v);
@@ -5386,6 +5389,16 @@ static const char *idata_optimise[] = {
 "`````j`b`i`i`q`i`i`b`j`j```````````````````````````````j`b`k`i`q`q`i`k`b"
 };
 static Fl_Pixmap image_optimise(idata_optimise);
+
+void CMainFrame::cb_btnStructure_i(Fl_HoverButton*, void*) {
+  showRightToolbar(scrRightDisplacementToolbar);
+paintView->setDrawDisplacements(false);
+paintView->setDrawStress(false);
+paintView->setDrawForcesAndConstraints(false);
+}
+void CMainFrame::cb_btnStructure(Fl_HoverButton* o, void* v) {
+  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnStructure_i(o,v);
+}
 
 void CMainFrame::cb_btnStopCalculation_i(Fl_Button*, void*) {
   m_continueCalc = false;
@@ -16019,7 +16032,7 @@ CMainFrame::CMainFrame() {
       paintGroup->end();
       Fl_Group::current()->resizable(paintGroup);
     } // Fl_Group* paintGroup
-    { scrLeftResultToolbar = new Fl_Scroll(365, 251, 53, 304);
+    { scrLeftResultToolbar = new Fl_Scroll(365, 251, 53, 350);
       scrLeftResultToolbar->box(FL_FLAT_BOX);
       { btnStress = new Fl_HoverButton(370, 257, 42, 42);
         btnStress->tooltip("Stress visualisation");
@@ -16070,8 +16083,8 @@ CMainFrame::CMainFrame() {
         btnMisesStress->align(FL_ALIGN_CENTER);
         btnMisesStress->when(FL_WHEN_RELEASE);
       } // Fl_HoverButton* btnMisesStress
-      { Fl_Group* o = new Fl_Group(370, 455, 47, 95);
-        { btnMoveLoad = new Fl_HoverButton(371, 501, 42, 42);
+      { Fl_Group* o = new Fl_Group(370, 455, 47, 138);
+        { btnMoveLoad = new Fl_HoverButton(371, 551, 42, 42);
           btnMoveLoad->tooltip("Toggle between moving and rotating loads");
           btnMoveLoad->type(102);
           btnMoveLoad->box(FL_UP_BOX);
@@ -16087,7 +16100,7 @@ CMainFrame::CMainFrame() {
           btnMoveLoad->align(FL_ALIGN_WRAP);
           btnMoveLoad->when(FL_WHEN_RELEASE);
         } // Fl_HoverButton* btnMoveLoad
-        { btnRotateLoad = new Fl_HoverButton(371, 457, 42, 42);
+        { btnRotateLoad = new Fl_HoverButton(371, 507, 42, 42);
           btnRotateLoad->tooltip("Toggle between moving and rotating loads");
           btnRotateLoad->type(102);
           btnRotateLoad->box(FL_UP_BOX);
@@ -16106,7 +16119,7 @@ CMainFrame::CMainFrame() {
         } // Fl_HoverButton* btnRotateLoad
         o->end();
       } // Fl_Group* o
-      { btnOptimize = new Fl_HoverButton(370, 398, 42, 42);
+      { btnOptimize = new Fl_HoverButton(370, 448, 42, 42);
         btnOptimize->tooltip("Optimisation");
         btnOptimize->box(FL_UP_BOX);
         btnOptimize->down_box(FL_DOWN_BOX);
@@ -16121,6 +16134,21 @@ CMainFrame::CMainFrame() {
         btnOptimize->align(FL_ALIGN_CENTER);
         btnOptimize->when(FL_WHEN_RELEASE);
       } // Fl_HoverButton* btnOptimize
+      { btnStructure = new Fl_HoverButton(370, 391, 42, 42, "str");
+        btnStructure->tooltip("Displacement visualisation");
+        btnStructure->type(102);
+        btnStructure->box(FL_UP_BOX);
+        btnStructure->down_box(FL_DOWN_BOX);
+        btnStructure->color(FL_BACKGROUND_COLOR);
+        btnStructure->selection_color((Fl_Color)51);
+        btnStructure->labeltype(FL_NORMAL_LABEL);
+        btnStructure->labelfont(0);
+        btnStructure->labelsize(14);
+        btnStructure->labelcolor(FL_FOREGROUND_COLOR);
+        btnStructure->callback((Fl_Callback*)cb_btnStructure);
+        btnStructure->align(FL_ALIGN_CENTER);
+        btnStructure->when(FL_WHEN_RELEASE);
+      } // Fl_HoverButton* btnStructure
       scrLeftResultToolbar->end();
     } // Fl_Scroll* scrLeftResultToolbar
     { Fl_Group* o = new Fl_Group(53, 653, 747, 31);
@@ -17558,6 +17586,11 @@ else if (newMode == CPaintView::VM_PHYSICS)
 	modeMenuPhysics->deactivate();
 	btnPhysical->setonly();
 	
+	// Make sure the exclusion layer is turned off.
+	
+	btnOptLayer->value(0);
+	paintView->setOptLayer(false);
+	
 	hideRightToolbars();
 	hideLeftToolbars();
 	showLeftToolbar(scrLeftPhysicsToolbar);
@@ -17585,6 +17618,11 @@ else
 	hideLeftToolbars();
 	showLeftToolbar(scrLeftResultToolbar);
 	
+	// Make sure the exclusion layer is turned off.
+	
+	btnOptLayer->value(0);
+	paintView->setOptLayer(false);
+
 	paintView->setEditMode(CPaintView::EM_DYNAMIC_FORCE_UPDATE);
 	
 	if (btnStress->value()==1)
@@ -17730,3 +17768,4 @@ bool CMainFrame::onContinueCalc() {
 Fl::flush();
 return m_continueCalc;
 }
+#include "OptSettings.h"

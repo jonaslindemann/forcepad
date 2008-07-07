@@ -56,11 +56,11 @@ CFemGridSolver2::CFemGridSolver2()
 	// Optimisation parameters
 
 	m_optPenalty = 3.0;
-	m_optVolfrac = 0.2;
+	m_optVolfrac = 0.5;
 	m_optMinChange = 0.01;
 	m_optMaxLoops = 100;
 	m_optRmin = 2.75;
-	m_filterType = FT_BACK_PEDERSEN;
+	m_filterType = FT_SHARP_CONTOURING;
 
 	// Events
 
@@ -1917,11 +1917,18 @@ void CFemGridSolver2::objectiveFunctionAndSensitivity(Matrix& X, Matrix& dC, Mat
 
 				// [1x8][8x8][8x1] = [1x1]
 
-				if (L(i+1,j+1)<1.0)
+				if (L(i+1,j+1)<0.2)
 				{
 					double W = (Ed * Ke * Ed.t()).as_scalar();
 					c += pow(X(i+1,j+1),penalty)*W;
 					dC(i+1,j+1) = -penalty*pow(X(i+1,j+1),penalty-1)*W;
+				}
+				else
+				{
+					// Is this correct ?
+					//double W = (Ed * Ke * Ed.t()).as_scalar();
+					//c += pow(X(i+1,j+1),penalty)*W;
+					dC(i+1,j+1) = -1e50;
 				}
 				//cout << "W = " << W << ", pow(X(i+1,j+1),penalty) = " << pow(X(i+1,j+1),penalty) << endl;
 			}
@@ -1955,9 +1962,8 @@ ReturnMatrix CFemGridSolver2::optimalityCriteriaUpdate(Matrix& X, Matrix& dC, Ma
 
 	Matrix Xnew;
 
-	int rigidElements = (int)L.Sum();
-
-	cout << "rigidElements = " << rigidElements << endl;
+	//int rigidElements = (int)L.Sum();
+	//cout << "rigidElements = " << rigidElements << endl;
 
 	while (l2-l1 > 1e-4)
 	{
@@ -1968,12 +1974,13 @@ ReturnMatrix CFemGridSolver2::optimalityCriteriaUpdate(Matrix& X, Matrix& dC, Ma
 		Matrix X4 = elementMultiply(X,matrixSqrt(X3));
 		Xnew = matrixMax2(0.001, matrixMax1(X1, matrixMin2( 1.0, matrixMin1(X2, X4))));
 		m_femGrid->assignNonElements(Xnew, 0.0);
-		if (Xnew.Sum() - volfrac * (nElements-rigidElements) > 0.0)
+		//if (Xnew.Sum() - volfrac * (nElements-rigidElements) > 0.0)
+		if (Xnew.Sum() - volfrac * (nElements) > 0.0)
 			l1 = lmid;
 		else
 			l2 = lmid;
 	}
-	assignWhereGreaterThan(Xnew, L, X, 0.0);
+	//assignWhereGreaterThan(Xnew, L, X, 0.0);
 	Xnew.release(); return Xnew;
 }
 
@@ -2155,7 +2162,7 @@ void CFemGridSolver2::executeOptimizer()
 	m_femGrid->copyField(1, L);
 
 	calfem::assignWhereGreaterThan(L, L, 1.0, 0.0);
-	calfem::assignWhereGreaterThan(X, L, 1.0, 0.0);
+	//calfem::assignWhereGreaterThan(X, L, 1.0, 0.0);
 
 	///////////////////////////////////////////////////////////////////////////
 	// Start optimisation loop
@@ -2282,7 +2289,7 @@ void CFemGridSolver2::executeOptimizer()
 				dCnew = this->sensitivityFilter1(X, dC, m_optRmin);
 				dC = dCnew;
 				break;
-			case FT_BACK_PEDERSEN:
+			case FT_SHARP_CONTOURING:
 				dCnew = this->sensitivityFilter2(dC, m_optRmin);
 				dC = dCnew;
 				break;

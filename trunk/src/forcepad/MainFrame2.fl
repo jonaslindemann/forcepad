@@ -47,7 +47,7 @@ class CMainFrame {open : {CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusM
   } {
     Fl_Window wndMain {
       label {ForcePAD 2} open
-      xywh {564 181 861 684} type Double align 80 resizable visible
+      xywh {438 176 861 684} type Double align 80 resizable visible
     } {
       Fl_Menu_Bar mainMenu {open
         xywh {0 0 858 26} box FLAT_BOX labelsize 11 textsize 11
@@ -279,20 +279,21 @@ if (btnPaste->value()==1)
       Fl_Group paintGroup {open
         xywh {52 26 750 627} resizable
       } {
-        Fl_Box paintView {selected
+        Fl_Box paintView {
           xywh {53 27 747 625} box FLAT_BOX color 0
           code0 {\#include "PaintView.h"}
           class CPaintView
         }
       }
       Fl_Scroll scrLeftResultToolbar {open
-        xywh {365 251 53 304} box FLAT_BOX
+        xywh {365 251 53 350} box FLAT_BOX
       } {
         Fl_Button btnStress {
           callback {showRightToolbar(scrRightStressToolbar);
 paintView->setDrawDisplacements(false);
 paintView->setStressType(CFemGrid2::ST_PRINCIPAL);
-paintView->setDrawStress(true);}
+paintView->setDrawStress(true);
+paintView->setDrawForcesAndConstraints(true);}
           tooltip {Stress visualisation} image {../../images/stress2.xpm} xywh {370 257 42 42} type Radio down_box DOWN_BOX value 1 selection_color 51
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
@@ -300,7 +301,8 @@ paintView->setDrawStress(true);}
         Fl_Button btnDisplacements {
           callback {showRightToolbar(scrRightDisplacementToolbar);
 paintView->setDrawDisplacements(true);
-paintView->setDrawStress(false);}
+paintView->setDrawStress(false);
+paintView->setDrawForcesAndConstraints(true);}
           tooltip {Displacement visualisation} image {../../images/displacements.xpm} xywh {370 347 42 42} type Radio down_box DOWN_BOX selection_color 51
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
@@ -309,23 +311,24 @@ paintView->setDrawStress(false);}
           callback {showRightToolbar(scrRightMisesStressToolbar);
 paintView->setDrawDisplacements(false);
 paintView->setStressType(CFemGrid2::ST_MISES_SMOOTH);
-paintView->setDrawStress(true);}
+paintView->setDrawStress(true);
+paintView->setDrawForcesAndConstraints(true);}
           tooltip {Mises stress visualisation} image {../../images/stress_mises.xpm} xywh {370 302 42 42} type Radio down_box DOWN_BOX selection_color 51
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
         }
         Fl_Group {} {open
-          xywh {370 455 47 95}
+          xywh {370 455 47 138}
         } {
           Fl_Button btnMoveLoad {
             callback {paintView->setMoveLoad(true);}
-            tooltip {Toggle between moving and rotating loads} image {../../images/action_move_force.xpm} xywh {371 501 42 42} type Radio down_box DOWN_BOX selection_color 51 labelsize 11 align 128
+            tooltip {Toggle between moving and rotating loads} image {../../images/action_move_force.xpm} xywh {371 551 42 42} type Radio down_box DOWN_BOX selection_color 51 labelsize 11 align 128
             code0 {\#include "Fl_HoverButton.h"}
             class Fl_HoverButton
           }
           Fl_Button btnRotateLoad {
             callback {paintView->setMoveLoad(false);}
-            tooltip {Toggle between moving and rotating loads} image {../../images/action_rotate_force.xpm} xywh {371 457 42 42} type Radio down_box DOWN_BOX value 1 selection_color 51 labelsize 11 align 128
+            tooltip {Toggle between moving and rotating loads} image {../../images/action_rotate_force.xpm} xywh {371 507 42 42} type Radio down_box DOWN_BOX value 1 selection_color 51 labelsize 11 align 128
             code0 {\#include "Fl_HoverButton.h"}
             class Fl_HoverButton
           }
@@ -339,8 +342,18 @@ optSettings->centerWindow(wndMain);
 optSettings->show();
 delete optSettings;
 
-paintView->executeOpt();}
-          tooltip Optimisation image {../../images/optimise.xpm} xywh {370 398 42 42} down_box DOWN_BOX selection_color 51 labelsize 11
+paintView->executeOpt();} selected
+          tooltip Optimisation image {../../images/optimise.xpm} xywh {370 448 42 42} down_box DOWN_BOX selection_color 51 labelsize 11
+          code0 {\#include "Fl_HoverButton.h"}
+          class Fl_HoverButton
+        }
+        Fl_Button btnStructure {
+          label str
+          callback {showRightToolbar(scrRightDisplacementToolbar);
+paintView->setDrawDisplacements(false);
+paintView->setDrawStress(false);
+paintView->setDrawForcesAndConstraints(false);}
+          tooltip {Displacement visualisation} xywh {370 391 42 42} type Radio down_box DOWN_BOX selection_color 51
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
         }
@@ -1140,7 +1153,7 @@ else
 	btnCopy->deactivate();
 }} {}
   }
-  Function {onViewModeChange(CPaintView::TViewMode oldMode, CPaintView::TViewMode newMode)} {return_type void
+  Function {onViewModeChange(CPaintView::TViewMode oldMode, CPaintView::TViewMode newMode)} {open return_type void
   } {
     code {if (newMode == CPaintView::VM_SKETCH)
 {
@@ -1173,6 +1186,11 @@ else if (newMode == CPaintView::VM_PHYSICS)
 	modeMenuPhysics->deactivate();
 	btnPhysical->setonly();
 	
+	// Make sure the exclusion layer is turned off.
+	
+	btnOptLayer->value(0);
+	paintView->setOptLayer(false);
+	
 	hideRightToolbars();
 	hideLeftToolbars();
 	showLeftToolbar(scrLeftPhysicsToolbar);
@@ -1200,6 +1218,11 @@ else
 	hideLeftToolbars();
 	showLeftToolbar(scrLeftResultToolbar);
 	
+	// Make sure the exclusion layer is turned off.
+	
+	btnOptLayer->value(0);
+	paintView->setOptLayer(false);
+
 	paintView->setEditMode(CPaintView::EM_DYNAMIC_FORCE_UPDATE);
 	
 	if (btnStress->value()==1)
@@ -1341,4 +1364,5 @@ pixelLength->value(ruler->getPixelLength());} {}
 Fl::flush();
 return m_continueCalc;} {}
   }
+  decl {\#include "OptSettings.h"} {}
 } 

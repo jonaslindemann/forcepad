@@ -116,6 +116,9 @@ void CFemGrid2::doGeometry()
 		{
 			if (m_undeformedGrid)
 				drawUndeformedGrid();
+
+			if (m_drawStructure)
+				drawStructure();
 			drawGrid();
 		}
 	}
@@ -864,6 +867,37 @@ void CFemGrid2::drawUndeformedGrid()
 		}
 	}
 }
+
+void CFemGrid2::drawStructure()
+{
+	int i, j, l;
+	double alpha = 1.0;
+	int topo[8];
+	double ex[4];
+	double ey[4];
+	double value;
+
+	if (m_displacements!=NULL)
+	{
+		for (i=0; i<m_rows; i++)
+		{
+			for (j=0; j<m_cols; j++)
+			{
+				this->getElement(i, j, value, ex, ey, topo);
+
+				if (m_grid[i][j]>m_elementTreshold)
+				{
+					glBegin(GL_QUADS);
+					glColor4f(1.0f-m_grid[i][j], 1.0f-m_grid[i][j], 1.0f-m_grid[i][j], alpha);
+					for (l=0; l<4; l++)
+						glVertex2d(ex[l]/m_elementScaleFactor, ey[l]/m_elementScaleFactor);
+					glEnd();
+				}
+			}
+		}
+	}
+}
+
 
 void CFemGrid2::drawDoubleDofs()
 {

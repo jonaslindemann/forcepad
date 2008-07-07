@@ -38,7 +38,7 @@ mainWindow->hide();}
         xywh {15 105 286 20} type {Horz Knob} labelsize 11 align 5 minimum 0.01 maximum 0.1 value 0.01 textsize 11
       }
       Fl_Value_Slider maxLoops {
-        label {Max loops stop criteria} selected
+        label {Max loops stop criteria}
         xywh {15 147 286 20} type {Horz Knob} labelsize 11 align 5 minimum 1 maximum 1000 step 1 value 50 textsize 11
       }
       Fl_Group {} {
@@ -54,7 +54,7 @@ mainWindow->hide();}
           xywh {22 208 88 15} type Radio down_box ROUND_DOWN_BOX labelsize 11
         }
         Fl_Round_Button backPedersenFilter {
-          label {Back Pedersen}
+          label {Sharp Contouring Filter}
           xywh {22 223 93 15} type Radio down_box ROUND_DOWN_BOX value 1 labelsize 11
         }
       }
@@ -86,7 +86,7 @@ while (mainWindow->visible()) Fl::wait();} {}
 		noFilter->value(1);
 	if (view->getOptFilterType()==CFemGridSolver2::FT_OLE_SIGMUND)
 		sigmundFilter->value(1);
-	if (view->getOptFilterType()==CFemGridSolver2::FT_BACK_PEDERSEN)
+	if (view->getOptFilterType()==CFemGridSolver2::FT_SHARP_CONTOURING)
 		backPedersenFilter->value(1);
 
 }} {}
@@ -107,9 +107,10 @@ while (mainWindow->visible()) Fl::wait();} {}
 	if (sigmundFilter->value()==1)
 		view->setOptFilterType(CFemGridSolver2::FT_OLE_SIGMUND);
 	if (backPedersenFilter->value()==1)
-		view->setOptFilterType(CFemGridSolver2::FT_BACK_PEDERSEN);
+		view->setOptFilterType(CFemGridSolver2::FT_SHARP_CONTOURING);
 	
-}} {}
+}} {selected
+    }
   }
   Function {centerWindow(Fl_Window* window)} {open
   } {
