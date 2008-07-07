@@ -56,10 +56,6 @@
 #include "CGIndicator.h"
 #include "Fl_Cursor_Shape.H"
 
-#ifdef FORCEPAD_RIGID
-#include "ReactionForce.h"
-#endif
-
 class CPVModeChangeEvent;
 class CPVViewModeChangeEvent;
 class CPVViewModeErrorEvent;
@@ -243,11 +239,6 @@ private:
 	double m_relativeForceSize;
 	bool m_checkOpenGL;
 
-#ifdef FORCEPAD_RIGID
-	bool m_validReactions;
-	CReactionForce* m_reactionForces[3];
-#endif
-
 	void* m_mainFrame;
 
 	/*
@@ -363,7 +354,6 @@ public:
 
 	void showAbout();
 	void updateModel();
-	void calcRigidReactions();
 	void pasteFromWindows();
 	void copyToWindows();
 	void undo();
@@ -439,6 +429,8 @@ public:
 
 	void setDrawDisplacements(bool flag);
 	bool getDrawDisplacements();
+
+	void setDrawForcesAndConstraints(bool flag);
 
 	void setStressType(CFemGrid2::TStressType stressType);
 	void setColorMap(int index);

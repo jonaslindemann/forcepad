@@ -84,7 +84,7 @@ public:
 	enum TFilterType {
 		FT_NO_FILTER,
 		FT_OLE_SIGMUND,
-		FT_BACK_PEDERSEN
+		FT_SHARP_CONTOURING
 	};
 private:
 	double m_maxNodeValue;

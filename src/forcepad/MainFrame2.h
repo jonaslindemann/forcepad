@@ -197,6 +197,11 @@ private:
   void cb_btnOptimize_i(Fl_HoverButton*, void*);
   static void cb_btnOptimize(Fl_HoverButton*, void*);
 public:
+  Fl_HoverButton *btnStructure;
+private:
+  void cb_btnStructure_i(Fl_HoverButton*, void*);
+  static void cb_btnStructure(Fl_HoverButton*, void*);
+public:
   Fl_Progress *calcProgress;
   Fl_Output *statusOutput;
   Fl_Button *btnStopCalculation;

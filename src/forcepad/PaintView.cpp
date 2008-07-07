@@ -157,11 +157,13 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 	m_constraintStiffnessScale = 1e3;
 	m_moveLoad = false;
 
-	m_optVolfrac = 0.2;
+	// Optimisation parameters
+
+	m_optVolfrac = 0.5;
 	m_optMinChange = 0.01;
 	m_optMaxLoops = 100;
 	m_optRmin = 2.75;
-	m_optFilterType = CFemGridSolver2::FT_BACK_PEDERSEN;
+	m_optFilterType = CFemGridSolver2::FT_SHARP_CONTOURING;
 
 	// Test OpenGL version
 
@@ -212,26 +214,6 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 	m_cgIndicator->setColor(color);
 	m_relativeForceSize = 0.05;
 	
-#ifdef FORCEPAD_RIGID
-	m_cgIndicator->setShowGravityArrow(true);
-	m_cgIndicator->setArrowLength(50.0);
-	
-	color = new CColor();
-	color->setColor(1.0f, 0.5f, 0.0f, 1.0f);
-	
-	int i;
-	
-	for (i=0; i<3; i++)
-	{
-		m_reactionForces[i] = new CReactionForce();
-		m_reactionForces[i]->setColor(color);
-		m_reactionForces[i]->setPosition(100.0 + (double)i*20.0, 100.0);
-	}
-	
-	m_validReactions = false;
-	m_calcCG = true;
-#endif
-
 	// Optimisation constraints
 
 	m_optLayerActive = false;
@@ -249,7 +231,6 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 	m_drawing->setLayer(1);
 	m_drawing->fillColor(255,255,255);
 	m_drawing->fillAlpha(128);
-	m_drawing->fillRectAlpha(50,50,200,200, 128);
 	m_drawing->setAlpha(128);
 	m_drawing->setLayer(0);
 
@@ -315,16 +296,7 @@ CPaintView::~CPaintView()
 	
 	// Do the usual cleanup
 	
-	deleteBrushes();
-	
-	
-#ifdef FORCEPAD_RIGID
-	int i;
-	
-	for (i=0; i<3; i++)
-		delete m_reactionForces[i];
-#endif
-	
+	deleteBrushes();	
 	deleteCursors();
 }
 
@@ -496,21 +468,11 @@ void CPaintView::onPush(int x, int y)
 		
 		// Create a directional constraint (ForcePAD/Rigid)
 		
-#ifdef FORCEPAD_RIGID
-		if (m_femGrid->getConstraintsSize()<3)
-		{
-			m_newConstraint = new CConstraint();
-			m_newConstraint->setConstraintType(CConstraint::CT_VECTOR);
-			m_newConstraint->setPosition(x-m_drawingOffsetX, h()-y-m_drawingOffsetY);
-			m_femGrid->addConstraint(m_newConstraint);
-		}
-#else
 		m_newConstraint = new CConstraint();
 		m_newConstraint->setConstraintType(CConstraint::CT_VECTOR);
 		m_newConstraint->setPosition(x-m_drawingOffsetX, h()-y-m_drawingOffsetY);
 		m_newConstraint->setDirection(0.0, 1.0);
 		m_femGrid->addConstraint(m_newConstraint);
-#endif
 
 		break;
 	case EM_CONSTRAINT_HINGE:
@@ -599,10 +561,6 @@ void CPaintView::onDrag(int x, int y)
 	m_current[0] = x;
 	m_current[1] = y;
 	
-#ifndef FORCEPAD_RIGID
-	CConstraintPtr constraint;
-#endif
-
 	updateCursor();
 	
 	switch (m_editMode) {
@@ -686,9 +644,16 @@ void CPaintView::onDrag(int x, int y)
 		else
 		{
 			if (m_optLayerActive)
-				m_drawing->copyFrom(m_currentBrush, m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, h()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, m_optConstraintColor);
+				if (m_editMode == EM_DIRECT_ERASE)
+					m_drawing->copyFrom(m_currentBrush, m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, h()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, eraseColor);
+				else 
+					m_drawing->copyFrom(m_currentBrush, m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, h()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, m_optConstraintColor);
 			else
-				m_drawing->copyFrom(m_currentBrush, m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, h()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, m_brushColor);
+				if (m_editMode == EM_DIRECT_ERASE)
+					m_drawing->copyFrom(m_currentBrush, m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, h()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, eraseColor);
+				else
+					m_drawing->copyFrom(m_currentBrush, m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, h()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, m_brushColor);
+
 		}
 		this->redraw();
 		break;
@@ -825,19 +790,12 @@ void CPaintView::onDrag(int x, int y)
 		// Update the constraint direction (Rigid) for the new constraint 
 		// created in onPush
 		
-#ifdef FORCEPAD_RIGID
-		if ((m_femGrid->getConstraintsSize()<=3)&&(m_newConstraint!=NULL))
-		{
-			m_newConstraint->setDirection(m_start[0]-m_current[0], (h() - m_start[1]) - (h() - m_current[1]) );
-			this->redraw();
-		}
-#else
 		if (m_newConstraint!=NULL)
 		{
 			m_newConstraint->setDirection(m_start[0]-m_current[0], (h() - m_start[1]) - (h() - m_current[1]) );
 			this->redraw();
 		}
-#endif
+
 		break;
 	case EM_CONSTRAINT_HINGE:
 		
@@ -854,13 +812,6 @@ void CPaintView::onDrag(int x, int y)
 		
 		// Create additional constraints (normal ForcePAD)
 		
-#ifndef FORCEPAD_RIGID
-		constraint = new CConstraint();
-		constraint->setPosition(x-m_drawingOffsetX, h()-y-m_drawingOffsetY);
-		constraint->setConstraintType(m_constraintType);
-		m_femGrid->addConstraint(constraint);
-		this->redraw();
-#endif
 		break;
 	case EM_ERASE_CONSTRAINTS_FORCES:
 		
@@ -936,11 +887,7 @@ void CPaintView::onRelease(int x, int y)
 	
 	if (m_calcCG)
 	{
-#ifndef FORCEPAD_RIGID
 		m_femGrid->calcCenterOfGravity(m_cg[0], m_cg[1]);
-#else
-		m_femGrid->calcCenterOfStiffness(m_cg[0], m_cg[1]);
-#endif
 		m_cgIndicator->setPosition(m_drawingOffsetX+m_cg[0], m_drawingOffsetY+m_cg[1]);
 		this->redraw();
 	}
@@ -986,11 +933,7 @@ void CPaintView::onInitContext()
 	
 	if (m_calcCG)
 	{
-#ifndef FORCEPAD_RIGID
 		m_femGrid->calcCenterOfGravity(m_cg[0], m_cg[1]);
-#else
-		m_femGrid->calcCenterOfStiffness(m_cg[0], m_cg[1]);
-#endif
 		m_cgIndicator->setPosition(m_drawingOffsetX+m_cg[0], m_drawingOffsetY+m_cg[1]);
 	}
 	else
@@ -1202,19 +1145,6 @@ void CPaintView::onDraw()
 			m_cgIndicator->render();
 		
 		m_femGrid->render();
-		
-#ifdef FORCEPAD_RIGID
-		if (m_validReactions)
-		{
-			int i;
-			glPushMatrix();
-			glTranslated((double)m_drawingOffsetX, (double)m_drawingOffsetY, 0.0);
-			for (i=0; i<3; i++)
-				m_reactionForces[i]->render();
-			glPopMatrix();
-		}
-#endif
-		
 	}
 	if (m_editMode==EM_SELECT_BOX)
 	{
@@ -1554,7 +1484,6 @@ void CPaintView::updateModel()
 	{
 		((CMainFrame*)m_mainFrame)->setPixelWeight(m_femGrid->getPixelArea()*1e-3);
 		((CMainFrame*)m_mainFrame)->setExternalForce(m_femGrid->getPixelArea()*m_relativeForceSize*1e-3);
-		calcRigidReactions();
 		this->redraw();
 	}
 }
@@ -1924,7 +1853,13 @@ void CPaintView::newModel()
 		m_drawing->setChannels(4);
 		m_drawing->setSize(width, height);
 		m_drawing->fillColor(255-initialStiffness,255-initialStiffness,255-initialStiffness);
-		
+
+		m_drawing->setLayer(1);
+		m_drawing->fillColor(255,255,255);
+		m_drawing->fillAlpha(128);
+		m_drawing->setAlpha(128);
+		m_drawing->setLayer(0);
+
 		// Create image grid
 		
 		m_femGrid->setImage(m_drawing);
@@ -1935,9 +1870,6 @@ void CPaintView::newModel()
 		
 		m_showMesh = false;
 		
-#ifdef FORCEPAD_RIGID
-		m_validReactions = false;
-#endif
 		this->invalidate();
 		this->redraw();
 	}
@@ -2029,10 +1961,6 @@ void CPaintView::openImage()
 			m_screenImage->setImage(m_drawing);
 			
 			m_showMesh = false;
-			
-#ifdef FORCEPAD_RIGID
-			m_validReactions = false;
-#endif
 		}
 		else
 		{
@@ -2140,6 +2068,12 @@ void CPaintView::expandImageToWindow()
 
 	m_drawing->setSize(width, height);
 	m_drawing->fillColor(255, 255 ,255);
+
+	m_drawing->setLayer(1);
+	m_drawing->fillColor(255,255,255);
+	m_drawing->fillAlpha(128);
+	m_drawing->setAlpha(128);
+	m_drawing->setLayer(0);
 	
 	// Create image grid
 	
@@ -2588,122 +2522,6 @@ void CPaintView::pasteFromWindows()
 #endif
 }
 
-void CPaintView::calcRigidReactions()
-{
-	so_print("CPaintView", "calcRigidReactions()");
-#ifdef FORCEPAD_RIGID
-	if (m_calcCG)
-	{
-		int i;
-		
-		double pixelArea = m_femGrid->getPixelArea();
-		
-		if (pixelArea>0.0)
-		{
-			
-			CConstraintSelectionPtr constraintSelection = m_femGrid->getConstraints();
-			CForceSelectionPtr forceSelection = m_femGrid->getForces();
-			
-			if (constraintSelection->getSize()!=3)
-				return;
-			
-			double Fx = 0.0;
-			double Fy = 0.0;
-			double M = 0.0;
-			
-			Matrix K(3,3);
-			K = 0.0;
-			
-			ColumnVector R(3);
-			R = 0.0;
-			
-			ColumnVector Fext(3);
-			R = 0.0;
-			
-			for (i=0; i<3; i++)
-			{
-				CConstraintPtr constraint = constraintSelection->getConstraint(i);
-				
-				double x, y;
-				double ex, ey;
-				
-				constraint->getPosition(x, y);
-				constraint->getDirection(ex, ey);
-				
-				switch (constraint->getConstraintType()) {
-				case CConstraint::CT_X:
-					K(1,i+1) = 1.0;
-					K(3,i+1) = y - (double)m_cg[1];
-					m_reactionForces[i]->setDirection(1.0, 0.0);
-					break;
-				case CConstraint::CT_Y:
-					K(2,i+1) = 1.0;
-					K(3,i+1) = (double)m_cg[0] - x;
-					m_reactionForces[i]->setDirection(0.0, 1.0);
-					break;
-				case CConstraint::CT_VECTOR:
-					K(1,i+1) = ex;
-					K(2,i+1) = ey;
-					//K(3,i+1) = ey*((double)m_cg[0] - x) + ex*(y - (double)m_cg[1]);
-					K(3,i+1) = ey*x - ex*y;
-					m_reactionForces[i]->setDirection(ex, ey);
-					break;
-				default:
-					
-					break;
-				}
-				m_reactionForces[i]->setPosition(x, y);
-			}
-			
-			for (i=0; i<forceSelection->getSize(); i++)
-			{
-				CForcePtr force = forceSelection->getForce(i);
-				
-				double x, y;
-				
-				force->getPosition(x, y);
-				
-				double ex, ey;
-				
-				force->getDirection(ex, ey);
-				
-				Fx += m_relativeForceSize*pixelArea*ex;
-				Fy += m_relativeForceSize*pixelArea*ey;
-				
-				//M += Fx * (y - (double)m_cg[1]);
-				//M += Fy * ((double)m_cg[0] - x);
-				M -= m_relativeForceSize*pixelArea*ex * y;
-				M += m_relativeForceSize*pixelArea*ey * x;
-			}
-			
-			M -= pixelArea*m_cg[0];
-			
-			Fy -= pixelArea;
-			
-			Fext(1) = -Fx;
-			Fext(2) = -Fy;
-			Fext(3) = -M;
-			
-			Try 
-			{
-				LinearEquationSolver A = K;
-				R = A.i() * Fext;
-			}
-			CatchAll 
-			{	
-				so_print("CPaintView","\tSomethings wrong...");
-			}
-			
-			m_reactionForces[0]->setLength(m_cgIndicator->getArrowLength()*R(1)/pixelArea);
-			m_reactionForces[1]->setLength(m_cgIndicator->getArrowLength()*R(2)/pixelArea);
-			m_reactionForces[2]->setLength(m_cgIndicator->getArrowLength()*R(3)/pixelArea);
-			
-			m_validReactions = true;
-		}
-	}
-#endif
-}
-
 void CPaintView::lockScaleFactor()
 {
 	m_femGrid->setLockScale(true);
@@ -2985,7 +2803,6 @@ void CPaintView::setCalcCG(bool flag)
 		m_cgIndicator->setPosition(m_drawingOffsetX+cgx, m_drawingOffsetY+cgy);
 		m_cg[0] = cgx;
 		m_cg[1] = cgy;
-		this->calcRigidReactions();
 	}
 	else
 		m_femGrid->updatePixelArea();
@@ -3095,6 +2912,13 @@ bool CPaintView::getDrawDisplacements()
 {
 	return m_femGrid->getDrawDisplacements();
 }
+
+void CPaintView::setDrawForcesAndConstraints(bool flag)
+{
+	m_femGrid->setDrawForcesAndConstraints(flag);
+	this->redraw();
+}
+
 
 void CPaintView::setStressType(CFemGrid2::TStressType stressType)
 {

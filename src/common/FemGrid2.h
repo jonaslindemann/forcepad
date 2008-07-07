@@ -71,6 +71,7 @@ private:
 	bool m_drawStress;
 	bool m_drawDisplacements;
 	bool m_drawForcesAndConstraints;
+	bool m_drawStructure;
 	
 	CColorPtr m_forceColor;
 	CColorPtr m_constraintColor;
@@ -138,6 +139,7 @@ private:
 
 	void drawGrid();
 	void drawUndeformedGrid();
+	void drawStructure();
 	void drawConstraints();
 	void drawForces();
 	void drawStress();

@@ -78,7 +78,7 @@ COptSettings::COptSettings() {
         sigmundFilter->down_box(FL_ROUND_DOWN_BOX);
         sigmundFilter->labelsize(11);
       } // Fl_Round_Button* sigmundFilter
-      { backPedersenFilter = new Fl_Round_Button(22, 223, 93, 15, "Back Pedersen");
+      { backPedersenFilter = new Fl_Round_Button(22, 223, 93, 15, "Sharp Contouring Filter");
         backPedersenFilter->type(102);
         backPedersenFilter->down_box(FL_ROUND_DOWN_BOX);
         backPedersenFilter->value(1);
@@ -116,7 +116,7 @@ void COptSettings::setData() {
 		noFilter->value(1);
 	if (view->getOptFilterType()==CFemGridSolver2::FT_OLE_SIGMUND)
 		sigmundFilter->value(1);
-	if (view->getOptFilterType()==CFemGridSolver2::FT_BACK_PEDERSEN)
+	if (view->getOptFilterType()==CFemGridSolver2::FT_SHARP_CONTOURING)
 		backPedersenFilter->value(1);
 
 }
@@ -137,7 +137,7 @@ void COptSettings::getData() {
 	if (sigmundFilter->value()==1)
 		view->setOptFilterType(CFemGridSolver2::FT_OLE_SIGMUND);
 	if (backPedersenFilter->value()==1)
-		view->setOptFilterType(CFemGridSolver2::FT_BACK_PEDERSEN);
+		view->setOptFilterType(CFemGridSolver2::FT_SHARP_CONTOURING);
 	
 }
 }
