@@ -36,6 +36,13 @@ decl {\#include <iostream>} {public global
 decl {\#include <string>} {public global
 } 
 
+Function {mainWindowCB(Fl_Widget* w, void* v)} {open private return_type void
+} {
+  code {// Make sure all windows are hidden when Window is closed.
+w->default_callback(w, v);
+while( Fl::first_window() ) Fl::first_window()->hide();} {}
+} 
+
 class CMainFrame {open : {CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusMessageEvent, CGSLogMessageEvent, CGSContinueCalcEvent, CPVViewModeErrorEvent, CPVModelChangedEvent, CPVRulerChangedEvent}
 } {
   decl {bool m_continueCalc;} {}
@@ -46,7 +53,7 @@ class CMainFrame {open : {CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusM
   Function {CMainFrame()} {open
   } {
     Fl_Window wndMain {
-      label {ForcePAD 2}
+      label {ForcePAD 2} open
       xywh {360 132 861 684} type Double color 0 align 80 resizable visible
     } {
       Fl_Menu_Bar mainMenu {open
@@ -80,7 +87,7 @@ class CMainFrame {open : {CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusM
             label {E&xit}
             callback {m_tabletToolbar->hide();
 wndMain->hide();
-this->close();} selected
+this->close();}
             xywh {0 0 30 20} labelsize 12
           }
         }
@@ -272,7 +279,7 @@ if (btnPaste->value()==1)
         } {
           Fl_Button btnOptLayer {
             callback {paintView->setOptLayer(btnOptLayer->value());}
-            tooltip {Flood fill tool} image {../../images/no_opt_black.xpm} xywh {5 226 42 42} type Toggle box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1
+            tooltip {Exclusion layer (NOT IMPLEMETED YET)} image {../../images/no_opt_black.xpm} xywh {5 226 42 42} type Toggle box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1
             code0 {\#include "Fl_HoverButton.h"}
             class Fl_HoverButton
           }
@@ -350,12 +357,12 @@ paintView->executeOpt();}
           class Fl_HoverButton
         }
         Fl_Button btnStructure {
-          label str
+          label STR
           callback {showRightToolbar(scrRightDisplacementToolbar);
 paintView->setDrawDisplacements(false);
 paintView->setDrawStress(false);
 paintView->setDrawForcesAndConstraints(false);}
-          tooltip {Displacement visualisation} xywh {370 391 42 42} type Radio box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1
+          tooltip {Show structure only} xywh {370 391 42 42} type Radio box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1 labelcolor 7
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
         }
@@ -955,14 +962,14 @@ m_physicsEditMode = paintView->getEditMode();}
 showRightToolbar(scrRightDimensionToolbar);
 paintView->setEditMode(CPaintView::EM_RULER);
 actualLength->value(paintView->getRulerLength());
-m_physicsEditMode = paintView->getEditMode();}
-          tooltip Contraints image {../../images/ruler_black.xpm} xywh {641 190 42 42} type Radio box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1
+m_physicsEditMode = paintView->getEditMode();} selected
+          tooltip {Set model scale} image {../../images/ruler_black.xpm} xywh {641 190 42 42} type Radio box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
         }
         Fl_Button btnThickness {
           callback {showRightToolbar(scrRightThicknessToolbar);}
-          tooltip Contraints image {../../images/thickness_black.xpm} xywh {641 232 42 42} type Radio box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 51
+          tooltip {Set model thickness} image {../../images/thickness_black.xpm} xywh {641 232 42 42} type Radio box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 51
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
         }
@@ -1021,16 +1028,18 @@ m_tabletToolbar = new CTabletToolbar();
 m_tabletToolbar->setView(paintView);
 
 m_sketchEditMode = CPaintView::EM_BRUSH;
-m_physicsEditMode = CPaintView::EM_FORCE;} {}
+m_physicsEditMode = CPaintView::EM_FORCE;
+
+// Add a callback for closing windows at application end.
+
+wndMain->callback(mainWindowCB);} {}
   }
-  Function {~CMainFrame()} {open
-  } {
+  Function {~CMainFrame()} {} {
     code {m_tabletToolbar->hide();
 delete m_tabletToolbar;
 delete paintView;} {}
   }
-  Function {show()} {open
-  } {
+  Function {show()} {} {
     code {\#ifdef WIN32
 extern HINSTANCE fl_display;
 wndMain->icon((char *)LoadIcon(fl_display, MAKEINTRESOURCE(IDI_FORCEPAD)));
@@ -1320,7 +1329,7 @@ scrRightDimensionToolbar->deactivate();
 scrRightThicknessToolbar->hide();
 scrRightThicknessToolbar->deactivate();} {}
   }
-  Function {showLeftToolbar(Fl_Widget* toolbar)} {open return_type void
+  Function {showLeftToolbar(Fl_Widget* toolbar)} {return_type void
   } {
     code {hideLeftToolbars();
 
@@ -1363,7 +1372,7 @@ wndMain->label(caption.c_str());} {}
     code {pixelLength->precision(1);
 pixelLength->value(ruler->getPixelLength());} {}
   }
-  Function {onContinueCalc()} {open return_type bool
+  Function {onContinueCalc()} {return_type bool
   } {
     code {Fl::check();
 Fl::flush();

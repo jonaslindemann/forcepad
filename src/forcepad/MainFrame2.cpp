@@ -11,6 +11,12 @@
 #include "CalcSettings.h"
 #include "OptSettings.h"
 
+static void mainWindowCB(Fl_Widget* w, void* v) {
+  // Make sure all windows are hidden when Window is closed.
+w->default_callback(w, v);
+while( Fl::first_window() ) Fl::first_window()->hide();
+}
+
 void CMainFrame::cb_fileMenuNew_i(Fl_Menu_*, void*) {
   paintView->newModel();
 }
@@ -16006,7 +16012,7 @@ CMainFrame::CMainFrame() {
       } // Fl_Box* o
       { Fl_Group* o = new Fl_Group(2, 223, 49, 58);
         { btnOptLayer = new Fl_HoverButton(5, 226, 42, 42);
-          btnOptLayer->tooltip("Flood fill tool");
+          btnOptLayer->tooltip("Exclusion layer (NOT IMPLEMETED YET)");
           btnOptLayer->type(1);
           btnOptLayer->box(FL_THIN_UP_BOX);
           btnOptLayer->down_box(FL_THIN_DOWN_FRAME);
@@ -16144,8 +16150,8 @@ CMainFrame::CMainFrame() {
         btnOptimize->align(FL_ALIGN_CENTER);
         btnOptimize->when(FL_WHEN_RELEASE);
       } // Fl_HoverButton* btnOptimize
-      { btnStructure = new Fl_HoverButton(370, 391, 42, 42, "str");
-        btnStructure->tooltip("Displacement visualisation");
+      { btnStructure = new Fl_HoverButton(370, 391, 42, 42, "STR");
+        btnStructure->tooltip("Show structure only");
         btnStructure->type(102);
         btnStructure->box(FL_THIN_UP_BOX);
         btnStructure->down_box(FL_THIN_DOWN_FRAME);
@@ -16154,7 +16160,7 @@ CMainFrame::CMainFrame() {
         btnStructure->labeltype(FL_NORMAL_LABEL);
         btnStructure->labelfont(0);
         btnStructure->labelsize(14);
-        btnStructure->labelcolor(FL_FOREGROUND_COLOR);
+        btnStructure->labelcolor(FL_BACKGROUND2_COLOR);
         btnStructure->callback((Fl_Callback*)cb_btnStructure);
         btnStructure->align(FL_ALIGN_CENTER);
         btnStructure->when(FL_WHEN_RELEASE);
@@ -17359,7 +17365,7 @@ CMainFrame::CMainFrame() {
         btnConstraintHinge->when(FL_WHEN_RELEASE);
       } // Fl_HoverButton* btnConstraintHinge
       { btnDimensionTools = new Fl_HoverButton(641, 190, 42, 42);
-        btnDimensionTools->tooltip("Contraints");
+        btnDimensionTools->tooltip("Set model scale");
         btnDimensionTools->type(102);
         btnDimensionTools->box(FL_THIN_UP_BOX);
         btnDimensionTools->down_box(FL_THIN_DOWN_FRAME);
@@ -17375,7 +17381,7 @@ CMainFrame::CMainFrame() {
         btnDimensionTools->when(FL_WHEN_RELEASE);
       } // Fl_HoverButton* btnDimensionTools
       { btnThickness = new Fl_HoverButton(641, 232, 42, 42);
-        btnThickness->tooltip("Contraints");
+        btnThickness->tooltip("Set model thickness");
         btnThickness->type(102);
         btnThickness->box(FL_THIN_UP_BOX);
         btnThickness->down_box(FL_THIN_DOWN_FRAME);
@@ -17491,6 +17497,10 @@ m_tabletToolbar->setView(paintView);
 
 m_sketchEditMode = CPaintView::EM_BRUSH;
 m_physicsEditMode = CPaintView::EM_FORCE;
+
+// Add a callback for closing windows at application end.
+
+wndMain->callback(mainWindowCB);
 }
 
 CMainFrame::~CMainFrame() {
