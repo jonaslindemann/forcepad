@@ -666,8 +666,7 @@ CConstraint* CFemGrid2::getFirstPointConstraint()
 
 	// Find first non-empty row
 
-	for (i=0; (i<height)&&(m_pointConstraints[i].empty()); i++)
-		cout << "i = " << i << endl;
+	for (i=0; (i<height)&&(m_pointConstraints[i].empty()); i++);
 
 	// If no constraints where found return NULL
 

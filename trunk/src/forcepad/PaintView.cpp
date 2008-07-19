@@ -372,15 +372,7 @@ int CPaintView::handle(int event)
 	
 	// Call the different event methods
 
-	cout << "handle, event = " << event << endl;
-	
 	switch (event) {
-	case FL_HIDE:
-		cout << "FL_HIDE" << endl;
-		break;
-	case FL_CLOSE:
-		cout << "FL_CLOSE" << endl;
-		break;
 	case FL_PUSH:
 		m_leftMouseDown = true;
 		onPush(x, y);
@@ -411,6 +403,7 @@ int CPaintView::handle(int event)
 	default:
 		return Fl_Gl_Window::handle(event);
 	}
+	return Fl_Gl_Window::handle(event);
 }
 
 /////////////////////////////////////////////////////////////
