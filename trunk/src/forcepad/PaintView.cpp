@@ -371,8 +371,16 @@ int CPaintView::handle(int event)
 	}
 	
 	// Call the different event methods
+
+	cout << "handle, event = " << event << endl;
 	
 	switch (event) {
+	case FL_HIDE:
+		cout << "FL_HIDE" << endl;
+		break;
+	case FL_CLOSE:
+		cout << "FL_CLOSE" << endl;
+		break;
 	case FL_PUSH:
 		m_leftMouseDown = true;
 		onPush(x, y);
@@ -401,8 +409,7 @@ int CPaintView::handle(int event)
 		return 1;
 		break;
 	default:
-		//so_print("CPaintView","unhandled event");
-		return 0;
+		return Fl_Gl_Window::handle(event);
 	}
 }
 
@@ -1072,7 +1079,7 @@ void CPaintView::onDraw()
 			glPixelZoom(m_brushScale, m_brushScale);
 			glLogicOp(GL_AND);
 			glRasterPos2i(m_current[0]-m_clipboard->getClipboard()->getWidth()*m_brushScale/2, h()-m_current[1]-m_clipboard->getClipboard()->getHeight()*m_brushScale/2);
-			glDrawPixels(m_clipboard->getClipboard()->getWidth(), m_clipboard->getClipboard()->getHeight(), GL_RGBA, GL_UNSIGNED_BYTE, m_clipboard->getClipboard()->getImageMap());
+			glDrawPixels(m_clipboard->getClipboard()->getWidth(), m_clipboard->getClipboard()->getHeight(), GL_RGB, GL_UNSIGNED_BYTE, m_clipboard->getClipboard()->getImageMap());
 			glDisable(GL_COLOR_LOGIC_OP);
 			m_clipboard->render(m_current[0]-m_clipboard->getClipboard()->getWidth()*m_brushScale/2, h()-m_current[1]-m_clipboard->getClipboard()->getHeight()*m_brushScale/2);
 			glPixelZoom(1.0, 1.0);
@@ -2160,8 +2167,8 @@ void CPaintView::copy()
 		y2 = m_selectionEnd[1];
 	}
 	
-	copyToWindows();
 	m_clipboard->copy(x1, y1, x2, y2);
+	copyToWindows();
 	
 	this->redraw();
 }
@@ -2312,10 +2319,12 @@ void CPaintView::copyToWindows()
 	int i, j;
 	
 	
-	GLubyte *pPixelData = new GLubyte[nbBytes];
+	//GLubyte *pPixelData = new GLubyte[nbBytes];
 	//int storageWidth = w*3 - (w*3)%sizeof(DWORD) + sizeof(DWORD);
 	int storageWidth = w*3;
 	GLubyte *pPixelDataPadded = new GLubyte[storageWidth*h];
+	GLubyte red, green, blue;
+
 	
 	// Make OpenGL context current
 	
@@ -2323,6 +2332,7 @@ void CPaintView::copyToWindows()
 	
 	// Read pixels from screen
 	
+	/*
 	glPixelStorei(GL_PACK_ALIGNMENT, 1);
 	
 	glReadPixels(
@@ -2333,7 +2343,8 @@ void CPaintView::copyToWindows()
 		GL_RGBA,GL_UNSIGNED_BYTE,
 		pPixelData
 		);
-	
+	*/
+
 	// Create and fill header 
 	
 	header = new BITMAPINFOHEADER; 
@@ -2354,9 +2365,11 @@ void CPaintView::copyToWindows()
 	for (i=0; i<w; i++)
 		for (j=0; j<h; j++)
 		{
-			pPixelDataPadded[j*storageWidth+i*3] = pPixelData[j*w*3+i*3+2];
-			pPixelDataPadded[j*storageWidth+i*3+1] = pPixelData[j*w*3+i*3+1];
-			pPixelDataPadded[j*storageWidth+i*3+2] = pPixelData[j*w*3+i*3];
+			m_clipboard->getClipboardImage()->getPixel(i,j,red,green,blue);
+
+			pPixelDataPadded[j*storageWidth+i*3] = blue;
+			pPixelDataPadded[j*storageWidth+i*3+1] = green;
+			pPixelDataPadded[j*storageWidth+i*3+2] = red;
 		}
 		
 		// Generate handle 
@@ -2389,7 +2402,7 @@ void CPaintView::copyToWindows()
 		// Clean up
 		
 		delete header;
-		delete [] pPixelData;
+		//delete [] pPixelData;
 		delete [] pPixelDataPadded;
 #endif
 }

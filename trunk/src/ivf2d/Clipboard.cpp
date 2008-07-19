@@ -224,3 +224,9 @@ void CClipboard::getSelection(int &x1, int &y1, int &x2, int &y2)
 	x2 = m_selectionX[1];
 	y2 = m_selectionY[1];
 }
+
+CImage* CClipboard::getClipboardImage()
+{
+	return m_clipboard;
+}
+

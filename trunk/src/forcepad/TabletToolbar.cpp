@@ -1014,3 +1014,7 @@ void CTabletToolbar::centerWindow(Fl_Window* window) {
 void CTabletToolbar::placeWindow(Fl_Window* window) {
   mainWindow->position(window->x()+window->w()-mainWindow->w()-100, window->y()+window->h()-mainWindow->h()-100);
 }
+
+void CTabletToolbar::hide() {
+  mainWindow->hide();
+}

@@ -46,7 +46,7 @@ class CMainFrame {open : {CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusM
   Function {CMainFrame()} {open
   } {
     Fl_Window wndMain {
-      label {ForcePAD 2} open
+      label {ForcePAD 2}
       xywh {360 132 861 684} type Double color 0 align 80 resizable visible
     } {
       Fl_Menu_Bar mainMenu {open
@@ -78,7 +78,9 @@ class CMainFrame {open : {CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusM
           }
           MenuItem fileMenuExit {
             label {E&xit}
-            callback {wndMain->hide();}
+            callback {m_tabletToolbar->hide();
+wndMain->hide();
+this->close();} selected
             xywh {0 0 30 20} labelsize 12
           }
         }
@@ -279,7 +281,7 @@ if (btnPaste->value()==1)
       Fl_Group paintGroup {open
         xywh {52 26 750 627} resizable
       } {
-        Fl_Box paintView {selected
+        Fl_Box paintView {
           xywh {53 27 747 625} box FLAT_BOX color 0
           code0 {\#include "PaintView.h"}
           class CPaintView
@@ -1023,7 +1025,8 @@ m_physicsEditMode = CPaintView::EM_FORCE;} {}
   }
   Function {~CMainFrame()} {open
   } {
-    code {delete m_tabletToolbar;
+    code {m_tabletToolbar->hide();
+delete m_tabletToolbar;
 delete paintView;} {}
   }
   Function {show()} {open
@@ -1079,8 +1082,10 @@ paintView->setModelName("noname.fp2");
 thickness->value(paintView->getThickness());
 forceMagnitude->value(paintView->getForceMagnitude());} {}
   }
-  Function {close()} {} {
-    code {wndMain->hide();
+  Function {close()} {open
+  } {
+    code {m_tabletToolbar->hide();
+wndMain->hide();
 so_hide();} {}
   }
   Function {resetButtons()} {private

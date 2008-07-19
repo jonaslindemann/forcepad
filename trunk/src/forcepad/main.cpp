@@ -35,7 +35,7 @@
 
 #include "SplashFrame.h"
 //#include "StatusOutput.h"
-#include "LogWindow.h"
+//#include "LogWindow.h"
 
 int
 main(int argc, char **argv)
@@ -43,8 +43,6 @@ main(int argc, char **argv)
 	//
 	// Setup window visuals
 	//
-
-	so_print("main","Setting visual to FL_SINGLE|FL_RGB|FL_ALPHA");
 
 	Fl::visual(FL_DOUBLE|FL_RGB|FL_ALPHA);
 	Fl::get_system_colors();
@@ -59,8 +57,6 @@ main(int argc, char **argv)
 	// Create main window
 	//
 
-	so_print("main","Creating main window.");
-
 	CMainFrame* frame = new CMainFrame();
 	frame->setCommandLine(argc, argv);
 	frame->show();
@@ -68,8 +64,6 @@ main(int argc, char **argv)
 	//
 	// Show a splash screen
 	//
-
-	so_print("main","Creating splash screen.");
 
 	CSplashFrame* splash = new CSplashFrame();
 	splash->setTimer(true);
@@ -82,13 +76,12 @@ main(int argc, char **argv)
 
 	int result = Fl::run();
 
+	cout << "After Fl::run();" << endl;
+
 	// 
 	// Cleanup
 	//
 
 	delete frame;
-
-	so_hide();
-
 	return result;
 }

@@ -40,7 +40,9 @@ void CMainFrame::cb_fileMenuSaveAs(Fl_Menu_* o, void* v) {
 }
 
 void CMainFrame::cb_fileMenuExit_i(Fl_Menu_*, void*) {
-  wndMain->hide();
+  m_tabletToolbar->hide();
+wndMain->hide();
+this->close();
 }
 void CMainFrame::cb_fileMenuExit(Fl_Menu_* o, void* v) {
   ((CMainFrame*)(o->parent()->user_data()))->cb_fileMenuExit_i(o,v);
@@ -17492,7 +17494,8 @@ m_physicsEditMode = CPaintView::EM_FORCE;
 }
 
 CMainFrame::~CMainFrame() {
-  delete m_tabletToolbar;
+  m_tabletToolbar->hide();
+delete m_tabletToolbar;
 delete paintView;
 }
 
@@ -17550,7 +17553,8 @@ forceMagnitude->value(paintView->getForceMagnitude());
 }
 
 void CMainFrame::close() {
-  wndMain->hide();
+  m_tabletToolbar->hide();
+wndMain->hide();
 so_hide();
 }
 
