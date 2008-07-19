@@ -69,10 +69,14 @@ CFemGrid2::CFemGrid2()
 	m_dimmedConstraints = false;
 	m_undeformedGrid = false;
 	m_drawDensity = false;
+	m_drawStructure = false;
 
 	m_pixelArea = -1.0;
 
 	m_upperMisesTreshold = 0.8; // Remove stress spikes.
+
+	m_pointConstraints.clear();
+	m_pointForces.clear();
 }
 
 CFemGrid2::~CFemGrid2()
@@ -658,9 +662,12 @@ CConstraint* CFemGrid2::getFirstPointConstraint()
 	int i;
 	int height = getImage()->getHeight();
 
+	// Make sure m_pointConstraints has been initialiased
+
 	// Find first non-empty row
 
-	for (i=0; (m_pointConstraints[i].empty())&&(i<height); i++);
+	for (i=0; (i<height)&&(m_pointConstraints[i].empty()); i++)
+		cout << "i = " << i << endl;
 
 	// If no constraints where found return NULL
 
@@ -2009,6 +2016,8 @@ void CFemGrid2::moveForce(CForce* force, int x, int y)
 	CForceQueIter fi;
 	CForceQueIter eraseForce;
 
+	CForcePtr holdForce = force;
+
 	force->getPosition(fx, fy);
 
 	fxs = (int)fx;
@@ -2017,8 +2026,8 @@ void CFemGrid2::moveForce(CForce* force, int x, int y)
 
 	for (fi=m_pointForces[fys].begin(); (!m_pointForces[fys].empty())&&(fi!=m_pointForces[fys].end()); fi++)
 	{
-		CForce* aForce = (*fi);
-		if (force = aForce)
+		CForcePtr aForce = (*fi);
+		if (force == aForce)
 			eraseForce = fi;
 	}
 

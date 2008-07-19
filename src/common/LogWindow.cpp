@@ -5,30 +5,12 @@
 CLogWindow* CLogWindow::m_instance = 0; 
 
 CLogWindow::CLogWindow() {
-  { mainWindow = new Fl_Double_Window(576, 166, "Log output window");
-    mainWindow->user_data((void*)(this));
-    { textDisplay = new Fl_Text_Display(5, 5, 565, 155);
-      textDisplay->textfont(4);
-      textDisplay->textsize(10);
-    } // Fl_Text_Display* textDisplay
-    mainWindow->set_non_modal();
-    mainWindow->end();
-    mainWindow->resizable(mainWindow);
-  } // Fl_Double_Window* mainWindow
-  textDisplay->buffer(new Fl_Text_Buffer(0));
-textDisplay->scrollbar_align(FL_ALIGN_RIGHT);
-#ifdef WIN32
-//m_editStrBuf.setLog(textDisplay);
-//m_oldBuf = std::cout.rdbuf( &m_editStrBuf );
-#endif
 }
 
 void CLogWindow::hide() {
-  mainWindow->hide();
 }
 
 void CLogWindow::show() {
-  mainWindow->show();
 }
 
 CLogWindow* CLogWindow::getInstance() {

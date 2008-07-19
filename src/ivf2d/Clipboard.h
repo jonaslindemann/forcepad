@@ -67,6 +67,7 @@ public:
 
 	void setPasteMode(TPasteMode mode);
 	void setImage(CImage* image);
+	CImage* getClipboardImage();
 	void setCopyImageMode(TCopyImageMode mode);
 	void getSelection(int &x1, int &y1, int &x2, int &y2);
 

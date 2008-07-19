@@ -40,5 +40,6 @@ public:
   void setView(void* view);
   void centerWindow(Fl_Window* window);
   void placeWindow(Fl_Window* window);
+  void hide();
 };
 #endif
