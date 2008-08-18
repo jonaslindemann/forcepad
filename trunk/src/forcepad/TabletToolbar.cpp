@@ -3,6 +3,12 @@
 #include "TabletToolbar.h"
 #include "PaintView.h"
 #include "CalcSettings.h"
+#include "PlatformInfo.h"
+#ifdef WIN32
+#include "resource.h"
+#include "dwmapi.h"
+#endif
+#include <FL/x.H>
 
 void CTabletToolbar::cb_btnOpen_i(Fl_HoverButton*, void*) {
   if (m_paintView!=NULL)
@@ -922,11 +928,12 @@ static Fl_Pixmap image_calc(idata_calc);
 
 CTabletToolbar::CTabletToolbar() {
   { mainWindow = new Fl_Double_Window(232, 49, "Tablet Toolbar");
+    mainWindow->color(FL_FOREGROUND_COLOR);
     mainWindow->user_data((void*)(this));
     { btnOpen = new Fl_HoverButton(50, 3, 42, 42);
       btnOpen->tooltip("Open model");
-      btnOpen->box(FL_UP_BOX);
-      btnOpen->color(FL_BACKGROUND_COLOR);
+      btnOpen->box(FL_THIN_UP_BOX);
+      btnOpen->color(FL_FOREGROUND_COLOR);
       btnOpen->selection_color(FL_BACKGROUND_COLOR);
       btnOpen->image(image_open);
       btnOpen->labeltype(FL_NORMAL_LABEL);
@@ -939,8 +946,8 @@ CTabletToolbar::CTabletToolbar() {
     } // Fl_HoverButton* btnOpen
     { btnNew = new Fl_HoverButton(5, 3, 42, 42);
       btnNew->tooltip("New model");
-      btnNew->box(FL_UP_BOX);
-      btnNew->color(FL_BACKGROUND_COLOR);
+      btnNew->box(FL_THIN_UP_BOX);
+      btnNew->color(FL_FOREGROUND_COLOR);
       btnNew->selection_color(FL_BACKGROUND_COLOR);
       btnNew->image(image_new);
       btnNew->labeltype(FL_NORMAL_LABEL);
@@ -953,8 +960,8 @@ CTabletToolbar::CTabletToolbar() {
     } // Fl_HoverButton* btnNew
     { btnSaveAs = new Fl_HoverButton(95, 3, 42, 42);
       btnSaveAs->tooltip("Save model as...");
-      btnSaveAs->box(FL_UP_BOX);
-      btnSaveAs->color(FL_BACKGROUND_COLOR);
+      btnSaveAs->box(FL_THIN_UP_BOX);
+      btnSaveAs->color(FL_FOREGROUND_COLOR);
       btnSaveAs->selection_color(FL_BACKGROUND_COLOR);
       btnSaveAs->image(image_save);
       btnSaveAs->labeltype(FL_NORMAL_LABEL);
@@ -967,8 +974,8 @@ CTabletToolbar::CTabletToolbar() {
     } // Fl_HoverButton* btnSaveAs
     { btnUndo = new Fl_HoverButton(140, 3, 42, 42);
       btnUndo->tooltip("Undo");
-      btnUndo->box(FL_UP_BOX);
-      btnUndo->color(FL_BACKGROUND_COLOR);
+      btnUndo->box(FL_THIN_UP_BOX);
+      btnUndo->color(FL_FOREGROUND_COLOR);
       btnUndo->selection_color(FL_BACKGROUND_COLOR);
       btnUndo->image(image_undo);
       btnUndo->labeltype(FL_NORMAL_LABEL);
@@ -981,8 +988,8 @@ CTabletToolbar::CTabletToolbar() {
     } // Fl_HoverButton* btnUndo
     { btnSettings = new Fl_HoverButton(185, 3, 42, 42);
       btnSettings->tooltip("Calculation settings");
-      btnSettings->box(FL_UP_BOX);
-      btnSettings->color(FL_BACKGROUND_COLOR);
+      btnSettings->box(FL_THIN_UP_BOX);
+      btnSettings->color(FL_FOREGROUND_COLOR);
       btnSettings->selection_color(FL_BACKGROUND_COLOR);
       btnSettings->image(image_calc);
       btnSettings->labeltype(FL_NORMAL_LABEL);
@@ -1000,7 +1007,18 @@ CTabletToolbar::CTabletToolbar() {
 }
 
 void CTabletToolbar::show() {
-  mainWindow->show();
+  CPlatformInfoPtr platformInfo = CPlatformInfo::getInstance();
+
+mainWindow->show();
+
+
+#ifdef WIN32
+   if (platformInfo->isVista())
+   {
+   	SetWindowLong(fl_xid(mainWindow), GWL_EXSTYLE, GetWindowLong(fl_xid(mainWindow), GWL_EXSTYLE) | WS_EX_LAYERED);
+	SetLayeredWindowAttributes(fl_xid(mainWindow), 0, (255 * 70) / 100, LWA_ALPHA);
+   }	   
+#endif
 }
 
 void CTabletToolbar::setView(void* view) {
