@@ -37,6 +37,14 @@
 //#include "StatusOutput.h"
 //#include "LogWindow.h"
 
+#ifdef WIN32
+#include "SystemInfo.h"
+#ifdef _WIN32_WINNT_VISTA
+#include "dwmapi.h"
+#pragma comment(lib, "dwmapi.lib")
+#endif
+#endif
+
 int
 main(int argc, char **argv)
 {
@@ -51,6 +59,11 @@ main(int argc, char **argv)
 	Fl::scheme("default");
 #else
 	Fl::scheme("GTK+");
+#endif
+
+#ifdef WIN32
+	Fl::set_font(FL_HELVETICA, "Segoe UI");
+	Fl::set_font(FL_HELVETICA, "Tahoma");
 #endif
 
 	//
