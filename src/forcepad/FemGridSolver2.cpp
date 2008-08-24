@@ -32,6 +32,9 @@
 
 #include <set>
 #include <fstream>
+#include <cstdlib>
+#include <cmath>
+#include <climits>
 
 CFemGridSolver2::CFemGridSolver2()
 {
@@ -2016,8 +2019,8 @@ ReturnMatrix CFemGridSolver2::sensitivityFilter1(Matrix& X, Matrix& dC, double r
 		{
 			sum = 0.0;
 
-			for (k=max(i-floor(rmin),1); k<=min(i+floor(rmin),cols); k++)
-				for (l=max(j-floor(rmin),1); l<=min(j+floor(rmin),rows); l++)
+			for (k=max(i-floor(rmin),1.0); k<=min(i+floor(rmin),(double)cols); k++)
+				for (l=max(j-floor(rmin),1.0); l<=min(j+floor(rmin),(double)rows); l++)
 				{
 					fac = rmin - sqrt(pow((double)(i-k),2.0)+pow((double)(j-l),2.0));
 					sum += max(0.0,fac);
@@ -2063,8 +2066,8 @@ ReturnMatrix CFemGridSolver2::sensitivityFilter2(Matrix& dC, double rmin)
 		{
 			sum = 0.0;
 
-			for (k=max(i-floor(rmin),1); k<=min(i+floor(rmin),cols); k++)
-				for (l=max(j-floor(rmin),1); l<=min(j+floor(rmin),rows); l++)
+			for (k=max(i-floor(rmin),1.0); k<=min(i+floor(rmin),(double)cols); k++)
+				for (l=max(j-floor(rmin),1.0); l<=min(j+floor(rmin),(double)rows); l++)
 				{
 					fac = rmin - sqrt(pow((double)(i-k),2.0)+pow((double)(j-l),2.0));
 					sum += max(0.0,fac);

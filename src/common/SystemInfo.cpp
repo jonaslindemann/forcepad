@@ -3,6 +3,8 @@
 
 #include "SystemInfo.h"
 
+#ifdef WIN32
+
 #include <tchar.h>
 #include <stdio.h>
 //////////////////////////////////////////////////////////////////////
@@ -429,3 +431,5 @@ bool SystemInfo::Is64bitPlatform() const
 		m_SysInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64 ||
 		m_SysInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_ALPHA64);
 }
+
+#endif
