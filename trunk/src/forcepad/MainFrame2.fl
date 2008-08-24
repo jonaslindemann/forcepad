@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0109 
+version 1.0300 
 header_name {.h} 
 code_name {.cpp}
 decl {/** Main window class generated from FLTK. */} {public
@@ -54,8 +54,7 @@ class CMainFrame {open : {CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusM
   decl {CPaintView::TEditMode m_sketchEditMode;} {}
   decl {CPaintView::TEditMode m_physicsEditMode;} {}
   decl {CTabletToolbar* m_tabletToolbar;} {}
-  Function {CMainFrame()} {open
-  } {
+  Function {CMainFrame()} {} {
     Fl_Window wndMain {
       label {ForcePAD 2} open
       xywh {667 148 861 684} type Double color 0 align 80 resizable visible
@@ -292,7 +291,7 @@ if (btnPaste->value()==1)
       Fl_Group paintGroup {open
         xywh {52 26 750 627} resizable
       } {
-        Fl_Box paintView {selected
+        Fl_Box paintView {
           xywh {53 27 747 625} box FLAT_BOX color 0
           code0 {\#include "PaintView.h"}
           class CPaintView
@@ -1043,8 +1042,7 @@ wndMain->callback(mainWindowCB);} {}
 delete m_tabletToolbar;
 delete paintView;} {}
   }
-  Function {show()} {open
-  } {
+  Function {show()} {} {
     code {\#ifdef WIN32
 extern HINSTANCE fl_display;
 wndMain->icon((char *)LoadIcon(fl_display, MAKEINTRESOURCE(IDI_FORCEPAD)));
@@ -1108,8 +1106,7 @@ paintView->setModelName("noname.fp2");
 thickness->value(paintView->getThickness());
 forceMagnitude->value(paintView->getForceMagnitude());} {}
   }
-  Function {close()} {open
-  } {
+  Function {close()} {} {
     code {m_tabletToolbar->hide();
 wndMain->hide();
 so_hide();} {}
@@ -1294,19 +1291,23 @@ else
 	}	
 }} {}
   }
-  Function {onStatusMessage(const std::string& message, const int progress)} {return_type void
+  Function {onStatusMessage(const std::string& message, const int progress)} {open return_type void
   } {
-    code {\#ifndef __APPLE__
-using namespace std;
+    code {using namespace std;
 statusOutput->value(message.c_str());
 calcProgress->value(progress);
 paintView->redraw();
+paintView->damage(1);
 cout << message << endl;
-Fl::check();
+//Fl::redraw();
+while (Fl::wait())
+{
 Fl::flush();
-\#endif} {}
+Fl::check();
+}} {selected
+    }
   }
-  Function {onLogMessage(const std::string& context, const std::string& message)} {return_type void
+  Function {onLogMessage(const std::string& context, const std::string& message)} {open return_type void
   } {
     code {std::cout << context << ": " << message << std::endl;} {}
   }

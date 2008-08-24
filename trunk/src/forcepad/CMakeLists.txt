@@ -5,39 +5,43 @@ FILE(GLOB INCLUDE_FILES *.h)
 IF(CMAKE_BUILD_TYPE STREQUAL Debug)
 	ADD_EXECUTABLE(forcepadd ${INCLUDE_FILES} ${SOURCE_FILES})
 ELSE(CMAKE_BUILD_TYPE STREQUAL Debug)
+IF(APPLE)
+ADD_EXECUTABLE(
+	forcepad 
+	MACOSX_BUNDLE
+	${SOURCE_FILES}
+	../../bin/release/brushes/rbrush16.rgb
+	../../bin/release/brushes/rbrush32.rgb
+	../../bin/release/brushes/rbrush4.rgb
+	../../bin/release/brushes/rbrush64.rgb
+	../../bin/release/brushes/rbrush8.rgb
+	../../bin/release/brushes/sbrush16.rgb
+	../../bin/release/brushes/sbrush32.rgb
+	../../bin/release/brushes/sbrush4.rgb
+	../../bin/release/brushes/sbrush64.rgb
+	../../bin/release/brushes/sbrush8.rgb
+)
+
+#SET_SOURCE_FILES_PROPERTIES(
+#        ../../bin/release/brushes/rbrush16.rgb
+#        ../../bin/release/brushes/rbrush32.rgb
+#        ../../bin/release/brushes/rbrush4.rgb
+#        ../../bin/release/brushes/rbrush64.rgb
+#        ../../bin/release/brushes/rbrush8.rgb
+#        ../../bin/release/brushes/sbrush16.rgb
+#        ../../bin/release/brushes/sbrush32.rgb
+#        ../../bin/release/brushes/sbrush4.rgb
+#        ../../bin/release/brushes/sbrush64.rgb
+#        ../../bin/release/brushes/sbrush8.rgb
+#	PROPERTIES
+#	MACOSX_PACKAGE_LOCATION MacOS/brushes
+#)
+ELSE(APPLE)
 	ADD_EXECUTABLE(forcepad ${INCLUDE_FILES} ${SOURCE_FILES})
+ENDIF(APPLE)
 ENDIF(CMAKE_BUILD_TYPE STREQUAL Debug)
 
-# ADD_EXECUTABLE(
-	# forcepad 
-	# MACOSX_BUNDLE
-	# ${SOURCE_FILES}
-	# brushes/rbrush16.rgb
-	# brushes/rbrush32.rgb
-	# brushes/rbrush4.rgb
-	# brushes/rbrush64.rgb
-	# brushes/rbrush8.rgb
-	# brushes/sbrush16.rgb
-	# brushes/sbrush32.rgb
-	# brushes/sbrush4.rgb
-	# brushes/sbrush64.rgb
-	# brushes/sbrush8.rgb
-# )
 
-# SET_SOURCE_FILES_PROPERTIES(
-        # brushes/rbrush16.rgb
-        # brushes/rbrush32.rgb
-        # brushes/rbrush4.rgb
-        # brushes/rbrush64.rgb
-        # brushes/rbrush8.rgb
-        # brushes/sbrush16.rgb
-        # brushes/sbrush32.rgb
-        # brushes/sbrush4.rgb
-        # brushes/sbrush64.rgb
-        # brushes/sbrush8.rgb
-	# PROPERTIES
-	# MACOSX_PACKAGE_LOCATION MacOS/brushes
-# )
 
 IF(WIN32)
 	IF(CMAKE_BUILD_TYPE STREQUAL Debug)
@@ -48,7 +52,7 @@ IF(WIN32)
 ELSE(WIN32)
 	IF(APPLE)
 		#TARGET_LINK_LIBRARIES(forcepad common ivf2d fltk fltk_gl fltk_images fltk_forms fltk_jpeg fltk_png calfemcxx newmat fltk_zlib GLU GL)
-		TARGET_LINK_LIBRARIES(forcepad common ivf2d fltk fltk_gl fltk_images fltk_forms fltk_jpeg fltk_png calfemcxx newmat "-framework Carbon" "-framework Cocoa" "-framework ApplicationServices" "-framework AGL" "-framework OpenGL" z)
+		TARGET_LINK_LIBRARIES(forcepad common ivf2d fltk fltk_gl fltk_images fltk_forms fltk_jpeg fltk_png calfemcxx newmat "-framework Carbon" "-framework Cocoa" "-framework ApplicationServices" "-framework AGL" "-framework OpenGL" GLEW z)
 	ELSE(APPLE)
 		TARGET_LINK_LIBRARIES(forcepad common ivf2d fltk fltk_gl fltk_images fltk_forms jpeg png calfemcxx newmat z GLU GL)
 	ENDIF(APPLE)

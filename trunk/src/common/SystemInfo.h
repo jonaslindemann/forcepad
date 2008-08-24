@@ -9,6 +9,7 @@
 //////////////////////////////////////////////////////////////////////
 #pragma once
 
+#ifdef WIN32
 #include <Windows.h>
 
 typedef enum WindowsVersion
@@ -102,3 +103,4 @@ public:
 	bool Is32bitPlatform() const;					// true if platform is 32-bit
 	bool Is64bitPlatform() const;					// true if platform is 64-bit
 };
+#endif
