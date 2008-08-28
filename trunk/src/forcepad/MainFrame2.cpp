@@ -17769,18 +17769,12 @@ else
 }
 
 void CMainFrame::onStatusMessage(const std::string& message, const int progress) {
-  using namespace std;
-statusOutput->value(message.c_str());
+  statusOutput->value(message.c_str());
 calcProgress->value(progress);
 paintView->redraw();
 paintView->damage(1);
-cout << message << endl;
-//Fl::redraw();
-while (Fl::wait())
-{
 Fl::flush();
 Fl::check();
-}
 }
 
 void CMainFrame::onLogMessage(const std::string& context, const std::string& message) {

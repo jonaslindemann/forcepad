@@ -1293,18 +1293,12 @@ else
   }
   Function {onStatusMessage(const std::string& message, const int progress)} {open return_type void
   } {
-    code {using namespace std;
-statusOutput->value(message.c_str());
+    code {statusOutput->value(message.c_str());
 calcProgress->value(progress);
 paintView->redraw();
 paintView->damage(1);
-cout << message << endl;
-//Fl::redraw();
-while (Fl::wait())
-{
 Fl::flush();
-Fl::check();
-}} {selected
+Fl::check();} {selected
     }
   }
   Function {onLogMessage(const std::string& context, const std::string& message)} {open return_type void

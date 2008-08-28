@@ -2,6 +2,8 @@ PROJECT(forcepad)
 
 ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
 
+SET(CMAKE_CXX_FLAGS -fast)
+
 INCLUDE_DIRECTORIES(${FLTK_ROOT}/include ${FLTK_ROOT}/jpeg ${FLTK_ROOT}/png ${FLTK_ROOT}/zlib ${GLEW_ROOT}/include src/calfemcxx src/newmat src/defs)
 LINK_DIRECTORIES(${FLTK_ROOT}/lib ${PROJECT_SOURCE_DIR}/lib ${GLEW_ROOT}/lib)
 #LINK_DIRECTORIES(${PROJECT_SOURCE_DIR}/../fltk-1.1.8/build_xcode/bin ${PROJECT_SOURCE_DIR}/../calfemcxx-1.0/lib ${PROJECT_SOURCE_DIR}/../newmat-10.A/lib)
