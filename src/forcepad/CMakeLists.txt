@@ -6,21 +6,22 @@ IF(CMAKE_BUILD_TYPE STREQUAL Debug)
 	ADD_EXECUTABLE(forcepadd ${INCLUDE_FILES} ${SOURCE_FILES})
 ELSE(CMAKE_BUILD_TYPE STREQUAL Debug)
 IF(APPLE)
-ADD_EXECUTABLE(
-	forcepad 
-	MACOSX_BUNDLE
-	${SOURCE_FILES}
-	../../bin/release/brushes/rbrush16.rgb
-	../../bin/release/brushes/rbrush32.rgb
-	../../bin/release/brushes/rbrush4.rgb
-	../../bin/release/brushes/rbrush64.rgb
-	../../bin/release/brushes/rbrush8.rgb
-	../../bin/release/brushes/sbrush16.rgb
-	../../bin/release/brushes/sbrush32.rgb
-	../../bin/release/brushes/sbrush4.rgb
-	../../bin/release/brushes/sbrush64.rgb
-	../../bin/release/brushes/sbrush8.rgb
-)
+ADD_EXECUTABLE(forcepad ${INCLUDE_FILES} ${SOURCE_FILES})
+#ADD_EXECUTABLE(
+#	forcepad 
+#	MACOSX_BUNDLE
+#	${SOURCE_FILES}
+#	../../bin/release/brushes/rbrush16.rgb
+#	../../bin/release/brushes/rbrush32.rgb
+#	../../bin/release/brushes/rbrush4.rgb
+#	../../bin/release/brushes/rbrush64.rgb
+#	../../bin/release/brushes/rbrush8.rgb
+#	../../bin/release/brushes/sbrush16.rgb
+#	../../bin/release/brushes/sbrush32.rgb
+#	../../bin/release/brushes/sbrush4.rgb
+#	../../bin/release/brushes/sbrush64.rgb
+#	../../bin/release/brushes/sbrush8.rgb
+#)
 
 #SET_SOURCE_FILES_PROPERTIES(
 #        ../../bin/release/brushes/rbrush16.rgb

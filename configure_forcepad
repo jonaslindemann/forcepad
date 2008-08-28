@@ -1,0 +1,37 @@
+#!/usr/bin/python
+
+import os, sys, string, shutil
+
+def checkBuildDir():
+
+	buildDir = "./build_"+sys.platform
+
+	if os.path.exists(buildDir):
+		print "Build directory exists. Removing..."
+		shutil.rmtree(buildDir)
+
+	os.mkdir(buildDir)
+	
+	return buildDir
+	
+def runCMake(buildDir, fltkDir, glewDir):
+	
+	cmdOptions = "-D FLTK_ROOT:FILEPATH=%s " % fltkDir
+	cmdOptions += "-D GLEW_ROOT:FILEPATH=%s " % glewDir
+	
+	oldDir = os.getcwd()
+	
+	os.chdir(buildDir)
+	
+	os.system("cmake "+cmdOptions+" ..")
+	
+	os.chdir(oldDir)
+	
+
+if __name__ == "__main__":
+	
+	fltkDir = "/Users/jonas/Documents/Libraries/fltk"
+	glewDir = "/Users/jonas/Documents/Libraries/glew"
+	
+	buildDir = checkBuildDir()
+	runCMake(buildDir, fltkDir, glewDir)
