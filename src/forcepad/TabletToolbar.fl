@@ -27,7 +27,7 @@ class CTabletToolbar {open
   Function {CTabletToolbar()} {open
   } {
     Fl_Window mainWindow {
-      label {Tablet Toolbar} open selected
+      label {Tablet Toolbar} open
       xywh {715 365 232 49} type Double color 0 non_modal visible
     } {
       Fl_Button btnOpen {
@@ -36,7 +36,7 @@ class CTabletToolbar {open
 	CPaintView* view = (CPaintView*)m_paintView;
 	view->openModel();
 }}
-        tooltip {Open model} image {../../images/open.xpm} xywh {50 3 42 42} box THIN_UP_BOX color 0
+        tooltip {Open model} image {../../images/open_black.xpm} xywh {50 3 42 42} box THIN_UP_BOX color 0
         code0 {\#include "Fl_HoverButton.h"}
         class Fl_HoverButton
       }
@@ -46,7 +46,7 @@ class CTabletToolbar {open
 	CPaintView* view = (CPaintView*)m_paintView;
 	view->newModel();
 }}
-        tooltip {New model} image {../../images/new.xpm} xywh {5 3 42 42} box THIN_UP_BOX color 0
+        tooltip {New model} image {../../images/new_model_black.xpm} xywh {5 3 42 42} box THIN_UP_BOX color 0
         code0 {\#include "Fl_HoverButton.h"}
         class Fl_HoverButton
       }
@@ -56,7 +56,7 @@ class CTabletToolbar {open
 	CPaintView* view = (CPaintView*)m_paintView;
 	view->saveModelAs();
 }}
-        tooltip {Save model as...} image {../../images/save.xpm} xywh {95 3 42 42} box THIN_UP_BOX color 0
+        tooltip {Save model as...} image {../../images/save_black.xpm} xywh {95 3 42 42} box THIN_UP_BOX color 0
         code0 {\#include "Fl_HoverButton.h"}
         class Fl_HoverButton
       }
@@ -66,7 +66,7 @@ class CTabletToolbar {open
 	CPaintView* view = (CPaintView*)m_paintView;
 	view->undo();
 }}
-        tooltip Undo image {../../images/undo.xpm} xywh {140 3 42 42} box THIN_UP_BOX color 0
+        tooltip Undo image {../../images/undo_black.xpm} xywh {140 3 42 42} box THIN_UP_BOX color 0
         code0 {\#include "Fl_HoverButton.h"}
         class Fl_HoverButton
       }
@@ -81,8 +81,8 @@ class CTabletToolbar {open
 	calcSettings->show();
 	delete calcSettings;
 	view->setViewMode(CPaintView::VM_SKETCH);
-}}
-        tooltip {Calculation settings} image {../../images/calc.xpm} xywh {185 3 42 42} box THIN_UP_BOX color 0
+}} selected
+        tooltip {Calculation settings} image {../../images/settings_black.xpm} xywh {185 3 42 42} box THIN_UP_BOX color 0
         code0 {\#include "Fl_HoverButton.h"}
         class Fl_HoverButton
       }
@@ -99,8 +99,8 @@ mainWindow->show();
 \#ifdef WIN32
    if (platformInfo->isVista())
    {
-   	SetWindowLong(fl_xid(mainWindow), GWL_EXSTYLE, GetWindowLong(fl_xid(mainWindow), GWL_EXSTYLE) | WS_EX_LAYERED);
-	SetLayeredWindowAttributes(fl_xid(mainWindow), 0, (255 * 70) / 100, LWA_ALPHA);
+   	//SetWindowLong(fl_xid(mainWindow), GWL_EXSTYLE, GetWindowLong(fl_xid(mainWindow), GWL_EXSTYLE) | WS_EX_LAYERED);
+	//SetLayeredWindowAttributes(fl_xid(mainWindow), 0, (255 * 70) / 100, LWA_ALPHA);
    }	   
 \#endif} {}
   }
