@@ -39,10 +39,6 @@
 
 #ifdef WIN32
 #include "SystemInfo.h"
-#ifdef _WIN32_WINNT_VISTA
-#include "dwmapi.h"
-#pragma comment(lib, "dwmapi.lib")
-#endif
 #endif
 
 int
@@ -88,8 +84,6 @@ main(int argc, char **argv)
 	//
 
 	int result = Fl::run();
-
-	cout << "After Fl::run();" << endl;
 
 	// 
 	// Cleanup

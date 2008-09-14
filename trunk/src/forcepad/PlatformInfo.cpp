@@ -26,8 +26,7 @@ CPlatformInfo::CPlatformInfo()
 bool CPlatformInfo::isTabletPC()
 {
 #ifdef WIN32
-	return true;
-	//return GetSystemMetrics(SM_TABLETPC)!=0;
+	return GetSystemMetrics(SM_TABLETPC)!=0;
 #else
 	return false;
 #endif

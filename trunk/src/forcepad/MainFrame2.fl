@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0300 
+version 1.0109 
 header_name {.h} 
 code_name {.cpp}
 decl {/** Main window class generated from FLTK. */} {public
@@ -54,7 +54,8 @@ class CMainFrame {open : {CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusM
   decl {CPaintView::TEditMode m_sketchEditMode;} {}
   decl {CPaintView::TEditMode m_physicsEditMode;} {}
   decl {CTabletToolbar* m_tabletToolbar;} {}
-  Function {CMainFrame()} {} {
+  Function {CMainFrame()} {open
+  } {
     Fl_Window wndMain {
       label {ForcePAD 2} open
       xywh {667 148 861 684} type Double color 0 align 80 resizable visible
@@ -291,7 +292,7 @@ if (btnPaste->value()==1)
       Fl_Group paintGroup {open
         xywh {52 26 750 627} resizable
       } {
-        Fl_Box paintView {
+        Fl_Box paintView {selected
           xywh {53 27 747 625} box FLAT_BOX color 0
           code0 {\#include "PaintView.h"}
           class CPaintView
@@ -1042,7 +1043,8 @@ wndMain->callback(mainWindowCB);} {}
 delete m_tabletToolbar;
 delete paintView;} {}
   }
-  Function {show()} {} {
+  Function {show()} {open
+  } {
     code {\#ifdef WIN32
 extern HINSTANCE fl_display;
 wndMain->icon((char *)LoadIcon(fl_display, MAKEINTRESOURCE(IDI_FORCEPAD)));
@@ -1059,9 +1061,9 @@ CPlatformInfoPtr platformInfo = CPlatformInfo::getInstance();
 \#ifdef WIN32
    if (platformInfo->isVista())
    {
-	   MARGINS margins = {0,0,28,0};
-	   HRESULT hr = S_OK;
-	   hr = DwmExtendFrameIntoClientArea(fl_xid(wndMain),&margins);
+	   //MARGINS margins = {0,0,28,0};
+	   //HRESULT hr = S_OK;
+	   //hr = DwmExtendFrameIntoClientArea(fl_xid(wndMain),&margins);
    }	   
 \#endif
 
@@ -1298,8 +1300,7 @@ calcProgress->value(progress);
 paintView->redraw();
 paintView->damage(1);
 Fl::flush();
-Fl::check();} {selected
-    }
+Fl::check();} {}
   }
   Function {onLogMessage(const std::string& context, const std::string& message)} {open return_type void
   } {
