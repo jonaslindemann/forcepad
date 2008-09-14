@@ -2951,8 +2951,14 @@ void CPaintView::setColorMap(int index)
 #else
 		string applicationExeLocation = this->m_argv[0];
 #endif
+		cout << "applicationExeLocation = " << applicationExeLocation << endl;
+#ifndef __APPLE__
 		int pos = applicationExeLocation.find_last_of("\\");
 		string applicationDir = applicationExeLocation.substr(0,pos);
+#else
+		int pos = applicationExeLocation.find_last_of("/");
+		string applicationDir = applicationExeLocation.substr(0,pos);
+#endif
 
 		ostringstream oss;
 		oss << index;
@@ -2966,6 +2972,7 @@ void CPaintView::setColorMap(int index)
 		else
 			filename = "colormaps/colormap" + filenameIndex + ".map";
 		
+		cout << "colormap filename = " << filename << endl;
 		m_femGrid->getColorMap()->open(filename.c_str());
 		this->redraw();
 	}

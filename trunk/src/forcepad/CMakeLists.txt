@@ -6,37 +6,56 @@ IF(CMAKE_BUILD_TYPE STREQUAL Debug)
 	ADD_EXECUTABLE(forcepadd ${INCLUDE_FILES} ${SOURCE_FILES})
 ELSE(CMAKE_BUILD_TYPE STREQUAL Debug)
 IF(APPLE)
-ADD_EXECUTABLE(forcepad ${INCLUDE_FILES} ${SOURCE_FILES})
-#ADD_EXECUTABLE(
-#	forcepad 
-#	MACOSX_BUNDLE
-#	${SOURCE_FILES}
-#	../../bin/release/brushes/rbrush16.rgb
-#	../../bin/release/brushes/rbrush32.rgb
-#	../../bin/release/brushes/rbrush4.rgb
-#	../../bin/release/brushes/rbrush64.rgb
-#	../../bin/release/brushes/rbrush8.rgb
-#	../../bin/release/brushes/sbrush16.rgb
-#	../../bin/release/brushes/sbrush32.rgb
-#	../../bin/release/brushes/sbrush4.rgb
-#	../../bin/release/brushes/sbrush64.rgb
-#	../../bin/release/brushes/sbrush8.rgb
-#)
+#ADD_EXECUTABLE(forcepad ${INCLUDE_FILES} ${SOURCE_FILES})
+ADD_EXECUTABLE(
+	forcepad 
+	MACOSX_BUNDLE
+	${SOURCE_FILES}
+	../../bin/release/brushes/rbrush16.rgb
+	../../bin/release/brushes/rbrush32.rgb
+	../../bin/release/brushes/rbrush4.rgb
+	../../bin/release/brushes/rbrush64.rgb
+	../../bin/release/brushes/rbrush8.rgb
+	../../bin/release/brushes/sbrush16.rgb
+	../../bin/release/brushes/sbrush32.rgb
+	../../bin/release/brushes/sbrush4.rgb
+	../../bin/release/brushes/sbrush64.rgb
+	../../bin/release/brushes/sbrush8.rgb
+        ../../bin/release/colormaps/colormap1.map
+        ../../bin/release/colormaps/colormap2.map
+        ../../images/forcepad_icon.icns
+)
 
-#SET_SOURCE_FILES_PROPERTIES(
-#        ../../bin/release/brushes/rbrush16.rgb
-#        ../../bin/release/brushes/rbrush32.rgb
-#        ../../bin/release/brushes/rbrush4.rgb
-#        ../../bin/release/brushes/rbrush64.rgb
-#        ../../bin/release/brushes/rbrush8.rgb
-#        ../../bin/release/brushes/sbrush16.rgb
-#        ../../bin/release/brushes/sbrush32.rgb
-#        ../../bin/release/brushes/sbrush4.rgb
-#        ../../bin/release/brushes/sbrush64.rgb
-#        ../../bin/release/brushes/sbrush8.rgb
-#	PROPERTIES
-#	MACOSX_PACKAGE_LOCATION MacOS/brushes
-#)
+SET( MACOSX_BUNDLE_ICON_FILE forcepad_icon.icns )
+SET( MACOSX_BUNDLE_SHORT_VERSION_STRING 2.4 )
+SET( MACOSX_BUNDLE_VERSION 2.4 )
+SET( MACOSX_BUNDLE_LONG_VERSION_STRING 2.4 )
+
+SET_SOURCE_FILES_PROPERTIES(
+        ../../bin/release/brushes/rbrush16.rgb
+        ../../bin/release/brushes/rbrush32.rgb
+        ../../bin/release/brushes/rbrush4.rgb
+        ../../bin/release/brushes/rbrush64.rgb
+        ../../bin/release/brushes/rbrush8.rgb
+        ../../bin/release/brushes/sbrush16.rgb
+        ../../bin/release/brushes/sbrush32.rgb
+        ../../bin/release/brushes/sbrush4.rgb
+        ../../bin/release/brushes/sbrush64.rgb
+        ../../bin/release/brushes/sbrush8.rgb
+	PROPERTIES
+	MACOSX_PACKAGE_LOCATION MacOS/brushes
+)
+SET_SOURCE_FILES_PROPERTIES(
+        ../../bin/release/colormaps/colormap1.map
+        ../../bin/release/colormaps/colormap2.map
+	PROPERTIES
+	MACOSX_PACKAGE_LOCATION MacOS/colormaps
+)
+SET_SOURCE_FILES_PROPERTIES(
+        ../../images/forcepad_icon.icns
+	PROPERTIES
+	MACOSX_PACKAGE_LOCATION Resources
+)
 ELSE(APPLE)
 	ADD_EXECUTABLE(forcepad ${INCLUDE_FILES} ${SOURCE_FILES})
 ENDIF(APPLE)
