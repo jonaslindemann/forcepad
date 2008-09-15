@@ -3,7 +3,7 @@
 
 [Setup]
 AppName=ForcePAD
-AppVerName=ForcePAD 2.4.0-BETA6
+AppVerName=ForcePAD 2.4.0-BETA7
 AppPublisher=Division of Structural Mechanics
 AppPublisherURL=http://www.byggmek.lth.se
 AppSupportURL=http://www.byggmek.lth.se/resources/forcepad/forcepad.htm
