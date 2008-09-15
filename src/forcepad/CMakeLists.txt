@@ -8,7 +8,7 @@ ELSE(CMAKE_BUILD_TYPE STREQUAL Debug)
 IF(APPLE)
 #ADD_EXECUTABLE(forcepad ${INCLUDE_FILES} ${SOURCE_FILES})
 ADD_EXECUTABLE(
-	forcepad 
+	ForcePAD 
 	MACOSX_BUNDLE
 	${SOURCE_FILES}
 	../../bin/release/brushes/rbrush16.rgb
@@ -72,7 +72,7 @@ IF(WIN32)
 ELSE(WIN32)
 	IF(APPLE)
 		#TARGET_LINK_LIBRARIES(forcepad common ivf2d fltk fltk_gl fltk_images fltk_forms fltk_jpeg fltk_png calfemcxx newmat fltk_zlib GLU GL)
-		TARGET_LINK_LIBRARIES(forcepad common ivf2d fltk fltk_gl fltk_images fltk_forms fltk_jpeg fltk_png calfemcxx newmat "-framework Carbon" "-framework Cocoa" "-framework ApplicationServices" "-framework AGL" "-framework OpenGL" GLEW z)
+		TARGET_LINK_LIBRARIES(ForcePAD common ivf2d fltk fltk_gl fltk_images fltk_forms fltk_jpeg fltk_png calfemcxx newmat "-framework Carbon" "-framework Cocoa" "-framework ApplicationServices" "-framework AGL" "-framework OpenGL" GLEW z)
 	ELSE(APPLE)
 		TARGET_LINK_LIBRARIES(forcepad common ivf2d fltk fltk_gl fltk_images fltk_forms jpeg png calfemcxx newmat z GLU GL)
 	ENDIF(APPLE)
