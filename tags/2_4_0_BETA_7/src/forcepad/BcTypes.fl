@@ -1,0 +1,96 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0100 
+header_name {.h} 
+code_name {.cpp}
+decl {\#define MR_OK 0} {public
+} 
+
+decl {\#define MR_CANCEL 1} {public
+} 
+
+decl {/** New dialog class. */} {public
+} 
+
+decl {\#include "PaintView.h"} {} 
+
+class CBcTypes {open
+} {
+  decl {int m_modalResult} {}
+  decl {int m_currentTool;} {}
+  decl {void* m_view} {}
+  Function {CBcTypes()} {} {
+    Fl_Window wnd {
+      label {Brush properties} open
+      xywh {556 246 144 100} box THIN_UP_BOX non_modal noborder visible
+    } {
+      Fl_Button btnOk {
+        callback {m_modalResult = MR_OK;
+wnd->hide();}
+        image {../../images/additional_close.xpm} xywh {132 3 9 42} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX labelsize 12
+        code0 {\#include "Fl_HoverButton.h"}
+        class Fl_HoverButton
+      }
+      Fl_Button btnBcX {
+        callback {if (m_view!=NULL)
+{
+	CPaintView* paintView = (CPaintView*) m_view;
+	paintView->setConstraintType(CConstraint::CT_X);
+	paintView->setEditMode(CPaintView::EM_CONSTRAINT);
+}
+wnd->hide();}
+        image {../../images/bcx.xpm} xywh {3 3 42 42} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 51 selection_color 51
+        code0 {\#include "Fl_HoverButton.h"}
+        class Fl_HoverButton
+      }
+      Fl_Button btnBcY {
+        callback {if (m_view!=NULL)
+{
+	CPaintView* paintView = (CPaintView*) m_view;
+	paintView->setConstraintType(CConstraint::CT_Y);
+	paintView->setEditMode(CPaintView::EM_CONSTRAINT);
+}
+wnd->hide();}
+        image {../../images/bcy.xpm} xywh {46 3 42 42} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 51 selection_color 51
+        code0 {\#include "Fl_HoverButton.h"}
+        class Fl_HoverButton
+      }
+      Fl_Button btnBcXY {
+        callback {if (m_view!=NULL)
+{
+	CPaintView* paintView = (CPaintView*) m_view;
+	paintView->setConstraintType(CConstraint::CT_XY);
+	paintView->setEditMode(CPaintView::EM_CONSTRAINT);
+}
+wnd->hide();}
+        image {../../images/bcxy.xpm} xywh {89 3 42 42} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 51 selection_color 51
+        code0 {\#include "Fl_HoverButton.h"}
+        class Fl_HoverButton
+      }
+    }
+    code {m_view = NULL;} {}
+    code {m_view = NULL;} {}
+  }
+  Function {~CBcTypes()} {} {
+    code {delete wnd;} {}
+  }
+  Function {show()} {open
+  } {
+    code {setSize(wnd->w(),btnOk->h()+4);
+wnd->show();
+//while (wnd->visible()) Fl::wait();} {selected
+    }
+  }
+  Function {setPosition(int x, int y)} {} {
+    code {wnd->position(x, y);} {}
+  }
+  Function {setSize(int width, int height)} {} {
+    code {wnd->size_range(0, 0);
+wnd->size(width, height);} {}
+  }
+  Function {setView(void* p)} {} {
+    code {m_view = p;} {}
+  }
+  Function {hide()} {} {
+    code {wnd->hide();} {}
+  }
+} 

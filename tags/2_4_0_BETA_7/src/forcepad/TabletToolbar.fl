@@ -1,0 +1,123 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0109 
+header_name {.h} 
+code_name {.cpp}
+decl {\#include "PaintView.h"} {global
+} 
+
+decl {\#include "CalcSettings.h"} {global
+} 
+
+decl {\#include "PlatformInfo.h"} {global
+} 
+
+decl {\#ifdef WIN32} {} 
+
+decl {\#include "resource.h"} {} 
+
+decl {\#include "dwmapi.h"} {} 
+
+decl {\#endif} {} 
+
+decl {\#include <FL/x.H>} {} 
+
+class CTabletToolbar {open
+} {
+  decl {void* m_paintView;} {}
+  Function {CTabletToolbar()} {open
+  } {
+    Fl_Window mainWindow {
+      label {Tablet Toolbar} open
+      xywh {715 365 232 49} type Double color 0 non_modal visible
+    } {
+      Fl_Button btnOpen {
+        callback {if (m_paintView!=NULL)
+{
+	CPaintView* view = (CPaintView*)m_paintView;
+	view->openModel();
+}}
+        tooltip {Open model} image {../../images/open_black.xpm} xywh {50 3 42 42} box THIN_UP_BOX color 0
+        code0 {\#include "Fl_HoverButton.h"}
+        class Fl_HoverButton
+      }
+      Fl_Button btnNew {
+        callback {if (m_paintView!=NULL)
+{
+	CPaintView* view = (CPaintView*)m_paintView;
+	view->newModel();
+}}
+        tooltip {New model} image {../../images/new_model_black.xpm} xywh {5 3 42 42} box THIN_UP_BOX color 0
+        code0 {\#include "Fl_HoverButton.h"}
+        class Fl_HoverButton
+      }
+      Fl_Button btnSaveAs {
+        callback {if (m_paintView!=NULL)
+{
+	CPaintView* view = (CPaintView*)m_paintView;
+	view->saveModelAs();
+}}
+        tooltip {Save model as...} image {../../images/save_black.xpm} xywh {95 3 42 42} box THIN_UP_BOX color 0
+        code0 {\#include "Fl_HoverButton.h"}
+        class Fl_HoverButton
+      }
+      Fl_Button btnUndo {
+        callback {if (m_paintView!=NULL)
+{
+	CPaintView* view = (CPaintView*)m_paintView;
+	view->undo();
+}}
+        tooltip Undo image {../../images/undo_black.xpm} xywh {140 3 42 42} box THIN_UP_BOX color 0
+        code0 {\#include "Fl_HoverButton.h"}
+        class Fl_HoverButton
+      }
+      Fl_Button btnSettings {
+        callback {if (m_paintView!=NULL)
+{
+	CPaintView* view = (CPaintView*)m_paintView;
+	
+	CCalcSettings* calcSettings = new CCalcSettings();
+	calcSettings->setView(view);
+	calcSettings->centerWindow(mainWindow);
+	calcSettings->show();
+	delete calcSettings;
+	view->setViewMode(CPaintView::VM_SKETCH);
+}} selected
+        tooltip {Calculation settings} image {../../images/settings_black.xpm} xywh {185 3 42 42} box THIN_UP_BOX color 0
+        code0 {\#include "Fl_HoverButton.h"}
+        class Fl_HoverButton
+      }
+    }
+    code {m_paintView = NULL;} {}
+  }
+  Function {show()} {open
+  } {
+    code {CPlatformInfoPtr platformInfo = CPlatformInfo::getInstance();
+
+mainWindow->show();
+
+
+\#ifdef WIN32
+   if (platformInfo->isVista())
+   {
+   	//SetWindowLong(fl_xid(mainWindow), GWL_EXSTYLE, GetWindowLong(fl_xid(mainWindow), GWL_EXSTYLE) | WS_EX_LAYERED);
+	//SetLayeredWindowAttributes(fl_xid(mainWindow), 0, (255 * 70) / 100, LWA_ALPHA);
+   }	   
+\#endif} {}
+  }
+  Function {setView(void* view)} {open
+  } {
+    code {m_paintView = view;} {}
+  }
+  Function {centerWindow(Fl_Window* window)} {open
+  } {
+    code {mainWindow->position(window->x()+window->w()/2-mainWindow->w()/2, window->y()+window->h()/2-mainWindow->h()/2);} {}
+  }
+  Function {placeWindow(Fl_Window* window)} {open
+  } {
+    code {mainWindow->position(window->x()+window->w()-mainWindow->w()-100, window->y()+window->h()-mainWindow->h()-100);} {}
+  }
+  Function {hide()} {open
+  } {
+    code {mainWindow->hide();} {}
+  }
+} 

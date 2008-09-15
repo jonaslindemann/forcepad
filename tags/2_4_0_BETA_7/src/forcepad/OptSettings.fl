@@ -1,0 +1,119 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0109 
+header_name {.h} 
+code_name {.cpp}
+decl {\#include "PaintView.h"} {global
+} 
+
+class COptSettings {open
+} {
+  decl {void* m_paintView;} {}
+  Function {COptSettings()} {open
+  } {
+    Fl_Window mainWindow {
+      label {Optimisation Settings} open
+      xywh {635 229 318 291} type Double modal visible
+    } {
+      Fl_Button cancelButton {
+        label Cancel
+        callback {mainWindow->hide();}
+        xywh {230 255 70 25} labelsize 11
+      }
+      Fl_Button okButton {
+        label OK
+        callback {this->getData();
+mainWindow->hide();}
+        xywh {154 255 70 25} labelsize 11
+      }
+      Fl_Value_Slider volFrac {
+        label {Volume fraction}
+        xywh {14 25 286 20} type {Horz Knob} labelsize 11 align 5 value 0.5 textsize 11
+      }
+      Fl_Value_Slider rmin {
+        label {Filter r,min (elements)}
+        xywh {14 65 286 20} type {Horz Knob} labelsize 11 align 5 minimum 1 maximum 5 value 2.75 textsize 11
+      }
+      Fl_Value_Slider minChange {
+        label {Min change stop criteria}
+        xywh {15 105 286 20} type {Horz Knob} labelsize 11 align 5 minimum 0.01 maximum 0.1 value 0.01 textsize 11
+      }
+      Fl_Value_Slider maxLoops {
+        label {Max loops stop criteria}
+        xywh {15 147 286 20} type {Horz Knob} labelsize 11 align 5 minimum 1 maximum 1000 step 1 value 50 textsize 11
+      }
+      Fl_Group {} {
+        label {Sensitivity filter} open
+        xywh {15 187 285 56} box DOWN_BOX labelsize 11 align 5
+      } {
+        Fl_Round_Button noFilter {
+          label {No filter}
+          xywh {22 193 64 15} type Radio down_box ROUND_DOWN_BOX labelsize 11
+        }
+        Fl_Round_Button sigmundFilter {
+          label {Ole Sigmund}
+          xywh {22 208 88 15} type Radio down_box ROUND_DOWN_BOX labelsize 11
+        }
+        Fl_Round_Button backPedersenFilter {
+          label {Sharp Contouring Filter}
+          xywh {22 223 93 15} type Radio down_box ROUND_DOWN_BOX value 1 labelsize 11
+        }
+      }
+    }
+    code {m_paintView = NULL;} {}
+  }
+  Function {show()} {open
+  } {
+    code {this->setData();
+mainWindow->show();
+while (mainWindow->visible()) Fl::wait();} {}
+  }
+  Function {setView(void* view)} {open
+  } {
+    code {m_paintView = (CPaintView*)view;} {}
+  }
+  Function {setData()} {open
+  } {
+    code {if (m_paintView!=NULL)
+{
+	CPaintView* view = (CPaintView*)m_paintView;
+	
+	volFrac->value(view->getOptVolumeFraction());
+	rmin->value(view->getOptRmin());
+	minChange->value(view->getOptMinChange());
+	maxLoops->value(view->getOptMaxLoops());
+	
+	if (view->getOptFilterType()==CFemGridSolver2::FT_NO_FILTER)
+		noFilter->value(1);
+	if (view->getOptFilterType()==CFemGridSolver2::FT_OLE_SIGMUND)
+		sigmundFilter->value(1);
+	if (view->getOptFilterType()==CFemGridSolver2::FT_SHARP_CONTOURING)
+		backPedersenFilter->value(1);
+
+}} {}
+  }
+  Function {getData()} {open
+  } {
+    code {if (m_paintView!=NULL)
+{
+	CPaintView* view = (CPaintView*)m_paintView;
+	
+	view->setOptVolumeFraction(volFrac->value());
+	view->setOptRmin(rmin->value());
+	view->setOptMinChange(minChange->value());
+	view->setOptMaxLoops(maxLoops->value());
+	
+	if (noFilter->value()==1)
+		view->setOptFilterType(CFemGridSolver2::FT_NO_FILTER);
+	if (sigmundFilter->value()==1)
+		view->setOptFilterType(CFemGridSolver2::FT_OLE_SIGMUND);
+	if (backPedersenFilter->value()==1)
+		view->setOptFilterType(CFemGridSolver2::FT_SHARP_CONTOURING);
+	
+}} {selected
+    }
+  }
+  Function {centerWindow(Fl_Window* window)} {open
+  } {
+    code {mainWindow->position(window->x()+window->w()/2-mainWindow->w()/2, window->y()+window->h()/2-mainWindow->h()/2);} {}
+  }
+} 
