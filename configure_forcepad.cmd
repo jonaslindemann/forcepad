@@ -1,7 +1,7 @@
 @echo off
 
 set BUILD_TYPE=%1
-set FLTK_ROOT=c:\users\jonas\libraries\fltk-1.1.9
+set FLTK_ROOT=c:\users\jonas\libraries\fltk-1.3.x-r6350
 set GLEW_ROOT=c:\users\jonas\libraries\glew
 
 if %BUILD_TYPE%==Debug (
