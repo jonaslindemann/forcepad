@@ -1,6 +1,6 @@
 //
 // ForcePAD - Educational Finite Element Software
-// Copyright (C) 2000-2007 Division of Structural Mecahnics, Lund University
+// Copyright (C) 2000-2008 Division of Structural Mecahnics, Lund University
 //
 // Written by Jonas Lindemann
 //
@@ -488,6 +488,14 @@ public:
 
 	void setOptFilterType(CFemGridSolver2::TFilterType filterType);
 	CFemGridSolver2::TFilterType getOptFilterType();
+
+	// User interface properties
+
+	void setUiLineThickness(double thickness);
+	double getUiLineThickness();
+
+	void setUiSymbolLength(double length);
+	double getUiSymbolLength();
 
 	// Events
 

@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0109 
+version 1.0300 
 header_name {.h} 
 code_name {.cpp}
 decl {/** Main window class generated from FLTK. */} {public
@@ -32,6 +32,9 @@ decl {\#include "CalcSettings.h"} {global
 decl {\#include "OptSettings.h"} {} 
 
 decl {\#include "TabletToolbar.h"} {public global
+} 
+
+decl {\#include "GeneralSettings.h"} {selected
 } 
 
 decl {\#include <iostream>} {public global
@@ -157,6 +160,15 @@ calcSettings->show();
 delete calcSettings;
 paintView->setViewMode(CPaintView::VM_SKETCH);}
             xywh {0 0 30 20} labelsize 12
+          }
+          MenuItem settingsMenuGeneral {
+            label {&General...}
+            callback {CGeneralSettings* generalSettings = new CGeneralSettings();
+generalSettings->setView(paintView);
+generalSettings->centerWindow(wndMain);
+generalSettings->show();
+delete generalSettings;}
+            xywh {10 10 30 20} labelsize 12
           }
           MenuItem settingsMenuSnapToGrid {
             label {&Snap to grid}
@@ -292,7 +304,7 @@ if (btnPaste->value()==1)
       Fl_Group paintGroup {open
         xywh {52 26 750 627} resizable
       } {
-        Fl_Box paintView {selected
+        Fl_Box paintView {
           xywh {53 27 747 625} box FLAT_BOX color 0
           code0 {\#include "PaintView.h"}
           class CPaintView

@@ -65,6 +65,8 @@
 #include "Fl_Cursor_Shape.H"
 #include "Cursors.h"
 
+#include "UiSettings.h"
+
 #ifdef use_namespace
 using namespace NEWMAT;
 #endif
@@ -3149,6 +3151,28 @@ void CPaintView::setOptMaxLoops(int loops)
 int CPaintView::getOptMaxLoops()
 {
 	return m_optMaxLoops;
+}
+
+void CPaintView::setUiLineThickness(double thickness)
+{
+	CUiSettings::getInstance()->setLineThickness(thickness);
+	this->redraw();
+}
+
+double CPaintView::getUiLineThickness()
+{
+	return CUiSettings::getInstance()->getLineThickness();
+}
+
+void CPaintView::setUiSymbolLength(double length)
+{
+	CUiSettings::getInstance()->setSymbolLength(length);
+	this->redraw();
+}
+
+double CPaintView::getUiSymbolLength()
+{
+	return CUiSettings::getInstance()->getSymbolLength();
 }
 
 void CPaintView::setOptFilterType(CFemGridSolver2::TFilterType filterType)
