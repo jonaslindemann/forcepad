@@ -1,0 +1,66 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0300 
+header_name {.h} 
+code_name {.cpp}
+decl {\#include "PaintView.h"} {global
+} 
+
+decl {\#include "CalcSettings.h"} {global
+} 
+
+decl {\#include "PlatformInfo.h"} {global
+} 
+
+decl {\#ifdef WIN32} {} 
+
+decl {\#include "resource.h"} {} 
+
+decl {\#include "dwmapi.h"} {} 
+
+decl {\#endif} {} 
+
+decl {\#include <FL/x.H>} {} 
+
+class CVizMixerToolbar {open
+} {
+  decl {void* m_paintView;} {}
+  Function {CVizMixerToolbar()} {open
+  } {
+    Fl_Window mainWindow {
+      label {Viz Mixer} open selected
+      xywh {383 218 232 205} type Double color 0 non_modal visible
+    } {}
+    code {m_paintView = NULL;} {}
+  }
+  Function {show()} {open
+  } {
+    code {CPlatformInfoPtr platformInfo = CPlatformInfo::getInstance();
+
+mainWindow->show();
+
+
+\#ifdef WIN32
+   if (platformInfo->isVista())
+   {
+   	//SetWindowLong(fl_xid(mainWindow), GWL_EXSTYLE, GetWindowLong(fl_xid(mainWindow), GWL_EXSTYLE) | WS_EX_LAYERED);
+	//SetLayeredWindowAttributes(fl_xid(mainWindow), 0, (255 * 70) / 100, LWA_ALPHA);
+   }	   
+\#endif} {}
+  }
+  Function {setView(void* view)} {open
+  } {
+    code {m_paintView = view;} {}
+  }
+  Function {centerWindow(Fl_Window* window)} {open
+  } {
+    code {mainWindow->position(window->x()+window->w()/2-mainWindow->w()/2, window->y()+window->h()/2-mainWindow->h()/2);} {}
+  }
+  Function {placeWindow(Fl_Window* window)} {open
+  } {
+    code {mainWindow->position(window->x()+window->w()-mainWindow->w()-100, window->y()+window->h()-mainWindow->h()-100);} {}
+  }
+  Function {hide()} {open
+  } {
+    code {mainWindow->hide();} {}
+  }
+} 

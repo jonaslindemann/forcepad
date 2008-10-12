@@ -1,6 +1,6 @@
 //
 // ForcePAD - Educational Finite Element Software
-// Copyright (C) 2000-2003 Division of Structural Mecahnics, Lund University
+// Copyright (C) 2000-2008 Division of Structural Mecahnics, Lund University
 //
 // Written by Jonas Lindemann
 //
@@ -23,6 +23,8 @@
 //
 
 #include "ReactionForce.h"
+
+#include "UiSettings.h"
 
 // ------------------------------------------------------------
 CReactionForce::CReactionForce ()
@@ -90,10 +92,22 @@ void CReactionForce::doGeometry()
 {
 	double x;
 	double y;
+
+	double oldArrowSize;
 	
 	this->getPosition(x, y);
+
+	if (CUiSettings::getInstance()->getLineThickness()>0.0)
+		glLineWidth(CUiSettings::getInstance()->getLineThickness());
+	else
+		glLineWidth(2.0);
+
+	if (CUiSettings::getInstance()->getSymbolLength()>0.0)
+	{
+		oldArrowSize = m_arrowSize;
+		this->setArrowSize(CUiSettings::getInstance()->getSymbolLength() * 0.25);
+	}
 	
-	glLineWidth(2.0);
 	glColor3f(1.0f, 0.5f, 0.0f);
 
 	if (m_length>=0.0)
@@ -130,6 +144,9 @@ void CReactionForce::doGeometry()
 		glEnd();
 		glPopMatrix();
 	}
+
+	if (CUiSettings::getInstance()->getSymbolLength()>0.0)
+		this->setArrowSize(oldArrowSize);
 }
 
 // ------------------------------------------------------------

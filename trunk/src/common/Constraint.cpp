@@ -1,6 +1,6 @@
 //
 // ForcePAD - Educational Finite Element Software
-// Copyright (C) 2000-2003 Division of Structural Mecahnics, Lund University
+// Copyright (C) 2000-2008 Division of Structural Mecahnics, Lund University
 //
 // Written by Jonas Lindemann
 //
@@ -24,6 +24,8 @@
 
 #include "Constraint.h"
 
+#include "UiSettings.h"
+
 // ------------------------------------------------------------
 CConstraint::CConstraint ()
 		:CShape()
@@ -45,7 +47,23 @@ CConstraint::~CConstraint ()
 // ------------------------------------------------------------
 void CConstraint::doGeometry()
 {
-	glLineWidth(2.0);
+	double oldVectorRadius;
+	double oldVectorSize;
+
+	if (CUiSettings::getInstance()->getLineThickness()>0.0)
+		glLineWidth(CUiSettings::getInstance()->getLineThickness());
+	else
+		glLineWidth(2.0);
+
+	if (CUiSettings::getInstance()->getSymbolLength()>0.0)
+	{
+		oldVectorRadius = m_vectorRadius;
+		oldVectorSize = this->getVectorSize();
+
+		this->setVectorSize(CUiSettings::getInstance()->getSymbolLength());
+		m_vectorRadius = 0.125*CUiSettings::getInstance()->getSymbolLength();
+	}
+
 	if (m_constraintType==CT_HINGE)
 	{
 		glEnable(GL_LINE_STIPPLE);
@@ -123,6 +141,15 @@ void CConstraint::doGeometry()
 		}
 		glEnd();
 
+		glBegin(GL_LINE_LOOP);
+		for (angle = 2*M_PI/40.0; angle<2*M_PI+2*M_PI/40.0; angle+=2*M_PI/20.0)
+		{
+			x = ox + m_vectorRadius*cos(angle);
+			y = oy + m_vectorRadius*sin(angle);
+			glVertex2d(x, y);
+		}
+		glEnd();
+
 		if (m_visibleReaction)
 			m_reactionForce->render();
 	}
@@ -153,6 +180,12 @@ void CConstraint::doGeometry()
 			glVertex2d(x, y);
 		}
 		glEnd();
+	}
+
+	if (CUiSettings::getInstance()->getSymbolLength()>0.0)
+	{
+		this->setVectorSize(oldVectorSize);
+		m_vectorRadius = oldVectorRadius;
 	}
 }
 

@@ -1,6 +1,6 @@
 //
 // ForcePAD - Educational Finite Element Software
-// Copyright (C) 2000-2003 Division of Structural Mecahnics, Lund University
+// Copyright (C) 2000-2008 Division of Structural Mecahnics, Lund University
 //
 // Written by Jonas Lindemann
 //
@@ -23,6 +23,8 @@
 //
 
 #include "Force.h"
+
+#include "UiSettings.h"
 
 // ------------------------------------------------------------
 CForce::CForce ()
@@ -89,20 +91,47 @@ void CForce::doGeometry()
 {
 	double x;
 	double y;
+	double length;
+	double arrowLength;
+	double oldLength;
+	double oldArrowLength;
 
 	this->getPosition(x, y);
 	
 	switch (m_forceType) {
 	case FT_VECTOR:
-		glLineWidth(2.0);
+		if (CUiSettings::getInstance()->getLineThickness()>0.0)
+			glLineWidth(CUiSettings::getInstance()->getLineThickness());
+		else
+			glLineWidth(2.0);
+
+		if (CUiSettings::getInstance()->getSymbolLength()>0.0)
+		{
+			length = CUiSettings::getInstance()->getSymbolLength();
+			arrowLength = 0.25*length;
+
+			oldLength = m_length;
+			oldArrowLength = m_arrowSize;
+
+			this->setLength(length);
+			this->setArrowSize(arrowLength);
+		}
+
 		glBegin(GL_LINES);
-		glVertex2d(0, 0);
+		//glVertex2d(0, 0);
+		glVertex2d(0 + m_direction[0]*m_length*0.02, 0 + m_direction[1]*m_length*0.02);
 		glVertex2d(0 - m_direction[0]*m_length, 0 - m_direction[1]*m_length);
 		glVertex2d(0, 0);
 		glVertex2d(0 - m_leftPos[0], 0 - m_leftPos[1]);
 		glVertex2d(0, 0);
 		glVertex2d(0 - m_rightPos[0], 0 - m_rightPos[1]);
 		glEnd();
+
+		if (CUiSettings::getInstance()->getSymbolLength()>0.0)
+		{
+			this->setLength(oldLength);
+			this->setArrowSize(oldArrowLength);
+		}
 		break;
 	case FT_SCALAR:
 		
