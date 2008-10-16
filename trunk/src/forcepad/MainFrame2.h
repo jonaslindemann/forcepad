@@ -6,6 +6,7 @@
 /** Main window class generated from FLTK. */
 #include "SplashFrame.h"
 #include "TabletToolbar.h"
+#include "VizMixerToolbar.h"
 #include <iostream>
 #include <string>
 #include <FL/Fl_Double_Window.H>
@@ -31,6 +32,7 @@ class CMainFrame : CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusMessageE
   CPaintView::TEditMode m_sketchEditMode; 
   CPaintView::TEditMode m_physicsEditMode; 
   CTabletToolbar* m_tabletToolbar; 
+  CVizMixerToolbar* m_vizMixer; 
 public:
   CMainFrame();
   Fl_Double_Window *wndMain;
@@ -206,6 +208,11 @@ public:
 private:
   void cb_btnStructure_i(Fl_HoverButton*, void*);
   static void cb_btnStructure(Fl_HoverButton*, void*);
+public:
+  Fl_HoverButton *btnVizMixer;
+private:
+  void cb_btnVizMixer_i(Fl_HoverButton*, void*);
+  static void cb_btnVizMixer(Fl_HoverButton*, void*);
 public:
   Fl_Progress *calcProgress;
   Fl_Output *statusOutput;

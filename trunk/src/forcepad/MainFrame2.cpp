@@ -186,7 +186,7 @@ Fl_Menu_Item CMainFrame::menu_mainMenu[] = {
  {0,0,0,0,0,0,0,0,0},
  {"&Help", 0,  0, 0, 64, FL_NORMAL_LABEL, 0, 12, 0},
  {"&Contents", 0,  0, 0, 0, FL_NORMAL_LABEL, 0, 12, 0},
- {"&About", 0,  (Fl_Callback*)CMainFrame::cb_helpMenuAbout, 0, 0, FL_NORMAL_LABEL, 0, 12, 0},
+ {"&About", 0,  (Fl_Callback*)CMainFrame::cb_helpMenuAbout, 0, 128, FL_NORMAL_LABEL, 0, 12, 0},
  {"Application &Log", 0,  (Fl_Callback*)CMainFrame::cb_helpMenuLog, 0, 16, FL_NORMAL_LABEL, 0, 12, 0},
  {0,0,0,0,0,0,0,0,0},
  {0,0,0,0,0,0,0,0,0}
@@ -5422,6 +5422,14 @@ paintView->setDrawForcesAndConstraints(false);
 }
 void CMainFrame::cb_btnStructure(Fl_HoverButton* o, void* v) {
   ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnStructure_i(o,v);
+}
+
+void CMainFrame::cb_btnVizMixer_i(Fl_HoverButton*, void*) {
+  m_vizMixer->show();
+m_vizMixer->placeWindow(wndMain);
+}
+void CMainFrame::cb_btnVizMixer(Fl_HoverButton* o, void* v) {
+  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnVizMixer_i(o,v);
 }
 
 void CMainFrame::cb_btnStopCalculation_i(Fl_Button*, void*) {
@@ -16062,11 +16070,11 @@ CMainFrame::CMainFrame() {
       paintGroup->end();
       Fl_Group::current()->resizable(paintGroup);
     } // Fl_Group* paintGroup
-    { scrLeftResultToolbar = new Fl_Scroll(365, 251, 53, 350);
+    { scrLeftResultToolbar = new Fl_Scroll(365, 234, 53, 420);
       scrLeftResultToolbar->box(FL_FLAT_BOX);
       scrLeftResultToolbar->color(FL_FOREGROUND_COLOR);
       scrLeftResultToolbar->labelcolor(FL_BACKGROUND2_COLOR);
-      { btnStress = new Fl_HoverButton(370, 257, 42, 42);
+      { btnStress = new Fl_HoverButton(370, 240, 42, 42);
         btnStress->tooltip("Stress visualisation");
         btnStress->type(102);
         btnStress->box(FL_THIN_UP_BOX);
@@ -16083,7 +16091,7 @@ CMainFrame::CMainFrame() {
         btnStress->align(Fl_Align(FL_ALIGN_CENTER));
         btnStress->when(FL_WHEN_RELEASE);
       } // Fl_HoverButton* btnStress
-      { btnDisplacements = new Fl_HoverButton(370, 347, 42, 42);
+      { btnDisplacements = new Fl_HoverButton(370, 330, 42, 42);
         btnDisplacements->tooltip("Displacement visualisation");
         btnDisplacements->type(102);
         btnDisplacements->box(FL_THIN_UP_BOX);
@@ -16099,7 +16107,7 @@ CMainFrame::CMainFrame() {
         btnDisplacements->align(Fl_Align(FL_ALIGN_CENTER));
         btnDisplacements->when(FL_WHEN_RELEASE);
       } // Fl_HoverButton* btnDisplacements
-      { btnMisesStress = new Fl_HoverButton(370, 302, 42, 42);
+      { btnMisesStress = new Fl_HoverButton(370, 285, 42, 42);
         btnMisesStress->tooltip("Mises stress visualisation");
         btnMisesStress->type(102);
         btnMisesStress->box(FL_THIN_UP_BOX);
@@ -16115,8 +16123,8 @@ CMainFrame::CMainFrame() {
         btnMisesStress->align(Fl_Align(FL_ALIGN_CENTER));
         btnMisesStress->when(FL_WHEN_RELEASE);
       } // Fl_HoverButton* btnMisesStress
-      { Fl_Group* o = new Fl_Group(370, 455, 47, 138);
-        { btnMoveLoad = new Fl_HoverButton(371, 551, 42, 42);
+      { Fl_Group* o = new Fl_Group(370, 438, 47, 191);
+        { btnMoveLoad = new Fl_HoverButton(371, 587, 42, 42);
           btnMoveLoad->tooltip("Toggle between moving and rotating loads");
           btnMoveLoad->type(102);
           btnMoveLoad->box(FL_THIN_UP_BOX);
@@ -16132,7 +16140,7 @@ CMainFrame::CMainFrame() {
           btnMoveLoad->align(Fl_Align(FL_ALIGN_WRAP));
           btnMoveLoad->when(FL_WHEN_RELEASE);
         } // Fl_HoverButton* btnMoveLoad
-        { btnRotateLoad = new Fl_HoverButton(371, 507, 42, 42);
+        { btnRotateLoad = new Fl_HoverButton(371, 543, 42, 42);
           btnRotateLoad->tooltip("Toggle between moving and rotating loads");
           btnRotateLoad->type(102);
           btnRotateLoad->box(FL_THIN_UP_BOX);
@@ -16151,7 +16159,7 @@ CMainFrame::CMainFrame() {
         } // Fl_HoverButton* btnRotateLoad
         o->end();
       } // Fl_Group* o
-      { btnOptimize = new Fl_HoverButton(370, 448, 42, 42);
+      { btnOptimize = new Fl_HoverButton(370, 484, 42, 42);
         btnOptimize->tooltip("Optimisation");
         btnOptimize->box(FL_THIN_UP_BOX);
         btnOptimize->down_box(FL_THIN_DOWN_FRAME);
@@ -16166,7 +16174,7 @@ CMainFrame::CMainFrame() {
         btnOptimize->align(Fl_Align(FL_ALIGN_CENTER));
         btnOptimize->when(FL_WHEN_RELEASE);
       } // Fl_HoverButton* btnOptimize
-      { btnStructure = new Fl_HoverButton(370, 391, 42, 42, "STR");
+      { btnStructure = new Fl_HoverButton(370, 374, 42, 42, "STR");
         btnStructure->tooltip("Show structure only");
         btnStructure->type(102);
         btnStructure->box(FL_THIN_UP_BOX);
@@ -16181,6 +16189,20 @@ CMainFrame::CMainFrame() {
         btnStructure->align(Fl_Align(FL_ALIGN_CENTER));
         btnStructure->when(FL_WHEN_RELEASE);
       } // Fl_HoverButton* btnStructure
+      { btnVizMixer = new Fl_HoverButton(370, 428, 42, 42, "Viz Synth");
+        btnVizMixer->tooltip("Show structure only");
+        btnVizMixer->box(FL_THIN_UP_BOX);
+        btnVizMixer->down_box(FL_THIN_DOWN_FRAME);
+        btnVizMixer->color(FL_FOREGROUND_COLOR);
+        btnVizMixer->selection_color((Fl_Color)1);
+        btnVizMixer->labeltype(FL_NORMAL_LABEL);
+        btnVizMixer->labelfont(0);
+        btnVizMixer->labelsize(11);
+        btnVizMixer->labelcolor(FL_BACKGROUND2_COLOR);
+        btnVizMixer->callback((Fl_Callback*)cb_btnVizMixer);
+        btnVizMixer->align(Fl_Align(FL_ALIGN_WRAP));
+        btnVizMixer->when(FL_WHEN_RELEASE);
+      } // Fl_HoverButton* btnVizMixer
       scrLeftResultToolbar->end();
     } // Fl_Scroll* scrLeftResultToolbar
     { Fl_Group* o = new Fl_Group(53, 653, 747, 31);
@@ -16276,7 +16298,7 @@ CMainFrame::CMainFrame() {
       } // Fl_HoverButton* btnUseWeight
       scrRightForceToolbar->end();
     } // Fl_Scroll* scrRightForceToolbar
-    { scrRightBCToolbar = new Fl_Scroll(365, 41, 53, 200);
+    { scrRightBCToolbar = new Fl_Scroll(365, 41, 53, 138);
       scrRightBCToolbar->box(FL_FLAT_BOX);
       scrRightBCToolbar->color(FL_FOREGROUND_COLOR);
       scrRightBCToolbar->labelcolor(FL_BACKGROUND2_COLOR);
@@ -17513,6 +17535,9 @@ paintView->setContinueCalcEvent(this);
 m_tabletToolbar = new CTabletToolbar();
 m_tabletToolbar->setView(paintView);
 
+m_vizMixer = new CVizMixerToolbar();
+m_vizMixer->setView(paintView);
+
 m_sketchEditMode = CPaintView::EM_BRUSH;
 m_physicsEditMode = CPaintView::EM_FORCE;
 
@@ -17523,7 +17548,9 @@ wndMain->callback(mainWindowCB);
 
 CMainFrame::~CMainFrame() {
   m_tabletToolbar->hide();
+m_vizMixer->hide();
 delete m_tabletToolbar;
+delete m_vizMixer;
 delete paintView;
 }
 
@@ -17594,6 +17621,7 @@ forceMagnitude->value(paintView->getForceMagnitude());
 
 void CMainFrame::close() {
   m_tabletToolbar->hide();
+m_vizMixer->hide();
 wndMain->hide();
 so_hide();
 }
