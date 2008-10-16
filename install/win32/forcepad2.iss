@@ -3,7 +3,7 @@
 
 [Setup]
 AppName=ForcePAD
-AppVerName=ForcePAD 2.4.0-BETA7
+AppVerName=ForcePAD 2.4.0-BETA8
 AppPublisher=Division of Structural Mechanics
 AppPublisherURL=http://www.byggmek.lth.se
 AppSupportURL=http://www.byggmek.lth.se/resources/forcepad/forcepad.htm
@@ -20,12 +20,12 @@ DefaultGroupName=Structural Mechanics
 Name: desktopicon; Description: Create a &desktop icon; GroupDescription: Additional icons:; MinVersion: 4,4
 
 [Run]
-Filename: {tmp}\vcredist_x86-sp1.exe; Flags: hidewizard
+Filename: {tmp}\vcredist_x86.exe; Flags: hidewizard
 
 Filename: {app}\forcepad.exe; WorkingDir: {app}; Description: Launch ForcePAD; Flags: nowait postinstall skipifsilent
 
 [Files]
-Source: ..\..\..\forcepad-redist\vcredist_x86-sp1.exe; DestDir: {tmp}; Flags: deleteafterinstall
+Source: ..\..\..\forcepad-redist\vc2008\vcredist_x86.exe; DestDir: {tmp}; Flags: deleteafterinstall
 Source: ..\..\bin\release\forcepad.exe; DestDir: {app}; Flags: ignoreversion
 Source: ..\..\bin\release\glew32.dll; DestDir: {app}; Flags: ignoreversion
 Source: ..\..\bin\release\brushes\*.*; DestDir: {app}\brushes; Flags: ignoreversion
