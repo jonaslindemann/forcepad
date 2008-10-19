@@ -5,10 +5,12 @@
 #include <FL/Fl.H>
 #include <FL/Fl_Double_Window.H>
 #include "Fl_HoverButton.h"
+#include <FL/Fl_Box.H>
+#include <FL/Fl_Wizard.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Roller.H>
 #include <FL/Fl_Slider.H>
-#include <FL/Fl_Box.H>
+#include <FL/Fl_Check_Button.H>
 
 class CVizMixerToolbar {
   void* m_paintView; 
@@ -16,8 +18,22 @@ public:
   CVizMixerToolbar();
   Fl_Double_Window *mainWindow;
   Fl_HoverButton *btnStress;
+private:
+  void cb_btnStress_i(Fl_HoverButton*, void*);
+  static void cb_btnStress(Fl_HoverButton*, void*);
+public:
   Fl_HoverButton *btnDisplacements;
+private:
+  void cb_btnDisplacements_i(Fl_HoverButton*, void*);
+  static void cb_btnDisplacements(Fl_HoverButton*, void*);
+public:
   Fl_HoverButton *btnMisesStress;
+private:
+  void cb_btnMisesStress_i(Fl_HoverButton*, void*);
+  static void cb_btnMisesStress(Fl_HoverButton*, void*);
+public:
+  Fl_Wizard *wizard;
+  Fl_Group *groupPrincipalStress;
   Fl_HoverButton *btnTensionCompression;
 private:
   void cb_btnTensionCompression_i(Fl_HoverButton*, void*);
@@ -72,6 +88,43 @@ public:
 private:
   void cb_stressWidth_i(Fl_Roller*, void*);
   static void cb_stressWidth(Fl_Roller*, void*);
+public:
+  Fl_Group *groupMisesStress;
+  Fl_HoverButton *btnColorMap1;
+private:
+  void cb_btnColorMap1_i(Fl_HoverButton*, void*);
+  static void cb_btnColorMap1(Fl_HoverButton*, void*);
+public:
+  Fl_HoverButton *btnColorMap2;
+private:
+  void cb_btnColorMap2_i(Fl_HoverButton*, void*);
+  static void cb_btnColorMap2(Fl_HoverButton*, void*);
+public:
+  Fl_Slider *sldUpperMisesTreshold;
+private:
+  void cb_sldUpperMisesTreshold_i(Fl_Slider*, void*);
+  static void cb_sldUpperMisesTreshold(Fl_Slider*, void*);
+public:
+  Fl_Check_Button *chkInvertColorMap;
+private:
+  void cb_chkInvertColorMap_i(Fl_Check_Button*, void*);
+  static void cb_chkInvertColorMap(Fl_Check_Button*, void*);
+public:
+  Fl_Group *groupDisplacement;
+  Fl_Slider *sldDisplacementScale;
+private:
+  void cb_sldDisplacementScale_i(Fl_Slider*, void*);
+  static void cb_sldDisplacementScale(Fl_Slider*, void*);
+public:
+  Fl_HoverButton *btnMoveLoad;
+private:
+  void cb_btnMoveLoad_i(Fl_HoverButton*, void*);
+  static void cb_btnMoveLoad(Fl_HoverButton*, void*);
+public:
+  Fl_HoverButton *btnRotateLoad;
+private:
+  void cb_btnRotateLoad_i(Fl_HoverButton*, void*);
+  static void cb_btnRotateLoad(Fl_HoverButton*, void*);
 public:
   void show();
   void setView(void* view);

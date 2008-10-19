@@ -60,7 +60,8 @@ class CMainFrame {open : {CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusM
   decl {CPaintView::TEditMode m_physicsEditMode;} {}
   decl {CTabletToolbar* m_tabletToolbar;} {}
   decl {CVizMixerToolbar* m_vizMixer;} {}
-  Function {CMainFrame()} {} {
+  Function {CMainFrame()} {open
+  } {
     Fl_Window wndMain {
       label {ForcePAD 2} open
       xywh {353 179 861 684} type Double color 0 align 80 resizable visible
@@ -385,9 +386,10 @@ paintView->setDrawForcesAndConstraints(false);}
           class Fl_HoverButton
         }
         Fl_Button btnVizMixer {
-          label {Viz Synth}
-          callback {m_vizMixer->show();
-m_vizMixer->placeWindow(wndMain);}
+          label {Viz Mixer}
+          callback {m_vizMixer->setView(paintView);
+m_vizMixer->show();
+m_vizMixer->placeWindow(wndMain);} selected
           tooltip {Show structure only} xywh {370 428 42 42} box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1 labelsize 11 labelcolor 7 align 128
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
@@ -1141,8 +1143,7 @@ forceMagnitude->value(paintView->getForceMagnitude());} {}
     code {m_tabletToolbar->hide();
 m_vizMixer->hide();
 wndMain->hide();
-so_hide();} {selected
-    }
+so_hide();} {}
   }
   Function {resetButtons()} {private
   } {

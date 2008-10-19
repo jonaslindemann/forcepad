@@ -5425,7 +5425,8 @@ void CMainFrame::cb_btnStructure(Fl_HoverButton* o, void* v) {
 }
 
 void CMainFrame::cb_btnVizMixer_i(Fl_HoverButton*, void*) {
-  m_vizMixer->show();
+  m_vizMixer->setView(paintView);
+m_vizMixer->show();
 m_vizMixer->placeWindow(wndMain);
 }
 void CMainFrame::cb_btnVizMixer(Fl_HoverButton* o, void* v) {
@@ -15899,7 +15900,7 @@ CMainFrame::CMainFrame() {
       mainMenu->color(FL_FOREGROUND_COLOR);
       mainMenu->labelsize(11);
       mainMenu->textsize(11);
-      mainMenu->textcolor(7);
+      mainMenu->textcolor(FL_BACKGROUND2_COLOR);
       mainMenu->menu(menu_mainMenu);
     } // Fl_Menu_Bar* mainMenu
     { scrRightToolbar = new Fl_Scroll(803, 492, 52, 156);
@@ -16189,7 +16190,7 @@ CMainFrame::CMainFrame() {
         btnStructure->align(Fl_Align(FL_ALIGN_CENTER));
         btnStructure->when(FL_WHEN_RELEASE);
       } // Fl_HoverButton* btnStructure
-      { btnVizMixer = new Fl_HoverButton(370, 428, 42, 42, "Viz Synth");
+      { btnVizMixer = new Fl_HoverButton(370, 428, 42, 42, "Viz Mixer");
         btnVizMixer->tooltip("Show structure only");
         btnVizMixer->box(FL_THIN_UP_BOX);
         btnVizMixer->down_box(FL_THIN_DOWN_FRAME);
@@ -16218,7 +16219,7 @@ CMainFrame::CMainFrame() {
         statusOutput->color(FL_INACTIVE_COLOR);
         statusOutput->labelsize(12);
         statusOutput->textsize(12);
-        statusOutput->textcolor(7);
+        statusOutput->textcolor(FL_BACKGROUND2_COLOR);
       } // Fl_Output* statusOutput
       { btnStopCalculation = new Fl_Button(754, 660, 42, 19, "Stop");
         btnStopCalculation->box(FL_FLAT_BOX);
@@ -16276,7 +16277,7 @@ CMainFrame::CMainFrame() {
         forceMagnitude->labelsize(12);
         forceMagnitude->labelcolor(FL_BACKGROUND2_COLOR);
         forceMagnitude->textsize(12);
-        forceMagnitude->textcolor(7);
+        forceMagnitude->textcolor(FL_BACKGROUND2_COLOR);
         forceMagnitude->callback((Fl_Callback*)cb_forceMagnitude);
         forceMagnitude->align(Fl_Align(FL_ALIGN_TOP));
       } // Fl_Value_Input* forceMagnitude
@@ -16588,7 +16589,7 @@ CMainFrame::CMainFrame() {
         sldLineWidth->maximum(30);
         sldLineWidth->step(1);
         sldLineWidth->value(5);
-        sldLineWidth->textcolor(7);
+        sldLineWidth->textcolor(FL_BACKGROUND2_COLOR);
         sldLineWidth->callback((Fl_Callback*)cb_sldLineWidth);
         sldLineWidth->align(Fl_Align(129));
         sldLineWidth->deactivate();
@@ -17487,7 +17488,7 @@ CMainFrame::CMainFrame() {
         thickness->labelsize(12);
         thickness->labelcolor(FL_BACKGROUND2_COLOR);
         thickness->textsize(12);
-        thickness->textcolor(7);
+        thickness->textcolor(FL_BACKGROUND2_COLOR);
         thickness->callback((Fl_Callback*)cb_thickness);
         thickness->align(Fl_Align(FL_ALIGN_TOP));
       } // Fl_Value_Input* thickness
@@ -17504,7 +17505,7 @@ CMainFrame::CMainFrame() {
         actualLength->labelsize(12);
         actualLength->labelcolor(FL_BACKGROUND2_COLOR);
         actualLength->textsize(12);
-        actualLength->textcolor(7);
+        actualLength->textcolor(FL_BACKGROUND2_COLOR);
         actualLength->callback((Fl_Callback*)cb_actualLength);
         actualLength->align(Fl_Align(FL_ALIGN_TOP));
       } // Fl_Value_Input* actualLength
@@ -17516,7 +17517,7 @@ CMainFrame::CMainFrame() {
         pixelLength->labelcolor(FL_BACKGROUND2_COLOR);
         pixelLength->maximum(10000);
         pixelLength->textsize(12);
-        pixelLength->textcolor(7);
+        pixelLength->textcolor(FL_BACKGROUND2_COLOR);
         pixelLength->align(Fl_Align(FL_ALIGN_TOP));
       } // Fl_Value_Output* pixelLength
       scrRightDimensionToolbar->end();
