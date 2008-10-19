@@ -2,13 +2,20 @@
 
 #include "VizMixerToolbar.h"
 #include "PaintView.h"
-#include "CalcSettings.h"
-#include "PlatformInfo.h"
-#ifdef WIN32
-#include "resource.h"
-#include "dwmapi.h"
-#endif
 #include <FL/x.H>
+
+void CVizMixerToolbar::cb_btnStress_i(Fl_HoverButton*, void*) {
+  wizard->value(groupPrincipalStress);
+
+CPaintView* paintView = (CPaintView*)m_paintView;
+paintView->setDrawDisplacements(false);
+paintView->setStressType(CFemGrid2::ST_PRINCIPAL);
+paintView->setDrawStress(true);
+paintView->setDrawForcesAndConstraints(true);
+}
+void CVizMixerToolbar::cb_btnStress(Fl_HoverButton* o, void* v) {
+  ((CVizMixerToolbar*)(o->parent()->user_data()))->cb_btnStress_i(o,v);
+}
 
 #include <FL/Fl_Pixmap.H>
 static const char *idata_stress2_black[] = {
@@ -308,6 +315,19 @@ static const char *idata_stress2_black[] = {
 };
 static Fl_Pixmap image_stress2_black(idata_stress2_black);
 
+void CVizMixerToolbar::cb_btnDisplacements_i(Fl_HoverButton*, void*) {
+  wizard->value(groupDisplacement);
+
+CPaintView* paintView = (CPaintView*)m_paintView;
+
+paintView->setDrawDisplacements(true);
+paintView->setDrawStress(false);
+paintView->setDrawForcesAndConstraints(true);
+}
+void CVizMixerToolbar::cb_btnDisplacements(Fl_HoverButton* o, void* v) {
+  ((CVizMixerToolbar*)(o->parent()->user_data()))->cb_btnDisplacements_i(o,v);
+}
+
 static const char *idata_displacements_black[] = {
 "    36    36      256            2",
 "`` c None",
@@ -604,6 +624,19 @@ static const char *idata_displacements_black[] = {
 "````````````````````````````````````````````````````````````````````````"
 };
 static Fl_Pixmap image_displacements_black(idata_displacements_black);
+
+void CVizMixerToolbar::cb_btnMisesStress_i(Fl_HoverButton*, void*) {
+  wizard->value(groupMisesStress);
+
+CPaintView* paintView = (CPaintView*)m_paintView;
+paintView->setDrawDisplacements(false);
+paintView->setStressType(CFemGrid2::ST_MISES_SMOOTH);
+paintView->setDrawStress(true);
+paintView->setDrawForcesAndConstraints(true);
+}
+void CVizMixerToolbar::cb_btnMisesStress(Fl_HoverButton* o, void* v) {
+  ((CVizMixerToolbar*)(o->parent()->user_data()))->cb_btnMisesStress_i(o,v);
+}
 
 static const char *idata_stress_mises_black[] = {
 "    36    36      256            2",
@@ -907,7 +940,7 @@ void CVizMixerToolbar::cb_btnTensionCompression_i(Fl_HoverButton*, void*) {
 paintView->setStressMode(CFemGrid2::SM_ALL);
 }
 void CVizMixerToolbar::cb_btnTensionCompression(Fl_HoverButton* o, void* v) {
-  ((CVizMixerToolbar*)(o->parent()->parent()->user_data()))->cb_btnTensionCompression_i(o,v);
+  ((CVizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_btnTensionCompression_i(o,v);
 }
 
 static const char *idata_tension_compression_black[] = {
@@ -1212,7 +1245,7 @@ void CVizMixerToolbar::cb_btnTension_i(Fl_HoverButton*, void*) {
 paintView->setStressMode(CFemGrid2::SM_POSITIVE);
 }
 void CVizMixerToolbar::cb_btnTension(Fl_HoverButton* o, void* v) {
-  ((CVizMixerToolbar*)(o->parent()->parent()->user_data()))->cb_btnTension_i(o,v);
+  ((CVizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_btnTension_i(o,v);
 }
 
 static const char *idata_tension_black[] = {
@@ -1517,7 +1550,7 @@ void CVizMixerToolbar::cb_btnCompression_i(Fl_HoverButton*, void*) {
 paintView->setStressMode(CFemGrid2::SM_NEGATIVE);
 }
 void CVizMixerToolbar::cb_btnCompression(Fl_HoverButton* o, void* v) {
-  ((CVizMixerToolbar*)(o->parent()->parent()->user_data()))->cb_btnCompression_i(o,v);
+  ((CVizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_btnCompression_i(o,v);
 }
 
 static const char *idata_compression_black[] = {
@@ -1822,7 +1855,7 @@ void CVizMixerToolbar::cb_rolArrowSize_i(Fl_Roller*, void*) {
 paintView->setStressSize(rolArrowSize->value());
 }
 void CVizMixerToolbar::cb_rolArrowSize(Fl_Roller* o, void* v) {
-  ((CVizMixerToolbar*)(o->parent()->parent()->user_data()))->cb_rolArrowSize_i(o,v);
+  ((CVizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_rolArrowSize_i(o,v);
 }
 
 void CVizMixerToolbar::cb_rolTransparency_i(Fl_Roller*, void*) {
@@ -1830,7 +1863,7 @@ void CVizMixerToolbar::cb_rolTransparency_i(Fl_Roller*, void*) {
 paintView->setStressAlpha(rolTransparency->value());
 }
 void CVizMixerToolbar::cb_rolTransparency(Fl_Roller* o, void* v) {
-  ((CVizMixerToolbar*)(o->parent()->parent()->user_data()))->cb_rolTransparency_i(o,v);
+  ((CVizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_rolTransparency_i(o,v);
 }
 
 void CVizMixerToolbar::cb_rolStep_i(Fl_Roller*, void*) {
@@ -1838,7 +1871,7 @@ void CVizMixerToolbar::cb_rolStep_i(Fl_Roller*, void*) {
 paintView->setStressStep(rolStep->value());
 }
 void CVizMixerToolbar::cb_rolStep(Fl_Roller* o, void* v) {
-  ((CVizMixerToolbar*)(o->parent()->parent()->user_data()))->cb_rolStep_i(o,v);
+  ((CVizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_rolStep_i(o,v);
 }
 
 void CVizMixerToolbar::cb_btnLockScale_i(Fl_HoverButton*, void*) {
@@ -1849,7 +1882,7 @@ else
 	paintView->lockScaleFactor();
 }
 void CVizMixerToolbar::cb_btnLockScale(Fl_HoverButton* o, void* v) {
-  ((CVizMixerToolbar*)(o->parent()->parent()->user_data()))->cb_btnLockScale_i(o,v);
+  ((CVizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_btnLockScale_i(o,v);
 }
 
 void CVizMixerToolbar::cb_minStress_i(Fl_Slider*, void*) {
@@ -1857,7 +1890,7 @@ void CVizMixerToolbar::cb_minStress_i(Fl_Slider*, void*) {
 paintView->setStressTreshold(minStress->value(),maxStress->value());
 }
 void CVizMixerToolbar::cb_minStress(Fl_Slider* o, void* v) {
-  ((CVizMixerToolbar*)(o->parent()->parent()->user_data()))->cb_minStress_i(o,v);
+  ((CVizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_minStress_i(o,v);
 }
 
 void CVizMixerToolbar::cb_maxStress_i(Fl_Slider*, void*) {
@@ -1865,7 +1898,7 @@ void CVizMixerToolbar::cb_maxStress_i(Fl_Slider*, void*) {
 paintView->setStressTreshold(minStress->value(),maxStress->value());
 }
 void CVizMixerToolbar::cb_maxStress(Fl_Slider* o, void* v) {
-  ((CVizMixerToolbar*)(o->parent()->parent()->user_data()))->cb_maxStress_i(o,v);
+  ((CVizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_maxStress_i(o,v);
 }
 
 void CVizMixerToolbar::cb_maxIntensity_i(Fl_Roller*, void*) {
@@ -1873,7 +1906,7 @@ void CVizMixerToolbar::cb_maxIntensity_i(Fl_Roller*, void*) {
 paintView->setMaxIntensity(maxIntensity->value());
 }
 void CVizMixerToolbar::cb_maxIntensity(Fl_Roller* o, void* v) {
-  ((CVizMixerToolbar*)(o->parent()->parent()->user_data()))->cb_maxIntensity_i(o,v);
+  ((CVizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_maxIntensity_i(o,v);
 }
 
 void CVizMixerToolbar::cb_stressWidth_i(Fl_Roller*, void*) {
@@ -1881,11 +1914,1259 @@ void CVizMixerToolbar::cb_stressWidth_i(Fl_Roller*, void*) {
 paintView->setStressWidth(stressWidth->value());
 }
 void CVizMixerToolbar::cb_stressWidth(Fl_Roller* o, void* v) {
-  ((CVizMixerToolbar*)(o->parent()->parent()->user_data()))->cb_stressWidth_i(o,v);
+  ((CVizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_stressWidth_i(o,v);
 }
 
+void CVizMixerToolbar::cb_btnColorMap1_i(Fl_HoverButton*, void*) {
+  CPaintView* paintView = (CPaintView*)m_paintView;
+paintView->setColorMap(1);
+}
+void CVizMixerToolbar::cb_btnColorMap1(Fl_HoverButton* o, void* v) {
+  ((CVizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_btnColorMap1_i(o,v);
+}
+
+static const char *idata_colormap2_black[] = {
+"    36    36      256            2",
+"`` c None",
+"`. c #171717",
+"`# c #3f0000",
+"`a c #7f0000",
+"`b c #0f0f0f",
+"`c c #d7d7d7",
+"`d c #070707",
+"`e c #7f0700",
+"`f c #ff0e00",
+"`g c #7f7f7f",
+"`h c #ffffff",
+"`i c #6f6f6f",
+"`j c #7f1500",
+"`k c #ff2a00",
+"`l c #efefef",
+"`m c #e7e7e7",
+"`n c #7f2300",
+"`o c #ff4601",
+"`p c #7f3100",
+"`q c #ff6301",
+"`r c #873d0f",
+"`s c #e3e3e3",
+"`t c #030303",
+"`u c #7f3f00",
+"`v c #ff7f01",
+"`w c #bf9f7f",
+"`x c #5f5f5f",
+"`y c #7f5000",
+"`z c #ffa001",
+"`A c #ffa610",
+"`B c #f7f4ef",
+"`C c #dbdbdb",
+"`D c #7f6100",
+"`E c #ffc200",
+"`F c #ffe07f",
+"`G c #7f7100",
+"`H c #ffe300",
+"`I c #ffe50f",
+"`J c #fffdef",
+"`K c #7b7f00",
+"`L c #f6ff00",
+"`M c #f8ff3f",
+"`N c #fcff9f",
+"`O c #cdcf9f",
+"`P c #9f9f9f",
+"`Q c #2b2b2b",
+"`R c #617f00",
+"`S c #c3ff00",
+"`T c #bfbfbf",
+"`U c #477f00",
+"`V c #8eff00",
+"`W c #2d7f00",
+"`X c #5bff00",
+"`Y c #137f00",
+"`Z c #27ff00",
+"`0 c #017f06",
+"`1 c #03ff0d",
+"`2 c #087f20",
+"`3 c #10ff40",
+"`4 c #0e7f39",
+"`5 c #1dff73",
+"`6 c #157f53",
+"`7 c #2affa7",
+"`8 c #1b7f6d",
+".` c #37ffda",
+".. c #1d757f",
+".# c #3bebff",
+".a c #15557f",
+".b c #2baaff",
+".c c #0d347f",
+".d c #1a69ff",
+".e c #05137f",
+".f c #0a26ff",
+".g c #000079",
+".h c #0000f2",
+".i c #000068",
+".j c #0000d1",
+".k c #000058",
+".l c #0000b1",
+".m c #000048",
+".n c #000090",
+".o c #000028",
+".p c #000050",
+".q c #777777",
+".r c #636363",
+".s c #000000",
+".t c #000000",
+".u c #000000",
+".v c #000000",
+".w c #000000",
+".x c #000000",
+".y c #000000",
+".z c #000000",
+".A c #000000",
+".B c #000000",
+".C c #000000",
+".D c #000000",
+".E c #000000",
+".F c #000000",
+".G c #000000",
+".H c #000000",
+".I c #000000",
+".J c #000000",
+".K c #000000",
+".L c #000000",
+".M c #000000",
+".N c #000000",
+".O c #000000",
+".P c #000000",
+".Q c #000000",
+".R c #000000",
+".S c #000000",
+".T c #000000",
+".U c #000000",
+".V c #000000",
+".W c #000000",
+".X c #000000",
+".Y c #000000",
+".Z c #000000",
+".0 c #000000",
+".1 c #000000",
+".2 c #000000",
+".3 c #000000",
+".4 c #000000",
+".5 c #000000",
+".6 c #000000",
+".7 c #000000",
+".8 c #000000",
+"#` c #000000",
+"#. c #000000",
+"## c #000000",
+"#a c #000000",
+"#b c #000000",
+"#c c #000000",
+"#d c #000000",
+"#e c #000000",
+"#f c #000000",
+"#g c #000000",
+"#h c #000000",
+"#i c #000000",
+"#j c #000000",
+"#k c #000000",
+"#l c #000000",
+"#m c #000000",
+"#n c #000000",
+"#o c #000000",
+"#p c #000000",
+"#q c #000000",
+"#r c #000000",
+"#s c #000000",
+"#t c #000000",
+"#u c #000000",
+"#v c #000000",
+"#w c #000000",
+"#x c #000000",
+"#y c #000000",
+"#z c #000000",
+"#A c #000000",
+"#B c #000000",
+"#C c #000000",
+"#D c #000000",
+"#E c #000000",
+"#F c #000000",
+"#G c #000000",
+"#H c #000000",
+"#I c #000000",
+"#J c #000000",
+"#K c #000000",
+"#L c #000000",
+"#M c #000000",
+"#N c #000000",
+"#O c #000000",
+"#P c #000000",
+"#Q c #000000",
+"#R c #000000",
+"#S c #000000",
+"#T c #000000",
+"#U c #000000",
+"#V c #000000",
+"#W c #000000",
+"#X c #000000",
+"#Y c #000000",
+"#Z c #000000",
+"#0 c #000000",
+"#1 c #000000",
+"#2 c #000000",
+"#3 c #000000",
+"#4 c #000000",
+"#5 c #000000",
+"#6 c #000000",
+"#7 c #000000",
+"#8 c #000000",
+"a` c #000000",
+"a. c #000000",
+"a# c #000000",
+"aa c #000000",
+"ab c #000000",
+"ac c #000000",
+"ad c #000000",
+"ae c #000000",
+"af c #000000",
+"ag c #000000",
+"ah c #000000",
+"ai c #000000",
+"aj c #000000",
+"ak c #000000",
+"al c #000000",
+"am c #000000",
+"an c #000000",
+"ao c #000000",
+"ap c #000000",
+"aq c #000000",
+"ar c #000000",
+"as c #000000",
+"at c #000000",
+"au c #000000",
+"av c #000000",
+"aw c #000000",
+"ax c #000000",
+"ay c #000000",
+"az c #000000",
+"aA c #000000",
+"aB c #000000",
+"aC c #000000",
+"aD c #000000",
+"aE c #000000",
+"aF c #000000",
+"aG c #000000",
+"aH c #000000",
+"aI c #000000",
+"aJ c #000000",
+"aK c #000000",
+"aL c #000000",
+"aM c #000000",
+"aN c #000000",
+"aO c #000000",
+"aP c #000000",
+"aQ c #000000",
+"aR c #000000",
+"aS c #000000",
+"aT c #000000",
+"aU c #000000",
+"aV c #000000",
+"aW c #000000",
+"aX c #000000",
+"aY c #000000",
+"aZ c #000000",
+"a0 c #000000",
+"a1 c #000000",
+"a2 c #000000",
+"a3 c #000000",
+"a4 c #000000",
+"a5 c #000000",
+"a6 c #000000",
+"a7 c #000000",
+"a8 c #000000",
+"````````````````````````````````````````````````````````````````````````",
+"````````````````````````````````````````````````````````````````````````",
+"````````````````````````````````````````````````````````````````````````",
+"```````````````````````````````````````````````.````````````````````````",
+"```````````````````#`a`a`a`a`a`a`a`a`a`a`#```b`c`d``````````````````````",
+"```````````````````e`f`f`f`f`f`f`f`f`f`f`e```g`h`i``````````````````````",
+"```````````````````j`k`k`k`k`k`k`k`k`k`k`j`b`l`h`m`d````````````````````",
+"```````````````````n`o`o`o`o`o`o`o`o`o`o`n`g`h`h`h`i````````````````````",
+"```````````````````p`q`q`q`q`q`q`q`q`q`q`r`l`h`h`h`s`t``````````````````",
+"```````````````````u`v`v`v`v`v`v`v`v`v`v`w`h`h`h`h`h`x``````````````````",
+"```````````````````y`z`z`z`z`z`z`z`z`z`A`B`h`h`h`h`h`C`t````````````````",
+"```````````````````D`E`E`E`E`E`E`E`E`E`F`h`h`h`h`h`h`h`x````````````````",
+"```````````````````G`H`H`H`H`H`H`H`H`I`J`h`h`h`h`h`h`h`C`t``````````````",
+"```````````````````K`L`L`L`L`L`L`L`L`M`N`O`P`m`h`C`P`P`P`Q``````````````",
+"```````````````````R`S`S`S`S`S`S`S`S`S`S`R```T`h`P``````````````````````",
+"```````````````````U`V`V`V`V`V`V`V`V`V`V`U```T`h`P``````````````````````",
+"```````````````````W`X`X`X`X`X`X`X`X`X`X`W```T`h`P``````````````````````",
+"```````````````````Y`Z`Z`Z`Z`Z`Z`Z`Z`Z`Z`Y```T`h`P``````````````````````",
+"```````````````````0`1`1`1`1`1`1`1`1`1`1`0```T`h`P``````````````````````",
+"```````````````````2`3`3`3`3`3`3`3`3`3`3`2```T`h`P``````````````````````",
+"```````````````````4`5`5`5`5`5`5`5`5`5`5`4```T`h`P``````````````````````",
+"```````````````````6`7`7`7`7`7`7`7`7`7`7`6```T`h`P``````````````````````",
+"```````````````````8.`.`.`.`.`.`.`.`.`.``8```T`h`P``````````````````````",
+"``````````````````...#.#.#.#.#.#.#.#.#.#..```T`h`P``````````````````````",
+"``````````````````.a.b.b.b.b.b.b.b.b.b.b.a```T`h`P``````````````````````",
+"``````````````````.c.d.d.d.d.d.d.d.d.d.d.c```T`h`P``````````````````````",
+"``````````````````.e.f.f.f.f.f.f.f.f.f.f.e```T`h`P``````````````````````",
+"``````````````````.g.h.h.h.h.h.h.h.h.h.h.g```T`h`P``````````````````````",
+"``````````````````.i.j.j.j.j.j.j.j.j.j.j.i```T`h`P``````````````````````",
+"``````````````````.k.l.l.l.l.l.l.l.l.l.l.k```T`h`P``````````````````````",
+"``````````````````.m.n.n.n.n.n.n.n.n.n.n.m```T`h`P``````````````````````",
+"``````````````````.o.p.p.p.p.p.p.p.p.p.p.o``.q`P.r``````````````````````",
+"````````````````````````````````````````````````````````````````````````",
+"````````````````````````````````````````````````````````````````````````",
+"````````````````````````````````````````````````````````````````````````",
+"````````````````````````````````````````````````````````````````````````"
+};
+static Fl_Pixmap image_colormap2_black(idata_colormap2_black);
+
+void CVizMixerToolbar::cb_btnColorMap2_i(Fl_HoverButton*, void*) {
+  CPaintView* paintView = (CPaintView*)m_paintView;
+paintView->setColorMap(2);
+}
+void CVizMixerToolbar::cb_btnColorMap2(Fl_HoverButton* o, void* v) {
+  ((CVizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_btnColorMap2_i(o,v);
+}
+
+static const char *idata_colormap3_black[] = {
+"    36    36      256            2",
+"`` c None",
+"`. c #171717",
+"`# c #3f3f00",
+"`a c #7f7f00",
+"`b c #0f0f0f",
+"`c c #d7d7d7",
+"`d c #070707",
+"`e c #7f7a00",
+"`f c #fff500",
+"`g c #7f7f7f",
+"`h c #ffffff",
+"`i c #6f6f6f",
+"`j c #7f7100",
+"`k c #ffe200",
+"`l c #efefef",
+"`m c #e7e7e7",
+"`n c #7f6700",
+"`o c #ffce00",
+"`p c #7f5d00",
+"`q c #ffba00",
+"`r c #87670f",
+"`s c #e3e3e3",
+"`t c #030303",
+"`u c #7f5300",
+"`v c #ffa700",
+"`w c #bfa97f",
+"`x c #5f5f5f",
+"`y c #7f4900",
+"`z c #ff9300",
+"`A c #ff990f",
+"`B c #f7f4ef",
+"`C c #dbdbdb",
+"`D c #7f4000",
+"`E c #ff8000",
+"`F c #ffbf7f",
+"`G c #7f3600",
+"`H c #ff6c00",
+"`I c #ff750f",
+"`J c #fff6ef",
+"`K c #7f2c00",
+"`L c #ff5800",
+"`M c #ff813f",
+"`N c #ffc09f",
+"`O c #cfaf9f",
+"`P c #9f9f9f",
+"`Q c #2b2b2b",
+"`R c #7f2200",
+"`S c #ff4500",
+"`T c #bfbfbf",
+"`U c #7f1800",
+"`V c #ff3100",
+"`W c #7f0e00",
+"`X c #ff1d00",
+"`Y c #7f0500",
+"`Z c #ff0a00",
+"`0 c #7a0000",
+"`1 c #f50000",
+"`2 c #710000",
+"`3 c #e20000",
+"`4 c #670000",
+"`5 c #ce0000",
+"`6 c #5d0000",
+"`7 c #ba0000",
+"`8 c #530000",
+".` c #a70000",
+".. c #490000",
+".# c #930000",
+".a c #400000",
+".b c #800000",
+".c c #360000",
+".d c #6c0000",
+".e c #2c0000",
+".f c #580000",
+".g c #220000",
+".h c #450000",
+".i c #180000",
+".j c #310000",
+".k c #0e0000",
+".l c #1d0000",
+".m c #050000",
+".n c #0a0000",
+".o c #777777",
+".p c #636363",
+".q c #000000",
+".r c #000000",
+".s c #000000",
+".t c #000000",
+".u c #000000",
+".v c #000000",
+".w c #000000",
+".x c #000000",
+".y c #000000",
+".z c #000000",
+".A c #000000",
+".B c #000000",
+".C c #000000",
+".D c #000000",
+".E c #000000",
+".F c #000000",
+".G c #000000",
+".H c #000000",
+".I c #000000",
+".J c #000000",
+".K c #000000",
+".L c #000000",
+".M c #000000",
+".N c #000000",
+".O c #000000",
+".P c #000000",
+".Q c #000000",
+".R c #000000",
+".S c #000000",
+".T c #000000",
+".U c #000000",
+".V c #000000",
+".W c #000000",
+".X c #000000",
+".Y c #000000",
+".Z c #000000",
+".0 c #000000",
+".1 c #000000",
+".2 c #000000",
+".3 c #000000",
+".4 c #000000",
+".5 c #000000",
+".6 c #000000",
+".7 c #000000",
+".8 c #000000",
+"#` c #000000",
+"#. c #000000",
+"## c #000000",
+"#a c #000000",
+"#b c #000000",
+"#c c #000000",
+"#d c #000000",
+"#e c #000000",
+"#f c #000000",
+"#g c #000000",
+"#h c #000000",
+"#i c #000000",
+"#j c #000000",
+"#k c #000000",
+"#l c #000000",
+"#m c #000000",
+"#n c #000000",
+"#o c #000000",
+"#p c #000000",
+"#q c #000000",
+"#r c #000000",
+"#s c #000000",
+"#t c #000000",
+"#u c #000000",
+"#v c #000000",
+"#w c #000000",
+"#x c #000000",
+"#y c #000000",
+"#z c #000000",
+"#A c #000000",
+"#B c #000000",
+"#C c #000000",
+"#D c #000000",
+"#E c #000000",
+"#F c #000000",
+"#G c #000000",
+"#H c #000000",
+"#I c #000000",
+"#J c #000000",
+"#K c #000000",
+"#L c #000000",
+"#M c #000000",
+"#N c #000000",
+"#O c #000000",
+"#P c #000000",
+"#Q c #000000",
+"#R c #000000",
+"#S c #000000",
+"#T c #000000",
+"#U c #000000",
+"#V c #000000",
+"#W c #000000",
+"#X c #000000",
+"#Y c #000000",
+"#Z c #000000",
+"#0 c #000000",
+"#1 c #000000",
+"#2 c #000000",
+"#3 c #000000",
+"#4 c #000000",
+"#5 c #000000",
+"#6 c #000000",
+"#7 c #000000",
+"#8 c #000000",
+"a` c #000000",
+"a. c #000000",
+"a# c #000000",
+"aa c #000000",
+"ab c #000000",
+"ac c #000000",
+"ad c #000000",
+"ae c #000000",
+"af c #000000",
+"ag c #000000",
+"ah c #000000",
+"ai c #000000",
+"aj c #000000",
+"ak c #000000",
+"al c #000000",
+"am c #000000",
+"an c #000000",
+"ao c #000000",
+"ap c #000000",
+"aq c #000000",
+"ar c #000000",
+"as c #000000",
+"at c #000000",
+"au c #000000",
+"av c #000000",
+"aw c #000000",
+"ax c #000000",
+"ay c #000000",
+"az c #000000",
+"aA c #000000",
+"aB c #000000",
+"aC c #000000",
+"aD c #000000",
+"aE c #000000",
+"aF c #000000",
+"aG c #000000",
+"aH c #000000",
+"aI c #000000",
+"aJ c #000000",
+"aK c #000000",
+"aL c #000000",
+"aM c #000000",
+"aN c #000000",
+"aO c #000000",
+"aP c #000000",
+"aQ c #000000",
+"aR c #000000",
+"aS c #000000",
+"aT c #000000",
+"aU c #000000",
+"aV c #000000",
+"aW c #000000",
+"aX c #000000",
+"aY c #000000",
+"aZ c #000000",
+"a0 c #000000",
+"a1 c #000000",
+"a2 c #000000",
+"a3 c #000000",
+"a4 c #000000",
+"a5 c #000000",
+"a6 c #000000",
+"a7 c #000000",
+"a8 c #000000",
+"````````````````````````````````````````````````````````````````````````",
+"````````````````````````````````````````````````````````````````````````",
+"````````````````````````````````````````````````````````````````````````",
+"```````````````````````````````````````````````.````````````````````````",
+"```````````````````#`a`a`a`a`a`a`a`a`a`a`#```b`c`d``````````````````````",
+"```````````````````e`f`f`f`f`f`f`f`f`f`f`e```g`h`i``````````````````````",
+"```````````````````j`k`k`k`k`k`k`k`k`k`k`j`b`l`h`m`d````````````````````",
+"```````````````````n`o`o`o`o`o`o`o`o`o`o`n`g`h`h`h`i````````````````````",
+"```````````````````p`q`q`q`q`q`q`q`q`q`q`r`l`h`h`h`s`t``````````````````",
+"```````````````````u`v`v`v`v`v`v`v`v`v`v`w`h`h`h`h`h`x``````````````````",
+"```````````````````y`z`z`z`z`z`z`z`z`z`A`B`h`h`h`h`h`C`t````````````````",
+"```````````````````D`E`E`E`E`E`E`E`E`E`F`h`h`h`h`h`h`h`x````````````````",
+"```````````````````G`H`H`H`H`H`H`H`H`I`J`h`h`h`h`h`h`h`C`t``````````````",
+"```````````````````K`L`L`L`L`L`L`L`L`M`N`O`P`m`h`C`P`P`P`Q``````````````",
+"```````````````````R`S`S`S`S`S`S`S`S`S`S`R```T`h`P``````````````````````",
+"```````````````````U`V`V`V`V`V`V`V`V`V`V`U```T`h`P``````````````````````",
+"```````````````````W`X`X`X`X`X`X`X`X`X`X`W```T`h`P``````````````````````",
+"```````````````````Y`Z`Z`Z`Z`Z`Z`Z`Z`Z`Z`Y```T`h`P``````````````````````",
+"```````````````````0`1`1`1`1`1`1`1`1`1`1`0```T`h`P``````````````````````",
+"```````````````````2`3`3`3`3`3`3`3`3`3`3`2```T`h`P``````````````````````",
+"```````````````````4`5`5`5`5`5`5`5`5`5`5`4```T`h`P``````````````````````",
+"```````````````````6`7`7`7`7`7`7`7`7`7`7`6```T`h`P``````````````````````",
+"```````````````````8.`.`.`.`.`.`.`.`.`.``8```T`h`P``````````````````````",
+"``````````````````...#.#.#.#.#.#.#.#.#.#..```T`h`P``````````````````````",
+"``````````````````.a.b.b.b.b.b.b.b.b.b.b.a```T`h`P``````````````````````",
+"``````````````````.c.d.d.d.d.d.d.d.d.d.d.c```T`h`P``````````````````````",
+"``````````````````.e.f.f.f.f.f.f.f.f.f.f.e```T`h`P``````````````````````",
+"``````````````````.g.h.h.h.h.h.h.h.h.h.h.g```T`h`P``````````````````````",
+"``````````````````.i.j.j.j.j.j.j.j.j.j.j.i```T`h`P``````````````````````",
+"``````````````````.k.l.l.l.l.l.l.l.l.l.l.k```T`h`P``````````````````````",
+"``````````````````.m.n.n.n.n.n.n.n.n.n.n.m```T`h`P``````````````````````",
+"````````````````````````````````````````````.o`P.p``````````````````````",
+"````````````````````````````````````````````````````````````````````````",
+"````````````````````````````````````````````````````````````````````````",
+"````````````````````````````````````````````````````````````````````````",
+"````````````````````````````````````````````````````````````````````````"
+};
+static Fl_Pixmap image_colormap3_black(idata_colormap3_black);
+
+void CVizMixerToolbar::cb_sldUpperMisesTreshold_i(Fl_Slider*, void*) {
+  CPaintView* paintView = (CPaintView*)m_paintView;
+paintView->setUpperMisesTreshold(sldUpperMisesTreshold->value());
+}
+void CVizMixerToolbar::cb_sldUpperMisesTreshold(Fl_Slider* o, void* v) {
+  ((CVizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_sldUpperMisesTreshold_i(o,v);
+}
+
+void CVizMixerToolbar::cb_chkInvertColorMap_i(Fl_Check_Button*, void*) {
+  CPaintView* paintView = (CPaintView*)m_paintView;
+
+if (chkInvertColorMap->value()==1)
+	paintView->setInvertColorMap(true);
+else
+	paintView->setInvertColorMap(false);
+}
+void CVizMixerToolbar::cb_chkInvertColorMap(Fl_Check_Button* o, void* v) {
+  ((CVizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_chkInvertColorMap_i(o,v);
+}
+
+void CVizMixerToolbar::cb_sldDisplacementScale_i(Fl_Slider*, void*) {
+  CPaintView* paintView = (CPaintView*) m_paintView;
+paintView->setDisplacementScale(sldDisplacementScale->value());
+}
+void CVizMixerToolbar::cb_sldDisplacementScale(Fl_Slider* o, void* v) {
+  ((CVizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_sldDisplacementScale_i(o,v);
+}
+
+void CVizMixerToolbar::cb_btnMoveLoad_i(Fl_HoverButton*, void*) {
+  CPaintView* paintView = (CPaintView*)m_paintView;
+paintView->setMoveLoad(true);
+}
+void CVizMixerToolbar::cb_btnMoveLoad(Fl_HoverButton* o, void* v) {
+  ((CVizMixerToolbar*)(o->parent()->parent()->user_data()))->cb_btnMoveLoad_i(o,v);
+}
+
+static const char *idata_action_move_force_black[] = {
+"    36    36      256            2",
+"`` c #000000",
+"`. c #0f0f0f",
+"`# c #bbbbbb",
+"`a c #190b0c",
+"`b c #be7273",
+"`c c #8f5556",
+"`d c #4b4b4b",
+"`e c #ffffff",
+"`f c #3f3f3f",
+"`g c #210f10",
+"`h c #f8989a",
+"`i c #b3b3b3",
+"`j c #a3a3a3",
+"`k c #1b1b1b",
+"`l c #fbfbfb",
+"`m c #f7f7f7",
+"`n c #878787",
+"`o c #efefef",
+"`p c #6b6b6b",
+"`q c #838383",
+"`r c #bfbfbf",
+"`s c #7f7f7f",
+"`t c #9f9f9f",
+"`u c #777777",
+"`v c #131313",
+"`w c #e7e7e7",
+"`x c #a7a7a7",
+"`y c #3b3b3b",
+"`z c #1f1f1f",
+"`A c #d3d3d3",
+"`B c #070707",
+"`C c #5f5f5f",
+"`D c #c3c3c3",
+"`E c #b7b7b7",
+"`F c #535353",
+"`G c #030303",
+"`H c #272727",
+"`I c #8b8b8b",
+"`J c #8f8f8f",
+"`K c #020000",
+"`L c #3d2021",
+"`M c #c67778",
+"`N c #15090a",
+"`O c #613738",
+"`P c #391e1f",
+"`Q c #d98384",
+"`R c #9e5f60",
+"`S c #ec8f91",
+"`T c #784647",
+"`U c #482828",
+"`V c #935859",
+"`W c #000000",
+"`X c #000000",
+"`Y c #000000",
+"`Z c #000000",
+"`0 c #000000",
+"`1 c #000000",
+"`2 c #000000",
+"`3 c #000000",
+"`4 c #000000",
+"`5 c #000000",
+"`6 c #000000",
+"`7 c #000000",
+"`8 c #000000",
+".` c #000000",
+".. c #000000",
+".# c #000000",
+".a c #000000",
+".b c #000000",
+".c c #000000",
+".d c #000000",
+".e c #000000",
+".f c #000000",
+".g c #000000",
+".h c #000000",
+".i c #000000",
+".j c #000000",
+".k c #000000",
+".l c #000000",
+".m c #000000",
+".n c #000000",
+".o c #000000",
+".p c #000000",
+".q c #000000",
+".r c #000000",
+".s c #000000",
+".t c #000000",
+".u c #000000",
+".v c #000000",
+".w c #000000",
+".x c #000000",
+".y c #000000",
+".z c #000000",
+".A c #000000",
+".B c #000000",
+".C c #000000",
+".D c #000000",
+".E c #000000",
+".F c #000000",
+".G c #000000",
+".H c #000000",
+".I c #000000",
+".J c #000000",
+".K c #000000",
+".L c #000000",
+".M c #000000",
+".N c #000000",
+".O c #000000",
+".P c #000000",
+".Q c #000000",
+".R c #000000",
+".S c #000000",
+".T c #000000",
+".U c #000000",
+".V c #000000",
+".W c #000000",
+".X c #000000",
+".Y c #000000",
+".Z c #000000",
+".0 c #000000",
+".1 c #000000",
+".2 c #000000",
+".3 c #000000",
+".4 c #000000",
+".5 c #000000",
+".6 c #000000",
+".7 c #000000",
+".8 c #000000",
+"#` c #000000",
+"#. c #000000",
+"## c #000000",
+"#a c #000000",
+"#b c #000000",
+"#c c #000000",
+"#d c #000000",
+"#e c #000000",
+"#f c #000000",
+"#g c #000000",
+"#h c #000000",
+"#i c #000000",
+"#j c #000000",
+"#k c #000000",
+"#l c #000000",
+"#m c #000000",
+"#n c #000000",
+"#o c #000000",
+"#p c #000000",
+"#q c #000000",
+"#r c #000000",
+"#s c #000000",
+"#t c #000000",
+"#u c #000000",
+"#v c #000000",
+"#w c #000000",
+"#x c #000000",
+"#y c #000000",
+"#z c #000000",
+"#A c #000000",
+"#B c #000000",
+"#C c #000000",
+"#D c #000000",
+"#E c #000000",
+"#F c #000000",
+"#G c #000000",
+"#H c #000000",
+"#I c #000000",
+"#J c #000000",
+"#K c #000000",
+"#L c #000000",
+"#M c #000000",
+"#N c #000000",
+"#O c #000000",
+"#P c #000000",
+"#Q c #000000",
+"#R c #000000",
+"#S c #000000",
+"#T c #000000",
+"#U c #000000",
+"#V c #000000",
+"#W c #000000",
+"#X c #000000",
+"#Y c #000000",
+"#Z c #000000",
+"#0 c #000000",
+"#1 c #000000",
+"#2 c #000000",
+"#3 c #000000",
+"#4 c #000000",
+"#5 c #000000",
+"#6 c #000000",
+"#7 c #000000",
+"#8 c #000000",
+"a` c #000000",
+"a. c #000000",
+"a# c #000000",
+"aa c #000000",
+"ab c #000000",
+"ac c #000000",
+"ad c #000000",
+"ae c #000000",
+"af c #000000",
+"ag c #000000",
+"ah c #000000",
+"ai c #000000",
+"aj c #000000",
+"ak c #000000",
+"al c #000000",
+"am c #000000",
+"an c #000000",
+"ao c #000000",
+"ap c #000000",
+"aq c #000000",
+"ar c #000000",
+"as c #000000",
+"at c #000000",
+"au c #000000",
+"av c #000000",
+"aw c #000000",
+"ax c #000000",
+"ay c #000000",
+"az c #000000",
+"aA c #000000",
+"aB c #000000",
+"aC c #000000",
+"aD c #000000",
+"aE c #000000",
+"aF c #000000",
+"aG c #000000",
+"aH c #000000",
+"aI c #000000",
+"aJ c #000000",
+"aK c #000000",
+"aL c #000000",
+"aM c #000000",
+"aN c #000000",
+"aO c #000000",
+"aP c #000000",
+"aQ c #000000",
+"aR c #000000",
+"aS c #000000",
+"aT c #000000",
+"aU c #000000",
+"aV c #000000",
+"aW c #000000",
+"aX c #000000",
+"aY c #000000",
+"aZ c #000000",
+"a0 c #000000",
+"a1 c #000000",
+"a2 c #000000",
+"a3 c #000000",
+"a4 c #000000",
+"a5 c #000000",
+"a6 c #000000",
+"a7 c #000000",
+"a8 c #000000",
+"````````````````````````````````````````````````````````````````````````",
+"```````````````````````.````````````````````````````````````````````````",
+"```````````````````````#`````````````````````a`b`b`c````````````````````",
+"`````````````````````d`e`f```````````````````g`h`h`b````````````````````",
+"`````````````````````i`e`j```````````````````g`h`h`b````````````````````",
+"```````````````````k`l`e`m`.`````````````````g`h`h`b````````````````````",
+"```````````````````n`o`e`o`p`````````````````g`h`h`b````````````````````",
+"```````````````````q`r`e`j`s`````````````````g`h`h`b````````````````````",
+"`````````````````````r`e`t```````````````````g`h`h`b````````````````````",
+"```````````k`n`u`````r`e`t`````n`u`v`````````g`h`h`b````````````````````",
+"```````d`i`l`m`r`r`r`o`e`w`r`r`r`m`m`x`y`````g`h`h`b````````````````````",
+"```z`A`e`e`e`e`e`e`e`e`e`e`e`e`e`e`e`e`e`r`v`g`h`h`b````````````````````",
+"`````B`C`D`e`m`r`r`r`o`e`w`r`r`D`l`l`E`F`G```g`h`h`b````````````````````",
+"```````````H`I`u`````r`e`t`````J`s`k`````````g`h`h`b````````````````````",
+"`````````````````````r`e`t```````````````````g`h`h`b````````````````````",
+"```````````````````u`r`e`j`s`````````````````g`h`h`b````````````````````",
+"```````````````````n`w`e`o`p`````````````````g`h`h`b````````````````````",
+"```````````````````k`l`e`m`.`````````````````g`h`h`b````````````````````",
+"`````````````````````i`e`j```````````````````g`h`h`b````````````````````",
+"`````````````````````d`e`f```````````````````g`h`h`b````````````````````",
+"```````````````````````#`````````````````````g`h`h`b````````````````````",
+"```````````````````````.`````````````````````g`h`h`b````````````````````",
+"`````````````````````````````````````````````g`h`h`b````````````````````",
+"`````````````````````````````````````````````g`h`h`b````````````````````",
+"```````````````````````````````````````K`g`g`L`h`h`M`g`g`N``````````````",
+"`````````````````````````````````````````M`h`h`h`h`h`h`h`O``````````````",
+"`````````````````````````````````````````P`h`h`h`h`h`h`Q`K``````````````",
+"```````````````````````````````````````````R`h`h`h`h`h`O````````````````",
+"```````````````````````````````````````````a`S`h`h`h`Q`K````````````````",
+"`````````````````````````````````````````````T`h`h`h`O``````````````````",
+"`````````````````````````````````````````````K`Q`h`Q`K``````````````````",
+"```````````````````````````````````````````````U`h`O````````````````````",
+"`````````````````````````````````````````````````V`K````````````````````",
+"````````````````````````````````````````````````````````````````````````",
+"````````````````````````````````````````````````````````````````````````",
+"````````````````````````````````````````````````````````````````````````"
+};
+static Fl_Pixmap image_action_move_force_black(idata_action_move_force_black);
+
+void CVizMixerToolbar::cb_btnRotateLoad_i(Fl_HoverButton*, void*) {
+  CPaintView* paintView = (CPaintView*) m_paintView;
+paintView->setMoveLoad(false);
+}
+void CVizMixerToolbar::cb_btnRotateLoad(Fl_HoverButton* o, void* v) {
+  ((CVizMixerToolbar*)(o->parent()->parent()->user_data()))->cb_btnRotateLoad_i(o,v);
+}
+
+static const char *idata_action_rotate_force_black[] = {
+"    36    36      256            2",
+"`` c #000000",
+"`. c #190b0c",
+"`# c #be7273",
+"`a c #8f5556",
+"`b c #210f10",
+"`c c #f8989a",
+"`d c #030303",
+"`e c #777777",
+"`f c #636363",
+"`g c #838383",
+"`h c #575757",
+"`i c #4f4f4f",
+"`j c #fbfbfb",
+"`k c #373737",
+"`l c #171717",
+"`m c #878787",
+"`n c #bfbfbf",
+"`o c #ebebeb",
+"`p c #e3e3e3",
+"`q c #8f8f8f",
+"`r c #e7e7e7",
+"`s c #b7b7b7",
+"`t c #7b7b7b",
+"`u c #0f0f0f",
+"`v c #f3f3f3",
+"`w c #333333",
+"`x c #f7f7f7",
+"`y c #ffffff",
+"`z c #979797",
+"`A c #efefef",
+"`B c #1f1f1f",
+"`C c #bbbbbb",
+"`D c #c3c3c3",
+"`E c #d3d3d3",
+"`F c #0b0b0b",
+"`G c #cfcfcf",
+"`H c #5b5b5b",
+"`I c #b3b3b3",
+"`J c #535353",
+"`K c #272727",
+"`L c #7f7f7f",
+"`M c #9f9f9f",
+"`N c #2f2f2f",
+"`O c #020000",
+"`P c #3d2021",
+"`Q c #c67778",
+"`R c #15090a",
+"`S c #613738",
+"`T c #391e1f",
+"`U c #d98384",
+"`V c #9e5f60",
+"`W c #ec8f91",
+"`X c #784647",
+"`Y c #482828",
+"`Z c #935859",
+"`0 c #000000",
+"`1 c #000000",
+"`2 c #000000",
+"`3 c #000000",
+"`4 c #000000",
+"`5 c #000000",
+"`6 c #000000",
+"`7 c #000000",
+"`8 c #000000",
+".` c #000000",
+".. c #000000",
+".# c #000000",
+".a c #000000",
+".b c #000000",
+".c c #000000",
+".d c #000000",
+".e c #000000",
+".f c #000000",
+".g c #000000",
+".h c #000000",
+".i c #000000",
+".j c #000000",
+".k c #000000",
+".l c #000000",
+".m c #000000",
+".n c #000000",
+".o c #000000",
+".p c #000000",
+".q c #000000",
+".r c #000000",
+".s c #000000",
+".t c #000000",
+".u c #000000",
+".v c #000000",
+".w c #000000",
+".x c #000000",
+".y c #000000",
+".z c #000000",
+".A c #000000",
+".B c #000000",
+".C c #000000",
+".D c #000000",
+".E c #000000",
+".F c #000000",
+".G c #000000",
+".H c #000000",
+".I c #000000",
+".J c #000000",
+".K c #000000",
+".L c #000000",
+".M c #000000",
+".N c #000000",
+".O c #000000",
+".P c #000000",
+".Q c #000000",
+".R c #000000",
+".S c #000000",
+".T c #000000",
+".U c #000000",
+".V c #000000",
+".W c #000000",
+".X c #000000",
+".Y c #000000",
+".Z c #000000",
+".0 c #000000",
+".1 c #000000",
+".2 c #000000",
+".3 c #000000",
+".4 c #000000",
+".5 c #000000",
+".6 c #000000",
+".7 c #000000",
+".8 c #000000",
+"#` c #000000",
+"#. c #000000",
+"## c #000000",
+"#a c #000000",
+"#b c #000000",
+"#c c #000000",
+"#d c #000000",
+"#e c #000000",
+"#f c #000000",
+"#g c #000000",
+"#h c #000000",
+"#i c #000000",
+"#j c #000000",
+"#k c #000000",
+"#l c #000000",
+"#m c #000000",
+"#n c #000000",
+"#o c #000000",
+"#p c #000000",
+"#q c #000000",
+"#r c #000000",
+"#s c #000000",
+"#t c #000000",
+"#u c #000000",
+"#v c #000000",
+"#w c #000000",
+"#x c #000000",
+"#y c #000000",
+"#z c #000000",
+"#A c #000000",
+"#B c #000000",
+"#C c #000000",
+"#D c #000000",
+"#E c #000000",
+"#F c #000000",
+"#G c #000000",
+"#H c #000000",
+"#I c #000000",
+"#J c #000000",
+"#K c #000000",
+"#L c #000000",
+"#M c #000000",
+"#N c #000000",
+"#O c #000000",
+"#P c #000000",
+"#Q c #000000",
+"#R c #000000",
+"#S c #000000",
+"#T c #000000",
+"#U c #000000",
+"#V c #000000",
+"#W c #000000",
+"#X c #000000",
+"#Y c #000000",
+"#Z c #000000",
+"#0 c #000000",
+"#1 c #000000",
+"#2 c #000000",
+"#3 c #000000",
+"#4 c #000000",
+"#5 c #000000",
+"#6 c #000000",
+"#7 c #000000",
+"#8 c #000000",
+"a` c #000000",
+"a. c #000000",
+"a# c #000000",
+"aa c #000000",
+"ab c #000000",
+"ac c #000000",
+"ad c #000000",
+"ae c #000000",
+"af c #000000",
+"ag c #000000",
+"ah c #000000",
+"ai c #000000",
+"aj c #000000",
+"ak c #000000",
+"al c #000000",
+"am c #000000",
+"an c #000000",
+"ao c #000000",
+"ap c #000000",
+"aq c #000000",
+"ar c #000000",
+"as c #000000",
+"at c #000000",
+"au c #000000",
+"av c #000000",
+"aw c #000000",
+"ax c #000000",
+"ay c #000000",
+"az c #000000",
+"aA c #000000",
+"aB c #000000",
+"aC c #000000",
+"aD c #000000",
+"aE c #000000",
+"aF c #000000",
+"aG c #000000",
+"aH c #000000",
+"aI c #000000",
+"aJ c #000000",
+"aK c #000000",
+"aL c #000000",
+"aM c #000000",
+"aN c #000000",
+"aO c #000000",
+"aP c #000000",
+"aQ c #000000",
+"aR c #000000",
+"aS c #000000",
+"aT c #000000",
+"aU c #000000",
+"aV c #000000",
+"aW c #000000",
+"aX c #000000",
+"aY c #000000",
+"aZ c #000000",
+"a0 c #000000",
+"a1 c #000000",
+"a2 c #000000",
+"a3 c #000000",
+"a4 c #000000",
+"a5 c #000000",
+"a6 c #000000",
+"a7 c #000000",
+"a8 c #000000",
+"````````````````````````````````````````````````````````````````````````",
+"````````````````````````````````````````````````````````````````````````",
+"`````````````````````````````````.`#`#`a````````````````````````````````",
+"`````````````````````````````````b`c`c`#````````````````````````````````",
+"`````````````````````````````````b`c`c`#````````````````````````````````",
+"`````````````````````````````````b`c`c`#````````````````````````````````",
+"`````````````````````````````````b`c`c`#````````````````````````````````",
+"`````````````````````````````````b`c`c`#````````````````````````````````",
+"`````````````````````````````````b`c`c`#````````````````````````````````",
+"`````````````````````````````````b`c`c`#````````````````````````````````",
+"`````````````````````````````````b`c`c`#````````````````````````````````",
+"`````````````````d```````````````b`c`c`#```````````````d````````````````",
+"```````````````e`f```````````````b`c`c`#```````````````g`h``````````````",
+"`````````````i`j`k`l`m`n`o`p`e```b`c`c`#```q`o`r`s`t`u`h`v`k````````````",
+"```````````w`v`o`q`x`y`y`y`y`e```b`c`c`#```z`y`y`y`y`A`m`j`r`B``````````",
+"`````````l`r`y`y`y`y`y`A`C`n`w```b`c`c`#```i`s`D`v`y`y`y`y`y`E`F````````",
+"```````F`G`y`y`y`y`n`i```````````b`c`c`#`````````d`H`G`y`y`y`y`s`d``````",
+"`````d`I`y`y`y`y`j`s`J```````````b`c`c`#```````````f`D`y`y`y`y`y`z``````",
+"`````K`L`m`M`M`M`M`C`n`l`````````b`c`c`#`````````N`n`s`M`M`M`M`g`L`l````",
+"`````````````````````````````````b`c`c`#````````````````````````````````",
+"`````````````````````````````````b`c`c`#````````````````````````````````",
+"`````````````````````````````````b`c`c`#````````````````````````````````",
+"`````````````````````````````````b`c`c`#````````````````````````````````",
+"`````````````````````````````````b`c`c`#````````````````````````````````",
+"```````````````````````````O`b`b`P`c`c`Q`b`b`R``````````````````````````",
+"`````````````````````````````Q`c`c`c`c`c`c`c`S``````````````````````````",
+"`````````````````````````````T`c`c`c`c`c`c`U`O``````````````````````````",
+"```````````````````````````````V`c`c`c`c`c`S````````````````````````````",
+"```````````````````````````````.`W`c`c`c`U`O````````````````````````````",
+"`````````````````````````````````X`c`c`c`S``````````````````````````````",
+"`````````````````````````````````O`U`c`U`O``````````````````````````````",
+"```````````````````````````````````Y`c`S````````````````````````````````",
+"`````````````````````````````````````Z`O````````````````````````````````",
+"````````````````````````````````````````````````````````````````````````",
+"````````````````````````````````````````````````````````````````````````",
+"````````````````````````````````````````````````````````````````````````"
+};
+static Fl_Pixmap image_action_rotate_force_black(idata_action_rotate_force_black);
+
 CVizMixerToolbar::CVizMixerToolbar() {
-  { mainWindow = new Fl_Double_Window(273, 200, "Viz Mixer");
+  { mainWindow = new Fl_Double_Window(939, 755, "Viz Mixer");
     mainWindow->color(FL_FOREGROUND_COLOR);
     mainWindow->user_data((void*)(this));
     { btnStress = new Fl_HoverButton(11, 147, 42, 42);
@@ -1901,6 +3182,7 @@ CVizMixerToolbar::CVizMixerToolbar() {
       btnStress->labelfont(0);
       btnStress->labelsize(14);
       btnStress->labelcolor(FL_FOREGROUND_COLOR);
+      btnStress->callback((Fl_Callback*)cb_btnStress);
       btnStress->align(Fl_Align(FL_ALIGN_CENTER));
       btnStress->when(FL_WHEN_RELEASE);
     } // Fl_HoverButton* btnStress
@@ -1916,6 +3198,7 @@ CVizMixerToolbar::CVizMixerToolbar() {
       btnDisplacements->labelfont(0);
       btnDisplacements->labelsize(14);
       btnDisplacements->labelcolor(FL_FOREGROUND_COLOR);
+      btnDisplacements->callback((Fl_Callback*)cb_btnDisplacements);
       btnDisplacements->align(Fl_Align(FL_ALIGN_CENTER));
       btnDisplacements->when(FL_WHEN_RELEASE);
     } // Fl_HoverButton* btnDisplacements
@@ -1931,155 +3214,276 @@ CVizMixerToolbar::CVizMixerToolbar() {
       btnMisesStress->labelfont(0);
       btnMisesStress->labelsize(14);
       btnMisesStress->labelcolor(FL_FOREGROUND_COLOR);
+      btnMisesStress->callback((Fl_Callback*)cb_btnMisesStress);
       btnMisesStress->align(Fl_Align(FL_ALIGN_CENTER));
       btnMisesStress->when(FL_WHEN_RELEASE);
     } // Fl_HoverButton* btnMisesStress
-    { Fl_Group* o = new Fl_Group(1, 1, 272, 135);
+    { Fl_Box* o = new Fl_Box(0, 135, 273, 3);
+      o->box(FL_FLAT_BOX);
       o->color(FL_BACKGROUND2_COLOR);
-      { btnTensionCompression = new Fl_HoverButton(11, 84, 42, 42);
-        btnTensionCompression->tooltip("Show both compression and tension");
-        btnTensionCompression->type(102);
-        btnTensionCompression->box(FL_THIN_UP_BOX);
-        btnTensionCompression->down_box(FL_THIN_DOWN_FRAME);
-        btnTensionCompression->value(1);
-        btnTensionCompression->color(FL_FOREGROUND_COLOR);
-        btnTensionCompression->selection_color((Fl_Color)1);
-        btnTensionCompression->image(image_tension_compression_black);
-        btnTensionCompression->labeltype(FL_NORMAL_LABEL);
-        btnTensionCompression->labelfont(0);
-        btnTensionCompression->labelsize(14);
-        btnTensionCompression->labelcolor(FL_FOREGROUND_COLOR);
-        btnTensionCompression->callback((Fl_Callback*)cb_btnTensionCompression);
-        btnTensionCompression->align(Fl_Align(FL_ALIGN_CENTER));
-        btnTensionCompression->when(FL_WHEN_RELEASE);
-      } // Fl_HoverButton* btnTensionCompression
-      { btnTension = new Fl_HoverButton(57, 84, 42, 42);
-        btnTension->tooltip("Show only tension");
-        btnTension->type(102);
-        btnTension->box(FL_THIN_UP_BOX);
-        btnTension->down_box(FL_THIN_DOWN_FRAME);
-        btnTension->color(FL_FOREGROUND_COLOR);
-        btnTension->selection_color((Fl_Color)1);
-        btnTension->image(image_tension_black);
-        btnTension->labeltype(FL_NORMAL_LABEL);
-        btnTension->labelfont(0);
-        btnTension->labelsize(14);
-        btnTension->labelcolor(FL_FOREGROUND_COLOR);
-        btnTension->callback((Fl_Callback*)cb_btnTension);
-        btnTension->align(Fl_Align(FL_ALIGN_CENTER));
-        btnTension->when(FL_WHEN_RELEASE);
-      } // Fl_HoverButton* btnTension
-      { btnCompression = new Fl_HoverButton(103, 84, 42, 42);
-        btnCompression->tooltip("Show only compression");
-        btnCompression->type(102);
-        btnCompression->box(FL_THIN_UP_BOX);
-        btnCompression->down_box(FL_THIN_DOWN_FRAME);
-        btnCompression->color(FL_FOREGROUND_COLOR);
-        btnCompression->selection_color((Fl_Color)1);
-        btnCompression->image(image_compression_black);
-        btnCompression->labeltype(FL_NORMAL_LABEL);
-        btnCompression->labelfont(0);
-        btnCompression->labelsize(14);
-        btnCompression->labelcolor(FL_FOREGROUND_COLOR);
-        btnCompression->callback((Fl_Callback*)cb_btnCompression);
-        btnCompression->align(Fl_Align(FL_ALIGN_CENTER));
-        btnCompression->when(FL_WHEN_RELEASE);
-      } // Fl_HoverButton* btnCompression
-      { rolArrowSize = new Fl_Roller(11, 19, 23, 57, "Size");
-        rolArrowSize->tooltip("Size of stress arrows");
-        rolArrowSize->box(FL_FLAT_BOX);
-        rolArrowSize->labelsize(10);
-        rolArrowSize->labelcolor(FL_BACKGROUND2_COLOR);
-        rolArrowSize->maximum(200);
-        rolArrowSize->step(1);
-        rolArrowSize->value(50);
-        rolArrowSize->callback((Fl_Callback*)cb_rolArrowSize);
-        rolArrowSize->align(Fl_Align(FL_ALIGN_TOP));
-      } // Fl_Roller* rolArrowSize
-      { rolTransparency = new Fl_Roller(50, 19, 23, 57, "Transp");
-        rolTransparency->tooltip("Transparency of stress arrows");
-        rolTransparency->box(FL_FLAT_BOX);
-        rolTransparency->labelsize(10);
-        rolTransparency->labelcolor(FL_BACKGROUND2_COLOR);
-        rolTransparency->step(0.01);
-        rolTransparency->value(0.49);
-        rolTransparency->callback((Fl_Callback*)cb_rolTransparency);
-        rolTransparency->align(Fl_Align(FL_ALIGN_TOP));
-      } // Fl_Roller* rolTransparency
-      { rolStep = new Fl_Roller(89, 19, 23, 57, "Step");
-        rolStep->tooltip("Render stresses for every \"Step\" element.");
-        rolStep->box(FL_FLAT_BOX);
-        rolStep->labelsize(10);
-        rolStep->labelcolor(FL_BACKGROUND2_COLOR);
-        rolStep->minimum(1);
-        rolStep->maximum(20);
-        rolStep->step(1);
-        rolStep->value(1);
-        rolStep->callback((Fl_Callback*)cb_rolStep);
-        rolStep->align(Fl_Align(FL_ALIGN_TOP));
-      } // Fl_Roller* rolStep
-      { btnLockScale = new Fl_HoverButton(150, 84, 42, 42, "Auto scale");
-        btnLockScale->tooltip("Show both compression and tension");
-        btnLockScale->type(1);
-        btnLockScale->box(FL_THIN_UP_BOX);
-        btnLockScale->down_box(FL_THIN_DOWN_FRAME);
-        btnLockScale->value(1);
-        btnLockScale->color(FL_FOREGROUND_COLOR);
-        btnLockScale->selection_color((Fl_Color)1);
-        btnLockScale->labeltype(FL_NORMAL_LABEL);
-        btnLockScale->labelfont(0);
-        btnLockScale->labelsize(10);
-        btnLockScale->labelcolor(FL_BACKGROUND2_COLOR);
-        btnLockScale->callback((Fl_Callback*)cb_btnLockScale);
-        btnLockScale->align(Fl_Align(FL_ALIGN_WRAP));
-        btnLockScale->when(FL_WHEN_RELEASE);
-      } // Fl_HoverButton* btnLockScale
-      { minStress = new Fl_Slider(208, 19, 25, 107, "Min");
-        minStress->box(FL_BORDER_BOX);
-        minStress->color(FL_INACTIVE_COLOR);
-        minStress->labelsize(11);
-        minStress->labelcolor(FL_BACKGROUND2_COLOR);
-        minStress->minimum(1);
-        minStress->maximum(0);
-        minStress->callback((Fl_Callback*)cb_minStress);
-        minStress->align(Fl_Align(FL_ALIGN_TOP));
-      } // Fl_Slider* minStress
-      { maxStress = new Fl_Slider(240, 19, 25, 107, "Max");
-        maxStress->box(FL_BORDER_BOX);
-        maxStress->color(FL_INACTIVE_COLOR);
-        maxStress->labelsize(11);
-        maxStress->labelcolor(FL_BACKGROUND2_COLOR);
-        maxStress->minimum(1);
-        maxStress->maximum(0);
-        maxStress->value(1);
-        maxStress->callback((Fl_Callback*)cb_maxStress);
-        maxStress->align(Fl_Align(FL_ALIGN_TOP));
-      } // Fl_Slider* maxStress
-      { maxIntensity = new Fl_Roller(129, 19, 23, 57, "Int.");
-        maxIntensity->tooltip("Render stresses for every \"Step\" element.");
-        maxIntensity->box(FL_FLAT_BOX);
-        maxIntensity->labelsize(10);
-        maxIntensity->labelcolor(FL_BACKGROUND2_COLOR);
-        maxIntensity->step(0.01);
-        maxIntensity->value(0.5);
-        maxIntensity->callback((Fl_Callback*)cb_maxIntensity);
-        maxIntensity->align(Fl_Align(FL_ALIGN_TOP));
-      } // Fl_Roller* maxIntensity
-      { stressWidth = new Fl_Roller(169, 19, 23, 57, "Width");
-        stressWidth->tooltip("Render stresses for every \"Step\" element.");
-        stressWidth->box(FL_FLAT_BOX);
-        stressWidth->labelsize(10);
-        stressWidth->labelcolor(FL_BACKGROUND2_COLOR);
-        stressWidth->minimum(1);
-        stressWidth->maximum(10);
-        stressWidth->step(1);
-        stressWidth->value(2);
-        stressWidth->callback((Fl_Callback*)cb_stressWidth);
-        stressWidth->align(Fl_Align(FL_ALIGN_TOP));
-      } // Fl_Roller* stressWidth
+    } // Fl_Box* o
+    { wizard = new Fl_Wizard(0, 0, 630, 354);
+      wizard->box(FL_NO_BOX);
+      { groupPrincipalStress = new Fl_Group(345, 25, 272, 135);
+        groupPrincipalStress->color(FL_BACKGROUND2_COLOR);
+        { btnTensionCompression = new Fl_HoverButton(355, 108, 42, 42);
+          btnTensionCompression->tooltip("Show both compression and tension");
+          btnTensionCompression->type(102);
+          btnTensionCompression->box(FL_THIN_UP_BOX);
+          btnTensionCompression->down_box(FL_THIN_DOWN_FRAME);
+          btnTensionCompression->value(1);
+          btnTensionCompression->color(FL_FOREGROUND_COLOR);
+          btnTensionCompression->selection_color((Fl_Color)1);
+          btnTensionCompression->image(image_tension_compression_black);
+          btnTensionCompression->labeltype(FL_NORMAL_LABEL);
+          btnTensionCompression->labelfont(0);
+          btnTensionCompression->labelsize(14);
+          btnTensionCompression->labelcolor(FL_FOREGROUND_COLOR);
+          btnTensionCompression->callback((Fl_Callback*)cb_btnTensionCompression);
+          btnTensionCompression->align(Fl_Align(FL_ALIGN_CENTER));
+          btnTensionCompression->when(FL_WHEN_RELEASE);
+        } // Fl_HoverButton* btnTensionCompression
+        { btnTension = new Fl_HoverButton(401, 108, 42, 42);
+          btnTension->tooltip("Show only tension");
+          btnTension->type(102);
+          btnTension->box(FL_THIN_UP_BOX);
+          btnTension->down_box(FL_THIN_DOWN_FRAME);
+          btnTension->color(FL_FOREGROUND_COLOR);
+          btnTension->selection_color((Fl_Color)1);
+          btnTension->image(image_tension_black);
+          btnTension->labeltype(FL_NORMAL_LABEL);
+          btnTension->labelfont(0);
+          btnTension->labelsize(14);
+          btnTension->labelcolor(FL_FOREGROUND_COLOR);
+          btnTension->callback((Fl_Callback*)cb_btnTension);
+          btnTension->align(Fl_Align(FL_ALIGN_CENTER));
+          btnTension->when(FL_WHEN_RELEASE);
+        } // Fl_HoverButton* btnTension
+        { btnCompression = new Fl_HoverButton(447, 108, 42, 42);
+          btnCompression->tooltip("Show only compression");
+          btnCompression->type(102);
+          btnCompression->box(FL_THIN_UP_BOX);
+          btnCompression->down_box(FL_THIN_DOWN_FRAME);
+          btnCompression->color(FL_FOREGROUND_COLOR);
+          btnCompression->selection_color((Fl_Color)1);
+          btnCompression->image(image_compression_black);
+          btnCompression->labeltype(FL_NORMAL_LABEL);
+          btnCompression->labelfont(0);
+          btnCompression->labelsize(14);
+          btnCompression->labelcolor(FL_FOREGROUND_COLOR);
+          btnCompression->callback((Fl_Callback*)cb_btnCompression);
+          btnCompression->align(Fl_Align(FL_ALIGN_CENTER));
+          btnCompression->when(FL_WHEN_RELEASE);
+        } // Fl_HoverButton* btnCompression
+        { rolArrowSize = new Fl_Roller(355, 43, 23, 57, "Size");
+          rolArrowSize->tooltip("Size of stress arrows");
+          rolArrowSize->box(FL_FLAT_BOX);
+          rolArrowSize->labelsize(10);
+          rolArrowSize->labelcolor(FL_BACKGROUND2_COLOR);
+          rolArrowSize->maximum(200);
+          rolArrowSize->step(1);
+          rolArrowSize->value(50);
+          rolArrowSize->callback((Fl_Callback*)cb_rolArrowSize);
+          rolArrowSize->align(Fl_Align(FL_ALIGN_TOP));
+        } // Fl_Roller* rolArrowSize
+        { rolTransparency = new Fl_Roller(394, 43, 23, 57, "Transp");
+          rolTransparency->tooltip("Transparency of stress arrows");
+          rolTransparency->box(FL_FLAT_BOX);
+          rolTransparency->labelsize(10);
+          rolTransparency->labelcolor(FL_BACKGROUND2_COLOR);
+          rolTransparency->step(0.01);
+          rolTransparency->value(0.49);
+          rolTransparency->callback((Fl_Callback*)cb_rolTransparency);
+          rolTransparency->align(Fl_Align(FL_ALIGN_TOP));
+        } // Fl_Roller* rolTransparency
+        { rolStep = new Fl_Roller(433, 43, 23, 57, "Step");
+          rolStep->tooltip("Render stresses for every \"Step\" element.");
+          rolStep->box(FL_FLAT_BOX);
+          rolStep->labelsize(10);
+          rolStep->labelcolor(FL_BACKGROUND2_COLOR);
+          rolStep->minimum(1);
+          rolStep->maximum(20);
+          rolStep->step(1);
+          rolStep->value(1);
+          rolStep->callback((Fl_Callback*)cb_rolStep);
+          rolStep->align(Fl_Align(FL_ALIGN_TOP));
+        } // Fl_Roller* rolStep
+        { btnLockScale = new Fl_HoverButton(494, 108, 42, 42, "Auto scale");
+          btnLockScale->tooltip("Show both compression and tension");
+          btnLockScale->type(1);
+          btnLockScale->box(FL_THIN_UP_BOX);
+          btnLockScale->down_box(FL_THIN_DOWN_FRAME);
+          btnLockScale->value(1);
+          btnLockScale->color(FL_FOREGROUND_COLOR);
+          btnLockScale->selection_color((Fl_Color)1);
+          btnLockScale->labeltype(FL_NORMAL_LABEL);
+          btnLockScale->labelfont(0);
+          btnLockScale->labelsize(10);
+          btnLockScale->labelcolor(FL_BACKGROUND2_COLOR);
+          btnLockScale->callback((Fl_Callback*)cb_btnLockScale);
+          btnLockScale->align(Fl_Align(FL_ALIGN_WRAP));
+          btnLockScale->when(FL_WHEN_RELEASE);
+        } // Fl_HoverButton* btnLockScale
+        { minStress = new Fl_Slider(552, 43, 25, 107, "Min");
+          minStress->box(FL_BORDER_BOX);
+          minStress->color(FL_INACTIVE_COLOR);
+          minStress->labelsize(11);
+          minStress->labelcolor(FL_BACKGROUND2_COLOR);
+          minStress->minimum(1);
+          minStress->maximum(0);
+          minStress->callback((Fl_Callback*)cb_minStress);
+          minStress->align(Fl_Align(FL_ALIGN_TOP));
+        } // Fl_Slider* minStress
+        { maxStress = new Fl_Slider(584, 43, 25, 107, "Max");
+          maxStress->box(FL_BORDER_BOX);
+          maxStress->color(FL_INACTIVE_COLOR);
+          maxStress->labelsize(11);
+          maxStress->labelcolor(FL_BACKGROUND2_COLOR);
+          maxStress->minimum(1);
+          maxStress->maximum(0);
+          maxStress->value(1);
+          maxStress->callback((Fl_Callback*)cb_maxStress);
+          maxStress->align(Fl_Align(FL_ALIGN_TOP));
+        } // Fl_Slider* maxStress
+        { maxIntensity = new Fl_Roller(473, 43, 23, 57, "Int.");
+          maxIntensity->tooltip("Render stresses for every \"Step\" element.");
+          maxIntensity->box(FL_FLAT_BOX);
+          maxIntensity->labelsize(10);
+          maxIntensity->labelcolor(FL_BACKGROUND2_COLOR);
+          maxIntensity->step(0.01);
+          maxIntensity->value(0.5);
+          maxIntensity->callback((Fl_Callback*)cb_maxIntensity);
+          maxIntensity->align(Fl_Align(FL_ALIGN_TOP));
+        } // Fl_Roller* maxIntensity
+        { stressWidth = new Fl_Roller(513, 43, 23, 57, "Width");
+          stressWidth->tooltip("Render stresses for every \"Step\" element.");
+          stressWidth->box(FL_FLAT_BOX);
+          stressWidth->labelsize(10);
+          stressWidth->labelcolor(FL_BACKGROUND2_COLOR);
+          stressWidth->minimum(1);
+          stressWidth->maximum(10);
+          stressWidth->step(1);
+          stressWidth->value(2);
+          stressWidth->callback((Fl_Callback*)cb_stressWidth);
+          stressWidth->align(Fl_Align(FL_ALIGN_TOP));
+        } // Fl_Roller* stressWidth
+        groupPrincipalStress->end();
+      } // Fl_Group* groupPrincipalStress
+      { groupMisesStress = new Fl_Group(347, 194, 283, 160);
+        groupMisesStress->color(FL_BACKGROUND2_COLOR);
+        groupMisesStress->hide();
+        { btnColorMap1 = new Fl_HoverButton(399, 249, 41, 42);
+          btnColorMap1->tooltip("Set default stress colormap");
+          btnColorMap1->type(102);
+          btnColorMap1->box(FL_THIN_UP_BOX);
+          btnColorMap1->down_box(FL_THIN_DOWN_FRAME);
+          btnColorMap1->color(FL_FOREGROUND_COLOR);
+          btnColorMap1->selection_color((Fl_Color)1);
+          btnColorMap1->image(image_colormap2_black);
+          btnColorMap1->labeltype(FL_NORMAL_LABEL);
+          btnColorMap1->labelfont(0);
+          btnColorMap1->labelsize(14);
+          btnColorMap1->labelcolor(FL_FOREGROUND_COLOR);
+          btnColorMap1->callback((Fl_Callback*)cb_btnColorMap1);
+          btnColorMap1->align(Fl_Align(FL_ALIGN_CENTER));
+          btnColorMap1->when(FL_WHEN_RELEASE);
+        } // Fl_HoverButton* btnColorMap1
+        { btnColorMap2 = new Fl_HoverButton(447, 249, 41, 42);
+          btnColorMap2->tooltip("Set colormap hot");
+          btnColorMap2->type(102);
+          btnColorMap2->box(FL_THIN_UP_BOX);
+          btnColorMap2->down_box(FL_THIN_DOWN_FRAME);
+          btnColorMap2->color(FL_FOREGROUND_COLOR);
+          btnColorMap2->selection_color((Fl_Color)1);
+          btnColorMap2->image(image_colormap3_black);
+          btnColorMap2->labeltype(FL_NORMAL_LABEL);
+          btnColorMap2->labelfont(0);
+          btnColorMap2->labelsize(14);
+          btnColorMap2->labelcolor(FL_FOREGROUND_COLOR);
+          btnColorMap2->callback((Fl_Callback*)cb_btnColorMap2);
+          btnColorMap2->align(Fl_Align(FL_ALIGN_CENTER));
+          btnColorMap2->when(FL_WHEN_RELEASE);
+        } // Fl_HoverButton* btnColorMap2
+        { sldUpperMisesTreshold = new Fl_Slider(537, 238, 23, 68, "Treshold");
+          sldUpperMisesTreshold->tooltip("Upper stress treshold");
+          sldUpperMisesTreshold->type(2);
+          sldUpperMisesTreshold->box(FL_BORDER_BOX);
+          sldUpperMisesTreshold->color((Fl_Color)24);
+          sldUpperMisesTreshold->labelsize(10);
+          sldUpperMisesTreshold->labelcolor(FL_BACKGROUND2_COLOR);
+          sldUpperMisesTreshold->minimum(1);
+          sldUpperMisesTreshold->maximum(0);
+          sldUpperMisesTreshold->step(0.05);
+          sldUpperMisesTreshold->value(0.8);
+          sldUpperMisesTreshold->callback((Fl_Callback*)cb_sldUpperMisesTreshold);
+          sldUpperMisesTreshold->align(Fl_Align(FL_ALIGN_TOP));
+        } // Fl_Slider* sldUpperMisesTreshold
+        { chkInvertColorMap = new Fl_Check_Button(502, 266, 15, 15, "Invert");
+          chkInvertColorMap->down_box(FL_DOWN_BOX);
+          chkInvertColorMap->labelsize(10);
+          chkInvertColorMap->labelcolor(FL_BACKGROUND2_COLOR);
+          chkInvertColorMap->callback((Fl_Callback*)cb_chkInvertColorMap);
+          chkInvertColorMap->align(Fl_Align(129));
+        } // Fl_Check_Button* chkInvertColorMap
+        groupMisesStress->end();
+      } // Fl_Group* groupMisesStress
+      { groupDisplacement = new Fl_Group(25, 205, 272, 135);
+        groupDisplacement->color(FL_BACKGROUND2_COLOR);
+        groupDisplacement->hide();
+        { sldDisplacementScale = new Fl_Slider(38, 265, 242, 25, "Scale");
+          sldDisplacementScale->tooltip("Displacement scalefactor");
+          sldDisplacementScale->type(5);
+          sldDisplacementScale->box(FL_BORDER_BOX);
+          sldDisplacementScale->color(FL_INACTIVE_COLOR);
+          sldDisplacementScale->labelsize(10);
+          sldDisplacementScale->labelcolor(FL_BACKGROUND2_COLOR);
+          sldDisplacementScale->minimum(-50);
+          sldDisplacementScale->maximum(50);
+          sldDisplacementScale->step(0.1);
+          sldDisplacementScale->callback((Fl_Callback*)cb_sldDisplacementScale);
+          sldDisplacementScale->align(Fl_Align(FL_ALIGN_TOP));
+        } // Fl_Slider* sldDisplacementScale
+        groupDisplacement->end();
+      } // Fl_Group* groupDisplacement
+      wizard->end();
+    } // Fl_Wizard* wizard
+    { Fl_Group* o = new Fl_Group(163, 138, 110, 56);
+      { btnMoveLoad = new Fl_HoverButton(224, 147, 42, 42);
+        btnMoveLoad->tooltip("Toggle between moving and rotating loads");
+        btnMoveLoad->type(102);
+        btnMoveLoad->box(FL_THIN_UP_BOX);
+        btnMoveLoad->down_box(FL_THIN_DOWN_FRAME);
+        btnMoveLoad->color(FL_FOREGROUND_COLOR);
+        btnMoveLoad->selection_color((Fl_Color)1);
+        btnMoveLoad->image(image_action_move_force_black);
+        btnMoveLoad->labeltype(FL_NORMAL_LABEL);
+        btnMoveLoad->labelfont(0);
+        btnMoveLoad->labelsize(11);
+        btnMoveLoad->labelcolor(FL_FOREGROUND_COLOR);
+        btnMoveLoad->callback((Fl_Callback*)cb_btnMoveLoad);
+        btnMoveLoad->align(Fl_Align(FL_ALIGN_WRAP));
+        btnMoveLoad->when(FL_WHEN_RELEASE);
+      } // Fl_HoverButton* btnMoveLoad
+      { btnRotateLoad = new Fl_HoverButton(176, 147, 42, 42);
+        btnRotateLoad->tooltip("Toggle between moving and rotating loads");
+        btnRotateLoad->type(102);
+        btnRotateLoad->box(FL_THIN_UP_BOX);
+        btnRotateLoad->down_box(FL_THIN_DOWN_FRAME);
+        btnRotateLoad->value(1);
+        btnRotateLoad->color(FL_FOREGROUND_COLOR);
+        btnRotateLoad->selection_color((Fl_Color)1);
+        btnRotateLoad->image(image_action_rotate_force_black);
+        btnRotateLoad->labeltype(FL_NORMAL_LABEL);
+        btnRotateLoad->labelfont(0);
+        btnRotateLoad->labelsize(11);
+        btnRotateLoad->labelcolor(FL_FOREGROUND_COLOR);
+        btnRotateLoad->callback((Fl_Callback*)cb_btnRotateLoad);
+        btnRotateLoad->align(Fl_Align(FL_ALIGN_WRAP));
+        btnRotateLoad->when(FL_WHEN_RELEASE);
+      } // Fl_HoverButton* btnRotateLoad
       o->end();
     } // Fl_Group* o
-    { Fl_Box* o = new Fl_Box(0, 135, 273, 3);
+    { Fl_Box* o = new Fl_Box(160, 135, 4, 72);
       o->box(FL_FLAT_BOX);
       o->color(FL_BACKGROUND2_COLOR);
     } // Fl_Box* o
@@ -2087,21 +3491,16 @@ CVizMixerToolbar::CVizMixerToolbar() {
     mainWindow->end();
   } // Fl_Double_Window* mainWindow
   m_paintView = NULL;
+
+groupPrincipalStress->position(0,0);
+groupMisesStress->position(0,0);
+groupDisplacement->position(0,0);
+
+mainWindow->size(273,200);
 }
 
 void CVizMixerToolbar::show() {
-  CPlatformInfoPtr platformInfo = CPlatformInfo::getInstance();
-
-mainWindow->show();
-
-
-#ifdef WIN32
-   if (platformInfo->isVista())
-   {
-   	//SetWindowLong(fl_xid(mainWindow), GWL_EXSTYLE, GetWindowLong(fl_xid(mainWindow), GWL_EXSTYLE) | WS_EX_LAYERED);
-	//SetLayeredWindowAttributes(fl_xid(mainWindow), 0, (255 * 70) / 100, LWA_ALPHA);
-   }	   
-#endif
+  mainWindow->show();
 }
 
 void CVizMixerToolbar::setView(void* view) {
