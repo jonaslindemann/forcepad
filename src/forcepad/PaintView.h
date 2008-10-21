@@ -61,6 +61,7 @@ class CPVViewModeChangeEvent;
 class CPVViewModeErrorEvent;
 class CPVModelChangedEvent;
 class CPVRulerChangedEvent;
+class CPVVisualisationModeChangedEvent;
 
 class CPaintView : public Fl_Gl_Window {
 public:
@@ -99,6 +100,13 @@ public:
 		VM_PHYSICS, 
 		VM_ACTION
 	};
+
+	enum TVisualisationMode {
+		VM_PRINCIPAL_STRESS,
+		VM_MISES_STRESS,
+		VM_DISPLACEMENTS,
+		VM_STRUCTURE
+	};
 private:
 	/*
 	 *    Command line arguments
@@ -109,6 +117,7 @@ private:
 
 	TEditMode m_editMode;
 	TViewMode m_viewMode;
+	TVisualisationMode m_visualisationMode;
 
 	/*
 	 *    Mouse state variables
@@ -261,6 +270,7 @@ private:
 	CPVViewModeErrorEvent* m_viewModeErrorEvent;
 	CPVModelChangedEvent* m_modelChangedEvent;
 	CPVRulerChangedEvent* m_rulerChangedEvent;
+	CPVVisualisationModeChangedEvent* m_visualisationModeChangedEvent;
 
 	CGSStatusMessageEvent* m_statusMessageEvent;
 	CGSLogMessageEvent* m_logMessageEvent;
@@ -438,6 +448,9 @@ public:
 
 	void setUpperMisesTreshold(double upper);
 
+	void setVisualisationMode(TVisualisationMode mode);
+	TVisualisationMode getVisualisationMode();
+
 	// Calculation settings
 
 	void setUseWeight(bool flag);
@@ -507,6 +520,7 @@ public:
 	void setContinueCalcEvent(CGSContinueCalcEvent* eventMethod);
 	void setModelChangedEvent(CPVModelChangedEvent* eventMethod);
 	void setRulerChangedEvent(CPVRulerChangedEvent* eventMethod);
+	void setVisualisationModeChangedEvent(CPVVisualisationModeChangedEvent* eventMethod);
 };
 
 class CPVModeChangeEvent {
@@ -537,6 +551,12 @@ class CPVRulerChangedEvent {
 public:
 	virtual ~CPVRulerChangedEvent() {};
 	virtual void onRulerChanged(CRuler* ruler) = 0;
+};
+
+class CPVVisualisationModeChangedEvent {
+public:
+	virtual ~CPVVisualisationModeChangedEvent() {};
+	virtual void onVisualisationModeChanged(CPaintView::TVisualisationMode oldMode, CPaintView::TVisualisationMode newMode) = 0;
 };
 
 

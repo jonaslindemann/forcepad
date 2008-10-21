@@ -283,6 +283,7 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 	m_logMessageEvent = NULL;
 	m_modelChangedEvent = NULL;
 	m_rulerChangedEvent = NULL;
+	m_visualisationModeChangedEvent = NULL;
 
 	// Set initial model name
 	
@@ -2755,6 +2756,47 @@ double CPaintView::getRulerLength()
 	return m_ruler->getActualLength();
 }
 
+void CPaintView::setVisualisationMode(TVisualisationMode mode)
+{
+	TVisualisationMode oldMode = m_visualisationMode;
+	m_visualisationMode = mode;
+
+	switch (m_visualisationMode) {
+	case VM_PRINCIPAL_STRESS:
+		this->setDrawDisplacements(false);
+		this->setStressType(CFemGrid2::ST_PRINCIPAL);
+		this->setDrawStress(true);
+		this->setDrawForcesAndConstraints(true);
+		break;
+	case VM_MISES_STRESS:
+		this->setDrawDisplacements(false);
+		this->setStressType(CFemGrid2::ST_MISES_SMOOTH);
+		this->setDrawStress(true);
+		this->setDrawForcesAndConstraints(true);
+		break;
+	case VM_DISPLACEMENTS:
+		this->setDrawDisplacements(true);
+		this->setDrawStress(false);
+		this->setDrawForcesAndConstraints(true);
+		break;
+	case VM_STRUCTURE:
+		this->setDrawDisplacements(false);
+		this->setDrawStress(false);
+		this->setDrawForcesAndConstraints(false);
+		break;
+	default:
+		break;
+	}
+
+	if (m_visualisationModeChangedEvent!=NULL)
+		this->m_visualisationModeChangedEvent->onVisualisationModeChanged(oldMode, mode);
+
+}
+
+CPaintView::TVisualisationMode CPaintView::getVisualisationMode()
+{
+	return m_visualisationMode;
+}
 
 void CPaintView::setCommandLine(int argc, char **argv)
 {
@@ -3223,4 +3265,9 @@ void CPaintView::setModelChangedEvent(CPVModelChangedEvent* eventMethod)
 void CPaintView::setRulerChangedEvent(CPVRulerChangedEvent* eventMethod)
 {
 	m_rulerChangedEvent = eventMethod;
+}
+
+void CPaintView::setVisualisationModeChangedEvent(CPVVisualisationModeChangedEvent* eventMethod)
+{
+	m_visualisationModeChangedEvent = eventMethod;
 }

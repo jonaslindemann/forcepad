@@ -31,10 +31,10 @@
 #define FORCEPAD_VERSION_MINOR 4
 #define FORCEPAD_VERSION_RELEASE 0
 
-#define FORCEPAD_VERSION_STRING "ForcePAD version 2.4.0-BETA-8"
+#define FORCEPAD_VERSION_STRING "ForcePAD version 2.4.0-BETA-9"
 
 #ifdef FORCEPAD_NEW_UI
-#define FORCEPAD_NAME "ForcePAD 2 - (2.4.0-BETA-8)"
+#define FORCEPAD_NAME "ForcePAD 2 - (2.4.0-BETA-9)"
 #else
 #define FORCEPAD_NAME "ForcePAD 2"
 #endif
