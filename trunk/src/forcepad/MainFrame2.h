@@ -12,21 +12,21 @@
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Menu_Bar.H>
 #include <FL/Fl_Scroll.H>
-#include <FL/Fl_Group.H>
 #include "Fl_HoverButton.h"
 #include <FL/Fl_Box.H>
+#include <FL/Fl_Group.H>
 #include "PaintView.h"
-#include <FL/Fl_Progress.H>
-#include <FL/Fl_Output.H>
-#include <FL/Fl_Button.H>
 #include <FL/Fl_Value_Input.H>
 #include <FL/Fl_Value_Slider.H>
 #include <FL/Fl_Roller.H>
 #include <FL/Fl_Slider.H>
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Value_Output.H>
+#include <FL/Fl_Progress.H>
+#include <FL/Fl_Output.H>
+#include <FL/Fl_Button.H>
 
-class CMainFrame : CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusMessageEvent, CGSLogMessageEvent, CGSContinueCalcEvent, CPVViewModeErrorEvent, CPVModelChangedEvent, CPVRulerChangedEvent {
+class CMainFrame : CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusMessageEvent, CGSLogMessageEvent, CGSContinueCalcEvent, CPVViewModeErrorEvent, CPVModelChangedEvent, CPVRulerChangedEvent, CPVVisualisationModeChangedEvent {
   bool m_continueCalc; 
   CPaintView::TEditMode m_saveEditMode; 
   CPaintView::TEditMode m_sketchEditMode; 
@@ -213,18 +213,6 @@ public:
 private:
   void cb_btnVizMixer_i(Fl_HoverButton*, void*);
   static void cb_btnVizMixer(Fl_HoverButton*, void*);
-public:
-  Fl_Progress *calcProgress;
-  Fl_Output *statusOutput;
-  Fl_Button *btnStopCalculation;
-private:
-  void cb_btnStopCalculation_i(Fl_Button*, void*);
-  static void cb_btnStopCalculation(Fl_Button*, void*);
-public:
-  Fl_Button *btnTabletToolbar;
-private:
-  void cb_btnTabletToolbar_i(Fl_Button*, void*);
-  static void cb_btnTabletToolbar(Fl_Button*, void*);
 public:
   Fl_Scroll *scrRightForceToolbar;
   Fl_HoverButton *btnAddForce;
@@ -540,6 +528,19 @@ private:
   static void cb_actualLength(Fl_Value_Input*, void*);
 public:
   Fl_Value_Output *pixelLength;
+  Fl_Group *statusBar;
+  Fl_Progress *calcProgress;
+  Fl_Output *statusOutput;
+  Fl_Button *btnStopCalculation;
+private:
+  void cb_btnStopCalculation_i(Fl_Button*, void*);
+  static void cb_btnStopCalculation(Fl_Button*, void*);
+public:
+  Fl_Button *btnTabletToolbar;
+private:
+  void cb_btnTabletToolbar_i(Fl_Button*, void*);
+  static void cb_btnTabletToolbar(Fl_Button*, void*);
+public:
   ~CMainFrame();
   void show();
   void close();
@@ -564,5 +565,8 @@ public:
   void onModelChanged(const std::string& newModelName);
   void onRulerChanged(CRuler* ruler);
   bool onContinueCalc();
+  void onVisualisationModeChanged(CPaintView::TVisualisationMode oldMode, CPaintView::TVisualisationMode newMode);
+  void disableUserInterface();
+  void enableUserInterface();
 };
 #endif

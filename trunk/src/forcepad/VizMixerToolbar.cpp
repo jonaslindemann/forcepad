@@ -8,10 +8,7 @@ void CVizMixerToolbar::cb_btnStress_i(Fl_HoverButton*, void*) {
   wizard->value(groupPrincipalStress);
 
 CPaintView* paintView = (CPaintView*)m_paintView;
-paintView->setDrawDisplacements(false);
-paintView->setStressType(CFemGrid2::ST_PRINCIPAL);
-paintView->setDrawStress(true);
-paintView->setDrawForcesAndConstraints(true);
+paintView->setVisualisationMode(CPaintView::VM_PRINCIPAL_STRESS);
 }
 void CVizMixerToolbar::cb_btnStress(Fl_HoverButton* o, void* v) {
   ((CVizMixerToolbar*)(o->parent()->user_data()))->cb_btnStress_i(o,v);
@@ -319,6 +316,7 @@ void CVizMixerToolbar::cb_btnDisplacements_i(Fl_HoverButton*, void*) {
   wizard->value(groupDisplacement);
 
 CPaintView* paintView = (CPaintView*)m_paintView;
+paintView->setVisualisationMode(CPaintView::VM_DISPLACEMENTS);
 
 paintView->setDrawDisplacements(true);
 paintView->setDrawStress(false);
@@ -629,10 +627,7 @@ void CVizMixerToolbar::cb_btnMisesStress_i(Fl_HoverButton*, void*) {
   wizard->value(groupMisesStress);
 
 CPaintView* paintView = (CPaintView*)m_paintView;
-paintView->setDrawDisplacements(false);
-paintView->setStressType(CFemGrid2::ST_MISES_SMOOTH);
-paintView->setDrawStress(true);
-paintView->setDrawForcesAndConstraints(true);
+paintView->setVisualisationMode(CPaintView::VM_MISES_STRESS);
 }
 void CVizMixerToolbar::cb_btnMisesStress(Fl_HoverButton* o, void* v) {
   ((CVizMixerToolbar*)(o->parent()->user_data()))->cb_btnMisesStress_i(o,v);
@@ -3166,7 +3161,7 @@ static const char *idata_action_rotate_force_black[] = {
 static Fl_Pixmap image_action_rotate_force_black(idata_action_rotate_force_black);
 
 CVizMixerToolbar::CVizMixerToolbar() {
-  { mainWindow = new Fl_Double_Window(939, 755, "Viz Mixer");
+  { mainWindow = new Fl_Double_Window(655, 417, "Viz Mixer");
     mainWindow->color(FL_FOREGROUND_COLOR);
     mainWindow->user_data((void*)(this));
     { btnStress = new Fl_HoverButton(11, 147, 42, 42);
