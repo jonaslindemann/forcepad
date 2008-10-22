@@ -64,7 +64,7 @@ class CMainFrame {open : {CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusM
   } {
     Fl_Window wndMain {
       label {ForcePAD 2} open
-      xywh {353 179 861 684} type Double color 0 align 80 resizable visible
+      xywh {-32000 -32000 861 684} type Double color 0 align 80 hide resizable
     } {
       Fl_Menu_Bar mainMenu {
         xywh {0 0 858 26} box FLAT_BOX down_box FLAT_BOX color 0 labelsize 11 textsize 11 textcolor 7
@@ -373,7 +373,7 @@ Fl::check();
 Fl::flush();
 
 disableUserInterface();
-paintView->executeOpt();} selected
+paintView->executeOpt();}
           tooltip Optimisation image {../../images/optimise_black.xpm} xywh {370 484 42 42} box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1 labelsize 11
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
@@ -1026,11 +1026,11 @@ m_physicsEditMode = paintView->getEditMode();}
       Fl_Group statusBar {open
         xywh {53 653 747 31} box FLAT_BOX color 0
       } {
-        Fl_Progress calcProgress {
-          xywh {432 660 315 19} box THIN_DOWN_BOX color 8 selection_color 84
-        }
         Fl_Output statusOutput {
           xywh {60 660 246 19} box THIN_DOWN_BOX color 8 labelsize 12 textsize 12 textcolor 7
+        }
+        Fl_Progress calcProgress {
+          xywh {432 660 315 19} box THIN_DOWN_BOX color 8 selection_color 84
         }
         Fl_Button btnStopCalculation {
           label Stop
@@ -1473,7 +1473,8 @@ paintGroup->deactivate();
 
 mainMenu->deactivate();
 
-scrRightToolbar->hide();} {}
+//scrRightToolbar->hide();} {selected
+    }
   }
   Function {enableUserInterface()} {open
   } {

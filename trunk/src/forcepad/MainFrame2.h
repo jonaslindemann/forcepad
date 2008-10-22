@@ -22,8 +22,8 @@
 #include <FL/Fl_Slider.H>
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Value_Output.H>
-#include <FL/Fl_Progress.H>
 #include <FL/Fl_Output.H>
+#include <FL/Fl_Progress.H>
 #include <FL/Fl_Button.H>
 
 class CMainFrame : CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusMessageEvent, CGSLogMessageEvent, CGSContinueCalcEvent, CPVViewModeErrorEvent, CPVModelChangedEvent, CPVRulerChangedEvent, CPVVisualisationModeChangedEvent {
@@ -529,8 +529,8 @@ private:
 public:
   Fl_Value_Output *pixelLength;
   Fl_Group *statusBar;
-  Fl_Progress *calcProgress;
   Fl_Output *statusOutput;
+  Fl_Progress *calcProgress;
   Fl_Button *btnStopCalculation;
 private:
   void cb_btnStopCalculation_i(Fl_Button*, void*);
