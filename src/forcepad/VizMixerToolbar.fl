@@ -13,7 +13,7 @@ class CVizMixerToolbar {open
   Function {CVizMixerToolbar()} {open
   } {
     Fl_Window mainWindow {
-      label {Viz Mixer} open selected
+      label {Viz Mixer} open
       xywh {342 160 655 417} type Double color 0 non_modal visible
     } {
       Fl_Button btnStress {
@@ -208,7 +208,13 @@ mainWindow->size(273,200);} {}
   }
   Function {show()} {open
   } {
-    code {mainWindow->show();} {}
+    code {mainWindow->show();
+\#ifdef WIN32
+HWND handle = fl_xid(mainWindow);
+long oldStyle = GetWindowLongPtr(handle, GWL_EXSTYLE);
+SetWindowLongPtr(handle, GWL_EXSTYLE, oldStyle | WS_EX_TOOLWINDOW);
+\#endif} {selected
+    }
   }
   Function {setView(void* view)} {open
   } {
