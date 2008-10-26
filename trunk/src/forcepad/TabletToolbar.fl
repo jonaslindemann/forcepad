@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0109 
+version 1.0300 
 header_name {.h} 
 code_name {.cpp}
 decl {\#include "PaintView.h"} {global
@@ -81,7 +81,7 @@ class CTabletToolbar {open
 	calcSettings->show();
 	delete calcSettings;
 	view->setViewMode(CPaintView::VM_SKETCH);
-}} selected
+}}
         tooltip {Calculation settings} image {../../images/settings_black.xpm} xywh {185 3 42 42} box THIN_UP_BOX color 0
         code0 {\#include "Fl_HoverButton.h"}
         class Fl_HoverButton
@@ -97,12 +97,13 @@ mainWindow->show();
 
 
 \#ifdef WIN32
-   if (platformInfo->isVista())
-   {
-   	//SetWindowLong(fl_xid(mainWindow), GWL_EXSTYLE, GetWindowLong(fl_xid(mainWindow), GWL_EXSTYLE) | WS_EX_LAYERED);
-	//SetLayeredWindowAttributes(fl_xid(mainWindow), 0, (255 * 70) / 100, LWA_ALPHA);
-   }	   
-\#endif} {}
+
+HWND handle = fl_xid(mainWindow);
+long oldStyle = GetWindowLongPtr(handle, GWL_EXSTYLE);
+SetWindowLongPtr(handle, GWL_EXSTYLE, oldStyle | WS_EX_TOOLWINDOW);
+
+\#endif} {selected
+    }
   }
   Function {setView(void* view)} {open
   } {
