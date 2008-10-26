@@ -2,9 +2,11 @@
 
 #include "GeneralSettings.h"
 #include "PaintView.h"
+#include "PlatformInfo.h"
 
 void CGeneralSettings::cb_okButton_i(Fl_Button*, void*) {
-  mainWindow->hide();
+  this->getData();
+mainWindow->hide();
 }
 void CGeneralSettings::cb_okButton(Fl_Button* o, void* v) {
   ((CGeneralSettings*)(o->parent()->user_data()))->cb_okButton_i(o,v);
@@ -27,9 +29,9 @@ void CGeneralSettings::cb_symbolLength(Fl_Value_Slider* o, void* v) {
 }
 
 CGeneralSettings::CGeneralSettings() {
-  { mainWindow = new Fl_Double_Window(318, 140, "General Settings");
+  { mainWindow = new Fl_Double_Window(311, 170, "General Settings");
     mainWindow->user_data((void*)(this));
-    { okButton = new Fl_Button(230, 100, 70, 25, "Close");
+    { okButton = new Fl_Button(230, 135, 70, 25, "Close");
       okButton->labelsize(11);
       okButton->callback((Fl_Callback*)cb_okButton);
     } // Fl_Button* okButton
@@ -55,6 +57,10 @@ CGeneralSettings::CGeneralSettings() {
       symbolLength->callback((Fl_Callback*)cb_symbolLength);
       symbolLength->align(Fl_Align(FL_ALIGN_TOP_LEFT));
     } // Fl_Value_Slider* symbolLength
+    { showTabletPCToolbar = new Fl_Check_Button(13, 95, 285, 25, "Show Tablet PC toolbar (even if not a Tablet PC)");
+      showTabletPCToolbar->down_box(FL_DOWN_BOX);
+      showTabletPCToolbar->labelsize(11);
+    } // Fl_Check_Button* showTabletPCToolbar
     mainWindow->set_modal();
     mainWindow->end();
   } // Fl_Double_Window* mainWindow
@@ -79,6 +85,11 @@ void CGeneralSettings::setData() {
 	lineThickness->value(view->getUiLineThickness());
 	symbolLength->value(view->getUiSymbolLength());
 }
+
+if (CPlatformInfo::getInstance()->getFakeTabletPC())
+	showTabletPCToolbar->set();
+else
+	showTabletPCToolbar->clear();
 }
 
 void CGeneralSettings::getData() {
@@ -86,6 +97,11 @@ void CGeneralSettings::getData() {
 {
 	CPaintView* view = (CPaintView*)m_paintView;	
 }
+
+if (showTabletPCToolbar->value()==1)
+	CPlatformInfo::getInstance()->setFakeTabletPC(true);
+else
+	CPlatformInfo::getInstance()->setFakeTabletPC(false);
 }
 
 void CGeneralSettings::centerWindow(Fl_Window* window) {

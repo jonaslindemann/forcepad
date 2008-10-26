@@ -6,6 +6,7 @@
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Value_Slider.H>
+#include <FL/Fl_Check_Button.H>
 
 class CGeneralSettings {
   void* m_paintView; 
@@ -27,6 +28,7 @@ private:
   void cb_symbolLength_i(Fl_Value_Slider*, void*);
   static void cb_symbolLength(Fl_Value_Slider*, void*);
 public:
+  Fl_Check_Button *showTabletPCToolbar;
   void show();
   void setView(void* view);
   void setData();

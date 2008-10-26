@@ -3496,6 +3496,11 @@ mainWindow->size(273,200);
 
 void CVizMixerToolbar::show() {
   mainWindow->show();
+#ifdef WIN32
+HWND handle = fl_xid(mainWindow);
+long oldStyle = GetWindowLongPtr(handle, GWL_EXSTYLE);
+SetWindowLongPtr(handle, GWL_EXSTYLE, oldStyle | WS_EX_TOOLWINDOW);
+#endif
 }
 
 void CVizMixerToolbar::setView(void* view) {
