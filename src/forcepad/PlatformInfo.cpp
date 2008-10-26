@@ -21,10 +21,14 @@ CPlatformInfo* CPlatformInfo::getInstance ()
 CPlatformInfo::CPlatformInfo()
 {
 	// Add protected construction code here
+	m_fakeTabletPC = false;
 }
 
 bool CPlatformInfo::isTabletPC()
 {
+	if (m_fakeTabletPC)
+		return true;
+
 #ifdef WIN32
 	return GetSystemMetrics(SM_TABLETPC)!=0;
 #else
@@ -41,4 +45,14 @@ bool CPlatformInfo::isVista()
 		return true;
 #endif
 	return true;
+}
+
+void CPlatformInfo::setFakeTabletPC(bool flag)
+{
+	m_fakeTabletPC = flag;
+}
+
+bool CPlatformInfo::getFakeTabletPC()
+{
+	return m_fakeTabletPC;
 }

@@ -10,6 +10,8 @@ class CPlatformInfo: public CBase {
 private:
 	static CPlatformInfo* m_instance;
 	static CSingletonDestroyer<CPlatformInfo> m_destroyer;
+
+	bool m_fakeTabletPC;
 public:
 	/** Returns the PlatformInfo singleton */
 	static CPlatformInfo* getInstance();
@@ -18,6 +20,8 @@ public:
 
 	bool isTabletPC();
 	bool isVista();
+	void setFakeTabletPC(bool flag);
+	bool getFakeTabletPC();
 protected:
 	/** Protected constructor (do not use) */
 	CPlatformInfo();

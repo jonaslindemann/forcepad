@@ -5,6 +5,7 @@
 #include <FL/Fl.H>
 /** Main window class generated from FLTK. */
 #include "SplashFrame.h"
+#include "OptSettings.h"
 #include "TabletToolbar.h"
 #include "VizMixerToolbar.h"
 #include <iostream>
@@ -33,6 +34,7 @@ class CMainFrame : CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusMessageE
   CPaintView::TEditMode m_physicsEditMode; 
   CTabletToolbar* m_tabletToolbar; 
   CVizMixerToolbar* m_vizMixer; 
+  COptSettings* m_optSettings; 
 public:
   CMainFrame();
   Fl_Double_Window *wndMain;
@@ -128,22 +130,6 @@ public:
 private:
   void cb_helpMenuLog_i(Fl_Menu_*, void*);
   static void cb_helpMenuLog(Fl_Menu_*, void*);
-public:
-  Fl_Scroll *scrRightToolbar;
-  Fl_HoverButton *btnPhysical;
-private:
-  void cb_btnPhysical_i(Fl_HoverButton*, void*);
-  static void cb_btnPhysical(Fl_HoverButton*, void*);
-public:
-  Fl_HoverButton *btnAction;
-private:
-  void cb_btnAction_i(Fl_HoverButton*, void*);
-  static void cb_btnAction(Fl_HoverButton*, void*);
-public:
-  Fl_HoverButton *btnSketch;
-private:
-  void cb_btnSketch_i(Fl_HoverButton*, void*);
-  static void cb_btnSketch(Fl_HoverButton*, void*);
 public:
   Fl_Scroll *scrLeftToolbar;
   Fl_HoverButton *btnBrushTools;
@@ -540,6 +526,22 @@ public:
 private:
   void cb_btnTabletToolbar_i(Fl_Button*, void*);
   static void cb_btnTabletToolbar(Fl_Button*, void*);
+public:
+  Fl_Group *scrRightToolbar;
+  Fl_HoverButton *btnPhysical;
+private:
+  void cb_btnPhysical_i(Fl_HoverButton*, void*);
+  static void cb_btnPhysical(Fl_HoverButton*, void*);
+public:
+  Fl_HoverButton *btnAction;
+private:
+  void cb_btnAction_i(Fl_HoverButton*, void*);
+  static void cb_btnAction(Fl_HoverButton*, void*);
+public:
+  Fl_HoverButton *btnSketch;
+private:
+  void cb_btnSketch_i(Fl_HoverButton*, void*);
+  static void cb_btnSketch(Fl_HoverButton*, void*);
 public:
   ~CMainFrame();
   void show();
