@@ -366,6 +366,7 @@ public:
 	void updateModel();
 	void pasteFromWindows();
 	void copyToWindows();
+	void transferViewToImage();
 	void undo();
 	void cut();
 	void copy();

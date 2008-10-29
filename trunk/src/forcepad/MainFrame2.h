@@ -543,6 +543,12 @@ private:
   void cb_btnSketch_i(Fl_HoverButton*, void*);
   static void cb_btnSketch(Fl_HoverButton*, void*);
 public:
+  Fl_Scroll *scrRightStructureToolbar;
+  Fl_HoverButton *transferViewToImage;
+private:
+  void cb_transferViewToImage_i(Fl_HoverButton*, void*);
+  static void cb_transferViewToImage(Fl_HoverButton*, void*);
+public:
   ~CMainFrame();
   void show();
   void close();

@@ -275,6 +275,9 @@ public:
 	void setUndeformedGrid(bool flag);
 	bool getUndeformedGrid();
 
+	void setDrawStructure(bool flag);
+	bool getDrawStructure();
+
 	void setMaxIntensity(double intensity);
 
 	void setColorMap(CColorMap* colorMap);

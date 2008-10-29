@@ -118,12 +118,15 @@ void CFemGrid2::doGeometry()
 			drawDensity();
 		else
 		{
-			if (m_undeformedGrid)
-				drawUndeformedGrid();
-
+			
 			if (m_drawStructure)
 				drawStructure();
-			drawGrid();
+			else
+			{
+				if (m_undeformedGrid)
+					drawUndeformedGrid();
+				drawGrid();
+			}
 		}
 	}
 
@@ -2415,6 +2418,16 @@ void CFemGrid2::setUndeformedGrid(bool flag)
 bool CFemGrid2::getUndeformedGrid()
 {
 	return m_undeformedGrid;
+}
+
+void CFemGrid2::setDrawStructure(bool flag)
+{
+	m_drawStructure = flag;
+}
+
+bool CFemGrid2::getDrawStructure()
+{
+	return m_drawStructure;
 }
 
 void CFemGrid2::setShowDensity(bool flag)

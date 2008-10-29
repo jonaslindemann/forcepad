@@ -366,7 +366,7 @@ paintView->executeOpt();}
           class Fl_HoverButton
         }
         Fl_Button btnStructure {
-          callback {//showRightToolbar(scrRightDisplacementToolbar);
+          callback {//showRightToolbar(scrRightStructureToolbar);
 paintView->setVisualisationMode(CPaintView::VM_STRUCTURE);
 //paintView->setDrawDisplacements(false);
 //paintView->setDrawStress(false);
@@ -609,7 +609,7 @@ else
           tooltip {Displacement scalefactor} xywh {539 58 30 165} box BORDER_BOX color 24 labelsize 10 labelcolor 7 align 1 minimum 0.1 maximum 100 step 0.1 value 0.1
         }
       }
-      Fl_Scroll scrRightSelectToolbar {
+      Fl_Scroll scrRightSelectToolbar {open
         xywh {582 39 53 304} box FLAT_BOX color 0 labelcolor 7
       } {
         Fl_Button btnSelect {
@@ -1055,6 +1055,16 @@ paintView->setViewMode(CPaintView::VM_ACTION);}
           class Fl_HoverButton
         }
       }
+      Fl_Scroll scrRightStructureToolbar {open selected
+        xywh {204 194 53 200} box FLAT_BOX color 0 labelcolor 7
+      } {
+        Fl_Button transferViewToImage {
+          callback {paintView->transferViewToImage();}
+          tooltip {Transfer structure to image} image {../../images/transferStructure.xpm} xywh {209 200 42 42} box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1
+          code0 {\#include "Fl_HoverButton.h"}
+          class Fl_HoverButton
+        }
+      }
     }
     code {paintView->setModeChangeEvent(this);
 paintView->setViewModeChangeEvent(this);
@@ -1233,7 +1243,7 @@ else
 	btnCopy->deactivate();
 }} {}
   }
-  Function {onViewModeChange(CPaintView::TViewMode oldMode, CPaintView::TViewMode newMode)} {return_type void
+  Function {onViewModeChange(CPaintView::TViewMode oldMode, CPaintView::TViewMode newMode)} {open return_type void
   } {
     code {if (newMode == CPaintView::VM_SKETCH)
 {
@@ -1390,7 +1400,9 @@ scrRightBCHingeToolbar->deactivate();
 scrRightDimensionToolbar->hide();
 scrRightDimensionToolbar->deactivate();
 scrRightThicknessToolbar->hide();
-scrRightThicknessToolbar->deactivate();} {}
+scrRightThicknessToolbar->deactivate();
+scrRightStructureToolbar->hide();
+scrRightStructureToolbar->deactivate();} {}
   }
   Function {showLeftToolbar(Fl_Widget* toolbar)} {return_type void
   } {
@@ -1402,7 +1414,7 @@ toolbar->show();
 toolbar->activate();
 wndMain->insert(*toolbar,0);} {}
   }
-  Function {showRightToolbar(Fl_Widget* toolbar)} {return_type void
+  Function {showRightToolbar(Fl_Widget* toolbar)} {open return_type void
   } {
     code {hideRightToolbars();
 
@@ -1441,7 +1453,8 @@ pixelLength->value(ruler->getPixelLength());} {}
 Fl::flush();
 return m_continueCalc;} {}
   }
-  Function {onVisualisationModeChanged(CPaintView::TVisualisationMode oldMode, CPaintView::TVisualisationMode newMode)} {} {
+  Function {onVisualisationModeChanged(CPaintView::TVisualisationMode oldMode, CPaintView::TVisualisationMode newMode)} {open
+  } {
     code {if (newMode == CPaintView::VM_PRINCIPAL_STRESS)
 {
 	showRightToolbar(scrRightStressToolbar);
@@ -1464,7 +1477,7 @@ if (newMode == CPaintView::VM_DISPLACEMENTS)
 }
 	
 if (newMode == CPaintView::VM_STRUCTURE)
-	showRightToolbar(scrRightDisplacementToolbar);} {}
+	showRightToolbar(scrRightStructureToolbar);} {}
   }
   Function {disableUserInterface()} {open
   } {
@@ -1512,7 +1525,6 @@ btnOptimize->deactivate();} {}
 paintGroup->activate();
 mainMenu->activate();
 scrRightToolbar->activate();
-btnOptimize->activate();} {selected
-    }
+btnOptimize->activate();} {}
   }
 } 
