@@ -2255,7 +2255,42 @@ void CPaintView::undoToDrawing()
 	updateUndoArea(m_drawing->getWidth(), m_drawing->getHeight(),0);
 }
 
+void CPaintView::transferViewToImage()
+{
+	int w = m_drawing->getWidth();
+	int h = m_drawing->getHeight();
+	int storageWidth = w*3;
+	GLubyte *pPixelData = new GLubyte[storageWidth*h];
+	
+	// Make OpenGL context current
+	
+	make_current(); 
+	
+	// Read pixels from screen
+	
+	glPixelStorei(GL_PACK_ALIGNMENT, 1);
+	
+	glReadPixels(
+		m_drawingOffsetX,
+		m_drawingOffsetY,
+		w,
+		h,
+		GL_RGB,GL_UNSIGNED_BYTE,
+		pPixelData
+		);
 
+	// Write pixels back into drawing.
+
+	int i, j;
+
+	for (i=0; i<h; i++)
+		for (j=0; j<w; j++)
+			m_drawing->setPixel(j, i, pPixelData[storageWidth*i + j*3], pPixelData[storageWidth*i + j*3 + 1], pPixelData[storageWidth*i + j*3 + 2]);
+
+	// Clean up
+
+	delete [] pPixelData;
+}
 
 void CPaintView::copyToWindows()
 {
@@ -2763,23 +2798,27 @@ void CPaintView::setVisualisationMode(TVisualisationMode mode)
 
 	switch (m_visualisationMode) {
 	case VM_PRINCIPAL_STRESS:
+		m_femGrid->setDrawStructure(false);
 		this->setDrawDisplacements(false);
 		this->setStressType(CFemGrid2::ST_PRINCIPAL);
 		this->setDrawStress(true);
 		this->setDrawForcesAndConstraints(true);
 		break;
 	case VM_MISES_STRESS:
+		m_femGrid->setDrawStructure(false);
 		this->setDrawDisplacements(false);
 		this->setStressType(CFemGrid2::ST_MISES_SMOOTH);
 		this->setDrawStress(true);
 		this->setDrawForcesAndConstraints(true);
 		break;
 	case VM_DISPLACEMENTS:
+		m_femGrid->setDrawStructure(false);
 		this->setDrawDisplacements(true);
 		this->setDrawStress(false);
 		this->setDrawForcesAndConstraints(true);
 		break;
 	case VM_STRUCTURE:
+		m_femGrid->setDrawStructure(true);
 		this->setDrawDisplacements(false);
 		this->setDrawStress(false);
 		this->setDrawForcesAndConstraints(false);
@@ -2909,6 +2948,7 @@ void CPaintView::setViewMode(TViewMode mode)
 		m_femGrid->setShowGrid(false);
 		m_femGrid->setDrawStress(false);
 		m_femGrid->setDimmedConstraints(true);
+		m_femGrid->setDrawForcesAndConstraints(true);
 		m_femGrid->clearResults();
 		this->invalidate();
 		this->redraw();
@@ -2924,6 +2964,7 @@ void CPaintView::setViewMode(TViewMode mode)
 		m_femGrid->setShowGrid(false);
 		m_femGrid->setDrawStress(false);
 		m_femGrid->setDimmedConstraints(false);
+		m_femGrid->setDrawForcesAndConstraints(true);
 		m_femGrid->clearResults();
 		this->invalidate();
 		this->redraw();
