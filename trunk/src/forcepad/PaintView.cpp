@@ -316,7 +316,8 @@ void CPaintView::draw()
 		//
 		// Initialise GLEW
 		//
-
+		
+#ifndef __APPLE__
 		GLenum err = glewInit();
 		if (GLEW_OK != err)
 		{
@@ -324,6 +325,7 @@ void CPaintView::draw()
 			fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
 		}
 		fprintf(stdout, "Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
+#endif 
 		m_runOnce = false;
 	}
 	

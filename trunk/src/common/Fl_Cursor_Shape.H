@@ -28,6 +28,7 @@
 
 
 #include <FL/Enumerations.H>
+#include <FL/Fl.h>
 
 #ifdef WIN32
 # include <windows.h>

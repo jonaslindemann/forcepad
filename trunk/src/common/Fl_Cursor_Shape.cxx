@@ -45,8 +45,6 @@
 #define SWAP_BYTES
 
 #include "Fl_Cursor_Shape.H"
-#include <FL/Fl.H>
-#include <FL/x.H>
 #include <FL/fl_draw.H>
 
 #ifdef WIN32
@@ -57,6 +55,9 @@
 # include <string.h>
 #endif
 
+#ifndef __APPLE__
+#include <FL/x.H>
+#endif
 
 //|
 //| activate this cursor shape for the given application
@@ -69,7 +70,7 @@ void fl_cursor_ex(Fl_Cursor_Shape *c) {
   Fl_X::i( win )->cursor = c->handle();
   SetCursor( c->handle() );
 #elif defined(__APPLE__)
-  SetCursor( c->handle() );
+  //SetCursor( c->handle() );
 #else
   XDefineCursor( fl_display, fl_xid(win), c->handle() );
 #endif

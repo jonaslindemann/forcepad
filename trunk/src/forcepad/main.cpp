@@ -62,6 +62,10 @@ main(int argc, char **argv)
 	//Fl::set_font(FL_HELVETICA, "Tahoma");
 #endif
 
+#ifdef __APPLE__
+	Fl::set_font(FL_HELVETICA, "Lucida Grande");
+#endif
+
 	//
 	// Create main window
 	//
