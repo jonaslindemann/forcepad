@@ -977,17 +977,22 @@ void CPaintView::onDraw()
 
 	// Background properties
 
-	int shadowWidth = 10;
-	int shadowWidth2 = 5;
+	int shadowWidth = 6;
+	int shadowWidth2 = 3;
+
+	float tColor[] = {0.6f, 0.6f, 0.6f};
+	float bColor[] = {0.7f, 0.7f, 0.7f};
+	float sColor[] = {0.3f, 0.3f, 0.3f};
+
 
 	// Draw background
 	
 	glDisable(GL_SCISSOR_TEST);
 	glBegin(GL_QUADS);
-	glColor3f(0.7f, 0.7f, 0.7f);
+	glColor3fv(tColor);
 	glVertex2i(0,h());
 	glVertex2i(w(),h());
-	glColor3f(0.8f, 0.8f, 0.8f);
+	glColor3fv(bColor);
 	glVertex2i(w(),0);
 	glVertex2i(0,0);
 	glEnd();
@@ -995,10 +1000,10 @@ void CPaintView::onDraw()
 	// Top frame shadow
 
 	glBegin(GL_QUADS);
-	glColor3f(0.5f, 0.5f, 0.5f);
+	glColor3fv(sColor);
 	glVertex2i(0,h());
 	glVertex2i(w(),h());
-	glColor3f(0.7f, 0.7f, 0.7f);
+	glColor3fv(tColor);
 	glVertex2i(w()-shadowWidth2,h()-shadowWidth);
 	glVertex2i(shadowWidth,h()-shadowWidth);
 	glEnd();
@@ -1006,34 +1011,34 @@ void CPaintView::onDraw()
 	// Left frame shadow
 
 	glBegin(GL_QUADS);
-	glColor3f(0.5f, 0.5f, 0.5f);
+	glColor3fv(sColor);
 	glVertex2i(0,h());
 	glVertex2i(0,0);
-	glColor3f(0.8f, 0.8f, 0.8f);
+	glColor3fv(bColor);
 	glVertex2i(shadowWidth,0);
-	glColor3f(0.7f, 0.7f, 0.7f);
+	glColor3fv(tColor);
 	glVertex2i(shadowWidth,h()-shadowWidth);
 	glEnd();
 
 	// Right frame shadow
 
 	glBegin(GL_QUADS);
-	glColor3f(0.5f, 0.5f, 0.5f);
+	glColor3fv(sColor);
 	glVertex2i(w(),h());
 	glVertex2i(w(),0);
-	glColor3f(0.8f, 0.8f, 0.8f);
+	glColor3fv(bColor);
 	glVertex2i(w()-shadowWidth2,0);
-	glColor3f(0.7f, 0.7f, 0.7f);
+	glColor3fv(tColor);
 	glVertex2i(w()-shadowWidth2,h()-shadowWidth);
 	glEnd();
 
 	// Bottom frame shadow
 
 	glBegin(GL_QUADS);
-	glColor3f(0.5f, 0.5f, 0.5f);
+	glColor3fv(sColor);
 	glVertex2i(0,0);
 	glVertex2i(w(),0);
-	glColor3f(0.8f, 0.8f, 0.8f);
+	glColor3fv(bColor);
 	glVertex2i(w()-shadowWidth2,shadowWidth2);
 	glVertex2i(shadowWidth,shadowWidth2);
 	glEnd();
