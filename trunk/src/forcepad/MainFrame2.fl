@@ -7,7 +7,12 @@ decl {/** Main window class generated from FLTK. */} {public
 
 decl {\#include <FL/Fl_Color_Chooser.H>} {} 
 
+decl {\#ifndef __APPLE__} {} 
+
 decl {\#include <FL/x.H>} {} 
+
+decl {\#endif} {selected
+} 
 
 decl {\#ifdef WIN32} {} 
 
@@ -46,7 +51,7 @@ decl {\#include <iostream>} {public global
 decl {\#include <string>} {public global
 } 
 
-Function {mainWindowCB(Fl_Widget* w, void* v)} {private return_type void
+Function {mainWindowCB(Fl_Widget* w, void* v)} {open private return_type void
 } {
   code {// Make sure all windows are hidden when Window is closed.
 w->default_callback(w, v);
@@ -68,7 +73,7 @@ class CMainFrame {open : {CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusM
       label {ForcePAD 2} open
       xywh {704 122 861 684} type Double color 0 align 80 resizable visible
     } {
-      Fl_Menu_Bar mainMenu {selected
+      Fl_Menu_Bar mainMenu {
         xywh {0 0 858 26} box FLAT_BOX down_box FLAT_BOX color 32 labelsize 11 textsize 11 textcolor 7
       } {
         Submenu fileMenu {

@@ -2,7 +2,9 @@
 
 #include "MainFrame2.h"
 #include <FL/Fl_Color_Chooser.H>
+#ifndef __APPLE__
 #include <FL/x.H>
+#endif
 #ifdef WIN32
 #include "resource.h"
 #include "dwmapi.h"
