@@ -36,7 +36,7 @@
 #endif
 
 #include <FL/Fl.H>
-#include <FL/x.H>
+//#include <FL/x.H>
 
 static char g_szFile[260];       // buffer for file name
 
