@@ -2,7 +2,9 @@
 
 #include "VizMixerToolbar.h"
 #include "PaintView.h"
+#ifndef __APPLE__
 #include <FL/x.H>
+#endif
 
 void CVizMixerToolbar::cb_btnStress_i(Fl_HoverButton*, void*) {
   wizard->value(groupPrincipalStress);
