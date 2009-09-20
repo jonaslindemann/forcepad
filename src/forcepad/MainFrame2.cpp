@@ -10983,7 +10983,9 @@ calcProgress->value(progress);
 paintView->redraw();
 paintView->damage(1);
 Fl::flush();
+#ifndef __APPLE__
 Fl::check();
+#endif
 }
 
 void CMainFrame::onLogMessage(const std::string& context, const std::string& message) {
@@ -11076,7 +11078,9 @@ pixelLength->value(ruler->getPixelLength());
 }
 
 bool CMainFrame::onContinueCalc() {
-  Fl::check();
+  #ifndef __APPLE__
+Fl::check();
+#endif
 Fl::flush();
 return m_continueCalc;
 }

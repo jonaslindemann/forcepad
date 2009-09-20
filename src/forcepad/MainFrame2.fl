@@ -7,8 +7,7 @@ decl {/** Main window class generated from FLTK. */} {public
 
 decl {\#include <FL/Fl_Color_Chooser.H>} {} 
 
-decl {\#include <FL/Fl.h>} {selected
-} 
+decl {\#include <FL/Fl.h>} {} 
 
 decl {\#ifndef __APPLE__} {} 
 
@@ -1360,14 +1359,16 @@ else
 	}	
 }} {}
   }
-  Function {onStatusMessage(const std::string& message, const int progress)} {return_type void
+  Function {onStatusMessage(const std::string& message, const int progress)} {open return_type void
   } {
     code {statusOutput->value(message.c_str());
 calcProgress->value(progress);
 paintView->redraw();
 paintView->damage(1);
 Fl::flush();
-Fl::check();} {}
+\#ifndef __APPLE__
+Fl::check();
+\#endif} {}
   }
   Function {onLogMessage(const std::string& context, const std::string& message)} {return_type void
   } {
@@ -1456,12 +1457,14 @@ pixelLength->value(ruler->getPixelLength());} {}
   }
   Function {onContinueCalc()} {open return_type bool
   } {
-    code {Fl::check();
+    code {\#ifndef __APPLE__
+Fl::check();
+\#endif
 Fl::flush();
-return m_continueCalc;} {}
+return m_continueCalc;} {selected
+    }
   }
-  Function {onVisualisationModeChanged(CPaintView::TVisualisationMode oldMode, CPaintView::TVisualisationMode newMode)} {open
-  } {
+  Function {onVisualisationModeChanged(CPaintView::TVisualisationMode oldMode, CPaintView::TVisualisationMode newMode)} {} {
     code {if (newMode == CPaintView::VM_PRINCIPAL_STRESS)
 {
 	showRightToolbar(scrRightStressToolbar);
@@ -1486,8 +1489,7 @@ if (newMode == CPaintView::VM_DISPLACEMENTS)
 if (newMode == CPaintView::VM_STRUCTURE)
 	showRightToolbar(scrRightStructureToolbar);} {}
   }
-  Function {disableUserInterface()} {open
-  } {
+  Function {disableUserInterface()} {} {
     code {//scrRightForceToolbar->deactivate();
 //scrRightBCToolbar->deactivate();
 //scrRightDrawToolbar->deactivate();
