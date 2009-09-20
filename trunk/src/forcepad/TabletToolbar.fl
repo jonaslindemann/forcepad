@@ -19,7 +19,12 @@ decl {\#include "dwmapi.h"} {}
 
 decl {\#endif} {} 
 
+decl {\#ifndef __APPLE__} {} 
+
 decl {\#include <FL/x.H>} {} 
+
+decl {\#endif} {selected
+} 
 
 class CTabletToolbar {open
 } {
@@ -102,8 +107,7 @@ HWND handle = fl_xid(mainWindow);
 long oldStyle = GetWindowLongPtr(handle, GWL_EXSTYLE);
 SetWindowLongPtr(handle, GWL_EXSTYLE, oldStyle | WS_EX_TOOLWINDOW);
 
-\#endif} {selected
-    }
+\#endif} {}
   }
   Function {setView(void* view)} {open
   } {

@@ -8,7 +8,9 @@
 #include "resource.h"
 #include "dwmapi.h"
 #endif
+#ifndef __APPLE__
 #include <FL/x.H>
+#endif
 
 void CTabletToolbar::cb_btnOpen_i(Fl_HoverButton*, void*) {
   if (m_paintView!=NULL)
