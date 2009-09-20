@@ -59,7 +59,7 @@ main(int argc, char **argv)
 
 #ifdef WIN32
 	Fl::set_font(FL_HELVETICA, "Segoe UI");
-	Fl::set_font(FL_HELVETICA, "Tahoma");
+	//Fl::set_font(FL_HELVETICA, "Tahoma");
 #endif
 
 	//
