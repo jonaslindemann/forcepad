@@ -2,6 +2,7 @@
 
 #include "MainFrame2.h"
 #include <FL/Fl_Color_Chooser.H>
+#include <FL/Fl.h>
 #ifndef __APPLE__
 #include <FL/x.H>
 #endif
