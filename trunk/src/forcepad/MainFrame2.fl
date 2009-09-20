@@ -7,12 +7,14 @@ decl {/** Main window class generated from FLTK. */} {public
 
 decl {\#include <FL/Fl_Color_Chooser.H>} {} 
 
+decl {\#include <FL/Fl.h>} {selected
+} 
+
 decl {\#ifndef __APPLE__} {} 
 
 decl {\#include <FL/x.H>} {} 
 
-decl {\#endif} {selected
-} 
+decl {\#endif} {} 
 
 decl {\#ifdef WIN32} {} 
 
