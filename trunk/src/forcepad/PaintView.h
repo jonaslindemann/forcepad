@@ -30,7 +30,6 @@
 #include <FL/Fl.H>
 #include <FL/Fl_Gl_Window.H>
 
-#include <GL/glew.h>
 #include <FL/gl.h>
 
 #ifdef __APPLE__

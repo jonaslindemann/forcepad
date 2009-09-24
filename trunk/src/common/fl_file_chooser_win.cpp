@@ -36,7 +36,9 @@
 #endif
 
 #include <FL/Fl.H>
-//#include <FL/x.H>
+#ifndef __APPLE__
+#include <FL/x.H>
+#endif
 
 static char g_szFile[260];       // buffer for file name
 

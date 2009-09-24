@@ -2,7 +2,6 @@
 
 set BUILD_TYPE=%1
 set FLTK_ROOT=c:\users\jonas\libraries\fltk-1.3.x
-set GLEW_ROOT=c:\users\jonas\libraries\glew
 set GENERATOR="Visual Studio 9 2008"
 
 if %BUILD_TYPE%==Debug (
@@ -20,7 +19,7 @@ if exist %BUILD_DIR% (
 
 mkdir %BUILD_DIR%
 pushd %BUILD_DIR%
-cmake -G %GENERATOR% -DCMAKE_BUILD_TYPE="%BUILD_TYPE%" -DFLTK_ROOT=%FLTK_ROOT% -DGLEW_ROOT=%GLEW_ROOT% ..
+cmake -G %GENERATOR% -DCMAKE_BUILD_TYPE="%BUILD_TYPE%" -DFLTK_ROOT=%FLTK_ROOT% ..
 popd
 goto end
 
