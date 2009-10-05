@@ -1,6 +1,6 @@
 //
 // ForcePAD - Educational Finite Element Software
-// Copyright (C) 2000-2003 Division of Structural Mecahnics, Lund University
+// Copyright (C) 2000-2009 Division of Structural Mecahnics, Lund University
 //
 // Written by Jonas Lindemann
 //

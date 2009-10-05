@@ -313,10 +313,6 @@ void CPaintView::draw()
 
 	if (m_runOnce)
 	{
-		//
-		// Initialise GLEW
-		//
-		
 		m_runOnce = false;
 	}
 	
@@ -2075,6 +2071,10 @@ void CPaintView::expandImageToWindow()
 	m_drawing->fillAlpha(128);
 	m_drawing->setAlpha(128);
 	m_drawing->setLayer(0);
+
+	// Copy previous image to new image.
+
+	m_clipboard->copy(0,0, m_femGrid->getImage()->getWidth(), m_femGrid->getImage()->getHeight());
 	
 	// Create image grid
 	
@@ -2083,6 +2083,8 @@ void CPaintView::expandImageToWindow()
 	m_clipboard->setImage(m_drawing);
 	m_undoClipboard->setImage(m_drawing);
 	m_screenImage->setImage(m_drawing);
+
+	m_clipboard->paste(0,0);
 
 	this->invalidate();
 	this->redraw();
