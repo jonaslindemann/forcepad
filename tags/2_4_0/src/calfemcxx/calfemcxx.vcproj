@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding = "Windows-1252"?>
+<VisualStudioProject
+	ProjectType="Visual C++"
+	Version="8.00"
+	Name="calfemcxx"
+	ProjectGUID="{01D24C5C-E232-4B02-A94A-F1C8F4A1713E}"
+	SccProjectName=""
+	SccLocalPath=""
+	Keyword="Win32Proj">
+	<Platforms>
+		<Platform
+			Name="Win32"/>
+	</Platforms>
+	<Configurations>
+		<Configuration
+			Name="Debug|Win32"
+			OutputDirectory="Debug"
+			IntermediateDirectory="calfemcxx.dir\Debug"
+			ConfigurationType="4"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="FALSE"
+			CharacterSet="2">
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions=" /DWIN32 /D_WINDOWS  /Zm1000   /D_DEBUG        -DCMAKE_INTDIR=\&quot;Debug\&quot;"
+				AdditionalIncludeDirectories="d:\lib\fltk-1.1.7;d:\lib\fltk-1.1.7\jpeg;d:\lib\fltk-1.1.7\png;d:\lib\fltk-1.1.7\zlib;D:\dev\forcepad-2.3.0\src\calfemcxx;D:\dev\forcepad-2.3.0\src\newmat;D:\dev\forcepad-2.3.0\src\defs;D:\dev\forcepad-2.3.0\src\calfemcxx\..\..\newmat-10.A\src;"
+				BasicRuntimeChecks="3"
+				CompileAs="2"
+				DebugInformationFormat="3"
+				ExceptionHandling="TRUE"
+				InlineFunctionExpansion="0"
+				Optimization="0"
+				RuntimeLibrary="3"
+				RuntimeTypeInfo="TRUE"
+				WarningLevel="3"
+				PreprocessorDefinitions=""
+				AssemblerListingLocation="Debug"
+				ObjectFile="$(IntDir)\"
+				ProgramDatabaseFileName="D:/dev/forcepad-2.3.0/lib/$(OutDir)/calfemcxx.pdb"
+/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				AdditionalIncludeDirectories="d:\lib\fltk-1.1.7;d:\lib\fltk-1.1.7\jpeg;d:\lib\fltk-1.1.7\png;d:\lib\fltk-1.1.7\zlib;D:\dev\forcepad-2.3.0\src\calfemcxx;D:\dev\forcepad-2.3.0\src\newmat;D:\dev\forcepad-2.3.0\src\defs;D:\dev\forcepad-2.3.0\src\calfemcxx\..\..\newmat-10.A\src;"
+				PreprocessorDefinitions="" />
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions=""
+				MkTypLibCompatible="FALSE"
+				TargetEnvironment="1"
+				GenerateStublessProxies="TRUE"
+				TypeLibraryName="$(InputName).tlb"
+				OutputDirectory="$(IntDir)"
+				HeaderFileName="$(InputName).h"
+				DLLDataFileName=""
+				InterfaceIdentifierFileName="$(InputName)_i.c"
+				ProxyFileName="$(InputName)_p.c"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCLibrarianTool"
+				OutputFile="D:\dev\forcepad-2.3.0\lib\$(OutDir)\calfemcxx.lib."/>
+		</Configuration>
+		<Configuration
+			Name="Release|Win32"
+			OutputDirectory="Release"
+			IntermediateDirectory="calfemcxx.dir\Release"
+			ConfigurationType="4"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="FALSE"
+			CharacterSet="2">
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions=" /DWIN32 /D_WINDOWS  /Zm1000      /D NDEBUG   -DCMAKE_INTDIR=\&quot;Release\&quot;"
+				AdditionalIncludeDirectories="d:\lib\fltk-1.1.7;d:\lib\fltk-1.1.7\jpeg;d:\lib\fltk-1.1.7\png;d:\lib\fltk-1.1.7\zlib;D:\dev\forcepad-2.3.0\src\calfemcxx;D:\dev\forcepad-2.3.0\src\newmat;D:\dev\forcepad-2.3.0\src\defs;D:\dev\forcepad-2.3.0\src\calfemcxx\..\..\newmat-10.A\src;"
+				CompileAs="2"
+				ExceptionHandling="TRUE"
+				InlineFunctionExpansion="2"
+				Optimization="2"
+				RuntimeLibrary="2"
+				RuntimeTypeInfo="TRUE"
+				WarningLevel="3"
+				PreprocessorDefinitions=""
+				AssemblerListingLocation="Release"
+				ObjectFile="$(IntDir)\"
+/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				AdditionalIncludeDirectories="d:\lib\fltk-1.1.7;d:\lib\fltk-1.1.7\jpeg;d:\lib\fltk-1.1.7\png;d:\lib\fltk-1.1.7\zlib;D:\dev\forcepad-2.3.0\src\calfemcxx;D:\dev\forcepad-2.3.0\src\newmat;D:\dev\forcepad-2.3.0\src\defs;D:\dev\forcepad-2.3.0\src\calfemcxx\..\..\newmat-10.A\src;"
+				PreprocessorDefinitions="" />
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions=""
+				MkTypLibCompatible="FALSE"
+				TargetEnvironment="1"
+				GenerateStublessProxies="TRUE"
+				TypeLibraryName="$(InputName).tlb"
+				OutputDirectory="$(IntDir)"
+				HeaderFileName="$(InputName).h"
+				DLLDataFileName=""
+				InterfaceIdentifierFileName="$(InputName)_i.c"
+				ProxyFileName="$(InputName)_p.c"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCLibrarianTool"
+				OutputFile="D:\dev\forcepad-2.3.0\lib\$(OutDir)\calfemcxx.lib."/>
+		</Configuration>
+		<Configuration
+			Name="MinSizeRel|Win32"
+			OutputDirectory="MinSizeRel"
+			IntermediateDirectory="calfemcxx.dir\MinSizeRel"
+			ConfigurationType="4"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="FALSE"
+			CharacterSet="2">
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions=" /DWIN32 /D_WINDOWS  /Zm1000      /D NDEBUG   -DCMAKE_INTDIR=\&quot;MinSizeRel\&quot;"
+				AdditionalIncludeDirectories="d:\lib\fltk-1.1.7;d:\lib\fltk-1.1.7\jpeg;d:\lib\fltk-1.1.7\png;d:\lib\fltk-1.1.7\zlib;D:\dev\forcepad-2.3.0\src\calfemcxx;D:\dev\forcepad-2.3.0\src\newmat;D:\dev\forcepad-2.3.0\src\defs;D:\dev\forcepad-2.3.0\src\calfemcxx\..\..\newmat-10.A\src;"
+				CompileAs="2"
+				ExceptionHandling="TRUE"
+				InlineFunctionExpansion="1"
+				Optimization="1"
+				RuntimeLibrary="2"
+				RuntimeTypeInfo="TRUE"
+				WarningLevel="3"
+				PreprocessorDefinitions=""
+				AssemblerListingLocation="MinSizeRel"
+				ObjectFile="$(IntDir)\"
+/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				AdditionalIncludeDirectories="d:\lib\fltk-1.1.7;d:\lib\fltk-1.1.7\jpeg;d:\lib\fltk-1.1.7\png;d:\lib\fltk-1.1.7\zlib;D:\dev\forcepad-2.3.0\src\calfemcxx;D:\dev\forcepad-2.3.0\src\newmat;D:\dev\forcepad-2.3.0\src\defs;D:\dev\forcepad-2.3.0\src\calfemcxx\..\..\newmat-10.A\src;"
+				PreprocessorDefinitions="" />
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions=""
+				MkTypLibCompatible="FALSE"
+				TargetEnvironment="1"
+				GenerateStublessProxies="TRUE"
+				TypeLibraryName="$(InputName).tlb"
+				OutputDirectory="$(IntDir)"
+				HeaderFileName="$(InputName).h"
+				DLLDataFileName=""
+				InterfaceIdentifierFileName="$(InputName)_i.c"
+				ProxyFileName="$(InputName)_p.c"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCLibrarianTool"
+				OutputFile="D:\dev\forcepad-2.3.0\lib\$(OutDir)\calfemcxx.lib."/>
+		</Configuration>
+		<Configuration
+			Name="RelWithDebInfo|Win32"
+			OutputDirectory="RelWithDebInfo"
+			IntermediateDirectory="calfemcxx.dir\RelWithDebInfo"
+			ConfigurationType="4"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="FALSE"
+			CharacterSet="2">
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions=" /DWIN32 /D_WINDOWS  /Zm1000       /D NDEBUG   -DCMAKE_INTDIR=\&quot;RelWithDebInfo\&quot;"
+				AdditionalIncludeDirectories="d:\lib\fltk-1.1.7;d:\lib\fltk-1.1.7\jpeg;d:\lib\fltk-1.1.7\png;d:\lib\fltk-1.1.7\zlib;D:\dev\forcepad-2.3.0\src\calfemcxx;D:\dev\forcepad-2.3.0\src\newmat;D:\dev\forcepad-2.3.0\src\defs;D:\dev\forcepad-2.3.0\src\calfemcxx\..\..\newmat-10.A\src;"
+				CompileAs="2"
+				DebugInformationFormat="3"
+				ExceptionHandling="TRUE"
+				InlineFunctionExpansion="1"
+				Optimization="2"
+				RuntimeLibrary="2"
+				RuntimeTypeInfo="TRUE"
+				WarningLevel="3"
+				PreprocessorDefinitions=""
+				AssemblerListingLocation="RelWithDebInfo"
+				ObjectFile="$(IntDir)\"
+				ProgramDatabaseFileName="D:/dev/forcepad-2.3.0/lib/$(OutDir)/calfemcxx.pdb"
+/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				AdditionalIncludeDirectories="d:\lib\fltk-1.1.7;d:\lib\fltk-1.1.7\jpeg;d:\lib\fltk-1.1.7\png;d:\lib\fltk-1.1.7\zlib;D:\dev\forcepad-2.3.0\src\calfemcxx;D:\dev\forcepad-2.3.0\src\newmat;D:\dev\forcepad-2.3.0\src\defs;D:\dev\forcepad-2.3.0\src\calfemcxx\..\..\newmat-10.A\src;"
+				PreprocessorDefinitions="" />
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions=""
+				MkTypLibCompatible="FALSE"
+				TargetEnvironment="1"
+				GenerateStublessProxies="TRUE"
+				TypeLibraryName="$(InputName).tlb"
+				OutputDirectory="$(IntDir)"
+				HeaderFileName="$(InputName).h"
+				DLLDataFileName=""
+				InterfaceIdentifierFileName="$(InputName)_i.c"
+				ProxyFileName="$(InputName)_p.c"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCLibrarianTool"
+				OutputFile="D:\dev\forcepad-2.3.0\lib\$(OutDir)\calfemcxx.lib."/>
+		</Configuration>
+	</Configurations>
+	<Files>
+			<File
+				RelativePath="D:\dev\forcepad-2.3.0\src\calfemcxx\CMakeLists.txt">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+					Name="VCCustomBuildTool"
+					Description="Building Custom Rule D:/dev/forcepad-2.3.0/src/calfemcxx/CMakeLists.txt"
+					CommandLine="&quot;C:\Program Files\CMake 2.4\bin\cmake.exe&quot; -HD:\dev\forcepad-2.3.0 -BD:\dev\forcepad-2.3.0&#x0D;&#x0A;"
+					AdditionalDependencies="D:\dev\forcepad-2.3.0\src\calfemcxx\CMakeLists.txt;&quot;C:\Program Files\CMake 2.4\share\CMake\Templates\CMakeWindowsSystemConfig.cmake&quot;;D:\dev\forcepad-2.3.0\src\calfemcxx\CMakeLists.txt;"
+					Outputs="calfemcxx.vcproj.cmake"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+					Name="VCCustomBuildTool"
+					Description="Building Custom Rule D:/dev/forcepad-2.3.0/src/calfemcxx/CMakeLists.txt"
+					CommandLine="&quot;C:\Program Files\CMake 2.4\bin\cmake.exe&quot; -HD:\dev\forcepad-2.3.0 -BD:\dev\forcepad-2.3.0&#x0D;&#x0A;"
+					AdditionalDependencies="D:\dev\forcepad-2.3.0\src\calfemcxx\CMakeLists.txt;&quot;C:\Program Files\CMake 2.4\share\CMake\Templates\CMakeWindowsSystemConfig.cmake&quot;;D:\dev\forcepad-2.3.0\src\calfemcxx\CMakeLists.txt;"
+					Outputs="calfemcxx.vcproj.cmake"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="MinSizeRel|Win32">
+					<Tool
+					Name="VCCustomBuildTool"
+					Description="Building Custom Rule D:/dev/forcepad-2.3.0/src/calfemcxx/CMakeLists.txt"
+					CommandLine="&quot;C:\Program Files\CMake 2.4\bin\cmake.exe&quot; -HD:\dev\forcepad-2.3.0 -BD:\dev\forcepad-2.3.0&#x0D;&#x0A;"
+					AdditionalDependencies="D:\dev\forcepad-2.3.0\src\calfemcxx\CMakeLists.txt;&quot;C:\Program Files\CMake 2.4\share\CMake\Templates\CMakeWindowsSystemConfig.cmake&quot;;D:\dev\forcepad-2.3.0\src\calfemcxx\CMakeLists.txt;"
+					Outputs="calfemcxx.vcproj.cmake"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="RelWithDebInfo|Win32">
+					<Tool
+					Name="VCCustomBuildTool"
+					Description="Building Custom Rule D:/dev/forcepad-2.3.0/src/calfemcxx/CMakeLists.txt"
+					CommandLine="&quot;C:\Program Files\CMake 2.4\bin\cmake.exe&quot; -HD:\dev\forcepad-2.3.0 -BD:\dev\forcepad-2.3.0&#x0D;&#x0A;"
+					AdditionalDependencies="D:\dev\forcepad-2.3.0\src\calfemcxx\CMakeLists.txt;&quot;C:\Program Files\CMake 2.4\share\CMake\Templates\CMakeWindowsSystemConfig.cmake&quot;;D:\dev\forcepad-2.3.0\src\calfemcxx\CMakeLists.txt;"
+					Outputs="calfemcxx.vcproj.cmake"/>
+				</FileConfiguration>
+			</File>
+		<Filter
+			Name="Source Files"
+			Filter="">
+			<File
+				RelativePath="D:\dev\forcepad-2.3.0\src\calfemcxx\calfem.cpp">
+			</File>
+		</Filter>
+	</Files>
+	<Globals>
+	</Globals>
+</VisualStudioProject>

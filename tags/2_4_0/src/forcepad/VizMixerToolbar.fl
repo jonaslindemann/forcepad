@@ -1,0 +1,240 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0300 
+header_name {.h} 
+code_name {.cpp}
+decl {\#include "PaintView.h"} {global
+} 
+
+decl {\#ifndef __APPLE__} {global
+} 
+
+decl {\#include <FL/x.H>} {} 
+
+decl {\#endif} {selected global
+} 
+
+class CVizMixerToolbar {open
+} {
+  decl {void* m_paintView;} {}
+  Function {CVizMixerToolbar()} {open
+  } {
+    Fl_Window mainWindow {
+      label {Viz Mixer} open
+      xywh {342 160 655 417} type Double color 0 non_modal visible
+    } {
+      Fl_Button btnStress {
+        callback {wizard->value(groupPrincipalStress);
+
+CPaintView* paintView = (CPaintView*)m_paintView;
+paintView->setVisualisationMode(CPaintView::VM_PRINCIPAL_STRESS);}
+        tooltip {Stress visualisation} image {../../images/stress2_black.xpm} xywh {11 147 42 42} type Radio box THIN_UP_BOX down_box THIN_DOWN_FRAME value 1 color 0 selection_color 1
+        code0 {\#include "Fl_HoverButton.h"}
+        class Fl_HoverButton
+      }
+      Fl_Button btnDisplacements {
+        callback {wizard->value(groupDisplacement);
+
+CPaintView* paintView = (CPaintView*)m_paintView;
+paintView->setVisualisationMode(CPaintView::VM_DISPLACEMENTS);
+
+paintView->setDrawDisplacements(true);
+paintView->setDrawStress(false);
+paintView->setDrawForcesAndConstraints(true);}
+        tooltip {Displacement visualisation} image {../../images/displacements_black.xpm} xywh {104 147 42 42} type Radio box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1
+        code0 {\#include "Fl_HoverButton.h"}
+        class Fl_HoverButton
+      }
+      Fl_Button btnMisesStress {
+        callback {wizard->value(groupMisesStress);
+
+CPaintView* paintView = (CPaintView*)m_paintView;
+paintView->setVisualisationMode(CPaintView::VM_MISES_STRESS);}
+        tooltip {Mises stress visualisation} image {../../images/stress_mises_black.xpm} xywh {57 147 42 42} type Radio box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1
+        code0 {\#include "Fl_HoverButton.h"}
+        class Fl_HoverButton
+      }
+      Fl_Box {} {
+        xywh {0 135 273 3} box FLAT_BOX color 7
+      }
+      Fl_Wizard wizard {open
+        xywh {0 0 630 354} box NO_BOX
+      } {
+        Fl_Group groupPrincipalStress {open
+          xywh {345 25 272 135} color 7
+        } {
+          Fl_Button btnTensionCompression {
+            callback {CPaintView* paintView = (CPaintView*)m_paintView;
+paintView->setStressMode(CFemGrid2::SM_ALL);}
+            tooltip {Show both compression and tension} image {../../images/tension_compression_black.xpm} xywh {355 108 42 42} type Radio box THIN_UP_BOX down_box THIN_DOWN_FRAME value 1 color 0 selection_color 1
+            code0 {\#include "Fl_HoverButton.h"}
+            class Fl_HoverButton
+          }
+          Fl_Button btnTension {
+            callback {CPaintView* paintView = (CPaintView*)m_paintView;
+paintView->setStressMode(CFemGrid2::SM_POSITIVE);}
+            tooltip {Show only tension} image {../../images/tension_black.xpm} xywh {401 108 42 42} type Radio box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1
+            code0 {\#include "Fl_HoverButton.h"}
+            class Fl_HoverButton
+          }
+          Fl_Button btnCompression {
+            callback {CPaintView* paintView = (CPaintView*)m_paintView;
+paintView->setStressMode(CFemGrid2::SM_NEGATIVE);}
+            tooltip {Show only compression} image {../../images/compression_black.xpm} xywh {447 108 42 42} type Radio box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1
+            code0 {\#include "Fl_HoverButton.h"}
+            class Fl_HoverButton
+          }
+          Fl_Roller rolArrowSize {
+            label Size
+            callback {CPaintView* paintView = (CPaintView*) m_paintView;
+paintView->setStressSize(rolArrowSize->value());}
+            tooltip {Size of stress arrows} xywh {355 43 23 57} box FLAT_BOX labelsize 10 labelcolor 7 align 1 maximum 200 step 1 value 50
+          }
+          Fl_Roller rolTransparency {
+            label Transp
+            callback {CPaintView* paintView = (CPaintView*) m_paintView;
+paintView->setStressAlpha(rolTransparency->value());}
+            tooltip {Transparency of stress arrows} xywh {394 43 23 57} box FLAT_BOX labelsize 10 labelcolor 7 align 1 step 0.01 value 0.49
+          }
+          Fl_Roller rolStep {
+            label Step
+            callback {CPaintView* paintView = (CPaintView*)m_paintView;
+paintView->setStressStep(rolStep->value());}
+            tooltip {Render stresses for every "Step" element.} xywh {433 43 23 57} box FLAT_BOX labelsize 10 labelcolor 7 align 1 minimum 1 maximum 20 step 1 value 1
+          }
+          Fl_Button btnLockScale {
+            label {Auto scale}
+            callback {CPaintView* paintView = (CPaintView*)m_paintView;
+if (btnLockScale->value()>0)
+	paintView->unlockScaleFactor();
+else
+	paintView->lockScaleFactor();}
+            tooltip {Show both compression and tension} xywh {494 108 42 42} type Toggle box THIN_UP_BOX down_box THIN_DOWN_FRAME value 1 color 0 selection_color 1 labelsize 10 labelcolor 7 align 128
+            code0 {\#include "Fl_HoverButton.h"}
+            class Fl_HoverButton
+          }
+          Fl_Slider minStress {
+            label Min
+            callback {CPaintView* paintView = (CPaintView*)m_paintView;
+paintView->setStressTreshold(minStress->value(),maxStress->value());}
+            xywh {552 43 25 107} box BORDER_BOX color 8 labelsize 11 labelcolor 7 align 1 minimum 1 maximum 0
+          }
+          Fl_Slider maxStress {
+            label Max
+            callback {CPaintView* paintView = (CPaintView*)m_paintView;
+paintView->setStressTreshold(minStress->value(),maxStress->value());}
+            xywh {584 43 25 107} box BORDER_BOX color 8 labelsize 11 labelcolor 7 align 1 minimum 1 maximum 0 value 1
+          }
+          Fl_Roller maxIntensity {
+            label {Int.}
+            callback {CPaintView* paintView = (CPaintView*)m_paintView;
+paintView->setMaxIntensity(maxIntensity->value());}
+            tooltip {Render stresses for every "Step" element.} xywh {473 43 23 57} box FLAT_BOX labelsize 10 labelcolor 7 align 1 step 0.01 value 0.5
+          }
+          Fl_Roller stressWidth {
+            label Width
+            callback {CPaintView* paintView = (CPaintView*)m_paintView;
+paintView->setStressWidth(stressWidth->value());}
+            tooltip {Render stresses for every "Step" element.} xywh {513 43 23 57} box FLAT_BOX labelsize 10 labelcolor 7 align 1 minimum 1 maximum 10 step 1 value 2
+          }
+        }
+        Fl_Group groupMisesStress {open
+          xywh {347 194 283 160} color 7 hide
+        } {
+          Fl_Button btnColorMap1 {
+            callback {CPaintView* paintView = (CPaintView*)m_paintView;
+paintView->setColorMap(1);}
+            tooltip {Set default stress colormap} image {../../images/colormap2_black.xpm} xywh {399 249 41 42} type Radio box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1
+            code0 {\#include "Fl_HoverButton.h"}
+            class Fl_HoverButton
+          }
+          Fl_Button btnColorMap2 {
+            callback {CPaintView* paintView = (CPaintView*)m_paintView;
+paintView->setColorMap(2);}
+            tooltip {Set colormap hot} image {../../images/colormap3_black.xpm} xywh {447 249 41 42} type Radio box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1
+            code0 {\#include "Fl_HoverButton.h"}
+            class Fl_HoverButton
+          }
+          Fl_Slider sldUpperMisesTreshold {
+            label Treshold
+            callback {CPaintView* paintView = (CPaintView*)m_paintView;
+paintView->setUpperMisesTreshold(sldUpperMisesTreshold->value());}
+            tooltip {Upper stress treshold} xywh {537 238 23 68} type {Vert Fill} box BORDER_BOX color 24 labelsize 10 labelcolor 7 align 1 minimum 1 maximum 0 step 0.05 value 0.8
+          }
+          Fl_Check_Button chkInvertColorMap {
+            label Invert
+            callback {CPaintView* paintView = (CPaintView*)m_paintView;
+
+if (chkInvertColorMap->value()==1)
+	paintView->setInvertColorMap(true);
+else
+	paintView->setInvertColorMap(false);}
+            xywh {502 266 15 15} down_box DOWN_BOX labelsize 10 labelcolor 7 align 129
+          }
+        }
+        Fl_Group groupDisplacement {open
+          xywh {25 205 272 135} color 7 hide
+        } {
+          Fl_Slider sldDisplacementScale {
+            label Scale
+            callback {CPaintView* paintView = (CPaintView*) m_paintView;
+paintView->setDisplacementScale(sldDisplacementScale->value());}
+            tooltip {Displacement scalefactor} xywh {38 265 242 25} type {Horz Knob} box BORDER_BOX color 8 labelsize 10 labelcolor 7 align 1 minimum -50 maximum 50 step 0.1
+          }
+        }
+      }
+      Fl_Group {} {open
+        xywh {163 138 110 56}
+      } {
+        Fl_Button btnMoveLoad {
+          callback {CPaintView* paintView = (CPaintView*)m_paintView;
+paintView->setMoveLoad(true);}
+          tooltip {Toggle between moving and rotating loads} image {../../images/action_move_force_black.xpm} xywh {224 147 42 42} type Radio box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1 labelsize 11 align 128
+          code0 {\#include "Fl_HoverButton.h"}
+          class Fl_HoverButton
+        }
+        Fl_Button btnRotateLoad {
+          callback {CPaintView* paintView = (CPaintView*) m_paintView;
+paintView->setMoveLoad(false);}
+          tooltip {Toggle between moving and rotating loads} image {../../images/action_rotate_force_black.xpm} xywh {176 147 42 42} type Radio box THIN_UP_BOX down_box THIN_DOWN_FRAME value 1 color 0 selection_color 1 labelsize 11 align 128
+          code0 {\#include "Fl_HoverButton.h"}
+          class Fl_HoverButton
+        }
+      }
+      Fl_Box {} {
+        xywh {160 135 4 72} box FLAT_BOX color 7
+      }
+    }
+    code {m_paintView = NULL;
+
+groupPrincipalStress->position(0,0);
+groupMisesStress->position(0,0);
+groupDisplacement->position(0,0);
+
+mainWindow->size(273,200);} {}
+  }
+  Function {show()} {open
+  } {
+    code {mainWindow->show();
+\#ifdef WIN32
+HWND handle = fl_xid(mainWindow);
+long oldStyle = GetWindowLongPtr(handle, GWL_EXSTYLE);
+SetWindowLongPtr(handle, GWL_EXSTYLE, oldStyle | WS_EX_TOOLWINDOW);
+\#endif} {}
+  }
+  Function {setView(void* view)} {open
+  } {
+    code {m_paintView = view;} {}
+  }
+  Function {centerWindow(Fl_Window* window)} {open
+  } {
+    code {mainWindow->position(window->x()+window->w()/2-mainWindow->w()/2, window->y()+window->h()/2-mainWindow->h()/2);} {}
+  }
+  Function {placeWindow(Fl_Window* window)} {open
+  } {
+    code {mainWindow->position(window->x()+window->w()-mainWindow->w()-100, window->y()+window->h()-mainWindow->h()-100);} {}
+  }
+  Function {hide()} {open
+  } {
+    code {mainWindow->hide();} {}
+  }
+} 
