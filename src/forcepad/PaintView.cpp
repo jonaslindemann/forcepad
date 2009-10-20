@@ -146,6 +146,10 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 	m_drawImage = false;
 	m_importMode = IM_NEW_MODEL;
 
+	// new Zoom mode
+
+	m_zoomResults = false;
+
 	// Calculation settings
 
 	m_forceMagnitude = 1000.0;
@@ -361,6 +365,13 @@ int CPaintView::handle(int event)
 			y = sy + m_drawingOffsetY;
 		}
 	}
+
+	/*
+	if ((Fl::event_state()&FL_CTRL)>0)
+		m_zoomResults = true;
+	else
+		m_zoomResults = false;
+	*/
 	
 	// Call the different event methods
 
@@ -407,6 +418,8 @@ void CPaintView::onPush(int x, int y)
 	//
 	// Handle FLTK push event (MouseDown)
 	//
+
+	cout << "onPush()" << endl;
 	
 	int ww, hh;
 
@@ -526,10 +539,16 @@ void CPaintView::onPush(int x, int y)
 		break;
 	}
 	
-	// We have to redraw then image
+	// We have to redraw the image
 	
 	if (m_editMode!=EM_RESULT)
 		this->redraw();
+
+	if (m_viewMode == VM_ACTION)
+	{
+		cout << "Zoom results:" << endl;
+		m_zoomResults = true;
+	}
 }
 
 
@@ -538,6 +557,8 @@ void CPaintView::onDrag(int x, int y)
 	//
 	// Handle FLTK drag event
 	//
+
+	cout << "onDrag()" << endl;
 	
 	// Store current position
 
@@ -828,6 +849,14 @@ void CPaintView::onDrag(int x, int y)
 		
 		break;
 	}
+
+	if (m_zoomResults)
+	{
+		cout << "zoomResults" << endl;
+		this->flush();
+		this->invalidate();
+		this->redraw();
+	}
 }
 
 
@@ -837,8 +866,11 @@ void CPaintView::onRelease(int x, int y)
 	// Handle FLTK release event (MouseUp).
 	// Read entire workspace into image m_drawing.
 	//
+
+	cout << "onRelease()" << endl;
 	
 	m_leftMouseDown = false;
+	m_zoomResults = false;
 	
 	updateCursor();
 	
@@ -1130,18 +1162,55 @@ void CPaintView::onDraw()
 			break;
 		default:
 			m_femGrid->setPosition(m_drawingOffsetX, m_drawingOffsetY);
+			if (m_zoomResults)
+			{
+				m_femGrid->setPosition(0.0, 0.0);
+				glPushMatrix();
+				glTranslatef( -(m_current[0]-m_drawingOffsetX), -((this->h()-m_current[1]) - m_drawingOffsetY), 0.0);
+				//glScalef(1.5, 1.5, 0.0);
+				glTranslatef(m_current[0], this->h()-m_current[1], 0.0);
+			}
+
 			m_femGrid->render();
+
+			if (m_zoomResults)
+			{
+				glPopMatrix();
+				m_femGrid->setPosition(m_drawingOffsetX, m_drawingOffsetY);
+			}
 			break;
 		}
 	}
 	else
 	{
 		m_femGrid->setPosition(m_drawingOffsetX, m_drawingOffsetY);
-		
+
 		if (m_calcCG)
 			m_cgIndicator->render();
 		
-		m_femGrid->render();
+		if (!m_femGrid->getShowGrid())
+		{
+			m_femGrid->render();
+		}
+		else
+		{
+			if (m_zoomResults)
+			{
+				m_femGrid->setPosition(m_drawingOffsetX+m_current[0]-m_drawingOffsetX, m_drawingOffsetY-m_current[1]+m_drawingOffsetY);
+				glPushMatrix();
+				glScalef(2.0f, 2.0f, 0.0f);
+			}
+
+			m_femGrid->render();
+
+			if (m_zoomResults)
+			{
+				glPopMatrix();
+				m_femGrid->setPosition(m_drawingOffsetX, m_drawingOffsetY);
+			}
+
+		}
+		//glPopMatrix();
 	}
 	if (m_editMode==EM_SELECT_BOX)
 	{
@@ -1184,6 +1253,9 @@ void CPaintView::onMove(int x, int y)
 		
 		break;
 	}
+
+	if (m_zoomResults&&m_femGrid->getShowGrid())
+		this->redraw();
 }
 
 /////////////////////////////////////////////////////////////

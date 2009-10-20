@@ -256,6 +256,8 @@ private:
 	bool m_resized;
 	bool m_drawImage;
 
+	bool m_zoomResults;
+
 	/*
 	 *    Private methods
 	 */
