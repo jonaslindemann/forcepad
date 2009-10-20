@@ -257,6 +257,7 @@ private:
 	bool m_drawImage;
 
 	bool m_zoomResults;
+	double m_zoomFactor;
 
 	/*
 	 *    Private methods
@@ -280,6 +281,9 @@ private:
 	/*
 	 *    Private event handlers
 	 */
+
+	/** Handles mouse wheel.  */
+	void onMouseWheel(int dx, int dy);
 
 	/** Handles mouse dragging. (Mouse move with button down) */
 	void onDrag(int x, int y);

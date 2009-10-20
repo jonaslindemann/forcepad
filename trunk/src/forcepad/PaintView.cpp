@@ -149,6 +149,7 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 	// new Zoom mode
 
 	m_zoomResults = false;
+	m_zoomFactor = 0.1;
 
 	// Calculation settings
 
@@ -403,6 +404,10 @@ int CPaintView::handle(int event)
 		fl_cursor( FL_CURSOR_DEFAULT );
 		return 1;
 		break;
+	case FL_MOUSEWHEEL:
+		onMouseWheel(Fl::event_dx(), Fl::event_dy());
+		return 1;
+		break;
 	default:
 		return Fl_Gl_Window::handle(event);
 	}
@@ -412,6 +417,28 @@ int CPaintView::handle(int event)
 /////////////////////////////////////////////////////////////
 // CPaintView event methods
 /////////////////////////////////////////////////////////////
+
+void CPaintView::onMouseWheel(int dx, int dy)
+{
+	cout << "Mousewheel..." << endl;
+	cout << dx << ", " << dy << endl;
+
+	if (m_leftMouseDown && m_zoomResults && (m_viewMode == VM_ACTION))
+	{
+		if (dy>0)
+		{
+			m_zoomFactor -= 0.01;
+			if (m_zoomFactor < 0.01)
+				m_zoomFactor = 0.01;
+		}
+		else
+		{
+			m_zoomFactor += 0.01;
+		}
+		this->flush();
+		this->redraw();
+	}
+}
 
 void CPaintView::onPush(int x, int y)
 {
@@ -1162,21 +1189,25 @@ void CPaintView::onDraw()
 			break;
 		default:
 			m_femGrid->setPosition(m_drawingOffsetX, m_drawingOffsetY);
-			if (m_zoomResults)
+			if ((m_zoomResults)&&(m_selectedForce==NULL))
 			{
-				m_femGrid->setPosition(0.0, 0.0);
-				glPushMatrix();
-				glTranslatef( -(m_current[0]-m_drawingOffsetX), -((this->h()-m_current[1]) - m_drawingOffsetY), 0.0);
-				//glScalef(1.5, 1.5, 0.0);
-				glTranslatef(m_current[0], this->h()-m_current[1], 0.0);
+				glMatrixMode(GL_PROJECTION);
+				glLoadIdentity();
+				glViewport(0,0,w(),h());
+				gluOrtho2D(m_current[0]-w()*m_zoomFactor,m_current[0]+w()*m_zoomFactor,(h()-m_current[1])-h()*m_zoomFactor,(h()-m_current[1])+h()*m_zoomFactor);
+				glMatrixMode(GL_MODELVIEW);
+
 			}
 
 			m_femGrid->render();
 
-			if (m_zoomResults)
+			if ((m_zoomResults)&&(m_selectedForce==NULL))
 			{
-				glPopMatrix();
-				m_femGrid->setPosition(m_drawingOffsetX, m_drawingOffsetY);
+				glMatrixMode(GL_PROJECTION);
+				glLoadIdentity();
+				glViewport(0,0,w(),h());
+				gluOrtho2D(0,w(),0,h());
+				glMatrixMode(GL_MODELVIEW);
 			}
 			break;
 		}
@@ -1196,17 +1227,29 @@ void CPaintView::onDraw()
 		{
 			if (m_zoomResults)
 			{
-				m_femGrid->setPosition(m_drawingOffsetX+m_current[0]-m_drawingOffsetX, m_drawingOffsetY-m_current[1]+m_drawingOffsetY);
-				glPushMatrix();
-				glScalef(2.0f, 2.0f, 0.0f);
+				//m_femGrid->setPosition(m_drawingOffsetX+m_current[0]-m_drawingOffsetX, m_drawingOffsetY-m_current[1]+m_drawingOffsetY);
+				//glPushMatrix();
+				//glScalef(2.0f, 2.0f, 0.0f);
+
+				glMatrixMode(GL_PROJECTION);
+				glLoadIdentity();
+				glViewport(0,0,w(),h());
+				gluOrtho2D(m_current[0]-w()*0.2,m_current[0]+w()*0.2,m_current[1]-h()*0.2,m_current[1]+h()*0.2);
+				glMatrixMode(GL_MODELVIEW);
+
 			}
 
 			m_femGrid->render();
 
 			if (m_zoomResults)
 			{
-				glPopMatrix();
-				m_femGrid->setPosition(m_drawingOffsetX, m_drawingOffsetY);
+				//glPopMatrix();
+				//m_femGrid->setPosition(m_drawingOffsetX, m_drawingOffsetY);
+				glMatrixMode(GL_PROJECTION);
+				glLoadIdentity();
+				glViewport(0,0,w(),h());
+				gluOrtho2D(0,w(),0,h());
+				glMatrixMode(GL_MODELVIEW);
 			}
 
 		}
