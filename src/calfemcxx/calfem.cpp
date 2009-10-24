@@ -1369,33 +1369,57 @@ void assignWhereGreaterThan(Matrix& toMatrix, Matrix& condMatrix, double value, 
 	
 }
 
-void writeRowVector(const char* name, RowVector &v, std::ostream &out)
+void writeRowVector(const std::string& name, RowVector &v, std::ostream &out, bool matlab)
 {
-	out << name << " = [" << std::endl;
+	if (matlab)
+		out << name << " = [" << std::endl;
+	else
+		out << name << " = matrix([[" << std::endl;
 
 	int i;
 
 	for (i=1; i<=v.Ncols(); i++)
-		out << v(i) << std::endl;
+			if (i<v.Nrows())
+				out << "\t " << v(i) << " ," << std::endl;
+			else
+				out << "\t " << v(i) << std::endl;
 
-	out << "]';" << endl;
+	if (matlab)
+		out << "]';" << endl;
+	else
+		out << "]])" << endl;
 }
 
-void writeColVector(const char* name, ColumnVector &v, std::ostream &out)
+void writeColVector(const std::string& name, ColumnVector &v, std::ostream &out, bool matlab)
 {
-	out << name << " = [" << std::endl;
+	if (matlab)
+		out << name << " = [" << std::endl;
+	else
+		out << name << " = matrix([" << std::endl;
 
 	int i;
 
 	for (i=1; i<=v.Nrows(); i++)
-		out << v(i) << std::endl;
+		if (matlab)
+			out << v(i) << std::endl;
+		else
+			if (i<v.Nrows())
+				out << "\t[ " << v(i) << " ]," << std::endl;
+			else
+				out << "\t[ " << v(i) << "]" << std::endl;
 
-	out << "];" << endl;
+	if (matlab)
+		out << "];" << endl;
+	else
+		out << "])" << endl;
 }
 
-void writeMatrix(const char* name, Matrix &m, std::ostream &out)
+void writeMatrix(const std::string& name, Matrix &m, std::ostream &out, bool matlab)
 {
-	out << name << " = [" << std::endl;
+	if (matlab)
+		out << name << " = [" << std::endl;
+	else
+		out << name << " = matrix([" << std::endl;
 
 	int i, j;
 
@@ -1404,18 +1428,36 @@ void writeMatrix(const char* name, Matrix &m, std::ostream &out)
 		for (j=1; j<=m.Ncols(); j++)
 		{
 			//std::cout << "row = " << i << " col = " << j << std::endl;
-			out << m(i,j) << " ";
+			if (matlab)
+				out << m(i,j) << " ";
+			else
+			{
+				if (j==1)
+					out << "\t[ ";
+				
+				if (j<m.Ncols())
+					out << m(i,j) << ", ";
+				else
+					out << m(i,j) << " ],";
+			}
 		}
-
-		out << ";" << std::endl;
+		if (matlab)
+			out << ";" << std::endl;
+		else
+			out << std::endl;
 	}
-
-	out << "];" << endl;
+	if (matlab)
+		out << "];" << endl;
+	else
+		out << "])" << endl;
 }
 
-void writeMatrix(const char* name, SymmetricBandMatrix &m, std::ostream &out)
+void writeMatrix(const std::string& name, SymmetricBandMatrix &m, std::ostream &out, bool matlab)
 {
-	out << name << " = [" << std::endl;
+	if (matlab)
+		out << name << " = [" << std::endl;
+	else
+		out << name << " = matrix([" << std::endl;
 
 	int i, j;
 
@@ -1424,13 +1466,28 @@ void writeMatrix(const char* name, SymmetricBandMatrix &m, std::ostream &out)
 		for (j=1; j<=m.Ncols(); j++)
 		{
 			//std::cout << "row = " << i << " col = " << j << std::endl;
-			out << m(i,j) << " ";
+			if (matlab)
+				out << m(i,j) << " ";
+			else
+			{
+				if (j==1)
+					out << "\t[ ";
+				
+				if (j<m.Ncols())
+					out << m(i,j) << ", ";
+				else
+					out << m(i,j) << " ],";
+			}
 		}
-
-		out << ";" << std::endl;
+		if (matlab)
+			out << ";" << std::endl;
+		else
+			out << std::endl;
 	}
-
-	out << "];" << endl;
+	if (matlab)
+		out << "];" << endl;
+	else
+		out << "])" << endl;
 }
 
 } // namespace calfem

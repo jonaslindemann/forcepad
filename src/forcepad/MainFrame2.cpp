@@ -91,6 +91,20 @@ void CMainFrame::cb_editMenuPaste(Fl_Menu_* o, void* v) {
   ((CMainFrame*)(o->parent()->user_data()))->cb_editMenuPaste_i(o,v);
 }
 
+void CMainFrame::cb_viewMenuZoomIn_i(Fl_Menu_*, void*) {
+  paintView->zoomIn();
+}
+void CMainFrame::cb_viewMenuZoomIn(Fl_Menu_* o, void* v) {
+  ((CMainFrame*)(o->parent()->user_data()))->cb_viewMenuZoomIn_i(o,v);
+}
+
+void CMainFrame::cb_viewMenuZoomOut_i(Fl_Menu_*, void*) {
+  paintView->zoomOut();
+}
+void CMainFrame::cb_viewMenuZoomOut(Fl_Menu_* o, void* v) {
+  ((CMainFrame*)(o->parent()->user_data()))->cb_viewMenuZoomOut_i(o,v);
+}
+
 void CMainFrame::cb_modeMenuSketch_i(Fl_Menu_*, void*) {
   paintView->setViewMode(CPaintView::VM_SKETCH);
 }
@@ -178,7 +192,9 @@ Fl_Menu_Item CMainFrame::menu_mainMenu[] = {
  {"&New", 0x4006e,  (Fl_Callback*)CMainFrame::cb_fileMenuNew, 0, 0, FL_NORMAL_LABEL, 0, 12, 0},
  {"&Open...", 0x4006f,  (Fl_Callback*)CMainFrame::cb_fileMenuOpen, 0, 0, FL_NORMAL_LABEL, 0, 12, 0},
  {"&Save.", 0x40073,  (Fl_Callback*)CMainFrame::cb_fileMenuSave, 0, 0, FL_NORMAL_LABEL, 0, 12, 0},
- {"S&ave as...", 0x50073,  (Fl_Callback*)CMainFrame::cb_fileMenuSaveAs, 0, 0, FL_NORMAL_LABEL, 0, 12, 0},
+ {"S&ave as...", 0x50073,  (Fl_Callback*)CMainFrame::cb_fileMenuSaveAs, 0, 128, FL_NORMAL_LABEL, 0, 12, 0},
+ {"Save as MATLAB...", 0,  0, 0, 0, FL_NORMAL_LABEL, 0, 12, 0},
+ {"Save as NumPy...", 0,  0, 0, 128, FL_NORMAL_LABEL, 0, 12, 0},
  {"E&xit", 0,  (Fl_Callback*)CMainFrame::cb_fileMenuExit, 0, 0, FL_NORMAL_LABEL, 0, 12, 0},
  {0,0,0,0,0,0,0,0,0},
  {"&Edit", 0,  0, 0, 64, FL_NORMAL_LABEL, 0, 12, 0},
@@ -186,6 +202,10 @@ Fl_Menu_Item CMainFrame::menu_mainMenu[] = {
  {"&Cut", 0x40078,  (Fl_Callback*)CMainFrame::cb_editMenuCut, 0, 0, FL_NORMAL_LABEL, 0, 12, 0},
  {"C&opy", 0x40063,  (Fl_Callback*)CMainFrame::cb_editMenuCopy, 0, 0, FL_NORMAL_LABEL, 0, 12, 0},
  {"&Paste", 0x40076,  (Fl_Callback*)CMainFrame::cb_editMenuPaste, 0, 0, FL_NORMAL_LABEL, 0, 12, 0},
+ {0,0,0,0,0,0,0,0,0},
+ {"&View", 0,  0, 0, 64, FL_NORMAL_LABEL, 0, 12, 0},
+ {"Zoom In", 0xff55,  (Fl_Callback*)CMainFrame::cb_viewMenuZoomIn, 0, 0, FL_NORMAL_LABEL, 0, 12, 0},
+ {"Zoom Out", 0xff56,  (Fl_Callback*)CMainFrame::cb_viewMenuZoomOut, 0, 0, FL_NORMAL_LABEL, 0, 12, 0},
  {0,0,0,0,0,0,0,0,0},
  {"&Mode", 0,  0, 0, 64, FL_NORMAL_LABEL, 0, 12, 0},
  {"Sketch", 0x40031,  (Fl_Callback*)CMainFrame::cb_modeMenuSketch, 0, 0, FL_NORMAL_LABEL, 0, 12, 0},
@@ -209,24 +229,29 @@ Fl_Menu_Item* CMainFrame::fileMenuNew = CMainFrame::menu_mainMenu + 1;
 Fl_Menu_Item* CMainFrame::fileMenuOpen = CMainFrame::menu_mainMenu + 2;
 Fl_Menu_Item* CMainFrame::fileMenuSave = CMainFrame::menu_mainMenu + 3;
 Fl_Menu_Item* CMainFrame::fileMenuSaveAs = CMainFrame::menu_mainMenu + 4;
-Fl_Menu_Item* CMainFrame::fileMenuExit = CMainFrame::menu_mainMenu + 5;
-Fl_Menu_Item* CMainFrame::editMenu = CMainFrame::menu_mainMenu + 7;
-Fl_Menu_Item* CMainFrame::editMenuUndo = CMainFrame::menu_mainMenu + 8;
-Fl_Menu_Item* CMainFrame::editMenuCut = CMainFrame::menu_mainMenu + 9;
-Fl_Menu_Item* CMainFrame::editMenuCopy = CMainFrame::menu_mainMenu + 10;
-Fl_Menu_Item* CMainFrame::editMenuPaste = CMainFrame::menu_mainMenu + 11;
-Fl_Menu_Item* CMainFrame::modeMenu = CMainFrame::menu_mainMenu + 13;
-Fl_Menu_Item* CMainFrame::modeMenuSketch = CMainFrame::menu_mainMenu + 14;
-Fl_Menu_Item* CMainFrame::modeMenuPhysics = CMainFrame::menu_mainMenu + 15;
-Fl_Menu_Item* CMainFrame::modeMenuAction = CMainFrame::menu_mainMenu + 16;
-Fl_Menu_Item* CMainFrame::settingsMenu = CMainFrame::menu_mainMenu + 18;
-Fl_Menu_Item* CMainFrame::settingsMenuCalculation = CMainFrame::menu_mainMenu + 19;
-Fl_Menu_Item* CMainFrame::settingsMenuGeneral = CMainFrame::menu_mainMenu + 20;
-Fl_Menu_Item* CMainFrame::settingsMenuSnapToGrid = CMainFrame::menu_mainMenu + 21;
-Fl_Menu_Item* CMainFrame::helpMenu = CMainFrame::menu_mainMenu + 23;
-Fl_Menu_Item* CMainFrame::helpMenuContents = CMainFrame::menu_mainMenu + 24;
-Fl_Menu_Item* CMainFrame::helpMenuAbout = CMainFrame::menu_mainMenu + 25;
-Fl_Menu_Item* CMainFrame::helpMenuLog = CMainFrame::menu_mainMenu + 26;
+Fl_Menu_Item* CMainFrame::fileMenuSaveMatlab = CMainFrame::menu_mainMenu + 5;
+Fl_Menu_Item* CMainFrame::fileMenuSaveNumPy = CMainFrame::menu_mainMenu + 6;
+Fl_Menu_Item* CMainFrame::fileMenuExit = CMainFrame::menu_mainMenu + 7;
+Fl_Menu_Item* CMainFrame::editMenu = CMainFrame::menu_mainMenu + 9;
+Fl_Menu_Item* CMainFrame::editMenuUndo = CMainFrame::menu_mainMenu + 10;
+Fl_Menu_Item* CMainFrame::editMenuCut = CMainFrame::menu_mainMenu + 11;
+Fl_Menu_Item* CMainFrame::editMenuCopy = CMainFrame::menu_mainMenu + 12;
+Fl_Menu_Item* CMainFrame::editMenuPaste = CMainFrame::menu_mainMenu + 13;
+Fl_Menu_Item* CMainFrame::viewMenu = CMainFrame::menu_mainMenu + 15;
+Fl_Menu_Item* CMainFrame::viewMenuZoomIn = CMainFrame::menu_mainMenu + 16;
+Fl_Menu_Item* CMainFrame::viewMenuZoomOut = CMainFrame::menu_mainMenu + 17;
+Fl_Menu_Item* CMainFrame::modeMenu = CMainFrame::menu_mainMenu + 19;
+Fl_Menu_Item* CMainFrame::modeMenuSketch = CMainFrame::menu_mainMenu + 20;
+Fl_Menu_Item* CMainFrame::modeMenuPhysics = CMainFrame::menu_mainMenu + 21;
+Fl_Menu_Item* CMainFrame::modeMenuAction = CMainFrame::menu_mainMenu + 22;
+Fl_Menu_Item* CMainFrame::settingsMenu = CMainFrame::menu_mainMenu + 24;
+Fl_Menu_Item* CMainFrame::settingsMenuCalculation = CMainFrame::menu_mainMenu + 25;
+Fl_Menu_Item* CMainFrame::settingsMenuGeneral = CMainFrame::menu_mainMenu + 26;
+Fl_Menu_Item* CMainFrame::settingsMenuSnapToGrid = CMainFrame::menu_mainMenu + 27;
+Fl_Menu_Item* CMainFrame::helpMenu = CMainFrame::menu_mainMenu + 29;
+Fl_Menu_Item* CMainFrame::helpMenuContents = CMainFrame::menu_mainMenu + 30;
+Fl_Menu_Item* CMainFrame::helpMenuAbout = CMainFrame::menu_mainMenu + 31;
+Fl_Menu_Item* CMainFrame::helpMenuLog = CMainFrame::menu_mainMenu + 32;
 
 void CMainFrame::cb_btnBrushTools_i(Fl_HoverButton*, void*) {
   showRightToolbar(scrRightDrawToolbar);
@@ -2048,6 +2073,136 @@ static unsigned char idata_visualisation_mixer_black_grd[] =
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 static Fl_RGB_Image image_visualisation_mixer_black_grd(idata_visualisation_mixer_black_grd, 36, 36, 3, 0);
+
+void CMainFrame::cb_btnZoomResults_i(Fl_HoverButton*, void*) {
+  if (btnZoomResults->value()>0)
+	paintView->setZoomResults(true);
+else
+	paintView->setZoomResults(false);
+}
+void CMainFrame::cb_btnZoomResults(Fl_HoverButton* o, void* v) {
+  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnZoomResults_i(o,v);
+}
+
+static unsigned char idata_zoom[] =
+{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,35,35,35,119,119,119,168,168,168,196,196,196,203,203,203,167,167,
+167,124,124,124,48,48,48,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,14,14,14,144,144,144,222,222,222,222,222,222,221,221,
+221,221,221,221,220,220,220,220,220,220,220,220,220,219,219,219,163,163,163,27,
+27,27,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,27,27,27,
+190,190,190,218,218,218,217,217,217,217,217,217,217,217,217,216,216,216,216,216,
+216,216,216,216,215,215,215,215,215,215,215,215,215,200,200,200,40,40,40,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,13,13,13,179,179,179,214,214,214,
+213,213,213,213,213,213,145,145,145,66,66,66,26,26,26,19,19,19,58,58,58,131,131,
+131,210,210,210,210,210,210,210,210,210,189,189,189,26,26,26,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,116,116,116,209,209,209,209,209,209,201,201,201,65,65,
+65,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,44,44,44,192,192,192,206,206,206,206,
+206,206,139,139,139,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,19,19,19,197,197,197,
+205,205,205,205,205,205,69,69,69,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,43,43,43,201,201,201,201,201,201,201,201,201,38,38,38,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,87,87,87,201,201,201,200,200,200,149,149,149,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,122,122,122,197,197,197,196,196,196,109,
+109,109,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,128,128,128,196,196,196,196,196,196,73,73,
+73,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,48,48,48,192,
+192,192,192,192,192,148,148,148,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,143,143,143,192,
+192,192,191,191,191,47,47,47,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,23,23,23,188,188,188,187,187,187,163,163,163,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,140,140,140,187,187,187,187,187,187,46,46,46,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,23,23,183,183,183,183,183,183,159,159,
+159,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,119,119,119,183,183,183,182,182,182,73,73,73,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,49,49,49,179,179,
+179,178,178,178,138,138,138,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,72,72,72,178,178,178,
+178,178,178,143,143,143,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,118,118,118,174,174,174,174,174,174,90,90,90,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,16,16,16,167,167,167,173,173,173,173,173,173,75,75,75,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,53,53,53,170,170,170,170,170,170,169,169,169,31,31,
+31,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,94,94,94,169,169,169,168,168,168,168,
+168,168,67,67,67,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,52,52,52,160,160,160,165,
+165,165,165,165,165,120,120,120,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,5,5,
+132,132,132,164,164,164,164,164,164,163,163,163,127,127,127,65,65,65,41,41,41,
+41,41,41,60,60,60,115,115,115,162,162,162,161,161,161,161,161,161,154,154,154,
+150,150,150,30,30,30,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,19,19,19,128,
+128,128,159,159,159,159,159,159,158,158,158,158,158,158,158,158,158,157,157,157,
+157,157,157,157,157,157,157,157,157,157,157,157,146,146,146,156,156,156,156,156,
+156,145,145,145,29,29,29,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,4,4,77,77,
+77,148,148,148,154,154,154,153,153,153,153,153,153,153,153,153,153,153,153,153,
+153,153,153,153,153,84,84,84,35,35,35,141,141,141,151,151,151,151,151,151,140,
+140,140,28,28,28,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,14,14,14,60,
+60,60,106,106,106,111,111,111,110,110,110,110,110,110,64,64,64,18,18,18,0,0,0,
+0,0,0,27,27,27,137,137,137,146,146,146,146,146,146,141,141,141,40,40,40,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,26,26,26,132,132,132,141,141,141,141,141,141,136,136,
+136,39,39,39,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,17,17,17,120,120,120,137,137,137,
+136,136,136,131,131,131,42,42,42,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,16,16,115,
+115,115,132,132,132,131,131,131,131,131,131,49,49,49,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,15,15,15,103,103,103,127,127,127,126,126,126,126,126,126,47,47,47,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,7,7,7,99,99,99,122,122,122,122,122,122,122,122,122,49,
+49,49,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,7,7,91,91,91,117,117,117,117,117,117,
+117,117,117,58,58,58,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,80,80,80,113,113,113,
+113,113,113,112,112,112,56,56,56,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,77,77,77,
+108,108,108,108,108,108,108,108,108,53,53,53,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,
+3,74,74,74,103,103,103,103,103,103,103,103,103,57,57,57,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,3,3,3,71,71,71,98,98,98,98,98,98,85,85,85,9,9,9,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,3,3,3,61,61,61,87,87,87,14,14,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,11,11,11,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+static Fl_RGB_Image image_zoom(idata_zoom, 36, 36, 3, 0);
 
 void CMainFrame::cb_btnAddForce_i(Fl_HoverButton*, void*) {
   paintView->setEditMode(CPaintView::EM_FORCE);
@@ -9038,7 +9193,7 @@ CMainFrame::CMainFrame() {
       mainMenu->color(FL_GRAY0);
       mainMenu->labelsize(11);
       mainMenu->textsize(11);
-      mainMenu->textcolor(FL_BACKGROUND2_COLOR);
+      mainMenu->textcolor(7);
       mainMenu->menu(menu_mainMenu);
     } // Fl_Menu_Bar* mainMenu
     { scrLeftToolbar = new Fl_Scroll(0, 26, 52, 500);
@@ -9148,11 +9303,11 @@ CMainFrame::CMainFrame() {
       paintGroup->end();
       Fl_Group::current()->resizable(paintGroup);
     } // Fl_Group* paintGroup
-    { scrLeftResultToolbar = new Fl_Scroll(365, 234, 53, 420);
+    { scrLeftResultToolbar = new Fl_Scroll(365, 194, 53, 460);
       scrLeftResultToolbar->box(FL_FLAT_BOX);
       scrLeftResultToolbar->color(FL_FOREGROUND_COLOR);
       scrLeftResultToolbar->labelcolor(FL_BACKGROUND2_COLOR);
-      { btnStress = new Fl_HoverButton(370, 240, 42, 42);
+      { btnStress = new Fl_HoverButton(370, 200, 42, 42);
         btnStress->tooltip("Stress visualisation");
         btnStress->type(102);
         btnStress->box(FL_THIN_UP_BOX);
@@ -9169,7 +9324,7 @@ CMainFrame::CMainFrame() {
         btnStress->align(Fl_Align(FL_ALIGN_CENTER));
         btnStress->when(FL_WHEN_RELEASE);
       } // Fl_HoverButton* btnStress
-      { btnDisplacements = new Fl_HoverButton(370, 330, 42, 42);
+      { btnDisplacements = new Fl_HoverButton(370, 290, 42, 42);
         btnDisplacements->tooltip("Displacement visualisation");
         btnDisplacements->type(102);
         btnDisplacements->box(FL_THIN_UP_BOX);
@@ -9185,7 +9340,7 @@ CMainFrame::CMainFrame() {
         btnDisplacements->align(Fl_Align(FL_ALIGN_CENTER));
         btnDisplacements->when(FL_WHEN_RELEASE);
       } // Fl_HoverButton* btnDisplacements
-      { btnMisesStress = new Fl_HoverButton(370, 285, 42, 42);
+      { btnMisesStress = new Fl_HoverButton(370, 245, 42, 42);
         btnMisesStress->tooltip("Mises stress visualisation");
         btnMisesStress->type(102);
         btnMisesStress->box(FL_THIN_UP_BOX);
@@ -9201,8 +9356,8 @@ CMainFrame::CMainFrame() {
         btnMisesStress->align(Fl_Align(FL_ALIGN_CENTER));
         btnMisesStress->when(FL_WHEN_RELEASE);
       } // Fl_HoverButton* btnMisesStress
-      { Fl_Group* o = new Fl_Group(370, 534, 47, 95);
-        { btnMoveLoad = new Fl_HoverButton(371, 587, 42, 42);
+      { Fl_Group* o = new Fl_Group(370, 494, 48, 95);
+        { btnMoveLoad = new Fl_HoverButton(371, 547, 42, 42);
           btnMoveLoad->tooltip("Toggle between moving and rotating loads");
           btnMoveLoad->type(102);
           btnMoveLoad->box(FL_THIN_UP_BOX);
@@ -9218,7 +9373,7 @@ CMainFrame::CMainFrame() {
           btnMoveLoad->align(Fl_Align(FL_ALIGN_WRAP));
           btnMoveLoad->when(FL_WHEN_RELEASE);
         } // Fl_HoverButton* btnMoveLoad
-        { btnRotateLoad = new Fl_HoverButton(371, 543, 42, 42);
+        { btnRotateLoad = new Fl_HoverButton(371, 503, 42, 42);
           btnRotateLoad->tooltip("Toggle between moving and rotating loads");
           btnRotateLoad->type(102);
           btnRotateLoad->box(FL_THIN_UP_BOX);
@@ -9237,7 +9392,7 @@ CMainFrame::CMainFrame() {
         } // Fl_HoverButton* btnRotateLoad
         o->end();
       } // Fl_Group* o
-      { btnOptimize = new Fl_HoverButton(370, 488, 42, 42);
+      { btnOptimize = new Fl_HoverButton(370, 448, 42, 42);
         btnOptimize->tooltip("Optimisation");
         btnOptimize->box(FL_THIN_UP_BOX);
         btnOptimize->down_box(FL_THIN_DOWN_FRAME);
@@ -9252,7 +9407,7 @@ CMainFrame::CMainFrame() {
         btnOptimize->align(Fl_Align(FL_ALIGN_CENTER));
         btnOptimize->when(FL_WHEN_RELEASE);
       } // Fl_HoverButton* btnOptimize
-      { btnStructure = new Fl_HoverButton(370, 374, 42, 42);
+      { btnStructure = new Fl_HoverButton(370, 334, 42, 42);
         btnStructure->tooltip("Show structure only");
         btnStructure->type(102);
         btnStructure->box(FL_THIN_UP_BOX);
@@ -9268,7 +9423,7 @@ CMainFrame::CMainFrame() {
         btnStructure->align(Fl_Align(FL_ALIGN_CENTER));
         btnStructure->when(FL_WHEN_RELEASE);
       } // Fl_HoverButton* btnStructure
-      { btnVizMixer = new Fl_HoverButton(370, 428, 42, 42);
+      { btnVizMixer = new Fl_HoverButton(370, 388, 42, 42);
         btnVizMixer->tooltip("Visualisation mixer");
         btnVizMixer->box(FL_THIN_UP_BOX);
         btnVizMixer->down_box(FL_THIN_DOWN_FRAME);
@@ -9283,6 +9438,22 @@ CMainFrame::CMainFrame() {
         btnVizMixer->align(Fl_Align(FL_ALIGN_WRAP));
         btnVizMixer->when(FL_WHEN_RELEASE);
       } // Fl_HoverButton* btnVizMixer
+      { btnZoomResults = new Fl_HoverButton(371, 599, 42, 42);
+        btnZoomResults->tooltip("Toggle between moving and rotating loads");
+        btnZoomResults->type(1);
+        btnZoomResults->box(FL_THIN_UP_BOX);
+        btnZoomResults->down_box(FL_THIN_DOWN_FRAME);
+        btnZoomResults->color(FL_FOREGROUND_COLOR);
+        btnZoomResults->selection_color((Fl_Color)1);
+        btnZoomResults->image(image_zoom);
+        btnZoomResults->labeltype(FL_NORMAL_LABEL);
+        btnZoomResults->labelfont(0);
+        btnZoomResults->labelsize(11);
+        btnZoomResults->labelcolor(FL_FOREGROUND_COLOR);
+        btnZoomResults->callback((Fl_Callback*)cb_btnZoomResults);
+        btnZoomResults->align(Fl_Align(FL_ALIGN_WRAP));
+        btnZoomResults->when(FL_WHEN_RELEASE);
+      } // Fl_HoverButton* btnZoomResults
       scrLeftResultToolbar->end();
     } // Fl_Scroll* scrLeftResultToolbar
     { scrRightForceToolbar = new Fl_Scroll(255, 42, 53, 249);
@@ -9327,7 +9498,7 @@ CMainFrame::CMainFrame() {
         forceMagnitude->labelsize(12);
         forceMagnitude->labelcolor(FL_BACKGROUND2_COLOR);
         forceMagnitude->textsize(12);
-        forceMagnitude->textcolor(FL_BACKGROUND2_COLOR);
+        forceMagnitude->textcolor(7);
         forceMagnitude->callback((Fl_Callback*)cb_forceMagnitude);
         forceMagnitude->align(Fl_Align(FL_ALIGN_TOP));
       } // Fl_Value_Input* forceMagnitude
@@ -9639,7 +9810,7 @@ CMainFrame::CMainFrame() {
         sldLineWidth->maximum(30);
         sldLineWidth->step(1);
         sldLineWidth->value(5);
-        sldLineWidth->textcolor(FL_BACKGROUND2_COLOR);
+        sldLineWidth->textcolor(7);
         sldLineWidth->callback((Fl_Callback*)cb_sldLineWidth);
         sldLineWidth->align(Fl_Align(129));
         sldLineWidth->deactivate();
@@ -10538,7 +10709,7 @@ CMainFrame::CMainFrame() {
         thickness->labelsize(12);
         thickness->labelcolor(FL_BACKGROUND2_COLOR);
         thickness->textsize(12);
-        thickness->textcolor(FL_BACKGROUND2_COLOR);
+        thickness->textcolor(7);
         thickness->callback((Fl_Callback*)cb_thickness);
         thickness->align(Fl_Align(FL_ALIGN_TOP));
         thickness->deactivate();
@@ -10556,7 +10727,7 @@ CMainFrame::CMainFrame() {
         actualLength->labelsize(12);
         actualLength->labelcolor(FL_BACKGROUND2_COLOR);
         actualLength->textsize(12);
-        actualLength->textcolor(FL_BACKGROUND2_COLOR);
+        actualLength->textcolor(7);
         actualLength->callback((Fl_Callback*)cb_actualLength);
         actualLength->align(Fl_Align(FL_ALIGN_TOP));
         actualLength->deactivate();
@@ -10569,7 +10740,7 @@ CMainFrame::CMainFrame() {
         pixelLength->labelcolor(FL_BACKGROUND2_COLOR);
         pixelLength->maximum(10000);
         pixelLength->textsize(12);
-        pixelLength->textcolor(FL_BACKGROUND2_COLOR);
+        pixelLength->textcolor(7);
         pixelLength->align(Fl_Align(FL_ALIGN_TOP));
         pixelLength->deactivate();
       } // Fl_Value_Output* pixelLength
@@ -10583,7 +10754,7 @@ CMainFrame::CMainFrame() {
         statusOutput->color(FL_INACTIVE_COLOR);
         statusOutput->labelsize(12);
         statusOutput->textsize(12);
-        statusOutput->textcolor(FL_BACKGROUND2_COLOR);
+        statusOutput->textcolor(7);
         statusOutput->align(Fl_Align(FL_ALIGN_CENTER));
       } // Fl_Output* statusOutput
       { calcProgress = new Fl_Progress(432, 660, 315, 19);

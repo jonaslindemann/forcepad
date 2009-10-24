@@ -1,6 +1,6 @@
 //
 // CALFEM C++ libray
-// Copyright (C) 1999-2006 Division of Structural Mecahnics, Lund University
+// Copyright (C) 1999-2009 Division of Structural Mecahnics, Lund University
 //
 // Written by Jonas Lindemann
 //
@@ -161,10 +161,10 @@ double maxValue(RowVector& rowVector);
 double minValue(RowVector& rowVector);
 void printMatrix(std::string name, Matrix & A);
 
-void writeRowVector(const char* name, RowVector &v, std::ostream &out);
-void writeColVector(const char* name, ColumnVector &v, std::ostream &out);
-void writeMatrix(const char* name, Matrix &m, std::ostream &out);
-void writeMatrix(const char* name, SymmetricBandMatrix &m, std::ostream &out);
+void writeRowVector(const std::string& name, RowVector &v, std::ostream &out, bool matlab=true);
+void writeColVector(const std::string& name, ColumnVector &v, std::ostream &out, bool matlab=true);
+void writeMatrix(const std::string& name, Matrix &m, std::ostream &out, bool matlab=true);
+void writeMatrix(const std::string& name, SymmetricBandMatrix &m, std::ostream &out, bool matlab=true);
 }
 
 #endif

@@ -1,6 +1,6 @@
 //
 // ForcePAD - Educational Finite Element Software
-// Copyright (C) 2000-2008 Division of Structural Mechanics, Lund University
+// Copyright (C) 2000-2009 Division of Structural Mechanics, Lund University
 //
 // Written by Jonas Lindemann
 //
@@ -120,6 +120,9 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 {
 	so_print("CPaintView","CPaintView(...)");
 
+	m_lastSize[0] = 0;
+	m_lastSize[1] = 0;
+
 	// Initialize general state variables
 	
 	m_drawingOffsetX = 0;
@@ -150,6 +153,8 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 
 	m_zoomResults = false;
 	m_zoomFactor = 0.1;
+	m_zoomPos[0] = w/2;
+	m_zoomPos[1] = h/2;
 
 	// Calculation settings
 
@@ -461,6 +466,8 @@ void CPaintView::onPush(int x, int y)
 		y = sy + m_drawingOffsetY;
 	}
 	
+	m_zoomStart[0] = m_zoomPos[0];
+	m_zoomStart[1] = m_zoomPos[1];
 	m_start[0] = x;
 	m_start[1] = y;
 	m_oldPos[0] = -1;
@@ -475,7 +482,8 @@ void CPaintView::onPush(int x, int y)
 		
 		// Rotate existing force
 
-		m_selectedForce = m_femGrid->getNearestForce(x-m_drawingOffsetX, h()-y-m_drawingOffsetY);
+		if (!m_zoomResults)
+			m_selectedForce = m_femGrid->getNearestForce(x-m_drawingOffsetX, h()-y-m_drawingOffsetY);
 		break;
 	case EM_CONSTRAINT:
 		
@@ -571,11 +579,18 @@ void CPaintView::onPush(int x, int y)
 	if (m_editMode!=EM_RESULT)
 		this->redraw();
 
+	/*
 	if (m_viewMode == VM_ACTION)
 	{
 		cout << "Zoom results:" << endl;
-		m_zoomResults = true;
+		if (m_zoomResults)
+			m_zoomResults = false;
+		else
+			m_zoomResults = true;
+		this->flush();
+		this->redraw();
 	}
+	*/
 }
 
 
@@ -880,8 +895,17 @@ void CPaintView::onDrag(int x, int y)
 	if (m_zoomResults)
 	{
 		cout << "zoomResults" << endl;
+
+		double dx = ( (double)m_current[0] - (double)m_start[0] );// * (2*m_zoomFactor);
+		double dy = ( (double)m_current[1] - (double)m_start[1] );// * (2*m_zoomFactor);
+
+		cout << dx << ", " << dy << endl;
+
+		m_zoomPos[0] = m_zoomStart[0]-dx;
+		m_zoomPos[1] = m_zoomStart[1]-dy;
+
 		this->flush();
-		this->invalidate();
+		//this->invalidate();
 		this->redraw();
 	}
 }
@@ -897,7 +921,7 @@ void CPaintView::onRelease(int x, int y)
 	cout << "onRelease()" << endl;
 	
 	m_leftMouseDown = false;
-	m_zoomResults = false;
+	//m_zoomResults = false;
 	
 	updateCursor();
 	
@@ -949,6 +973,7 @@ void CPaintView::onRelease(int x, int y)
 	
 	m_oldPos[0] = -1;
 	m_oldPos[1] = -1;
+
 }
 
 void CPaintView::onClear()
@@ -969,7 +994,7 @@ void CPaintView::onInitContext()
 	
 	m_drawingOffsetX = (w()-m_drawing->getWidth())/2;
 	m_drawingOffsetY = (h()-m_drawing->getHeight())/2;
-	
+
 	if (m_drawingOffsetX<0)
 		m_drawingOffsetX = 0;
 	
@@ -1016,12 +1041,34 @@ void CPaintView::onInitContext()
 	
 	glScissor(m_drawingOffsetX, m_drawingOffsetY, m_drawing->getWidth(), m_drawing->getHeight());
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+	// Implement a resize method
+
+	if ((m_lastSize[0]!=w())||(m_lastSize[1]!=h()))
+	{
+		m_lastSize[0] = w();
+		m_lastSize[1] = h();
+
+		this->onResize(w(), h());
+	}
+}
+
+void CPaintView::onResize(int w, int h)
+{
+	m_zoomPos[0] = w/2;
+	m_zoomPos[1] = h/2;
 }
 
 void CPaintView::onDraw()
 {
 	glEnable(GL_LINE_SMOOTH);
 	//glEnable(GL_POLYGON_SMOOTH);
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glViewport(0,0,w(),h());
+	gluOrtho2D(0,w(),0,h());
+	glMatrixMode(GL_MODELVIEW);
 
 	// Background properties
 
@@ -1094,6 +1141,12 @@ void CPaintView::onDraw()
 	// Disable drawing outside the image.
 
 	glEnable(GL_SCISSOR_TEST);
+
+	if (m_zoomResults)
+		glScissor(15, 15, w()-30, h()-30);
+	else
+		glScissor(m_drawingOffsetX, m_drawingOffsetY, m_drawing->getWidth(), m_drawing->getHeight());
+
 	
 	if (m_lockDrawing)
 		return;
@@ -1188,20 +1241,19 @@ void CPaintView::onDraw()
 		case EM_LINE:
 			break;
 		default:
-			m_femGrid->setPosition(m_drawingOffsetX, m_drawingOffsetY);
-			if ((m_zoomResults)&&(m_selectedForce==NULL))
+			if (m_zoomResults)
 			{
+				//m_femGrid->setPosition(m_drawingOffsetX+m_current[0]-m_drawingOffsetX, m_drawingOffsetY-m_current[1]+m_drawingOffsetY);
+				//glPushMatrix();
+				//glScalef(2.0f, 2.0f, 0.0f);
+
 				glMatrixMode(GL_PROJECTION);
 				glLoadIdentity();
 				glViewport(0,0,w(),h());
-				gluOrtho2D(m_current[0]-w()*m_zoomFactor,m_current[0]+w()*m_zoomFactor,(h()-m_current[1])-h()*m_zoomFactor,(h()-m_current[1])+h()*m_zoomFactor);
+				gluOrtho2D(m_zoomPos[0]-w()*m_zoomFactor,m_zoomPos[0]+w()*m_zoomFactor,(h()-m_zoomPos[1])-h()*m_zoomFactor,(h()-m_zoomPos[1])+h()*m_zoomFactor);
 				glMatrixMode(GL_MODELVIEW);
-
 			}
-
-			m_femGrid->render();
-
-			if ((m_zoomResults)&&(m_selectedForce==NULL))
+			else
 			{
 				glMatrixMode(GL_PROJECTION);
 				glLoadIdentity();
@@ -1209,6 +1261,8 @@ void CPaintView::onDraw()
 				gluOrtho2D(0,w(),0,h());
 				glMatrixMode(GL_MODELVIEW);
 			}
+
+			m_femGrid->render();
 			break;
 		}
 	}
@@ -1219,41 +1273,28 @@ void CPaintView::onDraw()
 		if (m_calcCG)
 			m_cgIndicator->render();
 		
-		if (!m_femGrid->getShowGrid())
+		if (m_zoomResults)
 		{
-			m_femGrid->render();
+			//m_femGrid->setPosition(m_drawingOffsetX+m_current[0]-m_drawingOffsetX, m_drawingOffsetY-m_current[1]+m_drawingOffsetY);
+			//glPushMatrix();
+			//glScalef(2.0f, 2.0f, 0.0f);
+
+			glMatrixMode(GL_PROJECTION);
+			glLoadIdentity();
+			glViewport(0,0,w(),h());
+			gluOrtho2D(m_zoomPos[0]-w()*m_zoomFactor,m_zoomPos[0]+w()*m_zoomFactor,(h()-m_zoomPos[1])-h()*m_zoomFactor,(h()-m_zoomPos[1])+h()*m_zoomFactor);
+			glMatrixMode(GL_MODELVIEW);
 		}
 		else
 		{
-			if (m_zoomResults)
-			{
-				//m_femGrid->setPosition(m_drawingOffsetX+m_current[0]-m_drawingOffsetX, m_drawingOffsetY-m_current[1]+m_drawingOffsetY);
-				//glPushMatrix();
-				//glScalef(2.0f, 2.0f, 0.0f);
-
-				glMatrixMode(GL_PROJECTION);
-				glLoadIdentity();
-				glViewport(0,0,w(),h());
-				gluOrtho2D(m_current[0]-w()*0.2,m_current[0]+w()*0.2,m_current[1]-h()*0.2,m_current[1]+h()*0.2);
-				glMatrixMode(GL_MODELVIEW);
-
-			}
-
-			m_femGrid->render();
-
-			if (m_zoomResults)
-			{
-				//glPopMatrix();
-				//m_femGrid->setPosition(m_drawingOffsetX, m_drawingOffsetY);
-				glMatrixMode(GL_PROJECTION);
-				glLoadIdentity();
-				glViewport(0,0,w(),h());
-				gluOrtho2D(0,w(),0,h());
-				glMatrixMode(GL_MODELVIEW);
-			}
-
+			glMatrixMode(GL_PROJECTION);
+			glLoadIdentity();
+			glViewport(0,0,w(),h());
+			gluOrtho2D(0,w(),0,h());
+			glMatrixMode(GL_MODELVIEW);
 		}
-		//glPopMatrix();
+
+		m_femGrid->render();
 	}
 	if (m_editMode==EM_SELECT_BOX)
 	{
@@ -1691,6 +1732,24 @@ void CPaintView::checkOpenGLVersion()
 /////////////////////////////////////////////////////////////
 // CPaintView public methods
 /////////////////////////////////////////////////////////////
+
+void CPaintView::zoomIn()
+{
+	m_zoomFactor -= 0.01;
+	if (m_zoomFactor < 0.01)
+		m_zoomFactor = 0.01;
+
+	this->flush();
+	this->redraw();
+}
+
+void CPaintView::zoomOut()
+{
+	m_zoomFactor += 0.01;
+	this->flush();
+	this->redraw();
+}
+
 
 bool CPaintView::execute()
 {
@@ -2994,6 +3053,17 @@ void CPaintView::setModelName(const std::string& modelName)
 //	return m_modelName;
 //}
 
+void CPaintView::setZoomResults(bool flag)
+{
+	m_zoomResults = flag;
+	this->redraw();
+}
+
+bool CPaintView::getZoomResults()
+{
+	return m_zoomResults;
+}
+
 void CPaintView::setCalcCG(bool flag)
 {
 	m_calcCG = flag;
@@ -3023,7 +3093,7 @@ bool CPaintView::getCalcCG()
 void CPaintView::showAbout()
 {
 #ifdef WIN32
-	ShellExecute(0, "open", "http://www.byggmek.lth.se/resources/forcepad/forcepad.htm", NULL, NULL, SW_SHOWNORMAL);
+	ShellExecute(0, "open", "http://forcepad.sourceforge.net", NULL, NULL, SW_SHOWNORMAL);
 #endif
 }
 
