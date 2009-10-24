@@ -61,6 +61,8 @@ private:
   void cb_fileMenuSaveAs_i(Fl_Menu_*, void*);
   static void cb_fileMenuSaveAs(Fl_Menu_*, void*);
 public:
+  static Fl_Menu_Item *fileMenuSaveMatlab;
+  static Fl_Menu_Item *fileMenuSaveNumPy;
   static Fl_Menu_Item *fileMenuExit;
 private:
   void cb_fileMenuExit_i(Fl_Menu_*, void*);
@@ -86,6 +88,17 @@ public:
 private:
   void cb_editMenuPaste_i(Fl_Menu_*, void*);
   static void cb_editMenuPaste(Fl_Menu_*, void*);
+public:
+  static Fl_Menu_Item *viewMenu;
+  static Fl_Menu_Item *viewMenuZoomIn;
+private:
+  void cb_viewMenuZoomIn_i(Fl_Menu_*, void*);
+  static void cb_viewMenuZoomIn(Fl_Menu_*, void*);
+public:
+  static Fl_Menu_Item *viewMenuZoomOut;
+private:
+  void cb_viewMenuZoomOut_i(Fl_Menu_*, void*);
+  static void cb_viewMenuZoomOut(Fl_Menu_*, void*);
 public:
   static Fl_Menu_Item *modeMenu;
   static Fl_Menu_Item *modeMenuSketch;
@@ -199,6 +212,11 @@ public:
 private:
   void cb_btnVizMixer_i(Fl_HoverButton*, void*);
   static void cb_btnVizMixer(Fl_HoverButton*, void*);
+public:
+  Fl_HoverButton *btnZoomResults;
+private:
+  void cb_btnZoomResults_i(Fl_HoverButton*, void*);
+  static void cb_btnZoomResults(Fl_HoverButton*, void*);
 public:
   Fl_Scroll *scrRightForceToolbar;
   Fl_HoverButton *btnAddForce;

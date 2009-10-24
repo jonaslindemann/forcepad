@@ -256,8 +256,12 @@ private:
 	bool m_resized;
 	bool m_drawImage;
 
+	int m_lastSize[2];
+
 	bool m_zoomResults;
 	double m_zoomFactor;
+	int m_zoomPos[2];
+	int m_zoomStart[2];
 
 	/*
 	 *    Private methods
@@ -296,6 +300,9 @@ private:
 
 	/** Handles passive mouse movement */
 	void onMove(int x, int y);
+
+	/** Handles passive mouse movement */
+	void onResize(int w, int h);
 
 	/** Handles OpenGL drawing */
 	void onDraw();
@@ -382,6 +389,9 @@ public:
 	double getRulerLength();
 	void setOptLayer(bool active);
 
+	void zoomIn();
+	void zoomOut();
+
 	/*
 	 *    Properties
 	 */
@@ -442,6 +452,9 @@ public:
 
 	void setDrawStress(bool flag);
 	bool getDrawStress();
+
+	void setZoomResults(bool flag);
+	bool getZoomResults();
 
 	void setDrawDisplacements(bool flag);
 	bool getDrawDisplacements();

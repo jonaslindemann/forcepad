@@ -72,9 +72,9 @@ class CMainFrame {open : {CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusM
   } {
     Fl_Window wndMain {
       label {ForcePAD 2} open
-      xywh {704 122 861 684} type Double color 0 align 80 resizable visible
+      xywh {380 202 861 684} type Double color 0 align 80 resizable visible
     } {
-      Fl_Menu_Bar mainMenu {
+      Fl_Menu_Bar mainMenu {open
         xywh {0 0 858 26} box FLAT_BOX down_box FLAT_BOX color 32 labelsize 11 textsize 11 textcolor 7
       } {
         Submenu fileMenu {
@@ -99,7 +99,15 @@ class CMainFrame {open : {CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusM
           MenuItem fileMenuSaveAs {
             label {S&ave as...}
             callback {paintView->saveModelAs();}
-            xywh {0 0 30 20} shortcut 0x50073 labelsize 12
+            xywh {0 0 30 20} shortcut 0x50073 labelsize 12 divider
+          }
+          MenuItem fileMenuSaveMatlab {
+            label {Save as MATLAB...}
+            xywh {0 0 100 20} labelsize 12
+          }
+          MenuItem fileMenuSaveNumPy {
+            label {Save as NumPy...} selected
+            xywh {10 10 100 20} labelsize 12 divider
           }
           MenuItem fileMenuExit {
             label {E&xit}
@@ -136,6 +144,21 @@ editMenuPaste->activate();}
 editMenuCut->deactivate();
 editMenuCopy->deactivate();}
             xywh {0 0 30 20} shortcut 0x40076 labelsize 12
+          }
+        }
+        Submenu viewMenu {
+          label {&View} open
+          xywh {0 0 62 20} labelsize 12
+        } {
+          MenuItem viewMenuZoomIn {
+            label {Zoom In}
+            callback {paintView->zoomIn();}
+            xywh {0 0 30 20} shortcut 0xff55 labelsize 12
+          }
+          MenuItem viewMenuZoomOut {
+            label {Zoom Out}
+            callback {paintView->zoomOut();}
+            xywh {0 0 30 20} shortcut 0xff56 labelsize 12
           }
         }
         Submenu modeMenu {
@@ -224,7 +247,7 @@ delete splashFrame;}
           }
         }
       }
-      Fl_Scroll scrLeftToolbar {open
+      Fl_Scroll scrLeftToolbar {
         xywh {0 26 52 500} box FLAT_BOX color 0
       } {
         Fl_Button btnBrushTools {
@@ -296,7 +319,7 @@ if (btnPaste->value()==1)
           }
         }
       }
-      Fl_Group paintGroup {open
+      Fl_Group paintGroup {
         xywh {52 26 750 627} resizable
       } {
         Fl_Box paintView {
@@ -305,8 +328,8 @@ if (btnPaste->value()==1)
           class CPaintView
         }
       }
-      Fl_Scroll scrLeftResultToolbar {open
-        xywh {365 234 53 420} box FLAT_BOX color 0 labelcolor 7
+      Fl_Scroll scrLeftResultToolbar {
+        xywh {365 194 53 460} box FLAT_BOX color 0 labelcolor 7
       } {
         Fl_Button btnStress {
           callback {//showRightToolbar(scrRightStressToolbar);
@@ -315,7 +338,7 @@ paintView->setVisualisationMode(CPaintView::VM_PRINCIPAL_STRESS);
 //paintView->setStressType(CFemGrid2::ST_PRINCIPAL);
 //paintView->setDrawStress(true);
 //paintView->setDrawForcesAndConstraints(true);}
-          tooltip {Stress visualisation} image {../../images/stress2_black_grd.png} xywh {370 240 42 42} type Radio box THIN_UP_BOX down_box THIN_DOWN_FRAME value 1 color 0 selection_color 1
+          tooltip {Stress visualisation} image {../../images/stress2_black_grd.png} xywh {370 200 42 42} type Radio box THIN_UP_BOX down_box THIN_DOWN_FRAME value 1 color 0 selection_color 1
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
         }
@@ -325,7 +348,7 @@ paintView->setVisualisationMode(CPaintView::VM_DISPLACEMENTS);
 //paintView->setDrawDisplacements(true);
 //paintView->setDrawStress(false);
 //paintView->setDrawForcesAndConstraints(true);}
-          tooltip {Displacement visualisation} image {../../images/displacements_black_grd.png} xywh {370 330 42 42} type Radio box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1
+          tooltip {Displacement visualisation} image {../../images/displacements_black_grd.png} xywh {370 290 42 42} type Radio box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
         }
@@ -336,22 +359,22 @@ paintView->setVisualisationMode(CPaintView::VM_MISES_STRESS);
 //paintView->setStressType(CFemGrid2::ST_MISES_SMOOTH);
 //paintView->setDrawStress(true);
 //paintView->setDrawForcesAndConstraints(true);}
-          tooltip {Mises stress visualisation} image {../../images/stress_mises_black_grd.png} xywh {370 285 42 42} type Radio box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1
+          tooltip {Mises stress visualisation} image {../../images/stress_mises_black_grd.png} xywh {370 245 42 42} type Radio box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
         }
         Fl_Group {} {open
-          xywh {370 534 47 95}
+          xywh {370 494 48 95}
         } {
           Fl_Button btnMoveLoad {
             callback {paintView->setMoveLoad(true);}
-            tooltip {Toggle between moving and rotating loads} image {../../images/action_move_force_black_grd.png} xywh {371 587 42 42} type Radio box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1 labelsize 11 align 128
+            tooltip {Toggle between moving and rotating loads} image {../../images/action_move_force_black_grd.png} xywh {371 547 42 42} type Radio box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1 labelsize 11 align 128
             code0 {\#include "Fl_HoverButton.h"}
             class Fl_HoverButton
           }
           Fl_Button btnRotateLoad {
             callback {paintView->setMoveLoad(false);}
-            tooltip {Toggle between moving and rotating loads} image {../../images/action_rotate_force_black_grd.png} xywh {371 543 42 42} type Radio box THIN_UP_BOX down_box THIN_DOWN_FRAME value 1 color 0 selection_color 1 labelsize 11 align 128
+            tooltip {Toggle between moving and rotating loads} image {../../images/action_rotate_force_black_grd.png} xywh {371 503 42 42} type Radio box THIN_UP_BOX down_box THIN_DOWN_FRAME value 1 color 0 selection_color 1 labelsize 11 align 128
             code0 {\#include "Fl_HoverButton.h"}
             class Fl_HoverButton
           }
@@ -367,7 +390,7 @@ m_optSettings->show();
 disableUserInterface();
 m_vizMixer->hide();
 paintView->executeOpt();}
-          tooltip Optimisation image {../../images/optimise_black_grd.png} xywh {370 488 42 42} box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1 labelsize 11
+          tooltip Optimisation image {../../images/optimise_black_grd.png} xywh {370 448 42 42} box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1 labelsize 11
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
         }
@@ -377,7 +400,7 @@ paintView->setVisualisationMode(CPaintView::VM_STRUCTURE);
 //paintView->setDrawDisplacements(false);
 //paintView->setDrawStress(false);
 //paintView->setDrawForcesAndConstraints(false);}
-          tooltip {Show structure only} image {../../images/structure_black_grd.png} xywh {370 374 42 42} type Radio box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1 labelcolor 7
+          tooltip {Show structure only} image {../../images/structure_black_grd.png} xywh {370 334 42 42} type Radio box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1 labelcolor 7
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
         }
@@ -385,7 +408,16 @@ paintView->setVisualisationMode(CPaintView::VM_STRUCTURE);
           callback {m_vizMixer->setView(paintView);
 m_vizMixer->show();
 m_vizMixer->placeWindow(wndMain);}
-          tooltip {Visualisation mixer} image {../../images/visualisation_mixer_black_grd.png} xywh {370 428 42 42} box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1 labelsize 11 labelcolor 7 align 128
+          tooltip {Visualisation mixer} image {../../images/visualisation_mixer_black_grd.png} xywh {370 388 42 42} box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1 labelsize 11 labelcolor 7 align 128
+          code0 {\#include "Fl_HoverButton.h"}
+          class Fl_HoverButton
+        }
+        Fl_Button btnZoomResults {
+          callback {if (btnZoomResults->value()>0)
+	paintView->setZoomResults(true);
+else
+	paintView->setZoomResults(false);}
+          tooltip {Toggle between moving and rotating loads} image {../../images/zoom.png} xywh {371 599 42 42} type Toggle box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1 labelsize 11 align 128
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
         }
@@ -615,7 +647,7 @@ else
           tooltip {Displacement scalefactor} xywh {539 58 30 165} box BORDER_BOX color 24 labelsize 10 labelcolor 7 align 1 minimum 0.1 maximum 100 step 0.1 value 0.1
         }
       }
-      Fl_Scroll scrRightSelectToolbar {open
+      Fl_Scroll scrRightSelectToolbar {
         xywh {582 39 53 304} box FLAT_BOX color 0 labelcolor 7
       } {
         Fl_Button btnSelect {
@@ -994,7 +1026,7 @@ m_physicsEditMode = paintView->getEditMode();}
           class Fl_HoverButton
         }
       }
-      Fl_Scroll scrRightThicknessToolbar {open
+      Fl_Scroll scrRightThicknessToolbar {
         xywh {141 176 53 304} box FLAT_BOX color 0 labelcolor 7
       } {
         Fl_Value_Input thickness {
@@ -1003,7 +1035,7 @@ m_physicsEditMode = paintView->getEditMode();}
           xywh {146 196 41 21} box THIN_DOWN_BOX color 0 labelsize 12 labelcolor 7 align 1 textsize 12 textcolor 7 deactivate
         }
       }
-      Fl_Scroll scrRightDimensionToolbar {open
+      Fl_Scroll scrRightDimensionToolbar {
         xywh {85 176 53 304} box FLAT_BOX color 0 labelcolor 7
       } {
         Fl_Value_Input actualLength {
@@ -1016,7 +1048,7 @@ m_physicsEditMode = paintView->getEditMode();}
           xywh {90 196 41 21} box THIN_DOWN_BOX color 0 selection_color 9 labelsize 12 labelcolor 7 align 1 maximum 10000 textsize 12 textcolor 7 deactivate
         }
       }
-      Fl_Group statusBar {open
+      Fl_Group statusBar {
         xywh {53 653 747 31} box FLAT_BOX color 0
       } {
         Fl_Output statusOutput {
@@ -1038,7 +1070,7 @@ m_tabletToolbar->placeWindow(wndMain);}
           xywh {348 660 42 19} box FLAT_BOX color 83 labelsize 11
         }
       }
-      Fl_Group scrRightToolbar {open
+      Fl_Group scrRightToolbar {
         xywh {808 511 46 139} color 0
       } {
         Fl_Button btnPhysical {
@@ -1461,8 +1493,7 @@ pixelLength->value(ruler->getPixelLength());} {}
 Fl::check();
 \#endif
 Fl::flush();
-return m_continueCalc;} {selected
-    }
+return m_continueCalc;} {}
   }
   Function {onVisualisationModeChanged(CPaintView::TVisualisationMode oldMode, CPaintView::TVisualisationMode newMode)} {} {
     code {if (newMode == CPaintView::VM_PRINCIPAL_STRESS)
