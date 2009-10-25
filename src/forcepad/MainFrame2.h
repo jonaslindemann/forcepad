@@ -4,12 +4,14 @@
 #define MainFrame2_h
 #include <FL/Fl.H>
 /** Main window class generated from FLTK. */
+#include <FL/Fl_Color_Chooser.H>
+#include "forcepad_config.h"
+#include <iostream>
+#include <string>
 #include "SplashFrame.h"
 #include "OptSettings.h"
 #include "TabletToolbar.h"
 #include "VizMixerToolbar.h"
-#include <iostream>
-#include <string>
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Menu_Bar.H>
 #include <FL/Fl_Scroll.H>
@@ -568,6 +570,7 @@ private:
   static void cb_transferViewToImage(Fl_HoverButton*, void*);
 public:
   ~CMainFrame();
+  bool onContinueCalc();
   void show();
   void close();
 private:
@@ -590,7 +593,6 @@ public:
   Fl_Window* getMainWindow();
   void onModelChanged(const std::string& newModelName);
   void onRulerChanged(CRuler* ruler);
-  bool onContinueCalc();
   void onVisualisationModeChanged(CPaintView::TVisualisationMode oldMode, CPaintView::TVisualisationMode newMode);
   void disableUserInterface();
   void enableUserInterface();

@@ -25,13 +25,12 @@
 #include "forcepad_config.h"
 
 #include <FL/Fl.H>
-#include "fl_message_win.h"
 
-#ifdef FORCEPAD_NEW_UI
-#include "MainFrame2.h"
-#else
-#include "MainFrame.h"
+#ifdef WIN32
+#include "fl_message_win.h"
 #endif
+
+#include "MainFrame2.h"
 
 #include "SplashFrame.h"
 //#include "StatusOutput.h"
