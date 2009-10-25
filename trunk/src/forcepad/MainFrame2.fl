@@ -5,9 +5,17 @@ code_name {.cpp}
 decl {/** Main window class generated from FLTK. */} {public
 } 
 
-decl {\#include <FL/Fl_Color_Chooser.H>} {} 
+decl {\#include <FL/Fl_Color_Chooser.H>} {public global
+} 
 
-decl {\#include <FL/Fl.h>} {} 
+decl {\#include "forcepad_config.h"} {public global
+} 
+
+decl {\#include <iostream>} {public global
+} 
+
+decl {\#include <string>} {public global
+} 
 
 decl {\#ifndef __APPLE__} {} 
 
@@ -22,8 +30,6 @@ decl {\#include "resource.h"} {}
 decl {\#include "dwmapi.h"} {} 
 
 decl {\#endif} {} 
-
-decl {\#include "forcepad_config.h"} {} 
 
 decl {\#include "PlatformInfo.h"} {} 
 
@@ -44,12 +50,6 @@ decl {\#include "TabletToolbar.h"} {public global
 decl {\#include "GeneralSettings.h"} {} 
 
 decl {\#include "VizMixerToolbar.h"} {public global
-} 
-
-decl {\#include <iostream>} {public global
-} 
-
-decl {\#include <string>} {public global
 } 
 
 Function {mainWindowCB(Fl_Widget* w, void* v)} {open private return_type void
@@ -106,7 +106,7 @@ class CMainFrame {open : {CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusM
             xywh {0 0 100 20} labelsize 12
           }
           MenuItem fileMenuSaveNumPy {
-            label {Save as NumPy...} selected
+            label {Save as NumPy...}
             xywh {10 10 100 20} labelsize 12 divider
           }
           MenuItem fileMenuExit {
@@ -319,7 +319,7 @@ if (btnPaste->value()==1)
           }
         }
       }
-      Fl_Group paintGroup {
+      Fl_Group paintGroup {open
         xywh {52 26 750 627} resizable
       } {
         Fl_Box paintView {
@@ -328,7 +328,7 @@ if (btnPaste->value()==1)
           class CPaintView
         }
       }
-      Fl_Scroll scrLeftResultToolbar {
+      Fl_Scroll scrLeftResultToolbar {open
         xywh {365 194 53 460} box FLAT_BOX color 0 labelcolor 7
       } {
         Fl_Button btnStress {
@@ -1130,8 +1130,7 @@ m_physicsEditMode = CPaintView::EM_FORCE;
 
 wndMain->callback(mainWindowCB);} {}
   }
-  Function {~CMainFrame()} {open
-  } {
+  Function {~CMainFrame()} {} {
     code {m_tabletToolbar->hide();
 m_vizMixer->hide();
 m_optSettings->hide();
@@ -1140,8 +1139,11 @@ delete m_vizMixer;
 delete m_optSettings;
 delete paintView;} {}
   }
-  Function {show()} {open
+  Function {onContinueCalc()} {open return_type bool
   } {
+    code {return m_continueCalc;} {}
+  }
+  Function {show()} {} {
     code {\#ifdef WIN32
 extern HINSTANCE fl_display;
 wndMain->icon((char *)LoadIcon(fl_display, MAKEINTRESOURCE(IDI_FORCEPAD)));
@@ -1305,6 +1307,9 @@ else
 		showRightToolbar(scrRightFillToolbar);
 		
 	paintView->setEditMode(m_sketchEditMode);
+	paintView->setZoomResults(false);
+	btnZoomResults->value(0);
+	
 }
 else if (newMode == CPaintView::VM_PHYSICS)
 {
@@ -1333,6 +1338,8 @@ else if (newMode == CPaintView::VM_PHYSICS)
 		showRightToolbar(scrRightDimensionToolbar);
 
 	paintView->setEditMode(m_physicsEditMode);
+	paintView->setZoomResults(false);
+	btnZoomResults->value(0);
 }
 else
 {
@@ -1341,6 +1348,8 @@ else
 	modeMenuAction->deactivate();
 	modeMenuPhysics->activate();
 	btnAction->setonly();
+	paintView->setZoomResults(false);
+	btnZoomResults->value(0);
 
 	hideRightToolbars();
 	hideLeftToolbars();
@@ -1389,9 +1398,10 @@ else
 		paintView->setDrawStress(false);
 		showRightToolbar(scrRightDisplacementToolbar);
 	}	
-}} {}
+}} {selected
+    }
   }
-  Function {onStatusMessage(const std::string& message, const int progress)} {open return_type void
+  Function {onStatusMessage(const std::string& message, const int progress)} {return_type void
   } {
     code {statusOutput->value(message.c_str());
 calcProgress->value(progress);
@@ -1454,7 +1464,7 @@ toolbar->show();
 toolbar->activate();
 wndMain->insert(*toolbar,0);} {}
   }
-  Function {showRightToolbar(Fl_Widget* toolbar)} {open return_type void
+  Function {showRightToolbar(Fl_Widget* toolbar)} {return_type void
   } {
     code {hideRightToolbars();
 
@@ -1486,14 +1496,6 @@ wndMain->label(caption.c_str());} {}
   Function {onRulerChanged(CRuler* ruler)} {} {
     code {pixelLength->precision(1);
 pixelLength->value(ruler->getPixelLength());} {}
-  }
-  Function {onContinueCalc()} {open return_type bool
-  } {
-    code {\#ifndef __APPLE__
-Fl::check();
-\#endif
-Fl::flush();
-return m_continueCalc;} {}
   }
   Function {onVisualisationModeChanged(CPaintView::TVisualisationMode oldMode, CPaintView::TVisualisationMode newMode)} {} {
     code {if (newMode == CPaintView::VM_PRINCIPAL_STRESS)
@@ -1543,8 +1545,7 @@ mainMenu->deactivate();
 scrRightToolbar->deactivate();
 btnOptimize->deactivate();} {}
   }
-  Function {enableUserInterface()} {open
-  } {
+  Function {enableUserInterface()} {} {
     code {//scrRightForceToolbar->activate();
 //scrRightBCToolbar->activate();
 //scrRightDrawToolbar->activate();

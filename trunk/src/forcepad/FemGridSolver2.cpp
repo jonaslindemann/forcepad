@@ -36,6 +36,8 @@
 #include <cmath>
 #include <climits>
 
+#include <FL/Fl.h>
+
 CFemGridSolver2::CFemGridSolver2()
 {
 	so_print("CFemGridSolver2","Constructed.");
@@ -79,6 +81,8 @@ CFemGridSolver2::~CFemGridSolver2()
 
 bool CFemGridSolver2::continueCalc()
 {
+	Fl::check();
+	Fl::flush();
 	if (m_continueCalcEvent!=NULL)
 		return m_continueCalcEvent->onContinueCalc();
 	else

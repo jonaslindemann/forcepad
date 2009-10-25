@@ -4,7 +4,7 @@ import os, sys, string, shutil
 
 def checkBuildDir():
 
-	buildDir = "./build_"+sys.platform
+	buildDir = "../forcepad_build_"+sys.platform
 
 	if os.path.exists(buildDir):
 		print "Build directory exists. Removing..."
@@ -18,12 +18,13 @@ def runCMake(buildDir, fltkDir, glewDir):
 	
 	cmdOptions = "-D FLTK_ROOT:FILEPATH=%s " % fltkDir
 	cmdOptions += "-D GLEW_ROOT:FILEPATH=%s " % glewDir
+	cmdOptions += '-G "Eclipse CDT4 - Unix Makefiles"'
 	
 	oldDir = os.getcwd()
 	
 	os.chdir(buildDir)
 	
-	os.system('cmake '+cmdOptions+' ..')
+	os.system('cmake '+cmdOptions+' ../forcepad')
 	
 	os.chdir(oldDir)
 	

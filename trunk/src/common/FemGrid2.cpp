@@ -77,6 +77,8 @@ CFemGrid2::CFemGrid2()
 
 	m_pointConstraints.clear();
 	m_pointForces.clear();
+
+	this->updateColorMapTexture();
 }
 
 CFemGrid2::~CFemGrid2()
@@ -1161,6 +1163,23 @@ void CFemGrid2::drawMisesStressSmooth()
 	double ey[4];
 	double value;
 
+	glPushAttrib(GL_BLEND);
+	glDisable(GL_BLEND);
+	glEnable(GL_TEXTURE_1D);
+	glBindTexture(GL_TEXTURE_1D, 13);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri (GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri (GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri (GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+
+	glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 128, 0, GL_RGB, GL_UNSIGNED_BYTE, m_colorMapTex1D);
+
+	glBindTexture(GL_TEXTURE_1D, 13);
+
 	if ((m_displacements!=NULL)&&(m_nodeResults!=NULL))
 	{
 		for (i=0; i<m_rows; i++)
@@ -1190,8 +1209,16 @@ void CFemGrid2::drawMisesStressSmooth()
 								break;
 						}
 
-						this->m_colorMap->getColor(sigm/this->m_maxMisesStressValue/m_upperMisesTreshold, r, g, b);
-						glColor3f(r, g, b);
+						if (false)
+						{
+							this->m_colorMap->getColor(sigm/this->m_maxMisesStressValue/m_upperMisesTreshold, r, g, b);
+							glColor3f(r, g, b);
+						}
+						else
+						{
+							float s = sigm/this->m_maxMisesStressValue/m_upperMisesTreshold;
+							glTexCoord1f(s);
+						}
 
 						dx = k*m_displacements[topo[l*2]];
 						dy = k*m_displacements[topo[l*2+1]];
@@ -1205,6 +1232,10 @@ void CFemGrid2::drawMisesStressSmooth()
 			}
 		}
 	}
+
+	glDisable(GL_TEXTURE_1D);
+
+	glPopAttrib();
 }
 
 void CFemGrid2::drawStressArrow(double x, double y, const double *values)
@@ -2358,6 +2389,7 @@ bool CFemGrid2::getDrawDisplacements()
 void CFemGrid2::setColorMap(CColorMap* colorMap)
 {
 	m_colorMap = colorMap;
+	this->updateColorMapTexture();
 }
 
 CColorMap* CFemGrid2::getColorMap()
@@ -2457,3 +2489,19 @@ void CFemGrid2::assignNonElements(Matrix& M, double value)
 			}
 	}
 }
+
+void CFemGrid2::updateColorMapTexture()
+{
+	int i;
+	float r, g, b;
+	for (i=0; i<384; i+=3)
+	{
+		m_colorMap->getColor((double)i/383.0, r, g, b);
+		m_colorMapTex1D[i]=(GLubyte)(r*255.0f);
+		m_colorMapTex1D[i+1]=(GLubyte)(g*255.0f);
+		m_colorMapTex1D[i+2]=(GLubyte)(b*255.0f);
+
+		cout << (GLubyte)(r*255.0f) << ", " << (GLubyte)(g*255.0f) << ", " << (GLubyte)(b*255.0f) << endl;
+	}
+}
+

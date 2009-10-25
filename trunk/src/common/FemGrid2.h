@@ -135,6 +135,8 @@ private:
 
 	double m_pixelArea;
 
+	GLubyte m_colorMapTex1D[384];
+
 	void calcMaxMin(int* arr, int size, int &maxVal, int &minVal );
 
 	void drawGrid();
@@ -297,6 +299,8 @@ public:
 
 	void setShowDensity(bool flag);
 	bool getShowDensity();
+
+	void updateColorMapTexture();
 
 	virtual void setImage(CImage* image);
 	virtual void initGrid();

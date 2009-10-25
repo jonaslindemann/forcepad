@@ -428,20 +428,16 @@ void CPaintView::onMouseWheel(int dx, int dy)
 	cout << "Mousewheel..." << endl;
 	cout << dx << ", " << dy << endl;
 
-	if (m_leftMouseDown && m_zoomResults && (m_viewMode == VM_ACTION))
+	if (m_zoomResults && (m_viewMode == VM_ACTION))
 	{
 		if (dy>0)
 		{
-			m_zoomFactor -= 0.01;
-			if (m_zoomFactor < 0.01)
-				m_zoomFactor = 0.01;
+			this->zoomIn();
 		}
 		else
 		{
-			m_zoomFactor += 0.01;
+			this->zoomOut();
 		}
-		this->flush();
-		this->redraw();
 	}
 }
 
@@ -922,6 +918,7 @@ void CPaintView::onRelease(int x, int y)
 	
 	m_leftMouseDown = false;
 	//m_zoomResults = false;
+	m_selectedForce = false;
 	
 	updateCursor();
 	
@@ -3244,6 +3241,7 @@ void CPaintView::setColorMap(int index)
 		
 		cout << "colormap filename = " << filename << endl;
 		m_femGrid->getColorMap()->open(filename.c_str());
+		m_femGrid->updateColorMapTexture();
 		this->redraw();
 	}
 }
