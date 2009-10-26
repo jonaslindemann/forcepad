@@ -425,9 +425,6 @@ int CPaintView::handle(int event)
 
 void CPaintView::onMouseWheel(int dx, int dy)
 {
-	cout << "Mousewheel..." << endl;
-	cout << dx << ", " << dy << endl;
-
 	if (m_zoomResults && (m_viewMode == VM_ACTION))
 	{
 		if (dy>0)
@@ -447,8 +444,6 @@ void CPaintView::onPush(int x, int y)
 	// Handle FLTK push event (MouseDown)
 	//
 
-	cout << "onPush()" << endl;
-	
 	int ww, hh;
 
 	int sx, sy;
@@ -596,8 +591,6 @@ void CPaintView::onDrag(int x, int y)
 	// Handle FLTK drag event
 	//
 
-	cout << "onDrag()" << endl;
-	
 	// Store current position
 
 	int prevPos[2];
@@ -890,12 +883,8 @@ void CPaintView::onDrag(int x, int y)
 
 	if (m_zoomResults)
 	{
-		cout << "zoomResults" << endl;
-
 		double dx = ( (double)m_current[0] - (double)m_start[0] );// * (2*m_zoomFactor);
 		double dy = ( (double)m_current[1] - (double)m_start[1] );// * (2*m_zoomFactor);
-
-		cout << dx << ", " << dy << endl;
 
 		m_zoomPos[0] = m_zoomStart[0]-dx;
 		m_zoomPos[1] = m_zoomStart[1]-dy;
@@ -914,8 +903,6 @@ void CPaintView::onRelease(int x, int y)
 	// Read entire workspace into image m_drawing.
 	//
 
-	cout << "onRelease()" << endl;
-	
 	m_leftMouseDown = false;
 	//m_zoomResults = false;
 	m_selectedForce = false;
