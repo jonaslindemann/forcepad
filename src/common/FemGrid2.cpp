@@ -26,6 +26,10 @@
 
 #include "Vec3d.h"
 
+#ifdef WIN32
+#define GL_CLAMP_TO_EDGE 0x812F
+#endif
+
 CFemGrid2::CFemGrid2()
 {
 	m_showGrid = false;
@@ -2501,8 +2505,6 @@ void CFemGrid2::updateColorMapTexture()
 		m_colorMapTex1D[i]=(GLubyte)(r*255.0f);
 		m_colorMapTex1D[i+1]=(GLubyte)(g*255.0f);
 		m_colorMapTex1D[i+2]=(GLubyte)(b*255.0f);
-
-		cout << (GLubyte)(r*255.0f) << ", " << (GLubyte)(g*255.0f) << ", " << (GLubyte)(b*255.0f) << endl;
 	}
 }
 
