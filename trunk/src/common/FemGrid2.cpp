@@ -1163,7 +1163,7 @@ void CFemGrid2::drawMisesStressSmooth()
 	double ey[4];
 	double value;
 
-	glPushAttrib(GL_BLEND);
+	glPushAttrib(GL_ENABLE_BIT);
 	glDisable(GL_BLEND);
 	glEnable(GL_TEXTURE_1D);
 	glBindTexture(GL_TEXTURE_1D, 13);
@@ -2497,6 +2497,7 @@ void CFemGrid2::updateColorMapTexture()
 	for (i=0; i<384; i+=3)
 	{
 		m_colorMap->getColor((double)i/383.0, r, g, b);
+
 		m_colorMapTex1D[i]=(GLubyte)(r*255.0f);
 		m_colorMapTex1D[i+1]=(GLubyte)(g*255.0f);
 		m_colorMapTex1D[i+2]=(GLubyte)(b*255.0f);

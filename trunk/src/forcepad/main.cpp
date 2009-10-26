@@ -78,10 +78,10 @@ main(int argc, char **argv)
 	//
 
 	
-	//CSplashFrame* splash = new CSplashFrame();
-	//splash->setTimer(true);
-	//splash->centerWindow(frame->getMainWindow());
-	//splash->show();
+	CSplashFrame* splash = new CSplashFrame();
+	splash->setTimer(true);
+	splash->centerWindow(frame->getMainWindow());
+	splash->show();
 
 	//
 	// FLTK main loop
