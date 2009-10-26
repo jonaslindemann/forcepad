@@ -1,0 +1,87 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0300 
+header_name {.h} 
+code_name {.cpp}
+decl {\#include "PaintView.h"} {global
+} 
+
+decl {\#include "PlatformInfo.h"} {global
+} 
+
+class CGeneralSettings {open
+} {
+  decl {void* m_paintView;} {}
+  Function {CGeneralSettings()} {open
+  } {
+    Fl_Window mainWindow {
+      label {General Settings} open
+      xywh {621 228 311 170} type Double modal visible
+    } {
+      Fl_Button okButton {
+        label Close
+        callback {this->getData();
+mainWindow->hide();}
+        xywh {230 135 70 25} labelsize 11
+      }
+      Fl_Value_Slider lineThickness {
+        label {Line thickness (pixels)}
+        callback {CPaintView* view = (CPaintView*)m_paintView;
+view->setUiLineThickness(lineThickness->value());}
+        xywh {14 25 286 20} type {Horz Knob} labelsize 11 align 5 minimum 1 maximum 20 step 1 value 2 textsize 11
+      }
+      Fl_Value_Slider symbolLength {
+        label {Symbol length (pixels)}
+        callback {CPaintView* view = (CPaintView*)m_paintView;
+view->setUiSymbolLength(symbolLength->value());}
+        xywh {14 65 286 20} type {Horz Knob} labelsize 11 align 5 minimum 10 maximum 300 step 5 value 50 textsize 11
+      }
+      Fl_Check_Button showTabletPCToolbar {
+        label {Show Tablet PC toolbar (even if not a Tablet PC)}
+        xywh {13 95 285 25} down_box DOWN_BOX labelsize 11
+      }
+    }
+    code {m_paintView = NULL;} {}
+  }
+  Function {show()} {open
+  } {
+    code {this->setData();
+mainWindow->show();
+while (mainWindow->visible()) Fl::wait();} {selected
+    }
+  }
+  Function {setView(void* view)} {open
+  } {
+    code {m_paintView = (CPaintView*)view;} {}
+  }
+  Function {setData()} {open
+  } {
+    code {if (m_paintView!=NULL)
+{
+	CPaintView* view = (CPaintView*)m_paintView;
+	
+	lineThickness->value(view->getUiLineThickness());
+	symbolLength->value(view->getUiSymbolLength());
+}
+
+if (CPlatformInfo::getInstance()->getFakeTabletPC())
+	showTabletPCToolbar->set();
+else
+	showTabletPCToolbar->clear();} {}
+  }
+  Function {getData()} {open
+  } {
+    code {if (m_paintView!=NULL)
+{
+	CPaintView* view = (CPaintView*)m_paintView;	
+}
+
+if (showTabletPCToolbar->value()==1)
+	CPlatformInfo::getInstance()->setFakeTabletPC(true);
+else
+	CPlatformInfo::getInstance()->setFakeTabletPC(false);} {}
+  }
+  Function {centerWindow(Fl_Window* window)} {open
+  } {
+    code {mainWindow->position(window->x()+window->w()/2-mainWindow->w()/2, window->y()+window->h()/2-mainWindow->h()/2);} {}
+  }
+} 

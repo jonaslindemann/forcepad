@@ -1,0 +1,120 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0100 
+header_name {.h} 
+code_name {.cpp}
+decl {\#define MR_OK 0} {public
+} 
+
+decl {\#define MR_CANCEL 1} {public
+} 
+
+decl {\#include "PaintView.h"} {} 
+
+class CBrushProps {open
+} {
+  decl {void* m_view} {}
+  decl {int m_modalResult} {}
+  Function {CBrushProps()} {} {
+    Fl_Window wndBrushProps {
+      label {Brush properties} open selected
+      xywh {370 217 184 73} box THIN_UP_BOX non_modal noborder visible
+    } {
+      Fl_Button btnOk {
+        callback {m_modalResult = MR_OK;
+wndBrushProps->hide();}
+        image {../../images/additional_close.xpm} xywh {174 1 9 42} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX labelsize 12
+        code0 {\#include "Fl_HoverButton.h"}
+        class Fl_HoverButton
+      }
+      Fl_Value_Slider sldBlendFactor {
+        label Blending
+        callback {if (m_view!=NULL)
+{
+	CPaintView* paintView = (CPaintView*)m_view;
+	paintView->setBlendFactor((int)sldBlendFactor->value());
+}}
+        xywh {54 4 108 17} type {Horz Knob} box PLASTIC_DOWN_BOX labelsize 10 align 4 maximum 255 step 1 value 255
+      }
+      Fl_Choice mnuBrush {
+        label Brush
+        callback {if (m_view!=NULL)
+{
+	CPaintView* paintView = (CPaintView*)m_view;
+	paintView->setCurrentBrush(mnuBrush->value());
+}} open
+        xywh {54 23 107 17} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 49 labelsize 10 textsize 10
+      } {
+        menuitem mnuBrushR4 {
+          label {Round 4}
+          xywh {0 0 100 20} labelsize 10
+        }
+        menuitem mnuBrushR8 {
+          label {Round 8}
+          xywh {0 0 100 20} labelsize 10
+        }
+        menuitem mnuBrushR16 {
+          label {Round 16}
+          xywh {0 0 100 20} labelsize 10
+        }
+        menuitem mnuBrushR32 {
+          label {Round 32}
+          xywh {0 0 100 20} labelsize 10
+        }
+        menuitem mnuBrushR64 {
+          label {Round 64}
+          xywh {0 0 100 20} labelsize 10
+        }
+        menuitem mnuBrushS4 {
+          label {Square 4}
+          xywh {0 0 100 20} labelsize 10
+        }
+        menuitem mnuBrushS8 {
+          label {Square 8}
+          xywh {0 0 100 20} labelsize 10
+        }
+        menuitem mnuBrushS16 {
+          label {Square 16}
+          xywh {0 0 100 20} labelsize 10
+        }
+        menuitem mnuBrushS32 {
+          label {Square 32}
+          xywh {0 0 100 20} labelsize 10
+        }
+        menuitem mnuBrushS64 {
+          label {Square 64}
+          xywh {0 0 100 20} labelsize 10
+        }
+      }
+    }
+    code {m_view = NULL;} {}
+  }
+  Function {~CBrushProps()} {} {
+    code {delete wndBrushProps;} {}
+  }
+  Function {show()} {} {
+    code {setSize(wndBrushProps->w(),btnOk->h()+2);
+
+if (m_view!=NULL)
+{
+	CPaintView* paintView = (CPaintView*)m_view;
+	sldBlendFactor->value(paintView->getBlendFactor());
+	mnuBrush->value(paintView->getCurrentBrushIdx());
+}
+
+wndBrushProps->show();
+//while (wndBrushProps->visible()) Fl::wait();} {}
+  }
+  Function {setPosition(int x, int y)} {} {
+    code {wndBrushProps->position(x, y);} {}
+  }
+  Function {setSize(int width, int height)} {} {
+    code {wndBrushProps->size_range(0, 0);
+wndBrushProps->size(width, height);} {}
+  }
+  Function {hide()} {} {
+    code {wndBrushProps->hide();} {}
+  }
+  Function {setView(void* p)} {} {
+    code {m_view = p;} {}
+  }
+} 

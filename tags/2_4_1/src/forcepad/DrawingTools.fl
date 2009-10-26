@@ -1,0 +1,92 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0100 
+header_name {.h} 
+code_name {.cpp}
+decl {\#define MR_OK 0} {public
+} 
+
+decl {\#define MR_CANCEL 1} {public
+} 
+
+decl {\#include "PaintView.h"} {} 
+
+class CDrawingTools {open
+} {
+  decl {int m_modalResult} {}
+  decl {int m_currentTool;} {}
+  decl {void* m_view} {}
+  Function {CDrawingTools()} {open
+  } {
+    Fl_Window wndBrushProps {
+      label {Brush properties} open
+      xywh {509 235 143 103} box THIN_UP_BOX non_modal noborder visible
+    } {
+      Fl_Button btnOk {
+        callback {m_modalResult = MR_OK;
+wndBrushProps->hide();}
+        image {../../images/additional_close.xpm} xywh {132 3 9 42} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX labelsize 12
+        code0 {\#include "Fl_HoverButton.h"}
+        class Fl_HoverButton
+      }
+      Fl_Button btnRectangle {
+        callback {if (m_view!=NULL)
+{
+	CPaintView* paintView = (CPaintView*) m_view;
+	paintView->setEditMode(CPaintView::EM_RECTANGLE);
+}
+wndBrushProps->hide();}
+        image {../../images/rectangle.xpm} xywh {3 3 42 42} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 51 selection_color 51
+        code0 {\#include "Fl_HoverButton.h"}
+        class Fl_HoverButton
+      }
+      Fl_Button btnEllipse {
+        callback {if (m_view!=NULL)
+{
+	CPaintView* paintView = (CPaintView*) m_view;
+	paintView->setEditMode(CPaintView::EM_ELLIPSE);
+}
+wndBrushProps->hide();}
+        image {../../images/ellipse.xpm} xywh {46 3 42 42} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 51 selection_color 51
+        code0 {\#include "Fl_HoverButton.h"}
+        class Fl_HoverButton
+      }
+      Fl_Button btnLine {
+        callback {if (m_view!=NULL)
+{
+	CPaintView* paintView = (CPaintView*) m_view;
+	paintView->setEditMode(CPaintView::EM_LINE);
+}
+wndBrushProps->hide();}
+        image {../../images/line.xpm} xywh {89 3 42 42} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 51 selection_color 51
+        code0 {\#include "Fl_HoverButton.h"}
+        class Fl_HoverButton
+      }
+    }
+    code {m_view = NULL;} {}
+  }
+  Function {~CDrawingTools()} {} {
+    code {delete wndBrushProps;} {}
+  }
+  Function {show()} {open
+  } {
+    code {setSize(wndBrushProps->w(),btnOk->h()+4);
+
+wndBrushProps->show();
+//while (wndBrushProps->visible()) Fl::wait();} {selected
+    }
+  }
+  Function {setPosition(int x, int y)} {} {
+    code {wndBrushProps->position(x, y);} {}
+  }
+  Function {setSize(int width, int height)} {} {
+    code {wndBrushProps->size_range(0, 0);
+wndBrushProps->size(width, height);} {}
+  }
+  Function {setView(void* p)} {} {
+    code {m_view = p;} {}
+  }
+  Function {hide()} {open
+  } {
+    code {wndBrushProps->hide();} {}
+  }
+} 

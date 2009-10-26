@@ -1,0 +1,79 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0100 
+header_name {.h} 
+code_name {.cpp}
+decl {\#define MR_OK 0} {public
+} 
+
+decl {\#define MR_CANCEL 1} {public
+} 
+
+decl {\#include "PaintView.h"} {} 
+
+class CCalcProps {open
+} {
+  decl {void* m_view} {}
+  decl {int m_modalResult} {}
+  Function {CCalcProps()} {open
+  } {
+    Fl_Window wndCalcProps {
+      label {Drawing properties} open
+      xywh {370 217 184 73} box THIN_UP_BOX non_modal noborder visible
+    } {
+      Fl_Button btnOk {
+        callback {m_modalResult = MR_OK;
+wndCalcProps->hide();}
+        image {../..//images/additional_close.xpm} xywh {174 1 9 42} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX labelsize 12
+        code0 {\#include "Fl_HoverButton.h"}
+        class Fl_HoverButton
+      }
+      Fl_Value_Slider sldGridSize {
+        label {Grid step}
+        callback {if (m_view!=NULL)
+{
+	CPaintView* paintView = (CPaintView*)m_view;
+	paintView->setGridStride(sldGridSize->value());
+}}
+        xywh {51 3 119 17} type {Horz Knob} box PLASTIC_DOWN_BOX labelsize 10 align 4 minimum 2 maximum 32 step 1 value 8
+      }
+      Fl_Light_Button chkUseWeight {
+        label {Use weight}
+        callback {if (m_view!=NULL)
+{
+	CPaintView* paintView = (CPaintView*)m_view;
+	paintView->setUseWeight(chkUseWeight->value());
+}} selected
+        xywh {50 23 120 19} box NO_BOX down_box PLASTIC_DOWN_BOX selection_color 0 labelsize 10
+      }
+    }
+  }
+  Function {~CCalcProps()} {} {
+    code {delete wndCalcProps;} {}
+  }
+  Function {show()} {open
+  } {
+    code {setSize(wndCalcProps->w(),btnOk->h()+2);
+
+if (m_view!=NULL)
+{
+	CPaintView* paintView = (CPaintView*) m_view;
+}
+
+wndCalcProps->show();} {}
+  }
+  Function {setPosition(int x, int y)} {} {
+    code {wndCalcProps->position(x, y);} {}
+  }
+  Function {setSize(int width, int height)} {} {
+    code {wndCalcProps->size_range(0, 0);
+wndCalcProps->size(width, height);} {}
+  }
+  Function {setView(void* p)} {open
+  } {
+    code {m_view = p;} {}
+  }
+  Function {hide()} {open
+  } {
+    code {wndCalcProps->hide();} {}
+  }
+} 

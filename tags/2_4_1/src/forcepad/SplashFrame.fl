@@ -1,0 +1,92 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0300 
+header_name {.h} 
+code_name {.cpp}
+decl {\#include <string>} {global
+} 
+
+decl {\#include "forcepad_config.h"} {global
+} 
+
+Function {cbHide(void* w)} {open
+} {
+  code {Fl_Window* window = (Fl_Window*)w;
+window->hide();} {}
+} 
+
+class CSplashFrame {open
+} {
+  decl {bool m_timer} {}
+  Function {CSplashFrame()} {open
+  } {
+    Fl_Window wndSplash {open
+      xywh {444 111 402 302} type Double modal noborder visible
+    } {
+      Fl_Box boxImage {
+        image {../../images/new_splash.png} xywh {0 0 402 302}
+      }
+      Fl_Button btnClose {
+        label Close
+        callback {wndSplash->hide();}
+        xywh {335 265 55 25} box THIN_UP_FRAME down_box THIN_DOWN_FRAME labelsize 12
+      }
+      Fl_Output versionBox {selected
+        xywh {15 118 235 52} type Multiline box NO_BOX labelsize 11 align 0 textsize 11
+      }
+    }
+  }
+  Function {show()} {open
+  } {
+    code {using namespace std;
+
+string versionString = FORCEPAD_VERSION_STRING;
+versionString += "\\nCompiled: ";
+versionString += __TIME__;
+versionString += " ";
+versionString += __DATE__;
+
+versionBox->value(versionString.c_str());
+
+if (m_timer)
+	Fl::add_timeout(4.0,cbHide,(void*)wndSplash);
+
+wndSplash->show();} {}
+  }
+  Function {center()} {open
+  } {
+    code {wndSplash->position(Fl::w()/2-wndSplash->w()/2,Fl::h()/2-wndSplash->h()/2);} {}
+  }
+  Function {setTimer(bool flag)} {open
+  } {
+    code {m_timer = flag;} {}
+  }
+  Function {hide()} {open
+  } {
+    code {wndSplash->hide();} {}
+  }
+  Function {~CSplashFrame()} {open return_type virtual
+  } {
+    code {wndSplash->hide();
+delete wndSplash;} {}
+  }
+  Function {showModal()} {open
+  } {
+    code {using namespace std;
+
+string versionString = FORCEPAD_VERSION_STRING;
+versionString += "\\nCompiled: ";
+versionString += __TIME__;
+versionString += " ";
+versionString += __DATE__;
+
+versionBox->value(versionString.c_str());
+
+m_timer = false;
+wndSplash->show();
+while (wndSplash->visible()) Fl::wait();} {}
+  }
+  Function {centerWindow(Fl_Window* window)} {open
+  } {
+    code {wndSplash->position(window->x()+window->w()/2-wndSplash->w()/2, window->y()+window->h()/2-wndSplash->h()/2);} {}
+  }
+} 

@@ -1,0 +1,77 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0100 
+header_name {.h} 
+code_name {.cpp}
+decl {\#define MR_OK 0} {public
+} 
+
+decl {\#define MR_CANCEL 1} {public
+} 
+
+decl {\#include "PaintView.h"} {} 
+
+class CImportProps {open
+} {
+  decl {void* m_view} {}
+  decl {int m_modalResult} {}
+  Function {CImportProps()} {open
+  } {
+    Fl_Window wndImportProps {
+      label {Drawing properties} open
+      xywh {370 217 184 73} box THIN_UP_BOX non_modal noborder visible
+    } {
+      Fl_Button btnOk {
+        callback {m_modalResult = MR_OK;
+wndImportProps->hide();}
+        image {../..//images/additional.xpm} xywh {1 1 9 42} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX labelsize 12
+        code0 {\#include "Fl_HoverButton.h"}
+        class Fl_HoverButton
+      }
+      Fl_Round_Button rbImportNewModel {
+        label {Import as new model}
+        callback {CPaintView* paintView = (CPaintView*)m_view;
+paintView->setImportMode(CPaintView::IM_NEW_MODEL);}
+        xywh {15 4 135 18} type Radio down_box PLASTIC_DOWN_BOX value 1 labelsize 12
+      }
+      Fl_Round_Button rbImportAndPaste {
+        label {Import and paste}
+        callback {CPaintView* paintView = (CPaintView*)m_view;
+paintView->setImportMode(CPaintView::IM_PASTE);}
+        xywh {15 22 135 18} type Radio down_box PLASTIC_DOWN_BOX labelsize 12
+      }
+    }
+  }
+  Function {~CImportProps()} {open
+  } {
+    code {delete wndImportProps;} {selected
+    }
+  }
+  Function {show()} {} {
+    code {setSize(wndImportProps->w(),btnOk->h()+2);
+
+if (m_view!=NULL)
+{
+	CPaintView* paintView = (CPaintView*) m_view;
+	
+	if (paintView->getImportMode()==CPaintView::IM_NEW_MODEL)
+		rbImportNewModel->value(1);
+	else
+		rbImportAndPaste->value(1);
+}
+
+wndImportProps->show();} {}
+  }
+  Function {setPosition(int x, int y)} {} {
+    code {wndImportProps->position(x, y);} {}
+  }
+  Function {setSize(int width, int height)} {} {
+    code {wndImportProps->size_range(0, 0);
+wndImportProps->size(width, height);} {}
+  }
+  Function {setView(void* p)} {} {
+    code {m_view = p;} {}
+  }
+  Function {hide()} {} {
+    code {wndImportProps->hide();} {}
+  }
+} 
