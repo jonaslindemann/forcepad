@@ -27,10 +27,10 @@
 
 #define FORCEPAD_VERSION_MAJOR 2
 #define FORCEPAD_VERSION_MINOR 4
-#define FORCEPAD_VERSION_RELEASE 1
+#define FORCEPAD_VERSION_RELEASE 2
 
-#define FORCEPAD_VERSION_STRING "ForcePAD version 2.4.1"
+#define FORCEPAD_VERSION_STRING "ForcePAD version 2.4.2"
 
-#define FORCEPAD_NAME "ForcePAD 2 - (2.4.1)"
+#define FORCEPAD_NAME "ForcePAD 2 - (2.4.2)"
 
 #endif
