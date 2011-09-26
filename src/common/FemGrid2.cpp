@@ -74,6 +74,7 @@ CFemGrid2::CFemGrid2()
 	m_undeformedGrid = false;
 	m_drawDensity = false;
 	m_drawStructure = false;
+	m_useWeight = false;
 
 	m_pixelArea = -1.0;
 
@@ -1622,6 +1623,10 @@ void CFemGrid2::saveToStream(ostream &out)
 			}
 		}
 
+		if (m_useWeight)
+			out << 1 << endl;
+		else
+			out << 0 << endl;
 	}
 }
 
@@ -1752,6 +1757,17 @@ void CFemGrid2::readFromStream(istream &in)
 
 			this->addConstraint(constraint);
 		}
+
+		int weightFlag;
+
+		if (!in.eof()) 
+		{
+			in >> weightFlag;
+
+			m_useWeight = (weightFlag == 1);
+		}
+		else
+			m_useWeight = false;
 	}
 }
 
@@ -2508,3 +2524,12 @@ void CFemGrid2::updateColorMapTexture()
 	}
 }
 
+void CFemGrid2::setUseWeight(bool flag)
+{
+	m_useWeight = flag;
+}
+
+bool CFemGrid2::getUseWeight()
+{
+	return m_useWeight;
+}

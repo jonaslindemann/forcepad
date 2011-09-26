@@ -297,6 +297,8 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 	m_modelChangedEvent = NULL;
 	m_rulerChangedEvent = NULL;
 	m_visualisationModeChangedEvent = NULL;
+	m_modelLoadedEvent = NULL;
+	m_newModelEvent = NULL;
 
 	// Set initial model name
 	
@@ -2034,11 +2036,18 @@ void CPaintView::newModel()
 		m_screenImage->setImage(m_drawing);
 		
 		m_showMesh = false;
+
+		m_useWeight = false;
+		m_femGrid->setUseWeight(m_useWeight);
 		
 		this->invalidate();
 		this->redraw();
+
+		if (m_newModelEvent!=NULL)
+			m_newModelEvent->onNewModel();
 	}
-	
+
+	this->setViewMode(CPaintView::VM_SKETCH);	
 	enableDrawing();
 }
 
@@ -2162,6 +2171,8 @@ void CPaintView::saveModelAs()
 	//
 	
 	using namespace std;
+
+	m_femGrid->setUseWeight(m_useWeight);
 	
 	fstream f;
 	f.open(m_modelName.c_str(), ios::out);
@@ -2194,6 +2205,8 @@ void CPaintView::saveModel()
 	//
 	
 	using namespace std;
+
+	m_femGrid->setUseWeight(m_useWeight);
 	
 	fstream f;
 	f.open(m_modelName.c_str(), ios::out);
@@ -2260,6 +2273,54 @@ void CPaintView::expandImageToWindow()
 	enableDrawing();
 }
 
+void CPaintView::openModel(const std::string filename)
+{
+	using namespace std;
+	
+	disableDrawing();
+	
+	so_print("CPaintView", "openModel()");
+	
+	m_danglingRelease = true;
+	
+	setModelName(filename);
+		
+	m_drawing = new CImage(2);
+	m_drawing->setSize(640,480);
+	m_drawing->setChannels(4);
+	m_femGrid->setImage(m_drawing);
+
+	fstream f;
+	f.open(m_modelName.c_str(), ios::in);
+	m_femGrid->readFromStream(f);
+	f.close();
+
+	m_useWeight = m_femGrid->getUseWeight();
+
+	m_drawing->setLayer(1);
+	m_drawing->fillColor(255,255,255);
+	m_drawing->fillAlpha(128);
+	m_drawing->setAlpha(128);
+	m_drawing->setLayer(0);
+		
+	m_clipboard->setImage(m_drawing);
+	m_undoClipboard->setImage(m_drawing);
+	m_screenImage->setImage(m_drawing);
+
+	m_femGrid->setShowGrid(false);
+	m_showMesh = false;
+		
+	this->invalidate();
+	this->redraw();
+
+	enableDrawing();
+
+	this->setViewMode(CPaintView::VM_SKETCH);	
+
+	if (m_modelLoadedEvent!=NULL)
+		m_modelLoadedEvent->onModelLoaded();
+}
+
 void CPaintView::openModel()
 {
 	using namespace std;
@@ -2285,6 +2346,8 @@ void CPaintView::openModel()
 		m_femGrid->readFromStream(f);
 		f.close();
 
+		m_useWeight = m_femGrid->getUseWeight();
+
 		m_drawing->setLayer(1);
 		m_drawing->fillColor(255,255,255);
 		m_drawing->fillAlpha(128);
@@ -2300,6 +2363,12 @@ void CPaintView::openModel()
 		
 		this->invalidate();
 		this->redraw();
+
+		if (m_modelLoadedEvent!=NULL)
+			m_modelLoadedEvent->onModelLoaded();
+
+		this->setViewMode(CPaintView::VM_SKETCH);	
+
 	}
 	enableDrawing();
 }
@@ -2775,6 +2844,11 @@ void CPaintView::setUseWeight(bool flag)
 	m_useWeight = flag;
 }
 
+bool CPaintView::getUseWeight()
+{
+	return m_useWeight;
+}
+
 void CPaintView::setStressMode(CFemGrid2::TStressMode mode)
 {
 	m_femGrid->setStressMode(mode);
@@ -3021,6 +3095,18 @@ void CPaintView::setCommandLine(int argc, char **argv)
 	
 	setCurrentBrush(3);
 }
+
+const std::string CPaintView::getApplicationPath()
+{
+	std::string exePath = m_argv[0];
+#ifdef WIN32
+	int lastSlash = exePath.rfind("\\");
+#else
+	int lastSlash = exePath.rfind("/");
+#endif
+	return exePath.substr(0,lastSlash);
+}
+
 
 void CPaintView::setConstraintType(CConstraint::TConstraintType constraintType)
 {
@@ -3492,3 +3578,14 @@ void CPaintView::setVisualisationModeChangedEvent(CPVVisualisationModeChangedEve
 {
 	m_visualisationModeChangedEvent = eventMethod;
 }
+
+void CPaintView::setModelLoadedEvent(CPVModelLoadedEvent* eventMethod) 
+{
+	m_modelLoadedEvent = eventMethod;
+}
+
+void CPaintView::setNewModelEvent(CPVNewModelEvent* eventMethod)
+{
+	m_newModelEvent = eventMethod;
+}
+

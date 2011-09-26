@@ -29,7 +29,7 @@
 #include <FL/Fl_Progress.H>
 #include <FL/Fl_Button.H>
 
-class CMainFrame : CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusMessageEvent, CGSLogMessageEvent, CGSContinueCalcEvent, CPVViewModeErrorEvent, CPVModelChangedEvent, CPVRulerChangedEvent, CPVVisualisationModeChangedEvent {
+class CMainFrame : CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusMessageEvent, CGSLogMessageEvent, CGSContinueCalcEvent, CPVViewModeErrorEvent, CPVModelChangedEvent, CPVRulerChangedEvent, CPVVisualisationModeChangedEvent, CPVModelLoadedEvent, CPVNewModelEvent {
   bool m_continueCalc; 
   CPaintView::TEditMode m_saveEditMode; 
   CPaintView::TEditMode m_sketchEditMode; 
@@ -596,5 +596,7 @@ public:
   void onVisualisationModeChanged(CPaintView::TVisualisationMode oldMode, CPaintView::TVisualisationMode newMode);
   void disableUserInterface();
   void enableUserInterface();
+  void onNewModel();
+  void onModelLoaded();
 };
 #endif

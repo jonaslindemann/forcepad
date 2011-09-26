@@ -28,6 +28,8 @@
 
 #ifndef __APPLE__
 
+#define FL_INTERNALS
+
 #include <FL/Enumerations.H>
 #include <FL/Fl.h>
 

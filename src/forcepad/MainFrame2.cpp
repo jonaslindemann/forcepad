@@ -28,6 +28,10 @@ void CMainFrame::cb_fileMenuNew(Fl_Menu_* o, void* v) {
 
 void CMainFrame::cb_fileMenuOpen_i(Fl_Menu_*, void*) {
   paintView->openModel();
+if (paintView->getUseWeight())
+	btnUseWeight->value(1);
+else
+	btnUseWeight->value(0);
 }
 void CMainFrame::cb_fileMenuOpen(Fl_Menu_* o, void* v) {
   ((CMainFrame*)(o->parent()->user_data()))->cb_fileMenuOpen_i(o,v);
@@ -10861,6 +10865,8 @@ CMainFrame::CMainFrame() {
   paintView->setRulerChangedEvent(this);
   paintView->setContinueCalcEvent(this);
   paintView->setVisualisationModeChangedEvent(this);
+  paintView->setModelLoadedEvent(this);
+  paintView->setNewModelEvent(this);
   
   m_tabletToolbar = new CTabletToolbar();
   m_tabletToolbar->setView(paintView);
@@ -11328,4 +11334,18 @@ void CMainFrame::enableUserInterface() {
   mainMenu->activate();
   scrRightToolbar->activate();
   btnOptimize->activate();
+}
+
+void CMainFrame::onNewModel() {
+  if (paintView->getUseWeight())
+  	btnUseWeight->value(1);
+  else
+  	btnUseWeight->value(0);
+}
+
+void CMainFrame::onModelLoaded() {
+  if (paintView->getUseWeight())
+  	btnUseWeight->value(1);
+  else
+  	btnUseWeight->value(0);
 }

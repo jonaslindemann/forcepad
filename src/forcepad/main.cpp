@@ -44,6 +44,13 @@
 #include "SystemInfo.h"
 #endif
 
+#ifdef FORCEPAD_KIOSK
+static int my_handler(int event) {
+  if (event == FL_SHORTCUT) return 1; // eat all shortcut keys
+  return 0;
+}
+#endif
+
 int
 main(int argc, char **argv)
 {
@@ -67,6 +74,10 @@ main(int argc, char **argv)
 
 #ifdef __APPLE__
 	Fl::set_font(FL_HELVETICA, "Lucida Grande");
+#endif
+
+#ifdef FORCEPAD_KIOSK
+	 Fl::add_handler(my_handler);
 #endif
 
 	//
