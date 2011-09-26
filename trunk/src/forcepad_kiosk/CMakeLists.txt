@@ -1,25 +1,26 @@
-INCLUDE_DIRECTORIES(../common ../ivf2d)
-FILE(GLOB SOURCE_FILES *.cpp)
-FILE(GLOB INCLUDE_FILES *.h)
+INCLUDE_DIRECTORIES(../common ../ivf2d ../forcepad)
+FILE(GLOB SOURCE_FILES ../forcepad/*.cpp)
+FILE(GLOB INCLUDE_FILES ../forcepad/*.h)
 
-FILE(GLOB to_remove_cpp "MainFrame2_kiosk.cpp")
-FILE(GLOB to_remove_h "MainFrame2_kiosk.h")
+FILE(GLOB to_remove_cpp "../forcepad/MainFrame2.cpp")
+FILE(GLOB to_remove_h "../forcepad/MainFrame2.h")
 LIST(REMOVE_ITEM SOURCE_FILES ${to_remove_cpp})
 LIST(REMOVE_ITEM INCLUDE_FILES ${to_remove_h})
 
-FILE(GLOB to_remove_cpp "TabletToolbar_kiosk.cpp")
-FILE(GLOB to_remove_h "TabletToolbar_kiosk.h")
+FILE(GLOB to_remove_cpp "../forcepad/TabletToolbar.cpp")
+FILE(GLOB to_remove_h "../forcepad/TabletToolbar.h")
 LIST(REMOVE_ITEM SOURCE_FILES ${to_remove_cpp})
 LIST(REMOVE_ITEM INCLUDE_FILES ${to_remove_h})
 
+ADD_DEFINITIONS(-DFORCEPAD_KIOSK)
 
 IF(CMAKE_BUILD_TYPE STREQUAL Debug)
 	ADD_EXECUTABLE(forcepadd ${INCLUDE_FILES} ${SOURCE_FILES})
 ELSE(CMAKE_BUILD_TYPE STREQUAL Debug)
-
 IF(APPLE)
+#ADD_EXECUTABLE(forcepad ${INCLUDE_FILES} ${SOURCE_FILES})
 ADD_EXECUTABLE(
-	ForcePAD 
+	ForcePAD_Kiosk 
 	MACOSX_BUNDLE
 	${SOURCE_FILES}
 	../../bin/release/brushes/rbrush16.rgb
@@ -32,9 +33,12 @@ ADD_EXECUTABLE(
 	../../bin/release/brushes/sbrush4.rgb
 	../../bin/release/brushes/sbrush64.rgb
 	../../bin/release/brushes/sbrush8.rgb
-        ../../bin/release/colormaps/colormap1.map
-        ../../bin/release/colormaps/colormap2.map
-        ../../images/forcepad_icon.icns
+	../../bin/release/kiosk/ex1.fp2
+	../../bin/release/kiosk/ex2.fp2
+	../../bin/release/kiosk/ex3.fp2
+	../../bin/release/colormaps/colormap1.map
+	../../bin/release/colormaps/colormap2.map
+	../../images/forcepad_icon.icns
 )
 
 SET( MACOSX_BUNDLE_ICON_FILE forcepad_icon.icns )
@@ -56,6 +60,15 @@ SET_SOURCE_FILES_PROPERTIES(
 	PROPERTIES
 	MACOSX_PACKAGE_LOCATION MacOS/brushes
 )
+
+SET_SOURCE_FILES_PROPERTIES(
+        ../../bin/release/kiosk/ex1.fp2
+        ../../bin/release/kiosk/ex2.fp2
+        ../../bin/release/kiosk/ex3.fp2
+	PROPERTIES
+	MACOSX_PACKAGE_LOCATION MacOS/kiosk
+)
+
 SET_SOURCE_FILES_PROPERTIES(
         ../../bin/release/colormaps/colormap1.map
         ../../bin/release/colormaps/colormap2.map
@@ -82,7 +95,7 @@ IF(WIN32)
 	ENDIF(CMAKE_BUILD_TYPE STREQUAL Debug)
 ELSE(WIN32)
 	IF(APPLE)
-		TARGET_LINK_LIBRARIES(ForcePAD common ivf2d fltk fltk_gl fltk_images fltk_forms jpeg png calfemcxx newmat "-framework Cocoa" "-framework ApplicationServices" "-framework AGL" "-framework OpenGL" z)
+		TARGET_LINK_LIBRARIES(ForcePAD_Kiosk common ivf2d fltk fltk_gl fltk_images fltk_forms jpeg png calfemcxx newmat "-framework Cocoa" "-framework ApplicationServices" "-framework AGL" "-framework OpenGL" z)
 	ELSE(APPLE)
 		TARGET_LINK_LIBRARIES(forcepad common ivf2d fltk fltk_gl fltk_images fltk_forms jpeg png calfemcxx newmat z GLU GL)
 	ENDIF(APPLE)

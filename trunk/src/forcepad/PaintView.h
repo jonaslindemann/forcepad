@@ -171,7 +171,9 @@ private:
 	CSgiImagePtr m_currentBrush;
 	CSgiImagePtr m_currentInvertedBrush;
 
+#ifndef __APPLE__
 	Fl_Cursor_Shape* m_cursors[20];
+#endif
 
 	float m_brushColor[3];
 	float m_optConstraintColor[3];
