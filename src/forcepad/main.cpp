@@ -30,7 +30,11 @@
 #include "fl_message_win.h"
 #endif
 
+#ifdef FORCEPAD_KIOSK
+#include "MainFrame2_kiosk.h"
+#else
 #include "MainFrame2.h"
+#endif
 
 #include "SplashFrame.h"
 //#include "StatusOutput.h"

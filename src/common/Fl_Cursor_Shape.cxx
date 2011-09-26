@@ -42,6 +42,8 @@
 
 // A new "shape" method that reads Pixmaps is planned
 
+#ifndef __APPLE__
+
 #define SWAP_BYTES
 
 #include "Fl_Cursor_Shape.H"
@@ -425,5 +427,7 @@ void Fl_Cursor_Shape::color(Fl_Color fg, Fl_Color bg) {
 
 #ifdef intelSwap32
 #undef intelSwap32
+#endif
+
 #endif
 

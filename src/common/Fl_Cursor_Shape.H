@@ -26,6 +26,7 @@
 #ifndef FL_CURSOR_SHAPE_H
 #define FL_CURSOR_SHAPE_H
 
+#ifndef __APPLE__
 
 #include <FL/Enumerations.H>
 #include <FL/Fl.h>
@@ -69,6 +70,6 @@ public:
 
 
 
-
+#endif
 #endif
 

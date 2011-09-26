@@ -62,7 +62,10 @@
 #include <newmatio.h>
 #include <newmatap.h>
 
+#ifndef __APPLE__
 #include "Fl_Cursor_Shape.H"
+#endif
+
 #include "Cursors.h"
 
 #include "UiSettings.h"
@@ -406,7 +409,9 @@ int CPaintView::handle(int event)
 		return 1;
 		break;
 	case FL_LEAVE:
+#ifndef __APPLE__
 		fl_cursor( FL_CURSOR_DEFAULT );
+#endif
 		return 1;
 		break;
 	case FL_MOUSEWHEEL:
@@ -1627,6 +1632,7 @@ void CPaintView::updateModel()
 
 void CPaintView::updateCursor()
 {
+#ifndef __APPLE__
 	switch (m_editMode) {
 	//case EM_BRUSH:
 	case EM_DIRECT_BRUSH:
@@ -1667,10 +1673,12 @@ void CPaintView::updateCursor()
 	default:
 		fl_cursor( FL_CURSOR_DEFAULT );
 	}
+#endif
 }
 
 void CPaintView::createCursors()
 {
+#ifndef __APPLE__
 	int i;
 	
 	for (i=0; i<20; i++)
@@ -1694,15 +1702,17 @@ void CPaintView::createCursors()
 	m_cursors[15]->shape( cross_circle_hotX, cross_circle_hotY, cross_circle_and, cross_circle_xor );
 	m_cursors[16]->shape( cross_bucket_hotX, cross_bucket_hotY, cross_bucket_and, cross_bucket_xor );
 	m_cursors[17]->shape( erase_hotX, erase_hotX, erase_and, erase_xor );
-	
+#endif
 }
 
 void CPaintView::deleteCursors()
 {
+#ifndef __APPLE__
 	int i;
 	
 	for (i=0; i<20; i++)
 		delete m_cursors[i];
+#endif
 }
 
 void CPaintView::checkOpenGLVersion()
