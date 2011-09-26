@@ -118,6 +118,8 @@ private:
 	bool m_undeformedGrid;
 	bool m_drawDensity;
 
+	bool m_useWeight;
+
 	double m_maxStressFactor;
 	double m_maxPosStressFactor;
 	double m_maxNegStressFactor;
@@ -299,6 +301,9 @@ public:
 
 	void setShowDensity(bool flag);
 	bool getShowDensity();
+
+	void setUseWeight(bool flag);
+	bool getUseWeight();
 
 	void updateColorMapTexture();
 

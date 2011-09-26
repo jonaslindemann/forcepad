@@ -3,7 +3,7 @@
 
 [Setup]
 AppName=ForcePAD
-AppVerName=ForcePAD 2.4.2
+AppVerName=ForcePAD 2.4.3
 AppPublisher=Division of Structural Mechanics
 AppPublisherURL=http://www.byggmek.lth.se
 AppSupportURL=http://www.byggmek.lth.se/resources/forcepad/forcepad.htm
@@ -28,19 +28,22 @@ Filename: {tmp}\vcredist_x86.exe; Flags: hidewizard
 Filename: {app}\forcepad.exe; WorkingDir: {app}; Description: Launch ForcePAD; Flags: nowait postinstall skipifsilent
 
 [Files]
-Source: ..\..\..\forcepad-redist\vc2008\vcredist_x86.exe; DestDir: {tmp}; Flags: deleteafterinstall
+Source: ..\..\..\forcepad-redist\vc2010\vcredist_x86.exe; DestDir: {tmp}; Flags: deleteafterinstall
 Source: ..\..\bin\release\forcepad.exe; DestDir: {app}; Flags: ignoreversion
+Source: ..\..\bin\release\forcepad_kiosk.exe; DestDir: {app}; Flags: ignoreversion
 Source: ..\..\docs\eng_manual_2_4.pdf; DestDir: {app}; Flags: ignoreversion
 ;Source: ..\..\bin\release\glew32.dll; DestDir: {app}; Flags: ignoreversion
 Source: ..\..\bin\release\brushes\*.*; DestDir: {app}\brushes; Flags: ignoreversion
 Source: ..\..\bin\release\samples\*.*; DestDir: {app}\samples; Flags: ignoreversion
 Source: ..\..\bin\release\colormaps\*.*; DestDir: {app}\colormaps; Flags: ignoreversion
+Source: ..\..\bin\release\kiosk\*.*; DestDir: {app}\kiosk; Flags: ignoreversion
 ;Source: "c:\windows\system32\msvcp60.dll"; DestDir: "{sys}"; CopyMode: onlyifdoesntexist; Flags: uninsneveruninstall sharedfile
 Source: ISSkin.dll; DestDir: {app}; Flags: dontcopy
 Source: Styles\Office2007.cjstyles; DestDir: {tmp}; Flags: dontcopy
 
 [Icons]
 Name: {group}\ForcePAD 2; WorkingDir: {app}; Filename: {app}\forcepad.exe
+Name: {group}\ForcePAD 2 Kiosk; WorkingDir: {app}; Filename: {app}\forcepad_kiosk.exe
 Name: {group}\ForcePAD Users Guide; WorkingDir: {app}; Filename: {app}\eng_manual_2_4.pdf
 Name: {userdesktop}\ForcePAD 2; WorkingDir: {app}; Filename: {app}\forcepad.exe; MinVersion: 4,4; Tasks: desktopicon
 

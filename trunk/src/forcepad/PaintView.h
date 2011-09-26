@@ -61,6 +61,8 @@ class CPVViewModeErrorEvent;
 class CPVModelChangedEvent;
 class CPVRulerChangedEvent;
 class CPVVisualisationModeChangedEvent;
+class CPVModelLoadedEvent;
+class CPVNewModelEvent;
 
 class CPaintView : public Fl_Gl_Window {
 public:
@@ -279,6 +281,8 @@ private:
 	CPVModelChangedEvent* m_modelChangedEvent;
 	CPVRulerChangedEvent* m_rulerChangedEvent;
 	CPVVisualisationModeChangedEvent* m_visualisationModeChangedEvent;
+	CPVModelLoadedEvent* m_modelLoadedEvent;
+	CPVNewModelEvent* m_newModelEvent;
 
 	CGSStatusMessageEvent* m_statusMessageEvent;
 	CGSLogMessageEvent* m_logMessageEvent;
@@ -374,6 +378,7 @@ public:
 	void saveModelAs();
 	void openImage();
 	void openModel();
+	void openModel(const std::string filename);
 	void expandImageToWindow();
 
 	void showAbout();
@@ -410,6 +415,10 @@ public:
 
 	void setMainFrame(void* frame);
 	void setCommandLine(int argc, char** argv);
+
+	// ExecutablePath
+
+	const std::string getApplicationPath();
 
 	// Model related settings
 
@@ -475,6 +484,7 @@ public:
 	// Calculation settings
 
 	void setUseWeight(bool flag);
+	bool getUseWeight();
 
 	void setElementTreshold(double value);
 	double getElementTreshold();
@@ -542,6 +552,8 @@ public:
 	void setModelChangedEvent(CPVModelChangedEvent* eventMethod);
 	void setRulerChangedEvent(CPVRulerChangedEvent* eventMethod);
 	void setVisualisationModeChangedEvent(CPVVisualisationModeChangedEvent* eventMethod);
+	void setModelLoadedEvent(CPVModelLoadedEvent* eventMethod);
+	void setNewModelEvent(CPVNewModelEvent* eventMethod);
 };
 
 class CPVModeChangeEvent {
@@ -580,5 +592,16 @@ public:
 	virtual void onVisualisationModeChanged(CPaintView::TVisualisationMode oldMode, CPaintView::TVisualisationMode newMode) = 0;
 };
 
+class CPVModelLoadedEvent {
+public:
+	virtual ~CPVModelLoadedEvent() {};
+	virtual void onModelLoaded() = 0;
+};
+
+class CPVNewModelEvent {
+public:
+	virtual ~CPVNewModelEvent() {};
+	virtual void onNewModel() = 0;
+};
 
 #endif 

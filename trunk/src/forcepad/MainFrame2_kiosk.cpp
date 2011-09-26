@@ -10481,6 +10481,8 @@ CMainFrame::CMainFrame() {
   paintView->setRulerChangedEvent(this);
   paintView->setContinueCalcEvent(this);
   paintView->setVisualisationModeChangedEvent(this);
+  paintView->setModelLoadedEvent(this);
+  paintView->setNewModelEvent(this);
   
   m_tabletToolbar = new CTabletToolbar();
   m_tabletToolbar->setView(paintView);
@@ -10522,6 +10524,7 @@ void CMainFrame::show() {
   wndMain->label(FORCEPAD_NAME);
   wndMain->position(Fl::w() / 2 - wndMain->w() / 2, Fl::h() / 2 - wndMain->h() / 2);
   wndMain->show();
+  wndMain->fullscreen();
   
   //Set margins, extend bottom
   
@@ -10976,4 +10979,18 @@ void CMainFrame::enableUserInterface() {
   #endif
   scrRightToolbar->activate();
   btnOptimize->activate();
+}
+
+void CMainFrame::onNewModel() {
+  if (paintView->getUseWeight())
+  	btnUseWeight->value(1);
+  else
+  	btnUseWeight->value(0);
+}
+
+void CMainFrame::onModelLoaded() {
+  if (paintView->getUseWeight())
+  	btnUseWeight->value(1);
+  else
+  	btnUseWeight->value(0);
 }

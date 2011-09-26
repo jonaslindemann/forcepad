@@ -68,7 +68,7 @@ decl {\#else} {public global
 decl {\#include "TabletToolbar.h"} {public global
 } 
 
-decl {\#endif} {selected public global
+decl {\#endif} {public global
 } 
 
 decl {\#include "GeneralSettings.h"} {private local
@@ -84,7 +84,7 @@ w->default_callback(w, v);
 while( Fl::first_window() ) Fl::first_window()->hide();} {}
 } 
 
-class CMainFrame {open : {CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusMessageEvent, CGSLogMessageEvent, CGSContinueCalcEvent, CPVViewModeErrorEvent, CPVModelChangedEvent, CPVRulerChangedEvent, CPVVisualisationModeChangedEvent}
+class CMainFrame {open : {CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusMessageEvent, CGSLogMessageEvent, CGSContinueCalcEvent, CPVViewModeErrorEvent, CPVModelChangedEvent, CPVRulerChangedEvent, CPVVisualisationModeChangedEvent, CPVModelLoadedEvent, CPVNewModelEvent}
 } {
   decl {bool m_continueCalc;} {private local
   }
@@ -971,6 +971,8 @@ paintView->setModelChangedEvent(this);
 paintView->setRulerChangedEvent(this);
 paintView->setContinueCalcEvent(this);
 paintView->setVisualisationModeChangedEvent(this);
+paintView->setModelLoadedEvent(this);
+paintView->setNewModelEvent(this);
 
 m_tabletToolbar = new CTabletToolbar();
 m_tabletToolbar->setView(paintView);
@@ -986,7 +988,8 @@ m_physicsEditMode = CPaintView::EM_FORCE;
 
 // Add a callback for closing windows at application end.
 
-wndMain->callback(mainWindowCB);} {}
+wndMain->callback(mainWindowCB);} {selected
+    }
   }
   Function {~CMainFrame()} {} {
     code {m_tabletToolbar->hide();
@@ -1011,6 +1014,7 @@ wndMain->icon((char *)LoadIcon(fl_display, MAKEINTRESOURCE(IDI_FORCEPAD)));
 wndMain->label(FORCEPAD_NAME);
 wndMain->position(Fl::w() / 2 - wndMain->w() / 2, Fl::h() / 2 - wndMain->h() / 2);
 wndMain->show();
+wndMain->fullscreen();
 
 //Set margins, extend bottom
 
@@ -1299,7 +1303,7 @@ Fl::check();
   } {
     code {std::cout << context << ": " << message << std::endl;} {}
   }
-  Function {hideLeftToolbars()} {return_type void
+  Function {hideLeftToolbars()} {open return_type void
   } {
     code {scrLeftToolbar->hide();
 scrLeftToolbar->deactivate();
@@ -1359,7 +1363,8 @@ toolbar->activate();
 toolbar->redraw();
 wndMain->insert(*toolbar,0);} {}
   }
-  Function {onViewModeError(CPaintView::TViewMode oldMode, CPaintView::TViewMode newMode)} {} {
+  Function {onViewModeError(CPaintView::TViewMode oldMode, CPaintView::TViewMode newMode)} {open
+  } {
     code {if (oldMode = CPaintView::VM_SKETCH)
 	btnSketch->setonly();
 if (oldMode = CPaintView::VM_PHYSICS)
@@ -1376,7 +1381,8 @@ if (oldMode = CPaintView::VM_PHYSICS)
     code {string caption = newModelName + " - ForcePAD 2";
 wndMain->label(caption.c_str());} {}
   }
-  Function {onRulerChanged(CRuler* ruler)} {} {
+  Function {onRulerChanged(CRuler* ruler)} {open
+  } {
     code {pixelLength->precision(1);
 pixelLength->value(ruler->getPixelLength());} {}
   }
@@ -1456,5 +1462,19 @@ mainMenu->activate();
 \#endif
 scrRightToolbar->activate();
 btnOptimize->activate();} {}
+  }
+  Function {onNewModel()} {open return_type void
+  } {
+    code {if (paintView->getUseWeight())
+	btnUseWeight->value(1);
+else
+	btnUseWeight->value(0);} {}
+  }
+  Function {onModelLoaded()} {open return_type void
+  } {
+    code {if (paintView->getUseWeight())
+	btnUseWeight->value(1);
+else
+	btnUseWeight->value(0);} {}
   }
 } 

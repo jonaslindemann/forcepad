@@ -2,7 +2,7 @@
 version 1.0300 
 header_name {.h} 
 code_name {.cpp}
-decl {/** Main window class generated from FLTK. */} {public
+decl {/** Main window class generated from FLTK. */} {public local
 } 
 
 decl {\#include <FL/Fl_Color_Chooser.H>} {public global
@@ -17,28 +17,37 @@ decl {\#include <iostream>} {public global
 decl {\#include <string>} {public global
 } 
 
-decl {\#ifndef __APPLE__} {} 
+decl {\#ifndef __APPLE__} {private local
+} 
 
-decl {\#include <FL/x.H>} {} 
+decl {\#include <FL/x.H>} {private local
+} 
 
-decl {\#endif} {} 
+decl {\#endif} {private local
+} 
 
-decl {\#ifdef WIN32} {} 
+decl {\#ifdef WIN32} {private local
+} 
 
-decl {\#include "resource.h"} {} 
+decl {\#include "resource.h"} {private local
+} 
 
-decl {\#include "dwmapi.h"} {} 
+decl {\#include "dwmapi.h"} {private local
+} 
 
-decl {\#endif} {} 
+decl {\#endif} {private local
+} 
 
-decl {\#include "PlatformInfo.h"} {} 
+decl {\#include "PlatformInfo.h"} {private local
+} 
 
-decl {\#include "LogWindow.h"} {} 
+decl {\#include "LogWindow.h"} {private local
+} 
 
 decl {\#include "SplashFrame.h"} {public global
 } 
 
-decl {\#include "CalcSettings.h"} {global
+decl {\#include "CalcSettings.h"} {private global
 } 
 
 decl {\#include "OptSettings.h"} {public global
@@ -47,7 +56,8 @@ decl {\#include "OptSettings.h"} {public global
 decl {\#include "TabletToolbar.h"} {public global
 } 
 
-decl {\#include "GeneralSettings.h"} {} 
+decl {\#include "GeneralSettings.h"} {private local
+} 
 
 decl {\#include "VizMixerToolbar.h"} {public global
 } 
@@ -59,20 +69,27 @@ w->default_callback(w, v);
 while( Fl::first_window() ) Fl::first_window()->hide();} {}
 } 
 
-class CMainFrame {open : {CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusMessageEvent, CGSLogMessageEvent, CGSContinueCalcEvent, CPVViewModeErrorEvent, CPVModelChangedEvent, CPVRulerChangedEvent, CPVVisualisationModeChangedEvent}
+class CMainFrame {open : {CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusMessageEvent, CGSLogMessageEvent, CGSContinueCalcEvent, CPVViewModeErrorEvent, CPVModelChangedEvent, CPVRulerChangedEvent, CPVVisualisationModeChangedEvent, CPVModelLoadedEvent, CPVNewModelEvent}
 } {
-  decl {bool m_continueCalc;} {}
-  decl {CPaintView::TEditMode m_saveEditMode;} {}
-  decl {CPaintView::TEditMode m_sketchEditMode;} {}
-  decl {CPaintView::TEditMode m_physicsEditMode;} {}
-  decl {CTabletToolbar* m_tabletToolbar;} {}
-  decl {CVizMixerToolbar* m_vizMixer;} {}
-  decl {COptSettings* m_optSettings;} {}
+  decl {bool m_continueCalc;} {private local
+  }
+  decl {CPaintView::TEditMode m_saveEditMode;} {private local
+  }
+  decl {CPaintView::TEditMode m_sketchEditMode;} {private local
+  }
+  decl {CPaintView::TEditMode m_physicsEditMode;} {private local
+  }
+  decl {CTabletToolbar* m_tabletToolbar;} {private local
+  }
+  decl {CVizMixerToolbar* m_vizMixer;} {private local
+  }
+  decl {COptSettings* m_optSettings;} {private local
+  }
   Function {CMainFrame()} {open
   } {
     Fl_Window wndMain {
       label {ForcePAD 2} open
-      xywh {380 202 861 684} type Double color 0 align 80 resizable visible
+      xywh {707 194 861 684} type Double color 0 align 80 resizable visible
     } {
       Fl_Menu_Bar mainMenu {open
         xywh {0 0 858 26} box FLAT_BOX down_box FLAT_BOX color 32 labelsize 11 textsize 11 textcolor 7
@@ -88,7 +105,11 @@ class CMainFrame {open : {CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusM
           }
           MenuItem fileMenuOpen {
             label {&Open...}
-            callback {paintView->openModel();}
+            callback {paintView->openModel();
+if (paintView->getUseWeight())
+	btnUseWeight->value(1);
+else
+	btnUseWeight->value(0);}
             xywh {0 0 30 20} shortcut 0x4006f labelsize 12
           }
           MenuItem fileMenuSave {
@@ -1113,6 +1134,8 @@ paintView->setModelChangedEvent(this);
 paintView->setRulerChangedEvent(this);
 paintView->setContinueCalcEvent(this);
 paintView->setVisualisationModeChangedEvent(this);
+paintView->setModelLoadedEvent(this);
+paintView->setNewModelEvent(this);
 
 m_tabletToolbar = new CTabletToolbar();
 m_tabletToolbar->setView(paintView);
@@ -1128,7 +1151,8 @@ m_physicsEditMode = CPaintView::EM_FORCE;
 
 // Add a callback for closing windows at application end.
 
-wndMain->callback(mainWindowCB);} {}
+wndMain->callback(mainWindowCB);} {selected
+    }
   }
   Function {~CMainFrame()} {} {
     code {m_tabletToolbar->hide();
@@ -1398,8 +1422,7 @@ else
 		paintView->setDrawStress(false);
 		showRightToolbar(scrRightDisplacementToolbar);
 	}	
-}} {selected
-    }
+}} {}
   }
   Function {onStatusMessage(const std::string& message, const int progress)} {return_type void
   } {
@@ -1567,5 +1590,19 @@ paintGroup->activate();
 mainMenu->activate();
 scrRightToolbar->activate();
 btnOptimize->activate();} {}
+  }
+  Function {onNewModel()} {open return_type void
+  } {
+    code {if (paintView->getUseWeight())
+	btnUseWeight->value(1);
+else
+	btnUseWeight->value(0);} {}
+  }
+  Function {onModelLoaded()} {open return_type void
+  } {
+    code {if (paintView->getUseWeight())
+	btnUseWeight->value(1);
+else
+	btnUseWeight->value(0);} {}
   }
 } 

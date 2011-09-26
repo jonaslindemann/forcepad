@@ -11,6 +11,7 @@
 #ifndef __APPLE__
 #include <FL/x.H>
 #endif
+#include <Fl/Fl_PNG_Image.h>
 
 void CTabletToolbar::cb_btnNew_i(Fl_HoverButton*, void*) {
   if (m_paintView!=NULL)
@@ -947,7 +948,7 @@ void CTabletToolbar::cb_btnEx1_i(Fl_HoverButton*, void*) {
   if (m_paintView!=NULL)
 {
 	CPaintView* view = (CPaintView*)m_paintView;
-	view->newModel();
+	view->openModel("kiosk/ex1.fp2");
 };
 }
 void CTabletToolbar::cb_btnEx1(Fl_HoverButton* o, void* v) {
@@ -958,7 +959,7 @@ void CTabletToolbar::cb_btnEx2_i(Fl_HoverButton*, void*) {
   if (m_paintView!=NULL)
 {
 	CPaintView* view = (CPaintView*)m_paintView;
-	view->newModel();
+	view->openModel("kiosk/ex2.fp2");
 };
 }
 void CTabletToolbar::cb_btnEx2(Fl_HoverButton* o, void* v) {
@@ -969,7 +970,7 @@ void CTabletToolbar::cb_btnEx3_i(Fl_HoverButton*, void*) {
   if (m_paintView!=NULL)
 {
 	CPaintView* view = (CPaintView*)m_paintView;
-	view->newModel();
+	view->openModel("kiosk/ex3.fp2");
 };
 }
 void CTabletToolbar::cb_btnEx3(Fl_HoverButton* o, void* v) {
@@ -980,7 +981,7 @@ void CTabletToolbar::cb_btnEx4_i(Fl_HoverButton*, void*) {
   if (m_paintView!=NULL)
 {
 	CPaintView* view = (CPaintView*)m_paintView;
-	view->newModel();
+	view->openModel("kiosk/ex4.fp2");
 };
 }
 void CTabletToolbar::cb_btnEx4(Fl_HoverButton* o, void* v) {
@@ -991,7 +992,7 @@ void CTabletToolbar::cb_btnEx5_i(Fl_HoverButton*, void*) {
   if (m_paintView!=NULL)
 {
 	CPaintView* view = (CPaintView*)m_paintView;
-	view->newModel();
+	view->openModel("kiosk/ex5.fp2");
 };
 }
 void CTabletToolbar::cb_btnEx5(Fl_HoverButton* o, void* v) {
@@ -1002,7 +1003,7 @@ void CTabletToolbar::cb_btnEx6_i(Fl_HoverButton*, void*) {
   if (m_paintView!=NULL)
 {
 	CPaintView* view = (CPaintView*)m_paintView;
-	view->newModel();
+	view->openModel("kiosk/ex6.fp2");
 };
 }
 void CTabletToolbar::cb_btnEx6(Fl_HoverButton* o, void* v) {
@@ -1013,7 +1014,7 @@ void CTabletToolbar::cb_btnEx7_i(Fl_HoverButton*, void*) {
   if (m_paintView!=NULL)
 {
 	CPaintView* view = (CPaintView*)m_paintView;
-	view->newModel();
+	view->openModel("kiosk/ex7.fp2");
 };
 }
 void CTabletToolbar::cb_btnEx7(Fl_HoverButton* o, void* v) {
@@ -1024,7 +1025,7 @@ void CTabletToolbar::cb_btnEx8_i(Fl_HoverButton*, void*) {
   if (m_paintView!=NULL)
 {
 	CPaintView* view = (CPaintView*)m_paintView;
-	view->newModel();
+	view->openModel("kiosk/ex8.fp2");
 };
 }
 void CTabletToolbar::cb_btnEx8(Fl_HoverButton* o, void* v) {
@@ -1035,7 +1036,7 @@ void CTabletToolbar::cb_btnEx9_i(Fl_HoverButton*, void*) {
   if (m_paintView!=NULL)
 {
 	CPaintView* view = (CPaintView*)m_paintView;
-	view->newModel();
+	view->openModel("kiosk/ex9.fp2");
 };
 }
 void CTabletToolbar::cb_btnEx9(Fl_HoverButton* o, void* v) {
@@ -1222,6 +1223,25 @@ CTabletToolbar::CTabletToolbar() {
 
 void CTabletToolbar::show() {
   CPlatformInfoPtr platformInfo = CPlatformInfo::getInstance();
+  
+  Fl_PNG_Image* image1 = new Fl_PNG_Image("kiosk/ex1.png");
+  btnEx1->image(image1);
+  Fl_PNG_Image* image2 = new Fl_PNG_Image("kiosk/ex2.png");
+  btnEx2->image(image2);
+  Fl_PNG_Image* image3 = new Fl_PNG_Image("kiosk/ex3.png");
+  btnEx3->image(image3);
+  Fl_PNG_Image* image4 = new Fl_PNG_Image("kiosk/ex4.png");
+  btnEx4->image(image4);
+  Fl_PNG_Image* image5 = new Fl_PNG_Image("kiosk/ex5.png");
+  btnEx5->image(image5);
+  Fl_PNG_Image* image6 = new Fl_PNG_Image("kiosk/ex6.png");
+  btnEx6->image(image6);
+  Fl_PNG_Image* image7 = new Fl_PNG_Image("kiosk/ex7.png");
+  btnEx7->image(image7);
+  Fl_PNG_Image* image8 = new Fl_PNG_Image("kiosk/ex8.png");
+  btnEx8->image(image8);
+  Fl_PNG_Image* image9 = new Fl_PNG_Image("kiosk/ex9.png");
+  btnEx9->image(image9);
   
   mainWindow->show();
   

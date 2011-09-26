@@ -1,8 +1,8 @@
 @echo off
 
 set BUILD_TYPE=%1
-set FLTK_ROOT=c:\users\jonas\libraries\fltk-1.3.x
-set GENERATOR="Visual Studio 9 2008"
+set FLTK_ROOT=d:\users\jonas\libraries\fltk-1.3.0
+set GENERATOR="Visual Studio 10"
 
 if %BUILD_TYPE%==Debug (
 	set BUILD_DIR=win32_build_debug

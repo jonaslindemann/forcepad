@@ -32,6 +32,9 @@ decl {\#include <FL/x.H>} {private local
 decl {\#endif} {private local
 } 
 
+decl {\#include <Fl/Fl_PNG_Image.h>} {private local
+} 
+
 class CTabletToolbar {open
 } {
   decl {void* m_paintView;} {private local
@@ -39,8 +42,8 @@ class CTabletToolbar {open
   Function {CTabletToolbar()} {open
   } {
     Fl_Window mainWindow {
-      label {Tablet Toolbar} open selected
-      xywh {503 168 258 312} type Double color 0 non_modal visible
+      label {Tablet Toolbar} open
+      xywh {620 265 258 312} type Double color 0 non_modal visible
     } {
       Fl_Button btnNew {
         callback {if (m_paintView!=NULL)
@@ -82,7 +85,7 @@ class CTabletToolbar {open
         callback {if (m_paintView!=NULL)
 {
 	CPaintView* view = (CPaintView*)m_paintView;
-	view->newModel();
+	view->openModel("kiosk/ex1.fp2");
 }}
         tooltip {New model} image {../../images/new_model_black.xpm} xywh {5 58 80 80} box THIN_UP_BOX color 0
         code0 {\#include "Fl_HoverButton.h"}
@@ -92,7 +95,7 @@ class CTabletToolbar {open
         callback {if (m_paintView!=NULL)
 {
 	CPaintView* view = (CPaintView*)m_paintView;
-	view->newModel();
+	view->openModel("kiosk/ex2.fp2");
 }}
         tooltip {New model} image {../../images/new_model_black.xpm} xywh {89 58 80 80} box THIN_UP_BOX color 0
         code0 {\#include "Fl_HoverButton.h"}
@@ -102,7 +105,7 @@ class CTabletToolbar {open
         callback {if (m_paintView!=NULL)
 {
 	CPaintView* view = (CPaintView*)m_paintView;
-	view->newModel();
+	view->openModel("kiosk/ex3.fp2");
 }}
         tooltip {New model} image {../../images/new_model_black.xpm} xywh {173 58 80 80} box THIN_UP_BOX color 0
         code0 {\#include "Fl_HoverButton.h"}
@@ -112,7 +115,7 @@ class CTabletToolbar {open
         callback {if (m_paintView!=NULL)
 {
 	CPaintView* view = (CPaintView*)m_paintView;
-	view->newModel();
+	view->openModel("kiosk/ex4.fp2");
 }}
         tooltip {New model} image {../../images/new_model_black.xpm} xywh {5 142 80 80} box THIN_UP_BOX color 0
         code0 {\#include "Fl_HoverButton.h"}
@@ -122,7 +125,7 @@ class CTabletToolbar {open
         callback {if (m_paintView!=NULL)
 {
 	CPaintView* view = (CPaintView*)m_paintView;
-	view->newModel();
+	view->openModel("kiosk/ex5.fp2");
 }}
         tooltip {New model} image {../../images/new_model_black.xpm} xywh {89 142 80 80} box THIN_UP_BOX color 0
         code0 {\#include "Fl_HoverButton.h"}
@@ -132,7 +135,7 @@ class CTabletToolbar {open
         callback {if (m_paintView!=NULL)
 {
 	CPaintView* view = (CPaintView*)m_paintView;
-	view->newModel();
+	view->openModel("kiosk/ex6.fp2");
 }}
         tooltip {New model} image {../../images/new_model_black.xpm} xywh {173 142 80 80} box THIN_UP_BOX color 0
         code0 {\#include "Fl_HoverButton.h"}
@@ -142,7 +145,7 @@ class CTabletToolbar {open
         callback {if (m_paintView!=NULL)
 {
 	CPaintView* view = (CPaintView*)m_paintView;
-	view->newModel();
+	view->openModel("kiosk/ex7.fp2");
 }}
         tooltip {New model} image {../../images/new_model_black.xpm} xywh {5 226 80 80} box THIN_UP_BOX color 0
         code0 {\#include "Fl_HoverButton.h"}
@@ -152,7 +155,7 @@ class CTabletToolbar {open
         callback {if (m_paintView!=NULL)
 {
 	CPaintView* view = (CPaintView*)m_paintView;
-	view->newModel();
+	view->openModel("kiosk/ex8.fp2");
 }}
         tooltip {New model} image {../../images/new_model_black.xpm} xywh {89 226 80 80} box THIN_UP_BOX color 0
         code0 {\#include "Fl_HoverButton.h"}
@@ -162,7 +165,7 @@ class CTabletToolbar {open
         callback {if (m_paintView!=NULL)
 {
 	CPaintView* view = (CPaintView*)m_paintView;
-	view->newModel();
+	view->openModel("kiosk/ex9.fp2");
 }}
         tooltip {New model} image {../../images/new_model_black.xpm} xywh {173 226 80 80} box THIN_UP_BOX color 0
         code0 {\#include "Fl_HoverButton.h"}
@@ -175,6 +178,25 @@ class CTabletToolbar {open
   } {
     code {CPlatformInfoPtr platformInfo = CPlatformInfo::getInstance();
 
+Fl_PNG_Image* image1 = new Fl_PNG_Image("kiosk/ex1.png");
+btnEx1->image(image1);
+Fl_PNG_Image* image2 = new Fl_PNG_Image("kiosk/ex2.png");
+btnEx2->image(image2);
+Fl_PNG_Image* image3 = new Fl_PNG_Image("kiosk/ex3.png");
+btnEx3->image(image3);
+Fl_PNG_Image* image4 = new Fl_PNG_Image("kiosk/ex4.png");
+btnEx4->image(image4);
+Fl_PNG_Image* image5 = new Fl_PNG_Image("kiosk/ex5.png");
+btnEx5->image(image5);
+Fl_PNG_Image* image6 = new Fl_PNG_Image("kiosk/ex6.png");
+btnEx6->image(image6);
+Fl_PNG_Image* image7 = new Fl_PNG_Image("kiosk/ex7.png");
+btnEx7->image(image7);
+Fl_PNG_Image* image8 = new Fl_PNG_Image("kiosk/ex8.png");
+btnEx8->image(image8);
+Fl_PNG_Image* image9 = new Fl_PNG_Image("kiosk/ex9.png");
+btnEx9->image(image9);
+
 mainWindow->show();
 
 
@@ -184,7 +206,8 @@ HWND handle = fl_xid(mainWindow);
 long oldStyle = GetWindowLongPtr(handle, GWL_EXSTYLE);
 SetWindowLongPtr(handle, GWL_EXSTYLE, oldStyle | WS_EX_TOOLWINDOW);
 
-\#endif} {}
+\#endif} {selected
+    }
   }
   Function {setView(void* view)} {open
   } {

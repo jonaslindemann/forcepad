@@ -81,7 +81,7 @@ SET_SOURCE_FILES_PROPERTIES(
 	MACOSX_PACKAGE_LOCATION Resources
 )
 ELSE(APPLE)
-	ADD_EXECUTABLE(forcepad ${INCLUDE_FILES} ${SOURCE_FILES})
+	ADD_EXECUTABLE(forcepad_kiosk ${INCLUDE_FILES} ${SOURCE_FILES})
 ENDIF(APPLE)
 ENDIF(CMAKE_BUILD_TYPE STREQUAL Debug)
 
@@ -89,15 +89,15 @@ ENDIF(CMAKE_BUILD_TYPE STREQUAL Debug)
 
 IF(WIN32)
 	IF(CMAKE_BUILD_TYPE STREQUAL Debug)
-		TARGET_LINK_LIBRARIES(forcepadd commond ivf2dd fltkd fltkgld fltkimagesd fltkformsd fltkjpegd fltkpngd calfemcxxd newmatd fltkzd wsock32 comctl32 winmm.lib )
-	ELSE(CMAKE_BUILD_TYPE STREQUAL Debug)
-		TARGET_LINK_LIBRARIES(forcepad common ivf2d fltk fltkgl fltkimages fltkforms fltkjpeg fltkpng calfemcxx newmat fltkz wsock32 comctl32 winmm.lib)
+		TARGET_LINK_LIBRARIES(forcepad_kioskd commond ivf2dd fltkd fltkgld fltkimagesd fltkformsd fltkjpegd fltkpngd calfemcxxd newmatd fltkzlibd wsock32 comctl32 winmm.lib )
+	ELSE(CMAKE_BUILD_TYPE STREQUAL Release)
+		TARGET_LINK_LIBRARIES(forcepad_kiosk common ivf2d fltk fltkgl fltkimages fltkforms fltkjpeg fltkpng calfemcxx newmat fltkzlib wsock32 comctl32 winmm.lib)
 	ENDIF(CMAKE_BUILD_TYPE STREQUAL Debug)
 ELSE(WIN32)
 	IF(APPLE)
 		TARGET_LINK_LIBRARIES(ForcePAD_Kiosk common ivf2d fltk fltk_gl fltk_images fltk_forms jpeg png calfemcxx newmat "-framework Cocoa" "-framework ApplicationServices" "-framework AGL" "-framework OpenGL" z)
 	ELSE(APPLE)
-		TARGET_LINK_LIBRARIES(forcepad common ivf2d fltk fltk_gl fltk_images fltk_forms jpeg png calfemcxx newmat z GLU GL)
+		TARGET_LINK_LIBRARIES(forcepad_kiosk common ivf2d fltk fltk_gl fltk_images fltk_forms jpeg png calfemcxx newmat z GLU GL)
 	ENDIF(APPLE)
 ENDIF(WIN32)
 
