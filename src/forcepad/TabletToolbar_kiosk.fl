@@ -42,8 +42,8 @@ class CTabletToolbar {open
   Function {CTabletToolbar()} {open
   } {
     Fl_Window mainWindow {
-      label {Tablet Toolbar} open
-      xywh {620 265 258 312} type Double color 0 non_modal visible
+      label Snabbpanel open
+      xywh {620 265 258 410} type Double color 0 non_modal visible
     } {
       Fl_Button btnNew {
         callback {if (m_paintView!=NULL)
@@ -51,7 +51,7 @@ class CTabletToolbar {open
 	CPaintView* view = (CPaintView*)m_paintView;
 	view->newModel();
 }}
-        tooltip {New model} image {../../images/new_model_black.xpm} xywh {5 3 42 42} box THIN_UP_BOX color 0
+        tooltip {New model} image {../../images/new_model_black.xpm} xywh {5 98 42 42} box THIN_UP_BOX color 0
         code0 {\#include "Fl_HoverButton.h"}
         class Fl_HoverButton
       }
@@ -61,7 +61,7 @@ class CTabletToolbar {open
 	CPaintView* view = (CPaintView*)m_paintView;
 	view->undo();
 }}
-        tooltip Undo image {../../images/undo_black.xpm} xywh {165 3 42 42} box THIN_UP_BOX color 0
+        tooltip Undo image {../../images/undo_black.xpm} xywh {165 98 42 42} box THIN_UP_BOX color 0
         code0 {\#include "Fl_HoverButton.h"}
         class Fl_HoverButton
       }
@@ -77,7 +77,7 @@ class CTabletToolbar {open
 	delete calcSettings;
 	view->setViewMode(CPaintView::VM_SKETCH);
 }}
-        tooltip {Calculation settings} image {../../images/settings_black.xpm} xywh {211 3 42 42} box THIN_UP_BOX color 0
+        tooltip {Calculation settings} image {../../images/settings_black.xpm} xywh {211 98 42 42} box THIN_UP_BOX color 0
         code0 {\#include "Fl_HoverButton.h"}
         class Fl_HoverButton
       }
@@ -87,7 +87,7 @@ class CTabletToolbar {open
 	CPaintView* view = (CPaintView*)m_paintView;
 	view->openModel("kiosk/ex1.fp2");
 }}
-        tooltip {New model} image {../../images/new_model_black.xpm} xywh {5 58 80 80} box THIN_UP_BOX color 0
+        tooltip {New model} image {../../images/new_model_black.xpm} xywh {5 157 80 80} box THIN_UP_BOX color 0
         code0 {\#include "Fl_HoverButton.h"}
         class Fl_HoverButton
       }
@@ -97,7 +97,7 @@ class CTabletToolbar {open
 	CPaintView* view = (CPaintView*)m_paintView;
 	view->openModel("kiosk/ex2.fp2");
 }}
-        tooltip {New model} image {../../images/new_model_black.xpm} xywh {89 58 80 80} box THIN_UP_BOX color 0
+        tooltip {New model} image {../../images/new_model_black.xpm} xywh {89 157 80 80} box THIN_UP_BOX color 0
         code0 {\#include "Fl_HoverButton.h"}
         class Fl_HoverButton
       }
@@ -107,7 +107,7 @@ class CTabletToolbar {open
 	CPaintView* view = (CPaintView*)m_paintView;
 	view->openModel("kiosk/ex3.fp2");
 }}
-        tooltip {New model} image {../../images/new_model_black.xpm} xywh {173 58 80 80} box THIN_UP_BOX color 0
+        tooltip {New model} image {../../images/new_model_black.xpm} xywh {173 157 80 80} box THIN_UP_BOX color 0
         code0 {\#include "Fl_HoverButton.h"}
         class Fl_HoverButton
       }
@@ -117,7 +117,7 @@ class CTabletToolbar {open
 	CPaintView* view = (CPaintView*)m_paintView;
 	view->openModel("kiosk/ex4.fp2");
 }}
-        tooltip {New model} image {../../images/new_model_black.xpm} xywh {5 142 80 80} box THIN_UP_BOX color 0
+        tooltip {New model} image {../../images/new_model_black.xpm} xywh {5 241 80 80} box THIN_UP_BOX color 0
         code0 {\#include "Fl_HoverButton.h"}
         class Fl_HoverButton
       }
@@ -127,7 +127,7 @@ class CTabletToolbar {open
 	CPaintView* view = (CPaintView*)m_paintView;
 	view->openModel("kiosk/ex5.fp2");
 }}
-        tooltip {New model} image {../../images/new_model_black.xpm} xywh {89 142 80 80} box THIN_UP_BOX color 0
+        tooltip {New model} image {../../images/new_model_black.xpm} xywh {89 241 80 80} box THIN_UP_BOX color 0
         code0 {\#include "Fl_HoverButton.h"}
         class Fl_HoverButton
       }
@@ -137,7 +137,7 @@ class CTabletToolbar {open
 	CPaintView* view = (CPaintView*)m_paintView;
 	view->openModel("kiosk/ex6.fp2");
 }}
-        tooltip {New model} image {../../images/new_model_black.xpm} xywh {173 142 80 80} box THIN_UP_BOX color 0
+        tooltip {New model} image {../../images/new_model_black.xpm} xywh {173 241 80 80} box THIN_UP_BOX color 0
         code0 {\#include "Fl_HoverButton.h"}
         class Fl_HoverButton
       }
@@ -147,7 +147,7 @@ class CTabletToolbar {open
 	CPaintView* view = (CPaintView*)m_paintView;
 	view->openModel("kiosk/ex7.fp2");
 }}
-        tooltip {New model} image {../../images/new_model_black.xpm} xywh {5 226 80 80} box THIN_UP_BOX color 0
+        tooltip {New model} image {../../images/new_model_black.xpm} xywh {5 325 80 80} box THIN_UP_BOX color 0
         code0 {\#include "Fl_HoverButton.h"}
         class Fl_HoverButton
       }
@@ -157,7 +157,7 @@ class CTabletToolbar {open
 	CPaintView* view = (CPaintView*)m_paintView;
 	view->openModel("kiosk/ex8.fp2");
 }}
-        tooltip {New model} image {../../images/new_model_black.xpm} xywh {89 226 80 80} box THIN_UP_BOX color 0
+        tooltip {New model} image {../../images/new_model_black.xpm} xywh {89 325 80 80} box THIN_UP_BOX color 0
         code0 {\#include "Fl_HoverButton.h"}
         class Fl_HoverButton
       }
@@ -167,9 +167,59 @@ class CTabletToolbar {open
 	CPaintView* view = (CPaintView*)m_paintView;
 	view->openModel("kiosk/ex9.fp2");
 }}
-        tooltip {New model} image {../../images/new_model_black.xpm} xywh {173 226 80 80} box THIN_UP_BOX color 0
+        tooltip {New model} image {../../images/new_model_black.xpm} xywh {173 325 80 80} box THIN_UP_BOX color 0
         code0 {\#include "Fl_HoverButton.h"}
         class Fl_HoverButton
+      }
+      Fl_Button btnHelp {
+        label {Hjälp}
+        callback {if (m_paintView!=NULL)
+{
+	CPaintView* view = (CPaintView*)m_paintView;
+	view->showHelp();
+}}
+        tooltip {New model} xywh {50 98 110 42} box THIN_UP_BOX color 0 labelfont 1 labelsize 20 labelcolor 7
+        code0 {\#include "Fl_HoverButton.h"}
+        class Fl_HoverButton
+      }
+      Fl_Button btnSketchMode {
+        label {Skissläge}
+        callback {if (m_paintView!=NULL)
+{
+	CPaintView* view = (CPaintView*)m_paintView;
+	view->setViewMode(CPaintView::VM_SKETCH);
+}}
+        tooltip {New model} image {../../images/sketch_mode_black_grd.png} xywh {5 5 80 80} box THIN_UP_BOX color 0 labelcolor 7
+        code0 {\#include "Fl_HoverButton.h"}
+        class Fl_HoverButton
+      }
+      Fl_Button btnPhysicsMode {
+        label {Fysikläge}
+        callback {if (m_paintView!=NULL)
+{
+	CPaintView* view = (CPaintView*)m_paintView;
+	view->setViewMode(CPaintView::VM_PHYSICS);
+}}
+        tooltip {New model} image {../../images/physics_mode_black_grd.png} xywh {89 5 80 80} box THIN_UP_BOX color 0 labelcolor 7
+        code0 {\#include "Fl_HoverButton.h"}
+        class Fl_HoverButton
+      }
+      Fl_Button btnActionMode {
+        label {Aktionläge}
+        callback {if (m_paintView!=NULL)
+{
+	CPaintView* view = (CPaintView*)m_paintView;
+	view->setViewMode(CPaintView::VM_ACTION);
+}} selected
+        tooltip {New model} image {../../images/action_mode_black_grd.png} xywh {173 5 80 80} box THIN_UP_BOX color 0 labelcolor 7
+        code0 {\#include "Fl_HoverButton.h"}
+        class Fl_HoverButton
+      }
+      Fl_Box {} {
+        xywh {-2 90 262 2} box UP_FRAME
+      }
+      Fl_Box {} {
+        xywh {-2 147 262 2} box UP_FRAME
       }
     }
     code {m_paintView = NULL;} {}
@@ -206,8 +256,7 @@ HWND handle = fl_xid(mainWindow);
 long oldStyle = GetWindowLongPtr(handle, GWL_EXSTYLE);
 SetWindowLongPtr(handle, GWL_EXSTYLE, oldStyle | WS_EX_TOOLWINDOW);
 
-\#endif} {selected
-    }
+\#endif} {}
   }
   Function {setView(void* view)} {open
   } {

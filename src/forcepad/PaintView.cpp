@@ -3177,6 +3177,15 @@ void CPaintView::showAbout()
 #endif
 }
 
+void CPaintView::showHelp() 
+{
+#ifdef WIN32
+#ifdef FORCEPAD_KIOSK
+	ShellExecute(0, "open", ".\\kiosk\\ForcePAD.pdf", NULL, NULL, SW_SHOWNORMAL);
+#endif
+#endif
+}
+
 void CPaintView::setImportMode(TImportMode mode)
 {
 	m_importMode = mode;
