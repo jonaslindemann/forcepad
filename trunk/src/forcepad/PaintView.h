@@ -382,6 +382,7 @@ public:
 	void expandImageToWindow();
 
 	void showAbout();
+	void showHelp();
 	void updateModel();
 	void pasteFromWindows();
 	void copyToWindows();

@@ -5,6 +5,7 @@
 #include <FL/Fl.H>
 #include <FL/Fl_Double_Window.H>
 #include "Fl_HoverButton.h"
+#include <FL/Fl_Box.H>
 
 class CTabletToolbar {
   void* m_paintView; 
@@ -70,6 +71,26 @@ public:
 private:
   void cb_btnEx9_i(Fl_HoverButton*, void*);
   static void cb_btnEx9(Fl_HoverButton*, void*);
+public:
+  Fl_HoverButton *btnHelp;
+private:
+  void cb_btnHelp_i(Fl_HoverButton*, void*);
+  static void cb_btnHelp(Fl_HoverButton*, void*);
+public:
+  Fl_HoverButton *btnSketchMode;
+private:
+  void cb_btnSketchMode_i(Fl_HoverButton*, void*);
+  static void cb_btnSketchMode(Fl_HoverButton*, void*);
+public:
+  Fl_HoverButton *btnPhysicsMode;
+private:
+  void cb_btnPhysicsMode_i(Fl_HoverButton*, void*);
+  static void cb_btnPhysicsMode(Fl_HoverButton*, void*);
+public:
+  Fl_HoverButton *btnActionMode;
+private:
+  void cb_btnActionMode_i(Fl_HoverButton*, void*);
+  static void cb_btnActionMode(Fl_HoverButton*, void*);
 public:
   void show();
   void setView(void* view);
