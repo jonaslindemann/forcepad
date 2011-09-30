@@ -1,7 +1,7 @@
 @echo off
 
 set BUILD_TYPE=%1
-set FLTK_ROOT=d:\users\jonas\libraries\fltk-1.3.0
+set FLTK_ROOT="C:\Users\Jonas Lindemann\Libraries\fltk-1.3.0"
 set GENERATOR="Visual Studio 10"
 
 if %BUILD_TYPE%==Debug (

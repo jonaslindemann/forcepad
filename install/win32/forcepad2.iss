@@ -3,7 +3,7 @@
 
 [Setup]
 AppName=ForcePAD
-AppVerName=ForcePAD 2.4.4
+AppVerName=ForcePAD 2.4.5
 AppPublisher=Division of Structural Mechanics
 AppPublisherURL=http://www.byggmek.lth.se
 AppSupportURL=http://www.byggmek.lth.se/resources/forcepad/forcepad.htm
@@ -31,6 +31,7 @@ Filename: {app}\forcepad.exe; WorkingDir: {app}; Description: Launch ForcePAD; F
 Source: ..\..\..\forcepad-redist\vc2010\vcredist_x86.exe; DestDir: {tmp}; Flags: deleteafterinstall
 Source: ..\..\bin\release\forcepad.exe; DestDir: {app}; Flags: ignoreversion
 Source: ..\..\bin\release\forcepad_kiosk.exe; DestDir: {app}; Flags: ignoreversion
+Source: ..\..\bin\release\forcepad_kiosk_auto_restart.cmd; DestDir: {app}; Flags: ignoreversion
 Source: ..\..\docs\eng_manual_2_4.pdf; DestDir: {app}; Flags: ignoreversion
 ;Source: ..\..\bin\release\glew32.dll; DestDir: {app}; Flags: ignoreversion
 Source: ..\..\bin\release\brushes\*.*; DestDir: {app}\brushes; Flags: ignoreversion
@@ -44,6 +45,7 @@ Source: Styles\Office2007.cjstyles; DestDir: {tmp}; Flags: dontcopy
 [Icons]
 Name: {group}\ForcePAD 2; WorkingDir: {app}; Filename: {app}\forcepad.exe
 Name: {group}\ForcePAD 2 Kiosk; WorkingDir: {app}; Filename: {app}\forcepad_kiosk.exe
+Name: {group}\ForcePAD 2 Kiosk AutoRestart; WorkingDir: {app}; Filename: {app}\forcepad_kiosk_auto_restart.cmd
 Name: {group}\ForcePAD Users Guide; WorkingDir: {app}; Filename: {app}\eng_manual_2_4.pdf
 Name: {userdesktop}\ForcePAD 2; WorkingDir: {app}; Filename: {app}\forcepad.exe; MinVersion: 4,4; Tasks: desktopicon
 
