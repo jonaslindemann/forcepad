@@ -44,6 +44,8 @@
 #include "SystemInfo.h"
 #endif
 
+#include "PlatformInfo.h"
+
 #ifdef FORCEPAD_KIOSK
 static int my_handler(int event) {
   if (event == FL_SHORTCUT) return 1; // eat all shortcut keys
@@ -54,6 +56,10 @@ static int my_handler(int event) {
 int
 main(int argc, char **argv)
 {
+    std::string applicationExecutable = argv[0];
+    CPlatformInfoPtr platformInfo = CPlatformInfo::getInstance();
+    platformInfo->setApplicationExecutable(applicationExecutable);
+    
 	//
 	// Setup window visuals
 	//

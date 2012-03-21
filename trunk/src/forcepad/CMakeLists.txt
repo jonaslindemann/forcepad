@@ -31,9 +31,28 @@ ADD_EXECUTABLE(
 	../../bin/release/brushes/sbrush4.rgb
 	../../bin/release/brushes/sbrush64.rgb
 	../../bin/release/brushes/sbrush8.rgb
-        ../../bin/release/colormaps/colormap1.map
-        ../../bin/release/colormaps/colormap2.map
-        ../../images/forcepad_icon.icns
+    ../../bin/release/colormaps/colormap1.map
+    ../../bin/release/colormaps/colormap2.map
+    ../../images/forcepad_icon.icns
+	../../bin/release/kiosk/ex1.fp2
+	../../bin/release/kiosk/ex1.png
+	../../bin/release/kiosk/ex2.fp2
+	../../bin/release/kiosk/ex2.png
+	../../bin/release/kiosk/ex3.fp2
+	../../bin/release/kiosk/ex3.png
+	../../bin/release/kiosk/ex4.fp2
+	../../bin/release/kiosk/ex4.png
+	../../bin/release/kiosk/ex5.fp2
+	../../bin/release/kiosk/ex5.png
+	../../bin/release/kiosk/ex6.fp2
+	../../bin/release/kiosk/ex6.png
+	../../bin/release/kiosk/ex7.fp2
+	../../bin/release/kiosk/ex7.png
+	../../bin/release/kiosk/ex8.fp2
+	../../bin/release/kiosk/ex8.png
+	../../bin/release/kiosk/ex9.fp2
+	../../bin/release/kiosk/ex9.png
+
 )
 
 SET( MACOSX_BUNDLE_ICON_FILE forcepad_icon.icns )
@@ -66,6 +85,28 @@ SET_SOURCE_FILES_PROPERTIES(
 	PROPERTIES
 	MACOSX_PACKAGE_LOCATION Resources
 )
+SET_SOURCE_FILES_PROPERTIES(
+	../../bin/release/kiosk/ex1.fp2
+	../../bin/release/kiosk/ex1.png
+	../../bin/release/kiosk/ex2.fp2
+	../../bin/release/kiosk/ex2.png
+	../../bin/release/kiosk/ex3.fp2
+	../../bin/release/kiosk/ex3.png
+	../../bin/release/kiosk/ex4.fp2
+	../../bin/release/kiosk/ex4.png
+	../../bin/release/kiosk/ex5.fp2
+	../../bin/release/kiosk/ex5.png
+	../../bin/release/kiosk/ex6.fp2
+	../../bin/release/kiosk/ex6.png
+	../../bin/release/kiosk/ex7.fp2
+	../../bin/release/kiosk/ex7.png
+	../../bin/release/kiosk/ex8.fp2
+	../../bin/release/kiosk/ex8.png
+	../../bin/release/kiosk/ex9.fp2
+	../../bin/release/kiosk/ex9.png
+	PROPERTIES
+	MACOSX_PACKAGE_LOCATION MacOS/kiosk
+)
 ELSE(APPLE)
 	ADD_EXECUTABLE(forcepad ${INCLUDE_FILES} ${SOURCE_FILES})
 ENDIF(APPLE)
@@ -81,7 +122,7 @@ IF(WIN32)
 	ENDIF(CMAKE_BUILD_TYPE STREQUAL Debug)
 ELSE(WIN32)
 	IF(APPLE)
-		TARGET_LINK_LIBRARIES(ForcePAD common ivf2d fltk fltk_gl fltk_images fltk_forms jpeg png calfemcxx newmat "-framework Cocoa" "-framework ApplicationServices" "-framework AGL" "-framework OpenGL" z)
+		TARGET_LINK_LIBRARIES(ForcePAD common ivf2d fltk fltk_gl fltk_images fltk_forms fltk_jpeg fltk_png calfemcxx newmat "-framework Cocoa" "-framework ApplicationServices" "-framework AGL" "-framework OpenGL" z)
 	ELSE(APPLE)
 		TARGET_LINK_LIBRARIES(forcepad common ivf2d fltk fltk_gl fltk_images fltk_forms jpeg png calfemcxx newmat z GLU GL)
 	ENDIF(APPLE)

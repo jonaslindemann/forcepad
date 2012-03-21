@@ -988,8 +988,7 @@ m_physicsEditMode = CPaintView::EM_FORCE;
 
 // Add a callback for closing windows at application end.
 
-wndMain->callback(mainWindowCB);} {selected
-    }
+wndMain->callback(mainWindowCB);} {}
   }
   Function {~CMainFrame()} {} {
     code {m_tabletToolbar->hide();
@@ -1014,7 +1013,9 @@ wndMain->icon((char *)LoadIcon(fl_display, MAKEINTRESOURCE(IDI_FORCEPAD)));
 wndMain->label(FORCEPAD_NAME);
 wndMain->position(Fl::w() / 2 - wndMain->w() / 2, Fl::h() / 2 - wndMain->h() / 2);
 wndMain->show();
+\#ifndef __APPLE__
 wndMain->fullscreen();
+\#endif 
 
 //Set margins, extend bottom
 
@@ -1078,7 +1079,8 @@ showRightToolbar(scrRightDrawToolbar);
 
 paintView->setModelName("noname.fp2");
 thickness->value(paintView->getThickness());
-forceMagnitude->value(paintView->getForceMagnitude());} {}
+forceMagnitude->value(paintView->getForceMagnitude());} {selected
+    }
   }
   Function {close()} {} {
     code {m_tabletToolbar->hide();

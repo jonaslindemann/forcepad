@@ -947,8 +947,19 @@ static Fl_Pixmap image_settings_black(idata_settings_black);
 void CTabletToolbar::cb_btnEx1_i(Fl_HoverButton*, void*) {
   if (m_paintView!=NULL)
 {
+#ifdef __APPLE__
+	CPlatformInfoPtr platformInfo = CPlatformInfo::getInstance();
+
+	string exePath = platformInfo->getApplicationExecutable();
+	int lastSlash = exePath.rfind("/");
+	string kioskPath = exePath.substr(0,lastSlash)+"/kiosk/";
+	string filename = kioskPath + "/ex1.fp2";
+	CPaintView* view = (CPaintView*)m_paintView;
+	view->openModel(filename);
+#else
 	CPaintView* view = (CPaintView*)m_paintView;
 	view->openModel("kiosk/ex1.fp2");
+#endif
 };
 }
 void CTabletToolbar::cb_btnEx1(Fl_HoverButton* o, void* v) {
@@ -958,8 +969,21 @@ void CTabletToolbar::cb_btnEx1(Fl_HoverButton* o, void* v) {
 void CTabletToolbar::cb_btnEx2_i(Fl_HoverButton*, void*) {
   if (m_paintView!=NULL)
 {
+#ifdef __APPLE__
+	CPlatformInfoPtr platformInfo = CPlatformInfo::getInstance();
+
+	string exePath = platformInfo->getApplicationExecutable();
+	int lastSlash = exePath.rfind("/");
+	string kioskPath = exePath.substr(0,lastSlash)+"/kiosk/";
+	string filename = kioskPath + "/ex2.fp2";
 	CPaintView* view = (CPaintView*)m_paintView;
-	view->openModel("kiosk/ex2.fp2");
+	view->openModel(filename);
+#else
+	CPaintView* view = (CPaintView*)m_paintView;
+
+	view->openModel("kiosk/ex1.fp2");
+
+#endif
 };
 }
 void CTabletToolbar::cb_btnEx2(Fl_HoverButton* o, void* v) {
@@ -969,8 +993,21 @@ void CTabletToolbar::cb_btnEx2(Fl_HoverButton* o, void* v) {
 void CTabletToolbar::cb_btnEx3_i(Fl_HoverButton*, void*) {
   if (m_paintView!=NULL)
 {
+#ifdef __APPLE__
+	CPlatformInfoPtr platformInfo = CPlatformInfo::getInstance();
+
+	string exePath = platformInfo->getApplicationExecutable();
+	int lastSlash = exePath.rfind("/");
+	string kioskPath = exePath.substr(0,lastSlash)+"/kiosk/";
+	string filename = kioskPath + "/ex3.fp2";
 	CPaintView* view = (CPaintView*)m_paintView;
-	view->openModel("kiosk/ex3.fp2");
+	view->openModel(filename);
+#else
+	CPaintView* view = (CPaintView*)m_paintView;
+
+	view->openModel("kiosk/ex1.fp2");
+
+#endif
 };
 }
 void CTabletToolbar::cb_btnEx3(Fl_HoverButton* o, void* v) {
@@ -980,8 +1017,21 @@ void CTabletToolbar::cb_btnEx3(Fl_HoverButton* o, void* v) {
 void CTabletToolbar::cb_btnEx4_i(Fl_HoverButton*, void*) {
   if (m_paintView!=NULL)
 {
+#ifdef __APPLE__
+	CPlatformInfoPtr platformInfo = CPlatformInfo::getInstance();
+
+	string exePath = platformInfo->getApplicationExecutable();
+	int lastSlash = exePath.rfind("/");
+	string kioskPath = exePath.substr(0,lastSlash)+"/kiosk/";
+	string filename = kioskPath + "/ex4.fp2";
 	CPaintView* view = (CPaintView*)m_paintView;
-	view->openModel("kiosk/ex4.fp2");
+	view->openModel(filename);
+#else
+	CPaintView* view = (CPaintView*)m_paintView;
+
+	view->openModel("kiosk/ex1.fp2");
+
+#endif
 };
 }
 void CTabletToolbar::cb_btnEx4(Fl_HoverButton* o, void* v) {
@@ -991,8 +1041,21 @@ void CTabletToolbar::cb_btnEx4(Fl_HoverButton* o, void* v) {
 void CTabletToolbar::cb_btnEx5_i(Fl_HoverButton*, void*) {
   if (m_paintView!=NULL)
 {
+#ifdef __APPLE__
+	CPlatformInfoPtr platformInfo = CPlatformInfo::getInstance();
+
+	string exePath = platformInfo->getApplicationExecutable();
+	int lastSlash = exePath.rfind("/");
+	string kioskPath = exePath.substr(0,lastSlash)+"/kiosk/";
+	string filename = kioskPath + "/ex5.fp2";
 	CPaintView* view = (CPaintView*)m_paintView;
-	view->openModel("kiosk/ex5.fp2");
+	view->openModel(filename);
+#else
+	CPaintView* view = (CPaintView*)m_paintView;
+
+	view->openModel("kiosk/ex1.fp2");
+
+#endif
 };
 }
 void CTabletToolbar::cb_btnEx5(Fl_HoverButton* o, void* v) {
@@ -1002,8 +1065,21 @@ void CTabletToolbar::cb_btnEx5(Fl_HoverButton* o, void* v) {
 void CTabletToolbar::cb_btnEx6_i(Fl_HoverButton*, void*) {
   if (m_paintView!=NULL)
 {
+#ifdef __APPLE__
+	CPlatformInfoPtr platformInfo = CPlatformInfo::getInstance();
+
+	string exePath = platformInfo->getApplicationExecutable();
+	int lastSlash = exePath.rfind("/");
+	string kioskPath = exePath.substr(0,lastSlash)+"/kiosk/";
+	string filename = kioskPath + "/ex6.fp2";
 	CPaintView* view = (CPaintView*)m_paintView;
-	view->openModel("kiosk/ex6.fp2");
+	view->openModel(filename);
+#else
+	CPaintView* view = (CPaintView*)m_paintView;
+
+	view->openModel("kiosk/ex1.fp2");
+
+#endif
 };
 }
 void CTabletToolbar::cb_btnEx6(Fl_HoverButton* o, void* v) {
@@ -1013,8 +1089,21 @@ void CTabletToolbar::cb_btnEx6(Fl_HoverButton* o, void* v) {
 void CTabletToolbar::cb_btnEx7_i(Fl_HoverButton*, void*) {
   if (m_paintView!=NULL)
 {
+#ifdef __APPLE__
+	CPlatformInfoPtr platformInfo = CPlatformInfo::getInstance();
+
+	string exePath = platformInfo->getApplicationExecutable();
+	int lastSlash = exePath.rfind("/");
+	string kioskPath = exePath.substr(0,lastSlash)+"/kiosk/";
+	string filename = kioskPath + "/ex7.fp2";
 	CPaintView* view = (CPaintView*)m_paintView;
-	view->openModel("kiosk/ex7.fp2");
+	view->openModel(filename);
+#else
+	CPaintView* view = (CPaintView*)m_paintView;
+
+	view->openModel("kiosk/ex1.fp2");
+
+#endif
 };
 }
 void CTabletToolbar::cb_btnEx7(Fl_HoverButton* o, void* v) {
@@ -1024,8 +1113,21 @@ void CTabletToolbar::cb_btnEx7(Fl_HoverButton* o, void* v) {
 void CTabletToolbar::cb_btnEx8_i(Fl_HoverButton*, void*) {
   if (m_paintView!=NULL)
 {
+#ifdef __APPLE__
+	CPlatformInfoPtr platformInfo = CPlatformInfo::getInstance();
+
+	string exePath = platformInfo->getApplicationExecutable();
+	int lastSlash = exePath.rfind("/");
+	string kioskPath = exePath.substr(0,lastSlash)+"/kiosk/";
+	string filename = kioskPath + "/ex8.fp2";
 	CPaintView* view = (CPaintView*)m_paintView;
-	view->openModel("kiosk/ex8.fp2");
+	view->openModel(filename);
+#else
+	CPaintView* view = (CPaintView*)m_paintView;
+
+	view->openModel("kiosk/ex1.fp2");
+
+#endif
 };
 }
 void CTabletToolbar::cb_btnEx8(Fl_HoverButton* o, void* v) {
@@ -1035,8 +1137,21 @@ void CTabletToolbar::cb_btnEx8(Fl_HoverButton* o, void* v) {
 void CTabletToolbar::cb_btnEx9_i(Fl_HoverButton*, void*) {
   if (m_paintView!=NULL)
 {
+#ifdef __APPLE__
+	CPlatformInfoPtr platformInfo = CPlatformInfo::getInstance();
+
+	string exePath = platformInfo->getApplicationExecutable();
+	int lastSlash = exePath.rfind("/");
+	string kioskPath = exePath.substr(0,lastSlash)+"/kiosk/";
+	string filename = kioskPath + "/ex9.fp2";
 	CPaintView* view = (CPaintView*)m_paintView;
-	view->openModel("kiosk/ex9.fp2");
+	view->openModel(filename);
+#else
+	CPaintView* view = (CPaintView*)m_paintView;
+
+	view->openModel("kiosk/ex1.fp2");
+
+#endif
 };
 }
 void CTabletToolbar::cb_btnEx9(Fl_HoverButton* o, void* v) {
@@ -1708,7 +1823,40 @@ CTabletToolbar::CTabletToolbar() {
 
 void CTabletToolbar::show() {
   CPlatformInfoPtr platformInfo = CPlatformInfo::getInstance();
+  #ifdef __APPLE__
+  string exePath = platformInfo->getApplicationExecutable();
+  int lastSlash = exePath.rfind("/");
+  string kioskPath = exePath.substr(0,lastSlash)+"/kiosk/";
+  string filename;
   
+  filename = kioskPath+"ex1.png";
+  Fl_PNG_Image* image1 = new Fl_PNG_Image(filename.c_str());
+  btnEx1->image(image1);
+  filename = kioskPath+"ex2.png";
+  Fl_PNG_Image* image2 = new Fl_PNG_Image(filename.c_str());
+  btnEx2->image(image2);
+  filename = kioskPath+"ex3.png";
+  Fl_PNG_Image* image3 = new Fl_PNG_Image(filename.c_str());
+  btnEx3->image(image3);
+  filename = kioskPath+"ex4.png";
+  Fl_PNG_Image* image4 = new Fl_PNG_Image(filename.c_str());
+  btnEx4->image(image4);
+  filename = kioskPath+"ex5.png";
+  Fl_PNG_Image* image5 = new Fl_PNG_Image(filename.c_str());
+  btnEx5->image(image5);
+  filename = kioskPath+"ex6.png";
+  Fl_PNG_Image* image6 = new Fl_PNG_Image(filename.c_str());
+  btnEx6->image(image6);
+  filename = kioskPath+"ex7.png";
+  Fl_PNG_Image* image7 = new Fl_PNG_Image(filename.c_str());
+  btnEx7->image(image7);
+  filename = kioskPath+"ex8.png";
+  Fl_PNG_Image* image8 = new Fl_PNG_Image(filename.c_str());
+  btnEx8->image(image8);
+  filename = kioskPath+"ex9.png";
+  Fl_PNG_Image* image9 = new Fl_PNG_Image(filename.c_str());
+  btnEx9->image(image9);
+  #else
   Fl_PNG_Image* image1 = new Fl_PNG_Image("kiosk/ex1.png");
   btnEx1->image(image1);
   Fl_PNG_Image* image2 = new Fl_PNG_Image("kiosk/ex2.png");
@@ -1727,6 +1875,7 @@ void CTabletToolbar::show() {
   btnEx8->image(image8);
   Fl_PNG_Image* image9 = new Fl_PNG_Image("kiosk/ex9.png");
   btnEx9->image(image9);
+  #endif
   
   mainWindow->show();
   
