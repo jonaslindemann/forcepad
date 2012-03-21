@@ -12,7 +12,7 @@ ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
 IF(WIN32)
 	INCLUDE_DIRECTORIES(${FLTK_ROOT} ${FLTK_ROOT}/jpeg ${FLTK_ROOT}/png ${FLTK_ROOT}/zlib ${GLEW_ROOT}/include src/calfemcxx src/newmat src/defs)
 ELSE(WIN32)
-	INCLUDE_DIRECTORIES(${FLTK_ROOT} ${FLTK_ROOT}/jpeg ${FLTK_ROOT}/png ${FLTK_ROOT}/zlib ${GLEW_ROOT}/include src/calfemcxx src/newmat src/defs)
+	INCLUDE_DIRECTORIES(${FLTK_ROOT}/include ${FLTK_ROOT}/jpeg ${FLTK_ROOT}/png ${FLTK_ROOT}/zlib ${GLEW_ROOT}/include src/calfemcxx src/newmat src/defs)
 ENDIF(WIN32)
 
 LINK_DIRECTORIES(${FLTK_ROOT}/lib ${PROJECT_SOURCE_DIR}/lib )

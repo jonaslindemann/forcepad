@@ -31,7 +31,7 @@ def runCMake(buildDir, fltkDir, glewDir):
 
 if __name__ == "__main__":
 	
-	fltkDir = "/opt/local"
+	fltkDir = "/opt/fltk-1.3.0"
 	glewDir = "/opt/local"
 	
 	buildDir = checkBuildDir()

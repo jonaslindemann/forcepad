@@ -10524,7 +10524,9 @@ void CMainFrame::show() {
   wndMain->label(FORCEPAD_NAME);
   wndMain->position(Fl::w() / 2 - wndMain->w() / 2, Fl::h() / 2 - wndMain->h() / 2);
   wndMain->show();
+  #ifndef __APPLE__
   wndMain->fullscreen();
+  #endif 
   
   //Set margins, extend bottom
   

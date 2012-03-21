@@ -12,6 +12,7 @@ private:
 	static CSingletonDestroyer<CPlatformInfo> m_destroyer;
 
 	bool m_fakeTabletPC;
+    std::string m_applicationExecutable;
 public:
 	/** Returns the PlatformInfo singleton */
 	static CPlatformInfo* getInstance();
@@ -22,6 +23,8 @@ public:
 	bool isVista();
 	void setFakeTabletPC(bool flag);
 	bool getFakeTabletPC();
+    void setApplicationExecutable(std::string& appExecutable);
+    const std::string getApplicationExecutable();
 protected:
 	/** Protected constructor (do not use) */
 	CPlatformInfo();

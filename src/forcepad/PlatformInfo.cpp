@@ -56,3 +56,14 @@ bool CPlatformInfo::getFakeTabletPC()
 {
 	return m_fakeTabletPC;
 }
+
+void CPlatformInfo::setApplicationExecutable(std::string& appExecutable)
+{
+    m_applicationExecutable = appExecutable;
+}
+
+const std::string CPlatformInfo::getApplicationExecutable()
+{
+    return m_applicationExecutable;
+}
+
