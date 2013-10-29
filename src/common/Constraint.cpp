@@ -24,6 +24,14 @@
 
 #include "Constraint.h"
 
+#ifdef __APPLE__
+#include <OpenGL/glu.h>
+#include <OpenGL/gl.h>
+#else
+#include <GL/glu.h>
+#include <GL/gl.h>
+#endif
+
 #include "UiSettings.h"
 
 // ------------------------------------------------------------
@@ -47,8 +55,8 @@ CConstraint::~CConstraint ()
 // ------------------------------------------------------------
 void CConstraint::doGeometry()
 {
-	double oldVectorRadius;
-	double oldVectorSize;
+    double oldVectorRadius = m_vectorRadius;
+    double oldVectorSize = this->getVectorSize();
 
 	if (CUiSettings::getInstance()->getLineThickness()>0.0)
 		glLineWidth(CUiSettings::getInstance()->getLineThickness());
@@ -57,9 +65,6 @@ void CConstraint::doGeometry()
 
 	if (CUiSettings::getInstance()->getSymbolLength()>0.0)
 	{
-		oldVectorRadius = m_vectorRadius;
-		oldVectorSize = this->getVectorSize();
-
 		this->setVectorSize(CUiSettings::getInstance()->getSymbolLength());
 		m_vectorRadius = 0.125*CUiSettings::getInstance()->getSymbolLength();
 	}

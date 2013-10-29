@@ -42,12 +42,12 @@ private:
 	int m_currentLayer;
 	int m_size[2];
 	double m_ratio;
-	GLubyte* m_imageMap;
-	GLubyte** m_imageMaps;
+    unsigned char* m_imageMap;
+    unsigned char** m_imageMaps;
 	int m_channels;
-	GLubyte m_currentAlpha;
-	GLubyte m_startColor[3];
-	GLubyte m_fillColor[3];
+    unsigned char m_currentAlpha;
+    unsigned char m_startColor[3];
+    unsigned char m_fillColor[3];
 	deque<int> m_nextListX;
 	deque<int> m_nextListY;
 	deque<int> m_processListX;
@@ -67,13 +67,13 @@ public:
 	// Methods
 
 	/** Draw a rectangular frame. */
-	void drawFrame(int x1, int y1, int x2, int y2, GLubyte red, GLubyte green, GLubyte blue);
+    void drawFrame(int x1, int y1, int x2, int y2, unsigned char red, unsigned char green, unsigned char blue);
 
 	/** Draws a filled rectangular frame. */
-	void fillRect(int x1, int y1, int x2, int y2, GLubyte red, GLubyte green, GLubyte blue);
+    void fillRect(int x1, int y1, int x2, int y2, unsigned char red, unsigned char green, unsigned char blue);
 
 	/** Fills 2D image with specified color. */
-	void fillColor(GLubyte red, GLubyte green, GLubyte blue);
+    void fillColor(unsigned char red, unsigned char green, unsigned char blue);
 
 	/** Clears image. Color is set to black. */
 	void clear();
@@ -82,24 +82,24 @@ public:
 	bool valid(int x, int y);
 
 	/** Sets the pixel at position (\c x, \c y) to a specified color. */
-	void setPixel(int x, int y, GLubyte red, GLubyte green, GLubyte blue);
-	void addPixel(int x, int y, GLubyte red, GLubyte green, GLubyte blue);
-	void setPixelAlpha(int x, int y, GLubyte alpha);
-	void subtractPixel(int x, int y, GLubyte red, GLubyte green, GLubyte blue);
+    void setPixel(int x, int y, unsigned char red, unsigned char green, unsigned char blue);
+    void addPixel(int x, int y, unsigned char red, unsigned char green, unsigned char blue);
+    void setPixelAlpha(int x, int y, unsigned char alpha);
+    void subtractPixel(int x, int y, unsigned char red, unsigned char green, unsigned char blue);
 
 	/** Retrieve pixel color at position (\c x, \c y). */
-	void getPixel(int x, int y, GLubyte &red, GLubyte &green, GLubyte &blue);
+    void getPixel(int x, int y, unsigned char &red, unsigned char &green, unsigned char &blue);
 
 	void drawImage(int x, int y, CImage* image);
 	void drawImageLine(CImage* image, int x1, int y1, int x2, int y2, float* color);
 	void grayscale();
 	int getChannels();
-	void setImageMap(int width, int height, GLubyte* data, bool ownData);
+    void setImageMap(int width, int height, unsigned char* data, bool ownData);
 	void* getData();
 	void copyFrom(CImage* image);
 	void copyFrom(CImage* image, int startx, int starty);
 	void copyFrom(CImage* image, int startx, int starty, const float* color);
-	void setFillColor(GLubyte red, GLubyte green, GLubyte blue);
+    void setFillColor(unsigned char red, unsigned char green, unsigned char blue);
 	bool validPixel(int x, int y);
 	void floodFill(int x, int y);
 	bool popNextPixel(int &x, int &y);
@@ -108,13 +108,13 @@ public:
 	void pushPixel(int x, int y);
 	void doFloodFill(int x, int y);
 	void invert();
-	void colorAlpha(GLubyte red, GLubyte green, GLubyte blue);
-	void createAlphaMask(GLubyte min, GLubyte max);
-	void createMask(GLubyte comp, GLubyte treshold, GLubyte over, GLubyte under);
-	void fillAlpha(GLubyte alpha);
-	void getValue(int x, int y, int channel, GLubyte &value);
-	void createAlphaAll(GLubyte max, GLubyte min);
-	void fillRectAlpha(int x1, int y1, int x2, int y2, GLubyte alpha);
+    void colorAlpha(unsigned char red, unsigned char green, unsigned char blue);
+    void createAlphaMask(unsigned char min, unsigned char max);
+    void createMask(unsigned char comp, unsigned char treshold, unsigned char over, unsigned char under);
+    void fillAlpha(unsigned char alpha);
+    void getValue(int x, int y, int channel, unsigned char &value);
+    void createAlphaAll(unsigned char max, unsigned char min);
+    void fillRectAlpha(int x1, int y1, int x2, int y2, unsigned char alpha);
 
 	// Get/set methods
 
@@ -140,14 +140,14 @@ public:
 	 * 
 	 * This is typically used when specifying a texture in OpenGL. 
 	 */
-	GLubyte* getImageMap();
+    unsigned char* getImageMap();
 
-	void setAlpha(GLubyte alpha);
-	GLubyte getAlpha();
+    void setAlpha(unsigned char alpha);
+    unsigned char getAlpha();
 	void setChannels(int number);
-	void setValue(int x, int y, int channel, GLubyte value);
-	void addValue(int x, int y, int channel, GLubyte value);
-	void subtractValue(int x, int y, int channel, GLubyte value);
+    void setValue(int x, int y, int channel, unsigned char value);
+    void addValue(int x, int y, int channel, unsigned char value);
+    void subtractValue(int x, int y, int channel, unsigned char value);
 };
 
 #endif 

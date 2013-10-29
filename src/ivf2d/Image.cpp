@@ -24,6 +24,14 @@
 
 #include "Image.h"
 
+#ifdef __APPLE__
+#include <OpenGL/glu.h>
+#include <OpenGL/gl.h>
+#else
+#include <GL/glu.h>
+#include <GL/gl.h>
+#endif
+
 CImage::CImage()
 {
 	m_imageMap = NULL;
@@ -86,7 +94,7 @@ void CImage::initLayers()
 {
 	int i;
 
-	m_imageMaps = new GLubyte*[m_layers];
+    m_imageMaps = new unsigned char*[m_layers];
 
 	for (i=0; i<m_layers; i++)
 		m_imageMaps[i] = NULL;
@@ -116,7 +124,7 @@ void CImage::setSize(int width, int height)
 				m_size[1] = height;
 				m_ratio = width/height;
 
-				m_imageMaps[i] = new GLubyte[m_size[0]*m_size[1]*m_channels];
+                m_imageMaps[i] = new unsigned char[m_size[0]*m_size[1]*m_channels];
 			}
 		}
 		if ((width>0)&&(height>0))
@@ -154,12 +162,12 @@ int CImage::getLayerCount()
 }
 
 
-GLubyte* CImage::getImageMap()
+unsigned char* CImage::getImageMap()
 {
 	return m_imageMap;
 }
 
-void CImage::setPixel(int x, int y, GLubyte red, GLubyte green, GLubyte blue)
+void CImage::setPixel(int x, int y, unsigned char red, unsigned char green, unsigned char blue)
 {
 	if (valid(x, y))
 	{
@@ -171,7 +179,7 @@ void CImage::setPixel(int x, int y, GLubyte red, GLubyte green, GLubyte blue)
 	}
 }
 
-void CImage::setPixelAlpha(int x, int y, GLubyte alpha)
+void CImage::setPixelAlpha(int x, int y, unsigned char alpha)
 {
 	if (valid(x, y))
 	{
@@ -180,7 +188,7 @@ void CImage::setPixelAlpha(int x, int y, GLubyte alpha)
 	}
 }
 
-void CImage::addPixel(int x, int y, GLubyte red, GLubyte green, GLubyte blue)
+void CImage::addPixel(int x, int y, unsigned char red, unsigned char green, unsigned char blue)
 {
 	if (valid(x, y))
 	{
@@ -192,7 +200,7 @@ void CImage::addPixel(int x, int y, GLubyte red, GLubyte green, GLubyte blue)
 	}
 }
 
-void CImage::subtractPixel(int x, int y, GLubyte red, GLubyte green, GLubyte blue)
+void CImage::subtractPixel(int x, int y, unsigned char red, unsigned char green, unsigned char blue)
 {
 	if (valid(x, y))
 	{
@@ -209,7 +217,7 @@ bool CImage::valid(int x, int y)
 	return ((x>=0)&&(x<m_size[0])&&(y>=0)&&(y<m_size[1]));
 }
 
-void CImage::getPixel(int x, int y, GLubyte &red, GLubyte &green, GLubyte &blue)
+void CImage::getPixel(int x, int y, unsigned char &red, unsigned char &green, unsigned char &blue)
 {
 	if (valid(x, y))
 	{
@@ -224,7 +232,7 @@ void CImage::clear()
 	fillColor(0,0,0);
 }
 
-void CImage::fillColor(GLubyte red, GLubyte green, GLubyte blue)
+void CImage::fillColor(unsigned char red, unsigned char green, unsigned char blue)
 {
 	int i, j;
 
@@ -233,7 +241,7 @@ void CImage::fillColor(GLubyte red, GLubyte green, GLubyte blue)
 			setPixel(i, j, red, green, blue);
 }
 
-void CImage::fillRect(int x1, int y1, int x2, int y2, GLubyte red, GLubyte green, GLubyte blue)
+void CImage::fillRect(int x1, int y1, int x2, int y2, unsigned char red, unsigned char green, unsigned char blue)
 {
 	if ( (valid(x1, y1))&&(valid(x2, y2)) )
 	{
@@ -245,7 +253,7 @@ void CImage::fillRect(int x1, int y1, int x2, int y2, GLubyte red, GLubyte green
 	}
 }
 
-void CImage::fillRectAlpha(int x1, int y1, int x2, int y2, GLubyte alpha)
+void CImage::fillRectAlpha(int x1, int y1, int x2, int y2, unsigned char alpha)
 {
 	if ( (valid(x1, y1))&&(valid(x2, y2)) )
 	{
@@ -263,7 +271,7 @@ double CImage::getRatio()
 }
 
 
-void CImage::drawFrame(int x1, int y1, int x2, int y2, GLubyte red, GLubyte green, GLubyte blue)
+void CImage::drawFrame(int x1, int y1, int x2, int y2, unsigned char red, unsigned char green, unsigned char blue)
 {
 	if ( (valid(x1, y1))&&(valid(x2, y2)) )
 	{
@@ -296,17 +304,17 @@ void CImage::setChannels(int number)
 	}
 }
 
-void CImage::setAlpha(GLubyte alpha)
+void CImage::setAlpha(unsigned char alpha)
 {
 	m_currentAlpha = alpha;
 }
 
-GLubyte CImage::getAlpha()
+unsigned char CImage::getAlpha()
 {
 	return m_currentAlpha;
 }
 
-void CImage::setValue(int x, int y, int channel, GLubyte value)
+void CImage::setValue(int x, int y, int channel, unsigned char value)
 {
 	//	if (valid(x, y))
 	//	{
@@ -314,7 +322,7 @@ void CImage::setValue(int x, int y, int channel, GLubyte value)
 	//	}
 }
 
-void CImage::addValue(int x, int y, int channel, GLubyte value)
+void CImage::addValue(int x, int y, int channel, unsigned char value)
 {
 	if ((int)m_imageMap[x*m_channels + m_size[0]*y*m_channels + channel]+(int)value > 255)
 		m_imageMap[x*m_channels + m_size[0]*y*m_channels + channel] = 255;
@@ -322,7 +330,7 @@ void CImage::addValue(int x, int y, int channel, GLubyte value)
 		m_imageMap[x*m_channels + m_size[0]*y*m_channels + channel] += value;
 }
 
-void CImage::subtractValue(int x, int y, int channel, GLubyte value)
+void CImage::subtractValue(int x, int y, int channel, unsigned char value)
 {
 	if ((int)m_imageMap[x*m_channels + m_size[0]*y*m_channels + channel]-(int)value < 0)
 		m_imageMap[x*m_channels + m_size[0]*y*m_channels + channel] = 0;
@@ -331,11 +339,11 @@ void CImage::subtractValue(int x, int y, int channel, GLubyte value)
 }
 
 
-void CImage::createAlphaAll(GLubyte max, GLubyte min)
+void CImage::createAlphaAll(unsigned char max, unsigned char min)
 {
 	int i, j;
 
-	GLubyte red, green, blue;
+    unsigned char red, green, blue;
 
 	for (i=0; i<m_size[0]; i++)
 	{
@@ -355,12 +363,12 @@ void CImage::createAlphaAll(GLubyte max, GLubyte min)
 	}
 }
 
-void CImage::getValue(int x, int y, int channel, GLubyte &value)
+void CImage::getValue(int x, int y, int channel, unsigned char &value)
 {
 	value = m_imageMap[x*m_channels + m_size[0]*y*m_channels + channel];
 }
 
-void CImage::fillAlpha(GLubyte alpha)
+void CImage::fillAlpha(unsigned char alpha)
 {
 	int i, j;
 
@@ -369,11 +377,11 @@ void CImage::fillAlpha(GLubyte alpha)
 			setPixelAlpha(i, j, alpha);
 }
 
-void CImage::createMask(GLubyte comp, GLubyte treshold, GLubyte over, GLubyte under)
+void CImage::createMask(unsigned char comp, unsigned char treshold, unsigned char over, unsigned char under)
 {
 	int i, j;
 
-	GLubyte red, green, blue, color;
+    unsigned char red, green, blue, color;
 
 	for (i=0; i<m_size[0]; i++)
 	{
@@ -394,6 +402,7 @@ void CImage::createMask(GLubyte comp, GLubyte treshold, GLubyte over, GLubyte un
 				color = blue;
 				break;
 			default:
+                color = red;
 				break;
 			}
 
@@ -405,12 +414,11 @@ void CImage::createMask(GLubyte comp, GLubyte treshold, GLubyte over, GLubyte un
 	}
 }
 
-void CImage::createAlphaMask(GLubyte min, GLubyte max)
+void CImage::createAlphaMask(unsigned char min, unsigned char max)
 {
 	int i, j;
 
-	double average;
-	GLubyte red, green, blue;
+    unsigned char red, green, blue;
 
 	for (i=0; i<m_size[0]; i++)
 	{
@@ -420,8 +428,6 @@ void CImage::createAlphaMask(GLubyte min, GLubyte max)
 			getValue(i, j, 1, green);
 			getValue(i, j, 2, blue);
 
-			average = ((double)red + (double)green + (double)blue) / 3.0;
-
 			if (red>0)
 				setValue(i, j, 3, min);
 			else
@@ -430,12 +436,12 @@ void CImage::createAlphaMask(GLubyte min, GLubyte max)
 	}
 }
 
-void CImage::colorAlpha(GLubyte red, GLubyte green, GLubyte blue)
+void CImage::colorAlpha(unsigned char red, unsigned char green, unsigned char blue)
 {
 	int i, j;
 
 	double dVal;
-	GLubyte alpha;
+    unsigned char alpha;
 
 	for (i=0; i<m_size[0]; i++)
 	{
@@ -446,9 +452,9 @@ void CImage::colorAlpha(GLubyte red, GLubyte green, GLubyte blue)
 			if (alpha>0)
 			{
 				dVal = (double)alpha/255.0;
-				setValue(i, j, 0, (255-alpha) + (GLubyte)((double)red*dVal));
-				setValue(i, j, 1, (255-alpha) + (GLubyte)((double)green*dVal));
-				setValue(i, j, 2, (255-alpha) + (GLubyte)((double)blue*dVal));
+                setValue(i, j, 0, (255-alpha) + (unsigned char)((double)red*dVal));
+                setValue(i, j, 1, (255-alpha) + (unsigned char)((double)green*dVal));
+                setValue(i, j, 2, (255-alpha) + (unsigned char)((double)blue*dVal));
 			}
 			else
 			{
@@ -461,7 +467,7 @@ void CImage::colorAlpha(GLubyte red, GLubyte green, GLubyte blue)
 void CImage::invert()
 {
 	int i, j;
-	GLubyte red, green, blue;
+    unsigned char red, green, blue;
 
 	for (i=0; i<m_size[0]; i++)
 		for (j=0; j<m_size[1]; j++)
@@ -537,7 +543,7 @@ void CImage::floodFill(int x, int y)
 	m_processListX.clear();
 	m_processListY.clear();
 
-	GLubyte red, green, blue;
+    unsigned char red, green, blue;
 
 	getValue(x, y, 0, red);
 	getValue(x, y, 1, green);
@@ -579,7 +585,7 @@ bool CImage::validPixel(int x, int y)
 {
 	if (valid(x, y))
 	{
-		GLubyte red, green, blue;
+        unsigned char red, green, blue;
 
 		getValue(x, y, 0, red);
 		getValue(x, y, 1, green);
@@ -591,7 +597,7 @@ bool CImage::validPixel(int x, int y)
 		return false;
 }
 
-void CImage::setFillColor(GLubyte red, GLubyte green, GLubyte blue)
+void CImage::setFillColor(unsigned char red, unsigned char green, unsigned char blue)
 {
 	m_fillColor[0] = red;
 	m_fillColor[1] = green;
@@ -602,7 +608,7 @@ void CImage::copyFrom(CImage *image)
 {
 	int i, j;
 	int w, h;
-	GLubyte red, green, blue;
+    unsigned char red, green, blue;
 
 	w = image->getWidth();
 	h = image->getHeight();
@@ -622,7 +628,7 @@ void CImage::copyFrom(CImage* image, int startx, int starty)
 {
 	int i, j;
 	int w, h;
-	GLubyte red, green, blue;
+    unsigned char red, green, blue;
 
 	w = image->getWidth();
 	h = image->getHeight();
@@ -645,7 +651,7 @@ void CImage::copyFrom(CImage* image, int startx, int starty, const float* color)
 {
 	int i, j;
 	int w, h;
-	GLubyte red, green, blue;
+    unsigned char red, green, blue;
 
 	w = image->getWidth();
 	h = image->getHeight();
@@ -660,9 +666,9 @@ void CImage::copyFrom(CImage* image, int startx, int starty, const float* color)
 					image->getPixel(i, j, red, green, blue);
 					if ((red!=255)&&(green!=255)&&(blue!=255))
 					{
-						red = (GLubyte)(color[0]*255);
-						green = (GLubyte)(color[1]*255);
-						blue = (GLubyte)(color[2]*255);
+                        red = (unsigned char)(color[0]*255);
+                        green = (unsigned char)(color[1]*255);
+                        blue = (unsigned char)(color[2]*255);
 						setPixel(startx + i, starty + j, red, green, blue);
 					}
 				}
@@ -676,7 +682,7 @@ void* CImage::getData()
 	return (void*)m_imageMap;
 }
 
-void CImage::setImageMap(int width, int height, GLubyte* data, bool ownData)
+void CImage::setImageMap(int width, int height, unsigned char* data, bool ownData)
 {
 	if (m_ownData)
 	{
@@ -685,7 +691,7 @@ void CImage::setImageMap(int width, int height, GLubyte* data, bool ownData)
 	}
 
 	m_ownData = ownData;
-	m_imageMap = (GLubyte*)data;
+    m_imageMap = (unsigned char*)data;
 	m_size[0] = width;
 	m_size[1] = height;
 	m_channels = 3;
@@ -699,7 +705,7 @@ int CImage::getChannels()
 void CImage::grayscale()
 {
 	int i, j;
-	GLubyte red, green, blue, byteMedian;
+    unsigned char red, green, blue, byteMedian;
 	double median;
 
 	for (i=0; i<m_size[0]; i++)
@@ -710,7 +716,7 @@ void CImage::grayscale()
 			getValue(i, j, 2, blue);
 
 			median = ((double)red + (double)green + (double)blue) / 3.0;
-			byteMedian = (GLubyte) median;
+            byteMedian = (unsigned char) median;
 			setPixel(i, j, byteMedian, byteMedian, byteMedian);
 		}
 }
@@ -719,8 +725,8 @@ void CImage::drawImage(int x, int y, CImage *image)
 {
 	int i, j;
 	int w, h;
-	GLubyte sred, sgreen, sblue;
-	GLubyte tred, tgreen, tblue;
+    unsigned char sred, sgreen, sblue;
+    unsigned char tred, tgreen, tblue;
 
 	w = image->getWidth();
 	h = image->getHeight();

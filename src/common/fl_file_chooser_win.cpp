@@ -41,7 +41,9 @@
 #include <FL/x.H>
 #endif
 
+#ifdef WIN32
 static char g_szFile[260];       // buffer for file name
+#endif
 
 char *fl_file_chooser_image(const char *message,const char *fname)
 {

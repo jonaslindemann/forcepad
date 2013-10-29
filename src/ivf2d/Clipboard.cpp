@@ -60,7 +60,7 @@ void CClipboard::copy(int x1, int y1, int x2, int y2)
 
 			int i, j;
 
-			GLubyte red, green, blue;
+            unsigned char red, green, blue;
 
 			for (j=y1; j<=y2; j++)
 				for (i=x1; i<=x2; i++)
@@ -90,7 +90,7 @@ void CClipboard::cut(int x1, int y1, int x2, int y2)
 
 			int i, j;
 
-			GLubyte red, green, blue;
+            unsigned char red, green, blue;
 
 			for (j=y1; j<=y2; j++)
 				for (i=x1; i<=x2; i++)
@@ -114,7 +114,7 @@ void CClipboard::paste(int x, int y)
 		{
 			int i, j;
 
-			GLubyte red, green, blue;
+            unsigned char red, green, blue;
 
 			for (j=0; j<h; j++)
 				for (i=0; i<=w; i++)
@@ -151,7 +151,7 @@ void CClipboard::setPasteMode(TPasteMode mode)
 }
 
 
-void CClipboard::copyImage(int width, int height, GLubyte *imageMap)
+void CClipboard::copyImage(int width, int height, unsigned char *imageMap)
 {
 	CImage* image = new CImage();
 	image->setImageMap(width, height, imageMap, false);
@@ -162,7 +162,7 @@ void CClipboard::copyImage(int width, int height, GLubyte *imageMap)
 	if ((width>0)&&(height>0))
 	{
 		int i, j;
-		GLubyte red, green, blue, byteMedian;
+        unsigned char red, green, blue, byteMedian;
 		double median;
 
 		m_clipboard->setSize(width, height);
@@ -194,7 +194,7 @@ void CClipboard::copyImage(int width, int height, GLubyte *imageMap)
 					image->getPixel(i, j, red, green, blue);
 
 					median = ((double)red + (double)green + (double)blue) / 3.0;
-					byteMedian = (GLubyte) median;
+                    byteMedian = (unsigned char) median;
 
 					red = byteMedian;
 					green = byteMedian;

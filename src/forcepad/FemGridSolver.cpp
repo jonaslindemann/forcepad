@@ -183,8 +183,8 @@ void CFemGridSolver::execute()
 	else
 		maxBandwidth = bwBottomTop;
 
-	so_print("CFemGridSolver",so_format("Total dofs = %d",m_nDof));
-	so_print("CFemGridSolver",so_format("Bandwidth  = %d",maxBandwidth));
+    //so_print("CFemGridSolver",so_format("Total dofs = %d",m_nDof));
+    //so_print("CFemGridSolver",so_format("Bandwidth  = %d",maxBandwidth));
 	
 	if (m_nDof==0)
 	{
@@ -342,7 +342,7 @@ void CFemGridSolver::execute()
 		cf.close();
 	}
 
-	so_print("CFemGridSolver",so_format("%d elements assembled.",nElements));
+    //so_print("CFemGridSolver",so_format("%d elements assembled.",nElements));
 
 	///////////////////////////////////////////////////////////////////////////
 	// Scale load vector for body weight
@@ -394,7 +394,7 @@ void CFemGridSolver::execute()
 
 		if (dofs[0]>0)
 		{
-			so_print("CFemGridSolver",so_format("\tLoad found at [ %g, %g ], dofs = [ %d, %d ]",x, y, dofs[0], dofs[1]));
+            //so_print("CFemGridSolver",so_format("\tLoad found at [ %g, %g ], dofs = [ %d, %d ]",x, y, dofs[0], dofs[1]));
 
 			m_f(dofs[0]) += vx*value*m_forceMagnitude;
 			m_f(dofs[1]) += vy*value*m_forceMagnitude;
@@ -427,7 +427,6 @@ void CFemGridSolver::execute()
 		return;
 	}
 
-	int nConstraints = m_femGrid->getPointConstraintsSize();
 	pointConstraint = m_femGrid->getFirstPointConstraint();
 
 	set<int> uniqueDofs;
@@ -449,7 +448,7 @@ void CFemGridSolver::execute()
 
 		if (dofs[0]>0)
 		{
-			so_print("CFemGridSolver",so_format("\tConstraint found at [ %g, %g ], dofs = [ %d, %d ]",x, y, dofs[0], dofs[1]));
+            //so_print("CFemGridSolver",so_format("\tConstraint found at [ %g, %g ], dofs = [ %d, %d ]",x, y, dofs[0], dofs[1]));
 
 			switch (pointConstraint->getConstraintType()) {
 			case CConstraint::CT_XY:
@@ -539,7 +538,7 @@ void CFemGridSolver::execute()
 	for (si=uniqueDofs.begin(); si!=uniqueDofs.end(); si++)
 	{
 		int dof = (*si);
-		so_print("CFemGridSolver",so_format("\t%d",dof));
+        //so_print("CFemGridSolver",so_format("\t%d",dof));
 		
 		Bc(bcCount,1) = dof;
 		Bc(bcCount,2) = prescribedValues[dof];
@@ -576,7 +575,7 @@ void CFemGridSolver::execute()
 
 		nVars = K.Nrows() - Bc.Nrows();
 
-		so_print("CFemGridSolver",so_format("\tFree variables = %d",nVars));
+        //so_print("CFemGridSolver",so_format("\tFree variables = %d",nVars));
 
 		if (maxBandwidth>nVars)
 			maxBandwidth = nVars;
@@ -789,15 +788,6 @@ void CFemGridSolver::execute()
 						sigx[k]=Es(1);
 						sigy[k]=Es(2);
 						tau[k]=Es(3);
-
-						double ds = (sigx[k]-sigy[k])/2.0;
-						double R = sqrt(pow(ds,2)+pow(tau[k],2));						
-
-						double sig1 = (sigx[k]+sigy[k])/2.0+R; 
-						double sig2 = (sigx[k]+sigy[k])/2.0-R; 
-						double alfa = atan2(tau[k],ds)/2.0;
-
-						double misesStress = sqrt(	pow(sig1,2) - sig1*sig2 + pow(sig2,2) );
 					}
 					else
 					{
@@ -1012,7 +1002,6 @@ void CFemGridSolver::executeUpdate()
 		return;
 	}
 
-	int nConstraints = m_femGrid->getPointConstraintsSize();
 	CConstraint* pointConstraint = m_femGrid->getFirstPointConstraint();
 
 	set<int> uniqueDofs;
@@ -1233,15 +1222,6 @@ void CFemGridSolver::executeUpdate()
 						sigx[k]=Es(1);
 						sigy[k]=Es(2);
 						tau[k]=Es(3);
-
-						double ds = (sigx[k]-sigy[k])/2.0;
-						double R = sqrt(pow(ds,2)+pow(tau[k],2));						
-
-						double sig1 = (sigx[k]+sigy[k])/2.0+R; 
-						double sig2 = (sigx[k]+sigy[k])/2.0-R; 
-						double alfa = atan2(tau[k],ds)/2.0;
-
-						double misesStress = sqrt(	pow(sig1,2) - sig1*sig2 + pow(sig2,2) );
 					}
 					else
 					{

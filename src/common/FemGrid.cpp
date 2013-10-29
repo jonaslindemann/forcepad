@@ -24,6 +24,14 @@
 
 #include "FemGrid.h"
 
+#ifdef __APPLE__
+#include <OpenGL/glu.h>
+#include <OpenGL/gl.h>
+#else
+#include <GL/glu.h>
+#include <GL/gl.h>
+#endif
+
 #include "Vec3d.h"
 
 CFemGrid::CFemGrid()
@@ -168,8 +176,6 @@ bool CFemGrid::getShowGrid()
 void CFemGrid::setImage(CImage *image)
 {
 	CImageGrid::setImage(image);
-
-	int height = image->getHeight();
 
 	clearForces();
 	clearConstraints();
@@ -456,7 +462,6 @@ bool CFemGrid::getElement(int row, int col, int element, double &value, double *
 	int dx[3];
 	int dy[3];
 	int dof = 0;
-	bool active = true;
 
 	this->getGridSize(rows, cols);
 
@@ -610,14 +615,14 @@ void CFemGrid::erasePointLoad(int x, int y, int brushSize)
 {
 	unsigned int i;
 	double fx, fy;
-	int fxs, fys;
+	int fxs;
 
 	CForceQueIter fi;
 	CForceQueIter prevfi;
 
 	for (i=y-brushSize/2; i<(unsigned int)(y+brushSize/2); i++)
 	{
-		if ((i>=0)&&(i<m_pointForces.size())&&(!m_pointForces[i].empty()))
+		if ((i<m_pointForces.size())&&(!m_pointForces[i].empty()))
 		{
 			for (fi=m_pointForces[i].begin(); fi!=m_pointForces[i].end(); fi++)
 			{
@@ -625,7 +630,6 @@ void CFemGrid::erasePointLoad(int x, int y, int brushSize)
 				force->getPosition(fx, fy);
 
 				fxs = (int)fx;
-				fys = (int)fy;
 
 				if ((fxs>(x-brushSize/2))&&(fxs<(x+brushSize/2)))
 				{
@@ -710,14 +714,14 @@ void CFemGrid::erasePointConstraint(int x, int y, int brushSize)
 {
 	unsigned int i;
 	double cx, cy;
-	int cxs, cys;
+	int cxs;
 
 	CConstraintQueIter ci;
 	CConstraintQueIter prevci;
 
 	for (i=y-brushSize/2; i<(unsigned int)(y+brushSize/2); i++)
 	{
-		if ((i>=0)&&(i<m_pointConstraints.size())&&(!m_pointConstraints[i].empty()))
+		if ((i<m_pointConstraints.size())&&(!m_pointConstraints[i].empty()))
 		{
 			for (ci=m_pointConstraints[i].begin(); ci!=m_pointConstraints[i].end(); ci++)
 			{
@@ -725,7 +729,6 @@ void CFemGrid::erasePointConstraint(int x, int y, int brushSize)
 				constraint->getPosition(cx, cy);
 
 				cxs = (int)cx;
-				cys = (int)cy;
 
 				if ((cxs>(x-brushSize/2))&&(cxs<(x+brushSize/2)))
 				{
@@ -1379,7 +1382,6 @@ void CFemGrid::drawMisesStress()
 void CFemGrid::drawStress()
 {
 	int i, j;
-	double k = m_displacementScale/m_maxNodeValue;
 	double xm;
 	double ym;
 	double values[3];
@@ -1512,7 +1514,6 @@ void CFemGrid::drawDebugPoints()
 void CFemGrid::drawGridPoints()
 {
 	int i, j, kk, l;
-	double alpha = 0.7;
 	double ex[3];
 	double ey[3];
 
@@ -1578,12 +1579,6 @@ void CFemGrid::drawStressArrow(double x, double y, const double *values)
 		m_maxNegStressFactor = 1.0/maxNegStress;
 	}
 
-	if (m_stressMode==CFemGrid::SM_ALL)
-	{
-		sig1 = values[0]*m_maxStressFactor;
-		sig2 = values[1]*m_maxStressFactor;
-	}
-
 	if ((m_stressMode==CFemGrid::SM_POSITIVE)||(m_stressMode==CFemGrid::SM_NEGATIVE))
 	{
 		if (values[0]>0.0)
@@ -1596,6 +1591,11 @@ void CFemGrid::drawStressArrow(double x, double y, const double *values)
 		else
 			sig2 = values[1]*m_maxNegStressFactor;
 	}
+    else
+    {
+		sig1 = values[0]*m_maxStressFactor;
+		sig2 = values[1]*m_maxStressFactor;
+    }
 
 	double alpha = values[2];
 
@@ -1826,7 +1826,6 @@ void CFemGrid::readFromStream(istream &in)
 	int valueCount;
 	int row = 0;
 	int col = 0;
-	bool finished = false;
 	int nForces;
 	int nConstraints;
 	double x, y;
@@ -2044,12 +2043,9 @@ double CFemGrid::getStiffness(double x, double y)
 void CFemGrid::setStiffness(double x, double y, double value)
 {
 	int r, c;
-	double v;
 
 	this->getElementPos(x, y, r, c);
-	v = this->getGridValue(r, c, 0);
 	this->setGridValue(r, c, 0, value);
-	v = this->getGridValue(r, c, 1);
 	this->setGridValue(r, c, 1, value);
 }
 
@@ -2088,7 +2084,6 @@ void CFemGrid::setStiffnessLine(double x1, double y1, double x2, double y2, doub
 
 	double step = 0.5;
 	double t = 0.0;
-	double s = 0.0;
 	
 	CVec3d p0;
 	CVec3d p1;
@@ -2109,7 +2104,6 @@ void CFemGrid::setStiffnessLine(double x1, double y1, double x2, double y2, doub
 			p1 = p1 + v*step;
 		}
 //		s = s + step;
-		t = 0.0;
 //	}
 }
 
@@ -2169,7 +2163,7 @@ void CFemGrid::getForces(int x1, int y1, int x2, int y2, CForceSelection *select
 {
 	int i;
 	double fx, fy;
-	int fxs, fys;
+	int fxs;
 
 	CForceQueIter fi;
 	CForceQueIter prevfi;
@@ -2182,7 +2176,6 @@ void CFemGrid::getForces(int x1, int y1, int x2, int y2, CForceSelection *select
 			force->getPosition(fx, fy);
 
 			fxs = (int)fx;
-			fys = (int)fy;
 
 			if ((fxs>x1)&&(fxs<x2))
 				selection->add(force);
@@ -2194,7 +2187,7 @@ void CFemGrid::getConstraints(int x1, int y1, int x2, int y2, CConstraintSelecti
 {
 	int i;
 	double fx, fy;
-	int fxs, fys;
+	int fxs;
 
 	CConstraintQueIter fi;
 	CConstraintQueIter prevfi;
@@ -2207,7 +2200,6 @@ void CFemGrid::getConstraints(int x1, int y1, int x2, int y2, CConstraintSelecti
 			constraint->getPosition(fx, fy);
 
 			fxs = (int)fx;
-			fys = (int)fy;
 
 			if ((fxs>x1)&&(fxs<x2))
 				selection->add(constraint);
@@ -2218,21 +2210,20 @@ void CFemGrid::getConstraints(int x1, int y1, int x2, int y2, CConstraintSelecti
 void CFemGrid::removePointForce(CForce *force)
 {
 	double fx, fy;
-	int fxs, fys;
+	int fys;
 
 	CForceQueIter fi;
 	CForceQueIter prevfi;
 
 	force->getPosition(fx, fy);
 
-	fxs = (int)fx;
 	fys = (int)fy;
 
 	for (fi=m_pointForces[fys].begin(); (!m_pointForces[fys].empty())&&(fi!=m_pointForces[fys].end()); fi++)
 	{
 		CForce* aForce = (*fi);
 
-		if (force = aForce)
+		if (force == aForce)
 		{
 			if (fi!=m_pointForces[fys].begin())
 				prevfi = fi-1;
@@ -2251,21 +2242,20 @@ void CFemGrid::removePointForce(CForce *force)
 void CFemGrid::moveForce(CForce* force, int x, int y)
 {
 	double fx, fy;
-	int fxs, fys;
+	int fys;
 
 	CForceQueIter fi;
 	CForceQueIter eraseForce;
 
 	force->getPosition(fx, fy);
 
-	fxs = (int)fx;
 	fys = (int)fy;
 
 
 	for (fi=m_pointForces[fys].begin(); (!m_pointForces[fys].empty())&&(fi!=m_pointForces[fys].end()); fi++)
 	{
 		CForce* aForce = (*fi);
-		if (force = aForce)
+		if (force == aForce)
 			eraseForce = fi;
 	}
 
@@ -2288,21 +2278,20 @@ void CFemGrid::moveForce(CForce* force, int x, int y)
 void CFemGrid::removePointConstraint(CConstraint *constraint)
 {
 	double fx, fy;
-	int fxs, fys;
+	int fys;
 
 	CConstraintQueIter fi;
 	CConstraintQueIter prevfi;
 
 	constraint->getPosition(fx, fy);
 
-	fxs = (int)fx;
 	fys = (int)fy;
 
 	for (fi=m_pointConstraints[fys].begin(); (!m_pointConstraints[fys].empty())&&(fi!=m_pointConstraints[fys].end()); fi++)
 	{
 		CConstraint* aConstraint = (*fi);
 
-		if (constraint = aConstraint)
+		if (constraint == aConstraint)
 		{
 			if (fi!=m_pointConstraints[fys].begin())
 				prevfi = fi-1;
@@ -2444,7 +2433,6 @@ void CFemGrid::getElements(int x1, int y1, int x2, int y2, CElementList& list)
 	v.normalize();
 
 	double t;
-	double dt = 0.5;
 	double x, y, z;
 	int r, c, oldR, oldC;
 	CVec3d p;

@@ -57,8 +57,8 @@ private:
 	TRectangleType m_rectType;
 	TLineType m_lineType;
 	double m_lineWidth;
-	GLushort m_lineStipple;
-	GLint m_lineFactor;
+    short m_lineStipple;
+    int m_lineFactor;
 	CColorPtr m_lineColor;
 public:
 	/** Rectangle class constructor. */

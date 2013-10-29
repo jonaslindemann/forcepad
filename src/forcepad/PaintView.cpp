@@ -24,34 +24,20 @@
 
 #include "PaintView.h"
 
-#include "NewModelDlg.h"
 #include "FemGridSolver2.h"
 #include "MainFrame2.h"
 #include "LogWindow.h"
 #include "JpegImage.h"
 #include "PngImage.h"
 
-#define WIN32_COMMON_DIALOGS
-
-#ifdef WIN32
-#ifdef WIN32_COMMON_DIALOGS
-#include <windows.h>
-#include "fl_ask_win.h"
-#include "fl_message_win.h"
-#include "fl_file_chooser_win.H"
+#ifdef __APPLE__
+#include <OpenGL/glu.h>
 #else
-#include <FL/fl_ask.h>
-#include <FL/fl_message.h>
-#include <FL/fl_file_chooser.h>
-#endif
-#else
-#include <FL/fl_ask.h>
-#include <FL/fl_message.h>
-#include <FL/fl_file_chooser.h>
+#include <GL/glu.h>
 #endif
 
-#include <FL/filename.H>
-#include <FL/fl_draw.H>
+//#include <FL/filename.H>
+//#include <FL/fl_draw.H>
 
 #include <fstream>
 #include <string>
@@ -61,12 +47,6 @@
 #include <newmat.h>
 #include <newmatio.h>
 #include <newmatap.h>
-
-#ifndef __APPLE__
-#include "Fl_Cursor_Shape.H"
-#endif
-
-#include "Cursors.h"
 
 #include "UiSettings.h"
 
@@ -119,7 +99,6 @@ class CPaintView;
 /////////////////////////////////////////////////////////////
 
 CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
-: Fl_Gl_Window(x,y,w,h,l)
 {
 	so_print("CPaintView","CPaintView(...)");
 
@@ -216,6 +195,10 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 	m_line = new CLine();
 	m_line->setColor(color);
 	m_line->setWidth(4);
+
+    m_arch = new CArch();
+    m_arch->setColor(color);
+    m_arch->setLineWidth(4);
 	
 	color = new CColor();
 	color->setColor(0.5f, 0.0f, 0.0f, 1.0f);
@@ -251,7 +234,7 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 
 	m_ruler = new CRuler();
 	m_ruler->setStartPos(0,0);
-	m_ruler->setEndPos(m_drawing->getWidth(), 0);
+    m_ruler->setEndPos(m_drawing->getWidth(), 0);
 	m_ruler->setActualLength(1.0);
 	m_ruler->setColor(color);
 
@@ -287,8 +270,6 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 	
 	// Create dialogs
 	
-	createCursors();
-
 	m_modeChangeEvent = NULL;
 	m_viewModeChangeEvent = NULL;
 	m_viewModeErrorEvent = NULL;
@@ -310,7 +291,7 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 
 CPaintView::~CPaintView()
 {
-	so_print("CPaintView","~CPaintView()");
+    so_print("CPaintView","~CPaintViewidth()");
 	
 	// Do the usual cleanup
 	
@@ -318,11 +299,89 @@ CPaintView::~CPaintView()
 	deleteCursors();
 }
 
+int CPaintView::height()
+{
+    return -1;
+}
+
+int CPaintView::width()
+{
+    return -1;
+}
+
+void CPaintView::doRedraw()
+{
+}
+
+void CPaintView::doFlush()
+{
+}
+
+void CPaintView::doInvalidate()
+{
+}
+
+void CPaintView::doMakeCurrent()
+{
+}
+
+const std::string CPaintView::doSaveDialog(const string title, const string filter, const string defaultFilename)
+{
+    return "";
+}
+
+bool CPaintView::doNewModel(int &width, int &height, int& initialStiffness)
+{
+    return false;
+}
+
+void CPaintView::doInfoMessage(const string message)
+{
+
+}
+
+bool CPaintView::doAskYesNo(const string question)
+{
+    return false;
+}
+
+const std::string CPaintView::doOpenDialog(const string title, const string filter)
+{
+    return "";
+}
+
+void CPaintView::doCreateCursors()
+{
+
+}
+
+void CPaintView::doUpdateCursor(TEditMode mode)
+{
+
+}
+
+void CPaintView::doDeleteCursors()
+{
+
+}
+
+void CPaintView::doShowAbout()
+{
+
+}
+
+void CPaintView::doShowHelp()
+{
+
+}
+
+
 /////////////////////////////////////////////////////////////
 // CPaintView FLTK overrides
 /////////////////////////////////////////////////////////////
 
-void CPaintView::draw()
+/*
+void CPaintView::drawidth()
 {
 	// Clear screen
 
@@ -337,7 +396,7 @@ void CPaintView::draw()
 		onInitContext();
 	
 	glPushMatrix();
-	onDraw();
+    onDraw();
 	glPopMatrix();
 }
 
@@ -376,13 +435,6 @@ int CPaintView::handle(int event)
 			y = sy + m_drawingOffsetY;
 		}
 	}
-
-	/*
-	if ((Fl::event_state()&FL_CTRL)>0)
-		m_zoomResults = true;
-	else
-		m_zoomResults = false;
-	*/
 	
 	// Call the different event methods
 
@@ -425,6 +477,7 @@ int CPaintView::handle(int event)
 	}
 	return Fl_Gl_Window::handle(event);
 }
+*/
 
 /////////////////////////////////////////////////////////////
 // CPaintView event methods
@@ -481,17 +534,17 @@ void CPaintView::onPush(int x, int y)
 		// Rotate existing force
 
 		if (!m_zoomResults)
-			m_selectedForce = m_femGrid->getNearestForce(x-m_drawingOffsetX, h()-y-m_drawingOffsetY);
+            m_selectedForce = m_femGrid->getNearestForce(x-m_drawingOffsetX, height()-y-m_drawingOffsetY);
 		break;
 	case EM_CONSTRAINT:
 		
 		// Create a constraint and add it to the grid
 		
 		constraint = new CConstraint();
-		constraint->setPosition(x-m_drawingOffsetX, h()-y-m_drawingOffsetY);
+        constraint->setPosition(x-m_drawingOffsetX, height()-y-m_drawingOffsetY);
 		constraint->setConstraintType(m_constraintType);
 		m_femGrid->addConstraint(constraint);
-		this->redraw();
+        this->doRedraw();
 		break;
 	case EM_FORCE:
 		
@@ -499,7 +552,7 @@ void CPaintView::onPush(int x, int y)
 		// Direction is is done in the onDrag() method.
 		
 		m_newForce = new CForce();
-		m_newForce->setPosition(x-m_drawingOffsetX, h()-y-m_drawingOffsetY);
+        m_newForce->setPosition(x-m_drawingOffsetX, height()-y-m_drawingOffsetY);
 		m_femGrid->addForce(m_newForce);
 		break;
 	case EM_CONSTRAINT_VECTOR:
@@ -508,7 +561,7 @@ void CPaintView::onPush(int x, int y)
 		
 		m_newConstraint = new CConstraint();
 		m_newConstraint->setConstraintType(CConstraint::CT_VECTOR);
-		m_newConstraint->setPosition(x-m_drawingOffsetX, h()-y-m_drawingOffsetY);
+        m_newConstraint->setPosition(x-m_drawingOffsetX, height()-y-m_drawingOffsetY);
 		m_newConstraint->setDirection(0.0, 1.0);
 		m_femGrid->addConstraint(m_newConstraint);
 
@@ -519,7 +572,7 @@ void CPaintView::onPush(int x, int y)
 		
 		m_newConstraint = new CConstraint();
 		m_newConstraint->setConstraintType(CConstraint::CT_HINGE);
-		m_newConstraint->setPosition(x-m_drawingOffsetX, h()-y-m_drawingOffsetY);
+        m_newConstraint->setPosition(x-m_drawingOffsetX, height()-y-m_drawingOffsetY);
 		m_newConstraint->setDirection(0.0, 1.0);
 		m_femGrid->addConstraint(m_newConstraint);
 
@@ -528,15 +581,15 @@ void CPaintView::onPush(int x, int y)
 		
 		// Erase constraints and forces
 		
-		m_femGrid->erasePointLoad(x-m_drawingOffsetX, h()-y-m_drawingOffsetY,16);
-		m_femGrid->erasePointConstraint(x-m_drawingOffsetX, h()-y-m_drawingOffsetY,16);
+        m_femGrid->erasePointLoad(x-m_drawingOffsetX, height()-y-m_drawingOffsetY,16);
+        m_femGrid->erasePointConstraint(x-m_drawingOffsetX, height()-y-m_drawingOffsetY,16);
 		break;
 	case EM_SELECT_BOX:
 		
 		// Set starting point for selection box
 		
 		m_selectionStart[0] = x-m_drawingOffsetX;
-		m_selectionStart[1] = h()-y-m_drawingOffsetY;
+        m_selectionStart[1] = height()-y-m_drawingOffsetY;
 		m_selectionEnd[0] = m_selectionStart[0];
 		m_selectionEnd[1] = m_selectionStart[1];
 		break;
@@ -544,22 +597,22 @@ void CPaintView::onPush(int x, int y)
 		
 		// Paste from clipboard
 		
-		ww = m_clipboard->getClipboard()->getWidth()*m_brushScale;
+        ww = m_clipboard->getClipboard()->getWidth()*m_brushScale;
 		hh = m_clipboard->getClipboard()->getHeight()*m_brushScale;
 		resetUndoArea();
 		updateUndoArea(
-			m_current[0]-m_drawingOffsetX-m_clipboard->getClipboard()->getWidth()/2, 
-			h() - m_current[1]-m_drawingOffsetY-m_clipboard->getClipboard()->getHeight()/2,
+            m_current[0]-m_drawingOffsetX-m_clipboard->getClipboard()->getWidth()/2,
+            height() - m_current[1]-m_drawingOffsetY-m_clipboard->getClipboard()->getHeight()/2,
 			0
 			);
 		updateUndoArea(
-			m_current[0]-m_drawingOffsetX+m_clipboard->getClipboard()->getWidth()/2, 
-			h() - m_current[1]-m_drawingOffsetY+m_clipboard->getClipboard()->getHeight()/2,
+            m_current[0]-m_drawingOffsetX+m_clipboard->getClipboard()->getWidth()/2,
+            height() - m_current[1]-m_drawingOffsetY+m_clipboard->getClipboard()->getHeight()/2,
 			0
 			);
 		updateUndo();
-		m_clipboard->paste(x-m_drawingOffsetX-ww/2, h()-y-m_drawingOffsetY-hh/2);
-		this->redraw();
+        m_clipboard->paste(x-m_drawingOffsetX-ww/2, height()-y-m_drawingOffsetY-hh/2);
+        this->doRedraw();
 		break;
 	case EM_DIRECT_BRUSH:
 		
@@ -575,7 +628,7 @@ void CPaintView::onPush(int x, int y)
 	// We have to redraw the image
 	
 	if (m_editMode!=EM_RESULT)
-		this->redraw();
+        this->doRedraw();
 
 	/*
 	if (m_viewMode == VM_ACTION)
@@ -585,8 +638,8 @@ void CPaintView::onPush(int x, int y)
 			m_zoomResults = false;
 		else
 			m_zoomResults = true;
-		this->flush();
-		this->redraw();
+        this->flush();
+        this->doRedraw();
 	}
 	*/
 }
@@ -626,22 +679,22 @@ void CPaintView::onDrag(int x, int y)
 				// Update the position of the force
 
 				//m_femGrid->removePointForce(m_selectedForce);
-				//m_selectedForce->setPosition(x-m_drawingOffsetX, h()-y-m_drawingOffsetY);
+                //m_selectedForce->setPosition(x-m_drawingOffsetX, height()-y-m_drawingOffsetY);
 				//m_femGrid->addForce(m_selectedForce);
 
-				m_femGrid->moveForce(m_selectedForce, x-m_drawingOffsetX, h()-y-m_drawingOffsetY);
+                m_femGrid->moveForce(m_selectedForce, x-m_drawingOffsetX, height()-y-m_drawingOffsetY);
 
 			}
 			else
 			{
 				// Update the direction of the force created in onPush
 				
-				m_selectedForce->setDirection(m_start[0]-m_current[0], (h() - m_start[1]) - (h() - m_current[1]) );			
+                m_selectedForce->setDirection(m_start[0]-m_current[0], (height() - m_start[1]) - (height() - m_current[1]) );
 			}
 
 			m_solver->executeUpdate();
-			this->flush();
-			this->redraw();
+            this->doFlush();
+            this->doRedraw();
 		}
 
 		break;
@@ -654,19 +707,19 @@ void CPaintView::onDrag(int x, int y)
 				if (m_editMode == EM_DIRECT_ERASE)
 					m_drawing->drawImageLine(
 						m_currentBrush, 
-						prevPos[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, 
-						h()-prevPos[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, 
-						m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, 
-						h()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, 
+                        prevPos[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2,
+                        height()-prevPos[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2,
+                        m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2,
+                        height()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2,
 						eraseColor
 					);		
 				else
 					m_drawing->drawImageLine(
 						m_currentBrush, 
-						prevPos[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, 
-						h()-prevPos[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, 
-						m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, 
-						h()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, 
+                        prevPos[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2,
+                        height()-prevPos[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2,
+                        m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2,
+                        height()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2,
 						m_optConstraintColor
 					);		
 			}
@@ -675,40 +728,68 @@ void CPaintView::onDrag(int x, int y)
 				if (m_editMode == EM_DIRECT_ERASE)
 					m_drawing->drawImageLine(
 						m_currentBrush, 
-						prevPos[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, 
-						h()-prevPos[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, 
-						m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, 
-						h()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, 
+                        prevPos[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2,
+                        height()-prevPos[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2,
+                        m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2,
+                        height()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2,
 						eraseColor
 					);		
 				else
 					m_drawing->drawImageLine(
 						m_currentBrush, 
-						prevPos[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, 
-						h()-prevPos[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, 
-						m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, 
-						h()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, 
+                        prevPos[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2,
+                        height()-prevPos[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2,
+                        m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2,
+                        height()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2,
 						m_brushColor
-					);		
+                    );
 			}
 		}
 		else
 		{
 			if (m_optLayerActive)
 				if (m_editMode == EM_DIRECT_ERASE)
-					m_drawing->copyFrom(m_currentBrush, m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, h()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, eraseColor);
+                    m_drawing->copyFrom(m_currentBrush, m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, height()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, eraseColor);
 				else 
-					m_drawing->copyFrom(m_currentBrush, m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, h()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, m_optConstraintColor);
+                    m_drawing->copyFrom(m_currentBrush, m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, height()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, m_optConstraintColor);
 			else
 				if (m_editMode == EM_DIRECT_ERASE)
-					m_drawing->copyFrom(m_currentBrush, m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, h()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, eraseColor);
+                    m_drawing->copyFrom(m_currentBrush, m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, height()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, eraseColor);
 				else
-					m_drawing->copyFrom(m_currentBrush, m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, h()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, m_brushColor);
+                    m_drawing->copyFrom(m_currentBrush, m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, height()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, m_brushColor);
 
 		}
-		this->redraw();
+        this->doRedraw();
 		break;
-	case EM_RECTANGLE:
+    case EM_ARCH:
+        resetUndoArea();
+
+        // Update the rectangle primitive
+
+        if (this->m_optLayerActive)
+            m_arch->getColor()->setColor(m_optConstraintColor);
+        else
+            m_arch->getColor()->setColor(m_brushColor);
+
+        m_arch->setPosition(m_start[0], height() - m_start[1]);
+        m_arch->setSize(m_current[0]-m_start[0], -m_current[1]+m_start[1]);
+
+        // Update the affected area. We do this twice because
+        // updateUndoArea only takes a position as input
+
+        updateUndoArea(
+            m_start[0] - m_drawingOffsetX,
+            height() - m_start[1] - m_drawingOffsetY,
+            (int)m_arch->getLineWidth()
+            );
+        updateUndoArea(
+            m_current[0] - m_drawingOffsetX,
+            height() - m_current[1] - m_drawingOffsetY,
+            (int)m_arch->getLineWidth()
+            );
+        this->doRedraw();
+        break;
+    case EM_RECTANGLE:
 		resetUndoArea();
 		
 		// Update the rectangle primitive
@@ -718,7 +799,7 @@ void CPaintView::onDrag(int x, int y)
 		else
 			m_rectangle->getColor()->setColor(m_brushColor);
 		
-		m_rectangle->setPosition(m_start[0], h() - m_start[1]);
+        m_rectangle->setPosition(m_start[0], height() - m_start[1]);
 		m_rectangle->setSize(m_current[0]-m_start[0], -m_current[1]+m_start[1]);
 		
 		// Update the affected area. We do this twice because
@@ -726,15 +807,15 @@ void CPaintView::onDrag(int x, int y)
 		
 		updateUndoArea(
 			m_start[0] - m_drawingOffsetX,
-			h() - m_start[1] - m_drawingOffsetY,
+            height() - m_start[1] - m_drawingOffsetY,
 			0
 			);
 		updateUndoArea(
 			m_current[0] - m_drawingOffsetX,
-			h() - m_current[1] - m_drawingOffsetY,
+            height() - m_current[1] - m_drawingOffsetY,
 			0
 			);
-		this->redraw();
+        this->doRedraw();
 		break;
 	case EM_ELLIPSE:
 		resetUndoArea();
@@ -746,7 +827,7 @@ void CPaintView::onDrag(int x, int y)
 		else
 			m_ellipse->getColor()->setColor(m_brushColor);
 
-		m_ellipse->setPosition(m_start[0], h() - m_start[1]);
+        m_ellipse->setPosition(m_start[0], height() - m_start[1]);
 		m_ellipse->setSize(m_current[0]-m_start[0], -m_current[1]+m_start[1]);
 		
 		// Update the affected area. We do this three times because
@@ -773,20 +854,20 @@ void CPaintView::onDrag(int x, int y)
 
 		updateUndoArea(
 			p1[0] - m_drawingOffsetX,
-			h() - p1[1] - m_drawingOffsetY,
+            height() - p1[1] - m_drawingOffsetY,
 			0
 			);
 		updateUndoArea(
 			p2[0] - m_drawingOffsetX,
-			h() - p2[1] - m_drawingOffsetY,
+            height() - p2[1] - m_drawingOffsetY,
 			0
 			);
 		//updateUndoArea(
 		//	-m_current[0] - m_drawingOffsetX,
-		//	h() + m_current[1] - m_drawingOffsetY,
+        //	height() + m_current[1] - m_drawingOffsetY,
 		//	0
 		//	);
-		this->redraw();
+        this->doRedraw();
 		break;
 	case EM_LINE:
 		resetUndoArea();
@@ -798,43 +879,43 @@ void CPaintView::onDrag(int x, int y)
 		else
 			m_line->getColor()->setColor(m_brushColor);
 
-		m_line->setStartPos(m_start[0], h() - m_start[1]);
-		m_line->setEndPos(m_current[0], h() - m_current[1]);
+        m_line->setStartPos(m_start[0], height() - m_start[1]);
+        m_line->setEndPos(m_current[0], height() - m_current[1]);
 		
 		// Update the affected area. We do this three times because
 		// updateUndoArea only takes a position as input
 		
 		updateUndoArea(
 			m_start[0] - m_drawingOffsetX,
-			h() - m_start[1] - m_drawingOffsetY,
-			m_line->getWidth()
+            height() - m_start[1] - m_drawingOffsetY,
+            m_line->getWidth()
 			);
 		updateUndoArea(
 			m_current[0] - m_drawingOffsetX,
-			h() - m_current[1] - m_drawingOffsetY,
-			m_line->getWidth()
+            height() - m_current[1] - m_drawingOffsetY,
+            m_line->getWidth()
 			);
-		this->redraw();
+        this->doRedraw();
 		break;
 	case EM_RULER:
 		m_ruler->setStartPos(
 			m_start[0] - m_drawingOffsetX, 
-			h() - m_start[1] - m_drawingOffsetY
+            height() - m_start[1] - m_drawingOffsetY
 			);
 		m_ruler->setEndPos(
 			m_current[0] - m_drawingOffsetX, 
-			h() - m_current[1] - m_drawingOffsetY
+            height() - m_current[1] - m_drawingOffsetY
 			);
 		if (m_rulerChangedEvent!=NULL)
 			m_rulerChangedEvent->onRulerChanged(m_ruler);
-		this->redraw();
+        this->doRedraw();
 		break;
 	case EM_FORCE:
 		
 		// Update the direction of the force created in onPush
 		
-		m_newForce->setDirection(m_start[0]-m_current[0], (h() - m_start[1]) - (h() - m_current[1]) );
-		this->redraw();
+        m_newForce->setDirection(m_start[0]-m_current[0], (height() - m_start[1]) - (height() - m_current[1]) );
+        this->doRedraw();
 		break;
 	case EM_CONSTRAINT_VECTOR:
 		
@@ -843,8 +924,8 @@ void CPaintView::onDrag(int x, int y)
 		
 		if (m_newConstraint!=NULL)
 		{
-			m_newConstraint->setDirection(m_start[0]-m_current[0], (h() - m_start[1]) - (h() - m_current[1]) );
-			this->redraw();
+            m_newConstraint->setDirection(m_start[0]-m_current[0], (height() - m_start[1]) - (height() - m_current[1]) );
+            this->doRedraw();
 		}
 
 		break;
@@ -855,8 +936,8 @@ void CPaintView::onDrag(int x, int y)
 		
 		if (m_newConstraint!=NULL)
 		{
-			m_newConstraint->setDirection(m_start[0]-m_current[0], (h() - m_start[1]) - (h() - m_current[1]) );
-			this->redraw();
+            m_newConstraint->setDirection(m_start[0]-m_current[0], (height() - m_start[1]) - (height() - m_current[1]) );
+            this->doRedraw();
 		}
 		break;
 	case EM_CONSTRAINT:
@@ -868,20 +949,20 @@ void CPaintView::onDrag(int x, int y)
 		
 		// Erase constraints and forces
 		
-		m_femGrid->erasePointLoad(x-m_drawingOffsetX, h()-y-m_drawingOffsetY,16);
-		m_femGrid->erasePointConstraint(x-m_drawingOffsetX, h()-y-m_drawingOffsetY,16);
-		this->redraw();
+        m_femGrid->erasePointLoad(x-m_drawingOffsetX, height()-y-m_drawingOffsetY,16);
+        m_femGrid->erasePointConstraint(x-m_drawingOffsetX, height()-y-m_drawingOffsetY,16);
+        this->doRedraw();
 	case EM_SELECT_BOX:
 		
 		// Update the selection box to new cursor position
 		
 		m_selectionEnd[0] = x - m_drawingOffsetX;
-		m_selectionEnd[1] = h() - y - m_drawingOffsetY;
+        m_selectionEnd[1] = height() - y - m_drawingOffsetY;
 		updateSelectionBox();
 		
 		// Here we need to redraw the image (Tiled rendering perhaps??)
 		
-		this->redraw();
+        this->doRedraw();
 		break;
 	default:
 		
@@ -896,9 +977,9 @@ void CPaintView::onDrag(int x, int y)
 		m_zoomPos[0] = m_zoomStart[0]-dx;
 		m_zoomPos[1] = m_zoomStart[1]-dy;
 
-		this->flush();
+        this->doFlush();
 		//this->invalidate();
-		this->redraw();
+        this->doRedraw();
 	}
 }
 
@@ -912,7 +993,7 @@ void CPaintView::onRelease(int x, int y)
 
 	m_leftMouseDown = false;
 	//m_zoomResults = false;
-	m_selectedForce = false;
+	m_selectedForce = 0;
 	
 	updateCursor();
 	
@@ -921,8 +1002,8 @@ void CPaintView::onRelease(int x, int y)
 		
 		// Do floodfill of area under cursor
 		
-		m_drawing->floodFill(x-m_drawingOffsetX, (h()-y)-m_drawingOffsetY); //, 255, 0, 0);
-		this->redraw();
+        m_drawing->floodFill(x-m_drawingOffsetX, (height()-y)-m_drawingOffsetY); //, 255, 0, 0);
+        this->doRedraw();
 		break;
 	case EM_FORCE:
 	case EM_CONSTRAINT:
@@ -940,6 +1021,7 @@ void CPaintView::onRelease(int x, int y)
 	case EM_ELLIPSE:
 	case EM_RECTANGLE:
 	case EM_LINE:
+    case EM_ARCH:
 		
 		updateUndo();
 		m_screenImage->update(m_undoStart[0], m_undoStart[1], m_undoEnd[0], m_undoEnd[1]);
@@ -955,7 +1037,7 @@ void CPaintView::onRelease(int x, int y)
 	{
 		m_femGrid->calcCenterOfGravity(m_cg[0], m_cg[1]);
 		m_cgIndicator->setPosition(m_drawingOffsetX+m_cg[0], m_drawingOffsetY+m_cg[1]);
-		this->redraw();
+        this->doRedraw();
 	}
 	else
 		m_femGrid->updatePixelArea();
@@ -983,8 +1065,8 @@ void CPaintView::onInitContext()
 
 	// Initialize OpenGL context
 	
-	m_drawingOffsetX = (w()-m_drawing->getWidth())/2;
-	m_drawingOffsetY = (h()-m_drawing->getHeight())/2;
+    m_drawingOffsetX = (width()-m_drawing->getWidth())/2;
+    m_drawingOffsetY = (height()-m_drawing->getHeight())/2;
 
 	if (m_drawingOffsetX<0)
 		m_drawingOffsetX = 0;
@@ -1023,24 +1105,24 @@ void CPaintView::onInitContext()
 	
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glViewport(0,0,w(),h());
-	gluOrtho2D(0,w(),0,h());
+    glViewport(0,0,width(),height());
+    gluOrtho2D(0,width(),0,height());
 	glMatrixMode(GL_MODELVIEW);
 	
 	
 	// Define drawing area using the scissor function
 	
-	glScissor(m_drawingOffsetX, m_drawingOffsetY, m_drawing->getWidth(), m_drawing->getHeight());
+    glScissor(m_drawingOffsetX, m_drawingOffsetY, m_drawing->getWidth(), m_drawing->getHeight());
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 	// Implement a resize method
 
-	if ((m_lastSize[0]!=w())||(m_lastSize[1]!=h()))
+    if ((m_lastSize[0]!=width())||(m_lastSize[1]!=height()))
 	{
-		m_lastSize[0] = w();
-		m_lastSize[1] = h();
+        m_lastSize[0] = width();
+        m_lastSize[1] = height();
 
-		this->onResize(w(), h());
+        this->onResize(width(), height());
 	}
 }
 
@@ -1057,8 +1139,8 @@ void CPaintView::onDraw()
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glViewport(0,0,w(),h());
-	gluOrtho2D(0,w(),0,h());
+    glViewport(0,0,width(),height());
+    gluOrtho2D(0,width(),0,height());
 	glMatrixMode(GL_MODELVIEW);
 
 	// Background properties
@@ -1076,10 +1158,10 @@ void CPaintView::onDraw()
 	glDisable(GL_SCISSOR_TEST);
 	glBegin(GL_QUADS);
 	glColor3fv(tColor);
-	glVertex2i(0,h());
-	glVertex2i(w(),h());
+    glVertex2i(0,height());
+    glVertex2i(width(),height());
 	glColor3fv(bColor);
-	glVertex2i(w(),0);
+    glVertex2i(width(),0);
 	glVertex2i(0,0);
 	glEnd();
 
@@ -1087,35 +1169,35 @@ void CPaintView::onDraw()
 
 	glBegin(GL_QUADS);
 	glColor3fv(sColor);
-	glVertex2i(0,h());
-	glVertex2i(w(),h());
+    glVertex2i(0,height());
+    glVertex2i(width(),height());
 	glColor3fv(tColor);
-	glVertex2i(w()-shadowWidth2,h()-shadowWidth);
-	glVertex2i(shadowWidth,h()-shadowWidth);
+    glVertex2i(width()-shadowWidth2,height()-shadowWidth);
+    glVertex2i(shadowWidth,height()-shadowWidth);
 	glEnd();
 
 	// Left frame shadow
 
 	glBegin(GL_QUADS);
 	glColor3fv(sColor);
-	glVertex2i(0,h());
+    glVertex2i(0,height());
 	glVertex2i(0,0);
 	glColor3fv(bColor);
 	glVertex2i(shadowWidth,0);
 	glColor3fv(tColor);
-	glVertex2i(shadowWidth,h()-shadowWidth);
+    glVertex2i(shadowWidth,height()-shadowWidth);
 	glEnd();
 
 	// Right frame shadow
 
 	glBegin(GL_QUADS);
 	glColor3fv(sColor);
-	glVertex2i(w(),h());
-	glVertex2i(w(),0);
+    glVertex2i(width(),height());
+    glVertex2i(width(),0);
 	glColor3fv(bColor);
-	glVertex2i(w()-shadowWidth2,0);
+    glVertex2i(width()-shadowWidth2,0);
 	glColor3fv(tColor);
-	glVertex2i(w()-shadowWidth2,h()-shadowWidth);
+    glVertex2i(width()-shadowWidth2,height()-shadowWidth);
 	glEnd();
 
 	// Bottom frame shadow
@@ -1123,9 +1205,9 @@ void CPaintView::onDraw()
 	glBegin(GL_QUADS);
 	glColor3fv(sColor);
 	glVertex2i(0,0);
-	glVertex2i(w(),0);
+    glVertex2i(width(),0);
 	glColor3fv(bColor);
-	glVertex2i(w()-shadowWidth2,shadowWidth2);
+    glVertex2i(width()-shadowWidth2,shadowWidth2);
 	glVertex2i(shadowWidth,shadowWidth2);
 	glEnd();
 
@@ -1134,9 +1216,9 @@ void CPaintView::onDraw()
 	glEnable(GL_SCISSOR_TEST);
 
 	if (m_zoomResults)
-		glScissor(15, 15, w()-30, h()-30);
+        glScissor(15, 15, width()-30, height()-30);
 	else
-		glScissor(m_drawingOffsetX, m_drawingOffsetY, m_drawing->getWidth(), m_drawing->getHeight());
+        glScissor(m_drawingOffsetX, m_drawingOffsetY, m_drawing->getWidth(), m_drawing->getHeight());
 
 	
 	if (m_lockDrawing)
@@ -1171,10 +1253,10 @@ void CPaintView::onDraw()
 			glEnable(GL_COLOR_LOGIC_OP);
 			glPixelZoom(m_brushScale, m_brushScale);
 			glLogicOp(GL_AND);
-			glRasterPos2i(m_current[0]-m_clipboard->getClipboard()->getWidth()*m_brushScale/2, h()-m_current[1]-m_clipboard->getClipboard()->getHeight()*m_brushScale/2);
-			glDrawPixels(m_clipboard->getClipboard()->getWidth(), m_clipboard->getClipboard()->getHeight(), GL_RGB, GL_UNSIGNED_BYTE, m_clipboard->getClipboard()->getImageMap());
+            glRasterPos2i(m_current[0]-m_clipboard->getClipboard()->getWidth()*m_brushScale/2, height()-m_current[1]-m_clipboard->getClipboard()->getHeight()*m_brushScale/2);
+            glDrawPixels(m_clipboard->getClipboard()->getWidth(), m_clipboard->getClipboard()->getHeight(), GL_RGB, GL_UNSIGNED_BYTE, m_clipboard->getClipboard()->getImageMap());
 			glDisable(GL_COLOR_LOGIC_OP);
-			m_clipboard->render(m_current[0]-m_clipboard->getClipboard()->getWidth()*m_brushScale/2, h()-m_current[1]-m_clipboard->getClipboard()->getHeight()*m_brushScale/2);
+            m_clipboard->render(m_current[0]-m_clipboard->getClipboard()->getWidth()*m_brushScale/2, height()-m_current[1]-m_clipboard->getClipboard()->getHeight()*m_brushScale/2);
 			glPixelZoom(1.0, 1.0);
 			break;
 		case EM_RECTANGLE:
@@ -1182,7 +1264,13 @@ void CPaintView::onDraw()
 			{
 				m_rectangle->render();
 			}
-			break;
+            break;
+        case EM_ARCH:
+            if (m_leftMouseDown)
+            {
+                m_arch->render();
+            }
+            break;
 		case EM_ELLIPSE:
 			if (m_leftMouseDown)
 			{
@@ -1204,7 +1292,7 @@ void CPaintView::onDraw()
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			glPixelZoom(1.0, 1.0);
 			glRasterPos2i(m_drawingOffsetX, m_drawingOffsetY);
-			glDrawPixels(m_drawing->getWidth(), m_drawing->getHeight(), GL_RGBA, GL_UNSIGNED_BYTE, m_drawing->getImageMap());
+            glDrawPixels(m_drawing->getWidth(), m_drawing->getHeight(), GL_RGBA, GL_UNSIGNED_BYTE, m_drawing->getImageMap());
 			glDisable(GL_BLEND);
 			break;
 		default:
@@ -1229,6 +1317,7 @@ void CPaintView::onDraw()
 		switch (m_editMode) {
 		case EM_ELLIPSE:
 		case EM_RECTANGLE:
+        case EM_ARCH:
 		case EM_LINE:
 			break;
 		default:
@@ -1240,16 +1329,16 @@ void CPaintView::onDraw()
 
 				glMatrixMode(GL_PROJECTION);
 				glLoadIdentity();
-				glViewport(0,0,w(),h());
-				gluOrtho2D(m_zoomPos[0]-w()*m_zoomFactor,m_zoomPos[0]+w()*m_zoomFactor,(h()-m_zoomPos[1])-h()*m_zoomFactor,(h()-m_zoomPos[1])+h()*m_zoomFactor);
+                glViewport(0,0,width(),height());
+                gluOrtho2D(m_zoomPos[0]-width()*m_zoomFactor,m_zoomPos[0]+width()*m_zoomFactor,(height()-m_zoomPos[1])-height()*m_zoomFactor,(height()-m_zoomPos[1])+height()*m_zoomFactor);
 				glMatrixMode(GL_MODELVIEW);
 			}
 			else
 			{
 				glMatrixMode(GL_PROJECTION);
 				glLoadIdentity();
-				glViewport(0,0,w(),h());
-				gluOrtho2D(0,w(),0,h());
+                glViewport(0,0,width(),height());
+                gluOrtho2D(0,width(),0,height());
 				glMatrixMode(GL_MODELVIEW);
 			}
 
@@ -1272,16 +1361,16 @@ void CPaintView::onDraw()
 
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
-			glViewport(0,0,w(),h());
-			gluOrtho2D(m_zoomPos[0]-w()*m_zoomFactor,m_zoomPos[0]+w()*m_zoomFactor,(h()-m_zoomPos[1])-h()*m_zoomFactor,(h()-m_zoomPos[1])+h()*m_zoomFactor);
+            glViewport(0,0,width(),height());
+            gluOrtho2D(m_zoomPos[0]-width()*m_zoomFactor,m_zoomPos[0]+width()*m_zoomFactor,(height()-m_zoomPos[1])-height()*m_zoomFactor,(height()-m_zoomPos[1])+height()*m_zoomFactor);
 			glMatrixMode(GL_MODELVIEW);
 		}
 		else
 		{
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
-			glViewport(0,0,w(),h());
-			gluOrtho2D(0,w(),0,h());
+            glViewport(0,0,width(),height());
+            gluOrtho2D(0,width(),0,height());
 			glMatrixMode(GL_MODELVIEW);
 		}
 
@@ -1319,10 +1408,10 @@ void CPaintView::onMove(int x, int y)
 	
 	switch (m_editMode) {
 	case EM_DIRECT_BRUSH:
-		this->redraw();
+        this->doRedraw();
 		break;
 	case EM_PASTE:
-		this->redraw();
+        this->doRedraw();
 		break;
 	default:
 		
@@ -1330,7 +1419,7 @@ void CPaintView::onMove(int x, int y)
 	}
 
 	if (m_zoomResults&&m_femGrid->getShowGrid())
-		this->redraw();
+        this->doRedraw();
 }
 
 /////////////////////////////////////////////////////////////
@@ -1346,7 +1435,6 @@ void CPaintView::loadBrushes()
 	
 	// Test file locations
 	
-	FILE* f;
 	string brushPath = "";
 	string brushName = "";
 
@@ -1355,7 +1443,7 @@ void CPaintView::loadBrushes()
 	int lastSlash = exePath.rfind("/");
 	brushPath = exePath.substr(0,lastSlash)+"/brushes/";
 #else
-	f = fopen("/usr/share/forcepad/brushes/rbrush4.rgb", "rb");
+    FILE* f = fopen("/usr/share/forcepad/brushes/rbrush4.rgb", "rb");
 	if (!f)
 	{
 		f = fopen("/usr/local/share/forcepad/brushes/rbrush4.rgb", "rb");
@@ -1550,16 +1638,16 @@ void CPaintView::deleteBrushes()
 
 void CPaintView::clearMesh()
 {
-	so_print("CPaintView","clearMesh()");
+    so_print("CPaintView","clearMesh()");
 	m_femGrid->setShowGrid(false);
-	this->redraw();
+    this->doRedraw();
 }
 
 void CPaintView::clearResults()
 {
 	so_print("CPaintView", "clearResults()");
 	m_femGrid->clearResults();
-	this->redraw();
+    this->doRedraw();
 }
 
 void CPaintView::updateSelectionBox()
@@ -1628,93 +1716,23 @@ void CPaintView::updateModel()
 	{
 		((CMainFrame*)m_mainFrame)->setPixelWeight(m_femGrid->getPixelArea()*1e-3);
 		((CMainFrame*)m_mainFrame)->setExternalForce(m_femGrid->getPixelArea()*m_relativeForceSize*1e-3);
-		this->redraw();
+        this->doRedraw();
 	}
 }
 
 void CPaintView::updateCursor()
 {
-#ifndef __APPLE__
-	switch (m_editMode) {
-	//case EM_BRUSH:
-	case EM_DIRECT_BRUSH:
-	//case EM_ERASE:
-	case EM_DIRECT_ERASE:
-		fl_cursor_ex( m_cursors[m_currentBrushIdx] );
-		break;
-	case EM_SELECT_BOX:
-		fl_cursor_ex( m_cursors[10] );
-		break;
-	case EM_FORCE:
-		fl_cursor_ex( m_cursors[11] );
-		break;
-	case EM_CONSTRAINT:
-		fl_cursor_ex( m_cursors[12] );
-		break;
-	case EM_CONSTRAINT_VECTOR:
-		fl_cursor_ex( m_cursors[12] );
-		break;
-	case EM_CONSTRAINT_HINGE:
-		fl_cursor_ex( m_cursors[12] );
-		break;
-	case EM_LINE:
-		fl_cursor_ex( m_cursors[13] );
-		break;
-	case EM_RECTANGLE:
-		fl_cursor_ex( m_cursors[14] );
-		break;
-	case EM_ELLIPSE:
-		fl_cursor_ex( m_cursors[15] );
-		break;
-	case EM_FLOODFILL:
-		fl_cursor_ex( m_cursors[16] );
-		break;
-	case EM_ERASE_CONSTRAINTS_FORCES:
-		fl_cursor_ex( m_cursors[17] );
-		break;
-	default:
-		fl_cursor( FL_CURSOR_DEFAULT );
-	}
-#endif
+    doUpdateCursor(m_editMode);
 }
 
 void CPaintView::createCursors()
 {
-#ifndef __APPLE__
-	int i;
-	
-	for (i=0; i<20; i++)
-		m_cursors[i] = new Fl_Cursor_Shape();
-	
-	m_cursors[0]->shape( rshape4_hotX, rshape4_hotY, rshape4_and, rshape4_xor );
-	m_cursors[1]->shape( rshape8_hotX, rshape8_hotY, rshape8_and, rshape8_xor );
-	m_cursors[2]->shape( rshape16_hotX, rshape16_hotY, rshape16_and, rshape16_xor );
-	m_cursors[3]->shape( rshape32_hotX, rshape32_hotY, rshape32_and, rshape32_xor );
-	m_cursors[4]->shape( rshape32_hotX, rshape32_hotY, rshape32_and, rshape32_xor );
-	m_cursors[5]->shape( sshape4_hotX, sshape4_hotY, sshape4_and, sshape4_xor );
-	m_cursors[6]->shape( sshape8_hotX, sshape8_hotY, sshape8_and, sshape8_xor );
-	m_cursors[7]->shape( sshape16_hotX, sshape16_hotY, sshape16_and, sshape16_xor );
-	m_cursors[8]->shape( sshape32_hotX, sshape32_hotY, sshape32_and, sshape32_xor );
-	m_cursors[9]->shape( sshape32_hotX, sshape32_hotY, sshape32_and, sshape32_xor );
-	m_cursors[10]->shape( cross_select_hotX, cross_select_hotY, cross_select_and, cross_select_xor );
-	m_cursors[11]->shape( cross_load_hotX, cross_load_hotY, cross_load_and, cross_load_xor );
-	m_cursors[12]->shape( cross_bc_hotX, cross_bc_hotY, cross_bc_and, cross_bc_xor );
-	m_cursors[13]->shape( cross_line_hotX, cross_line_hotY, cross_line_and, cross_line_xor );
-	m_cursors[14]->shape( cross_rect_hotX, cross_rect_hotY, cross_rect_and, cross_rect_xor );
-	m_cursors[15]->shape( cross_circle_hotX, cross_circle_hotY, cross_circle_and, cross_circle_xor );
-	m_cursors[16]->shape( cross_bucket_hotX, cross_bucket_hotY, cross_bucket_and, cross_bucket_xor );
-	m_cursors[17]->shape( erase_hotX, erase_hotX, erase_and, erase_xor );
-#endif
+    doCreateCursors();
 }
 
 void CPaintView::deleteCursors()
 {
-#ifndef __APPLE__
-	int i;
-	
-	for (i=0; i<20; i++)
-		delete m_cursors[i];
-#endif
+    doDeleteCursors();
 }
 
 void CPaintView::checkOpenGLVersion()
@@ -1735,15 +1753,15 @@ void CPaintView::zoomIn()
 	if (m_zoomFactor < 0.01)
 		m_zoomFactor = 0.01;
 
-	this->flush();
-	this->redraw();
+    this->doFlush();
+    this->doRedraw();
 }
 
 void CPaintView::zoomOut()
 {
 	m_zoomFactor += 0.01;
-	this->flush();
-	this->redraw();
+    this->doFlush();
+    this->doRedraw();
 }
 
 
@@ -1764,7 +1782,7 @@ bool CPaintView::execute()
 	//
 	
 	if (m_femGrid->enumerateDofs(ED_BOTTOM_TOP)>10000)
-		if (fl_ask("Model contains >10000 degrees of freedom.\nCalculation can take a long time.\nContinue?")==0)	
+        if (!doAskYesNo("Model contains >10000 degrees of freedom.\nCalculation can take a long time.\nContinue?"))
 			return false;
 		
 	//
@@ -1808,25 +1826,25 @@ bool CPaintView::execute()
 		errors = false;
 		break;
 	case CFemGridSolver2::ET_NO_ELEMENTS:
-		fl_message("No structure to solve.");
+        doInfoMessage("No structure to solve.");
 		break;
 	case CFemGridSolver2::ET_NO_BCS:
-		fl_message("Add locks to structure.");
+        doInfoMessage("Add locks to structure.");
 		break;
 	case CFemGridSolver2::ET_NO_LOADS:
-		fl_message("No loads defined on structure.");
+        doInfoMessage("No loads defined on structure.");
 		break;
 	case CFemGridSolver2::ET_UNSTABLE:
-		fl_message("Structure unstable. Try adding locks.");
+        doInfoMessage("Structure unstable. Try adding locks.");
 		break;
 	case CFemGridSolver2::ET_INVALID_MODEL:
-		fl_message("Model invalid.");
+        doInfoMessage("Model invalid.");
 		break;
 	case CFemGridSolver2::ET_LOAD_OUTSIDE_AE:
-		fl_message("Loads defined outside structure.");
+        doInfoMessage("Loads defined outside structure.");
 		break;
 	case CFemGridSolver2::ET_BC_OUTSIDE_AE:
-		fl_message("Locks defined outside structure.");
+        doInfoMessage("Locks defined outside structure.");
 		break;
 	default:
 		
@@ -1844,14 +1862,14 @@ bool CPaintView::execute()
 	if (errors)
 	{
 		m_femGrid->setShowGrid(false);
-		this->invalidate();
+        this->doInvalidate();
 	}
 	else
 		m_femGrid->setShowGrid(true);
 	
 	so_print("CPaintView","\tRedraw.");
 	
-	this->redraw();
+    this->doRedraw();
 
 	return !errors;
 }
@@ -1873,7 +1891,7 @@ bool CPaintView::executeOpt()
 	//
 	
 	if (m_femGrid->enumerateDofs(ED_BOTTOM_TOP)>10000)
-		if (fl_ask("Model contains >10000 degrees of freedom.\nCalculation can take a long time.\nContinue?")==0)	
+        if (!doAskYesNo("Model contains >10000 degrees of freedom.\nCalculation can take a long time.\nContinue?"))
 			return false;
 		
 	//
@@ -1925,25 +1943,25 @@ bool CPaintView::executeOpt()
 		errors = false;
 		break;
 	case CFemGridSolver2::ET_NO_ELEMENTS:
-		fl_message("No structure to solve.");
+        doInfoMessage("No structure to solve.");
 		break;
 	case CFemGridSolver2::ET_NO_BCS:
-		fl_message("Add locks to structure.");
+        doInfoMessage("Add locks to structure.");
 		break;
 	case CFemGridSolver2::ET_NO_LOADS:
-		fl_message("No loads defined on structure.");
+        doInfoMessage("No loads defined on structure.");
 		break;
 	case CFemGridSolver2::ET_UNSTABLE:
-		fl_message("Structure unstable. Try adding locks.");
+        doInfoMessage("Structure unstable. Try adding locks.");
 		break;
 	case CFemGridSolver2::ET_INVALID_MODEL:
-		fl_message("Model invalid.");
+        doInfoMessage("Model invalid.");
 		break;
 	case CFemGridSolver2::ET_LOAD_OUTSIDE_AE:
-		fl_message("Loads defined outside structure.");
+        doInfoMessage("Loads defined outside structure.");
 		break;
 	case CFemGridSolver2::ET_BC_OUTSIDE_AE:
-		fl_message("Locks defined outside structure.");
+        doInfoMessage("Locks defined outside structure.");
 		break;
 	default:
 		
@@ -1962,14 +1980,14 @@ bool CPaintView::executeOpt()
 	{
 		m_femGrid->setShowGrid(false);
 		m_femGrid->setShowDensity(false);
-		this->invalidate();
+        this->doInvalidate();
 	}
 	else
 		m_femGrid->setShowDensity(false);
 	
 	so_print("CPaintView","\tRedraw.");
 	
-	this->redraw();
+    this->doRedraw();
 
 	return !errors;
 }
@@ -1980,18 +1998,12 @@ void CPaintView::newModel()
 
 	so_print("CPaintView","newModel()");
 	
-	CNewModelDlg* dlg = new CNewModelDlg();
-	dlg->setSize(640, 480);
-	dlg->centerWindow(this->window());
-	dlg->show();
+    int width = 640;
+    int height = 480;
+    int initialStiffness = 0;
 	
-	if (dlg->getModalResult()!=MR_CANCEL)
-	{
-		int width, height, initialStiffness;
-
-		dlg->getSize(width, height);
-		initialStiffness = dlg->getInitialStiffness();
-		
+    if (this->doNewModel(width, height, initialStiffness))
+	{		
 		this->setModelName("noname.fp2");
 		
 		// Create drawing area
@@ -2040,8 +2052,8 @@ void CPaintView::newModel()
 		m_useWeight = false;
 		m_femGrid->setUseWeight(m_useWeight);
 		
-		this->invalidate();
-		this->redraw();
+        this->doInvalidate();
+        this->doRedraw();
 
 		if (m_newModelEvent!=NULL)
 			m_newModelEvent->onNewModel();
@@ -2061,29 +2073,29 @@ void CPaintView::openImage()
 	
 	so_print("CPaintView","openImage()");
 	
-#ifdef WIN32
-	char* fname = fl_file_chooser_image("Open image file", "");
-#else
-	char* fname = fl_file_chooser("Open image file", "*.*", "");
-#endif
-	m_danglingRelease = true;
+    std::string fname = this->doOpenDialog("Open image file", "*.*");
+
+    m_danglingRelease = true;
 	
-	if (fname!=NULL)
+    if (fname!="")
 	{
 		bool jpegFile = false;
 		bool pngFile = false;
 		bool rgbFile = false;
-		
-		if (strcmp(fl_filename_ext(fname),".jpg")==0)
+
+        int lastIndex = fname.find_last_of(".");
+        std::string extension = fname.substr(lastIndex+1);
+
+        if (extension == ".jpg")
 			jpegFile = true;
 		
-		if (strcmp(fl_filename_ext(fname),".jpeg")==0)
+        if (extension == ".jpeg")
 			jpegFile = true;
 		
-		if (strcmp(fl_filename_ext(fname),".png")==0)
+        if (extension == ".png")
 			pngFile = true;
 		
-		if (strcmp(fl_filename_ext(fname),".rgb")==0)
+        if (extension == ".rgb")
 			rgbFile = true;
 		
 		if ((!jpegFile)&&(!pngFile)&&(!rgbFile))
@@ -2099,7 +2111,7 @@ void CPaintView::openImage()
 		if (jpegFile)
 		{
 			jpegImage = new CJpegImage();
-			jpegImage->setFileName(fname);
+            jpegImage->setFileName(fname.c_str());
 			jpegImage->read();
 			image = jpegImage;
 		}
@@ -2107,7 +2119,7 @@ void CPaintView::openImage()
 		if (pngFile)
 		{
 			pngImage = new CPngImage();
-			pngImage->setFileName(fname);
+            pngImage->setFileName(fname.c_str());
 			pngImage->read();
 			image = pngImage;
 		}
@@ -2115,7 +2127,7 @@ void CPaintView::openImage()
 		if (rgbFile)
 		{
 			rgbImage = new CSgiImage();
-			rgbImage->setFileName(fname);
+            rgbImage->setFileName(fname.c_str());
 			rgbImage->read();
 			image = rgbImage;
 		}
@@ -2138,12 +2150,12 @@ void CPaintView::openImage()
 		}
 		else
 		{
-			m_clipboard->copyImage(image->getWidth(), image->getHeight(), image->getImageMap());			
+            m_clipboard->copyImage(image->getWidth(), image->getHeight(), image->getImageMap());
 			setEditMode(EM_PASTE);
 		}
 		
-		this->invalidate();
-		this->redraw();
+        this->doInvalidate();
+        this->doRedraw();
 	}
 	
 	enableDrawing();
@@ -2157,14 +2169,12 @@ void CPaintView::saveModelAs()
 	// Ask for file name
 	//
 
-	char* fname = fl_file_chooser("Save forcepad model", "*.fp2", m_modelName.c_str());
-	
-	if (fname!=NULL)
-	{
-		setModelName(fname);
-	}
-	else
-		return;
+    std::string fname = this->doSaveDialog("Save forcepad model", "*.fp2", m_modelName);
+
+    if (fname!="")
+        this->setModelName(fname);
+    else
+        return;
 	
 	//
 	// Save file
@@ -2190,9 +2200,9 @@ void CPaintView::saveModel()
 
 	if (m_modelName=="noname.fp2")
 	{
-		char* fname = fl_file_chooser("Save forcepad model", "*.fp2", m_modelName.c_str());
+        std::string fname = this->doSaveDialog("Save forcepad model", "*.fp2", m_modelName);
 		
-		if (fname!=NULL)
+        if (fname!="")
 		{
 			setModelName(fname);
 		}
@@ -2214,6 +2224,83 @@ void CPaintView::saveModel()
 	f.close();
 }
 
+void CPaintView::expandImage()
+{
+    disableDrawing();
+
+    int i, width, height, maxWidth, maxHeight;
+    double dWidth, dHeight, dAspect;
+
+    width = m_drawing->getWidth();
+    height = m_drawing->getHeight();
+
+    maxWidth = this->width()-50;
+    maxHeight = this->height()-50;
+
+    dAspect = (double)width/(double)height;
+    dWidth = (double)width  * 1.20;
+    dHeight = dWidth/dAspect;
+
+    width = (int)dWidth;
+    height = (int)dHeight;
+
+    m_drawing = new CImage(2);
+    m_drawing->setChannels(4);
+
+    for (i=width; i>0; i--)
+    {
+        if (i % 8 == 0)
+        {
+            width = i;
+            break;
+        }
+    }
+
+    for (i=height; i>0; i--)
+    {
+        if (i % 8 == 0)
+        {
+            height = i;
+            break;
+        }
+    }
+
+    if (width>maxWidth)
+        width = maxWidth;
+    if (height>maxHeight)
+        height = maxHeight;
+
+    m_drawing->setSize(width, height);
+    m_drawing->fillColor(255, 255 ,255);
+
+    m_drawing->setLayer(1);
+    m_drawing->fillColor(255,255,255);
+    m_drawing->fillAlpha(128);
+    m_drawing->setAlpha(128);
+    m_drawing->setLayer(0);
+
+    // Copy previous image to new image.
+
+    m_clipboard->copy(0,0, m_femGrid->getImage()->getWidth(), m_femGrid->getImage()->getHeight());
+    width = m_femGrid->getImage()->getWidth();
+    height = m_femGrid->getImage()->getHeight();
+
+    // Create image grid
+
+    m_femGrid->setImage(m_drawing);
+    m_femGrid->setShowGrid(false);
+    m_clipboard->setImage(m_drawing);
+    m_undoClipboard->setImage(m_drawing);
+    m_screenImage->setImage(m_drawing);
+
+    m_clipboard->paste(m_drawing->getWidth()/2-width/2, m_drawing->getHeight()/2-height/2);
+
+    this->doInvalidate();
+    this->doRedraw();
+
+    enableDrawing();
+}
+
 void CPaintView::expandImageToWindow()
 {
 	disableDrawing();
@@ -2223,8 +2310,8 @@ void CPaintView::expandImageToWindow()
 
 	int i, width, height;
 
-	width = this->w()-50;
-	height = this->h()-50;
+    width = this->width()-50;
+    height = this->height()-50;
 
 	for (i=width; i>0; i--)
 	{
@@ -2255,7 +2342,7 @@ void CPaintView::expandImageToWindow()
 
 	// Copy previous image to new image.
 
-	m_clipboard->copy(0,0, m_femGrid->getImage()->getWidth(), m_femGrid->getImage()->getHeight());
+    m_clipboard->copy(0,0, m_femGrid->getImage()->getWidth(), m_femGrid->getImage()->getHeight());
 	
 	// Create image grid
 	
@@ -2267,8 +2354,8 @@ void CPaintView::expandImageToWindow()
 
 	m_clipboard->paste(0,0);
 
-	this->invalidate();
-	this->redraw();
+    this->doInvalidate();
+    this->doRedraw();
 
 	enableDrawing();
 }
@@ -2310,8 +2397,8 @@ void CPaintView::openModel(const std::string filename)
 	m_femGrid->setShowGrid(false);
 	m_showMesh = false;
 		
-	this->invalidate();
-	this->redraw();
+    this->doInvalidate();
+    this->doRedraw();
 
 	enableDrawing();
 
@@ -2329,10 +2416,10 @@ void CPaintView::openModel()
 	
 	so_print("CPaintView", "openModel()");
 	
-	char* fname = fl_file_chooser("Open forcepad model", "*.fp2", "");
+    std::string fname = doOpenDialog("Open forcepad model", "*.fp2");
 	m_danglingRelease = true;
 	
-	if (fname!=NULL)
+    if (fname!="")
 	{
 		setModelName(fname);
 		
@@ -2361,8 +2448,8 @@ void CPaintView::openModel()
 		m_femGrid->setShowGrid(false);
 		m_showMesh = false;
 		
-		this->invalidate();
-		this->redraw();
+        this->doInvalidate();
+        this->doRedraw();
 
 		if (m_modelLoadedEvent!=NULL)
 			m_modelLoadedEvent->onModelLoaded();
@@ -2403,7 +2490,7 @@ void CPaintView::copy()
 	m_clipboard->copy(x1, y1, x2, y2);
 	copyToWindows();
 	
-	this->redraw();
+    this->doRedraw();
 }
 
 void CPaintView::cut()
@@ -2435,7 +2522,7 @@ void CPaintView::cut()
 	
 	m_clipboard->cut(x1, y1, x2, y2);
 	
-	this->redraw();
+    this->doRedraw();
 }
 
 void CPaintView::undo()
@@ -2459,7 +2546,7 @@ void CPaintView::undo()
 	
 	m_undoClipboard->paste(x1, y1);
 	
-	this->redraw();
+    this->doRedraw();
 }
 
 void CPaintView::updateUndoArea(int x, int y, int brushSize)
@@ -2489,19 +2576,19 @@ void CPaintView::updateUndoArea(int x, int y, int brushSize)
 void CPaintView::undoToDrawing()
 {
 	updateUndoArea(0,0,0);
-	updateUndoArea(m_drawing->getWidth(), m_drawing->getHeight(),0);
+    updateUndoArea(m_drawing->getWidth(), m_drawing->getHeight(),0);
 }
 
 void CPaintView::transferViewToImage()
 {
-	int w = m_drawing->getWidth();
+    int w = m_drawing->getWidth();
 	int h = m_drawing->getHeight();
 	int storageWidth = w*3;
 	GLubyte *pPixelData = new GLubyte[storageWidth*h];
 	
 	// Make OpenGL context current
 	
-	make_current(); 
+    this->doMakeCurrent();
 	
 	// Read pixels from screen
 	
@@ -2596,7 +2683,8 @@ void CPaintView::copyToWindows()
 	
 	// Make OpenGL context current
 	
-	make_current(); 
+    this->doMakeCurrent();
+    //make_current();
 	
 	// Read pixels from screen
 	
@@ -2686,7 +2774,7 @@ void CPaintView::pasteFromWindows()
 	
 	if (!IsClipboardFormatAvailable(CF_DIB)) 
 	{
-		fl_message("Clipboard format not supported.");
+        doInfoMessage("Clipboard format not supported.");
 		return; 
 	}
 	
@@ -2694,7 +2782,7 @@ void CPaintView::pasteFromWindows()
 	
 	if (!OpenClipboard(NULL)) 
 	{
-		fl_message("Could not open clipboard.");
+        doInfoMessage("Could not open clipboard.");
 		return; 
 	}
 	
@@ -2709,7 +2797,7 @@ void CPaintView::pasteFromWindows()
 		char *pData = (char *) GlobalLock(hglb); 
 		
 		if (pData==NULL)
-			fl_message("This should not normally happen. (GlobalLock failed).");
+            doInfoMessage("This should not normally happen. (GlobalLock failed).");
 		
 		// Create header
 		
@@ -2723,10 +2811,10 @@ void CPaintView::pasteFromWindows()
 		// Check if we can handle the bitmap
 		
 		if (header->biBitCount!=24)
-			fl_message("Image must be 24 bit color.");
+            doInfoMessage("Image must be 24 bit color.");
 		
 		if (header->biCompression!=0)
-			fl_message("Compression not supported.");
+            doInfoMessage("Compression not supported.");
 		
 		GLubyte* pPixelDataPadded;
 		GLubyte* pPixelData;
@@ -2792,14 +2880,14 @@ void CPaintView::pasteFromWindows()
 		delete header;
 	} 
 	else
-		fl_message("Could not get clipboard data.");
+        doInfoMessage("Could not get clipboard data.");
 	
 	CloseClipboard(); 
 	
 	return; 
 	
 #else
-	fl_message("Hmm. I am currently having difficulties pasting from the Windows Clipboard...");
+    doInfoMessage("Hmm. I am currently having difficulties pasting from the Windows Clipboard...");
 #endif
 }
 
@@ -2831,7 +2919,7 @@ void CPaintView::setMainFrame(void *frame)
 void CPaintView::setStressStep(int step)
 {
 	m_femGrid->setStressStep(step);
-	this->redraw();
+    this->doRedraw();
 }
 
 int CPaintView::getStressStep()
@@ -2852,7 +2940,7 @@ bool CPaintView::getUseWeight()
 void CPaintView::setStressMode(CFemGrid2::TStressMode mode)
 {
 	m_femGrid->setStressMode(mode);
-	this->redraw();
+    this->doRedraw();
 }
 
 void CPaintView::setBrushMagnification(int factor)
@@ -2905,7 +2993,7 @@ void CPaintView::setGridStride(int stride)
 {
 	m_femGrid->setStride(stride);
 	this->clearResults();
-	this->clearMesh();
+    this->clearMesh();
 	m_gridSpacing = stride;
 }
 
@@ -2922,14 +3010,14 @@ void CPaintView::setEditMode(TEditMode mode)
 	
 	if ((m_editMode!=EM_SELECT_BOX)&&(m_editMode!=EM_RESULT)&&(m_editMode!=EM_DYNAMIC_FORCE_UPDATE))
 	{
-		this->clearMesh();
+        this->clearMesh();
 		m_femGrid->resetStressDrawing();
 	}
 	
 	updateSelectionBox();
 	
-	this->invalidate(); // Fixed redrawing problems
-	this->redraw();
+    this->doInvalidate(); // Fixed redrawing problems
+    this->doRedraw();
 
 	if (m_modeChangeEvent!=NULL)
 	{
@@ -2945,6 +3033,7 @@ CPaintView::TEditMode CPaintView::getEditMode()
 void CPaintView::setLineWidth(int width)
 {
 	m_line->setWidth(width);
+    m_arch->setLineWidth(width);
 }
 
 int CPaintView::getBlendFactor()
@@ -2959,7 +3048,7 @@ int CPaintView::getCurrentBrushIdx()
 
 int CPaintView::getLineWidth()
 {
-	return 	m_line->getWidth();
+    return 	m_line->getWidth();
 }
 
 void CPaintView::setStiffness(double stiffness)
@@ -2975,31 +3064,31 @@ double CPaintView::getStiffness()
 void CPaintView::setDisplacementScale(double value)
 {
 	m_femGrid->setDisplacementScale(value);
-	this->redraw();
+    this->doRedraw();
 }
 
 void CPaintView::setStressAlpha(double alpha)
 {
 	m_femGrid->setStressAlpha(alpha);
-	this->redraw();
+    this->doRedraw();
 }
 
 void CPaintView::setStressSize(double size)
 {
 	m_femGrid->setStressSize(size);
-	this->redraw();
+    this->doRedraw();
 }
 
 void CPaintView::setStressWidth(double width)
 {
 	m_femGrid->setStressWidth(width);
-	this->redraw();
+    this->doRedraw();
 }
 
 void CPaintView::setStressTreshold(double lower, double upper)
 {
 	m_femGrid->setStressTreshold(lower, upper);
-	this->redraw();
+    this->doRedraw();
 }
 
 void CPaintView::setLockScaling(bool flag)
@@ -3011,12 +3100,12 @@ void CPaintView::setMaxIntensity(float intensity)
 {
 	m_maxIntensity = intensity;
 	m_femGrid->setMaxIntensity(intensity);
-	this->redraw();
+    this->doRedraw();
 }
 
 void CPaintView::applyElementScale()
 {
-	this->m_femGrid->setElementScaleFactor(m_ruler->getActualLength()/m_ruler->getPixelLength());
+    this->m_femGrid->setElementScaleFactor(m_ruler->getActualLength()/m_ruler->getPixelLength());
 }
 
 void CPaintView::setRulerLength(double actualLength)
@@ -3024,13 +3113,13 @@ void CPaintView::setRulerLength(double actualLength)
 	if (actualLength>0.0)
 	{
 		m_ruler->setActualLength(actualLength);
-		this->m_femGrid->setElementScaleFactor(m_ruler->getActualLength()/m_ruler->getPixelLength());
+        this->m_femGrid->setElementScaleFactor(m_ruler->getActualLength()/m_ruler->getPixelLength());
 	}
 }
 
 double CPaintView::getRulerLength()
 {
-	return m_ruler->getActualLength();
+    return m_ruler->getActualLength();
 }
 
 void CPaintView::setVisualisationMode(TVisualisationMode mode)
@@ -3136,7 +3225,7 @@ void CPaintView::setModelName(const std::string& modelName)
 void CPaintView::setZoomResults(bool flag)
 {
 	m_zoomResults = flag;
-	this->redraw();
+    this->doRedraw();
 }
 
 bool CPaintView::getZoomResults()
@@ -3162,7 +3251,7 @@ void CPaintView::setCalcCG(bool flag)
 		m_femGrid->updatePixelArea();
 	
 	this->updateModel();
-	this->redraw();
+    this->doRedraw();
 }
 
 bool CPaintView::getCalcCG()
@@ -3172,18 +3261,12 @@ bool CPaintView::getCalcCG()
 
 void CPaintView::showAbout()
 {
-#ifdef WIN32
-	ShellExecute(0, "open", "http://forcepad.sourceforge.net", NULL, NULL, SW_SHOWNORMAL);
-#endif
+    this->doShowAbout();
 }
 
 void CPaintView::showHelp() 
 {
-#ifdef WIN32
-#ifdef FORCEPAD_KIOSK
-	ShellExecute(0, "open", ".\\kiosk\\ForcePAD.pdf", NULL, NULL, SW_SHOWNORMAL);
-#endif
-#endif
+    this->doShowHelp();
 }
 
 void CPaintView::setImportMode(TImportMode mode)
@@ -3224,8 +3307,8 @@ void CPaintView::setViewMode(TViewMode mode)
 		m_femGrid->setDimmedConstraints(true);
 		m_femGrid->setDrawForcesAndConstraints(true);
 		m_femGrid->clearResults();
-		this->invalidate();
-		this->redraw();
+        this->doInvalidate();
+        this->doRedraw();
 
 		if (m_viewModeChangeEvent!=NULL)
 		{
@@ -3240,8 +3323,8 @@ void CPaintView::setViewMode(TViewMode mode)
 		m_femGrid->setDimmedConstraints(false);
 		m_femGrid->setDrawForcesAndConstraints(true);
 		m_femGrid->clearResults();
-		this->invalidate();
-		this->redraw();
+        this->doInvalidate();
+        this->doRedraw();
 
 		if (m_viewModeChangeEvent!=NULL)
 		{
@@ -3258,7 +3341,7 @@ void CPaintView::setViewMode(TViewMode mode)
 void CPaintView::setDrawStress(bool flag)
 {
 	m_femGrid->setDrawStress(flag);
-	this->redraw();
+    this->doRedraw();
 }
 
 bool CPaintView::getDrawStress()
@@ -3270,7 +3353,7 @@ void CPaintView::setDrawDisplacements(bool flag)
 {
 	m_femGrid->setDrawDisplacements(flag);
 	m_femGrid->setUndeformedGrid(flag);
-	this->redraw();
+    this->doRedraw();
 }
 
 bool CPaintView::getDrawDisplacements()
@@ -3281,7 +3364,7 @@ bool CPaintView::getDrawDisplacements()
 void CPaintView::setDrawForcesAndConstraints(bool flag)
 {
 	m_femGrid->setDrawForcesAndConstraints(flag);
-	this->redraw();
+    this->doRedraw();
 }
 
 
@@ -3293,7 +3376,7 @@ void CPaintView::setStressType(CFemGrid2::TStressType stressType)
 		this->setColorMap(1);
 
 	m_femGrid->setStressType(stressType);
-	this->redraw();
+    this->doRedraw();
 }
 
 void CPaintView::setColorMap(int index)
@@ -3334,20 +3417,20 @@ void CPaintView::setColorMap(int index)
 		cout << "colormap filename = " << filename << endl;
 		m_femGrid->getColorMap()->open(filename.c_str());
 		m_femGrid->updateColorMapTexture();
-		this->redraw();
+        this->doRedraw();
 	}
 }
 
 void CPaintView::setInvertColorMap(bool flag)
 {
 	m_femGrid->getColorMap()->setInvert(flag);
-	this->redraw();
+    this->doRedraw();
 }
 
 void CPaintView::setUpperMisesTreshold(double upper)
 {
 	m_femGrid->setUpperMisesTreshold(upper);
-	this->redraw();
+    this->doRedraw();
 }
 
 void CPaintView::setElementTreshold(double value)
@@ -3468,7 +3551,7 @@ void CPaintView::setOptLayer(bool active)
 		m_drawing->setLayer(1);
 	else
 		m_drawing->setLayer(0);
-	this->redraw();
+    this->doRedraw();
 }
 
 void CPaintView::setOptVolumeFraction(double fraction)
@@ -3514,7 +3597,7 @@ int CPaintView::getOptMaxLoops()
 void CPaintView::setUiLineThickness(double thickness)
 {
 	CUiSettings::getInstance()->setLineThickness(thickness);
-	this->redraw();
+    this->doRedraw();
 }
 
 double CPaintView::getUiLineThickness()
@@ -3525,12 +3608,12 @@ double CPaintView::getUiLineThickness()
 void CPaintView::setUiSymbolLength(double length)
 {
 	CUiSettings::getInstance()->setSymbolLength(length);
-	this->redraw();
+    this->doRedraw();
 }
 
 double CPaintView::getUiSymbolLength()
 {
-	return CUiSettings::getInstance()->getSymbolLength();
+    return CUiSettings::getInstance()->getSymbolLength();
 }
 
 void CPaintView::setOptFilterType(CFemGridSolver2::TFilterType filterType)

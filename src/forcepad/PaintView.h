@@ -27,17 +27,6 @@
 
 #include "forcepad_config.h"
 
-#include <FL/Fl.H>
-#include <FL/Fl_Gl_Window.H>
-
-#include <FL/gl.h>
-
-#ifdef __APPLE__
-#include <OpenGL/glu.h>
-#else
-#include <GL/glu.h>
-#endif
-
 #include <vector>
 
 #include "Rectangle.h"
@@ -50,10 +39,10 @@
 #include "ForcePadClipboard.h"
 #include "ScreenImage.h"
 #include "Ruler.h"
+#include "Arch.h"
 
 #include "FemGridSolver2.h"
 #include "CGIndicator.h"
-#include "Fl_Cursor_Shape.H"
 
 class CPVModeChangeEvent;
 class CPVViewModeChangeEvent;
@@ -64,7 +53,7 @@ class CPVVisualisationModeChangedEvent;
 class CPVModelLoadedEvent;
 class CPVNewModelEvent;
 
-class CPaintView : public Fl_Gl_Window {
+class CPaintView {
 public:
 	/*
 	 *    Edit modes
@@ -88,7 +77,8 @@ public:
 		EM_SELECT_BOX,
 		EM_PASTE,
 		EM_RESULT,
-		EM_RULER
+        EM_RULER,
+        EM_ARCH
 	};
 
 	enum TImportMode {
@@ -108,7 +98,7 @@ public:
 		VM_DISPLACEMENTS,
 		VM_STRUCTURE
 	};
-private:
+protected:
 	/*
 	 *    Command line arguments
 	 */
@@ -173,9 +163,9 @@ private:
 	CSgiImagePtr m_currentBrush;
 	CSgiImagePtr m_currentInvertedBrush;
 
-#ifndef __APPLE__
-	Fl_Cursor_Shape* m_cursors[20];
-#endif
+//#ifndef __APPLE__
+//	Fl_Cursor_Shape* m_cursors[20];
+//#endif
 
 	float m_brushColor[3];
 	float m_optConstraintColor[3];
@@ -219,6 +209,7 @@ private:
 	CRectanglePtr m_rectangle;
 	CEllipsePtr m_ellipse;
 	CLinePtr m_line;
+    CArchPtr m_arch;
 	CForcePtr m_newForce;
 	CConstraintPtr m_newConstraint;
 	CConstraint::TConstraintType m_constraintType;
@@ -341,6 +332,25 @@ private:
 	void enableDrawing();
 	void disableDrawing();
 
+    virtual int height();
+    virtual int width();
+    virtual void doRedraw();
+    virtual void doFlush();
+    virtual void doInvalidate();
+    virtual void doMakeCurrent();
+    virtual const std::string doSaveDialog(const std::string title, const std::string filter, const std::string defaultFilename);
+    virtual bool doNewModel(int& width, int& height, int& initialStiffness);
+    virtual void doInfoMessage(const std::string message);
+    virtual bool doAskYesNo(const std::string question);
+    virtual const std::string doOpenDialog(const std::string title, const std::string filter);
+
+    virtual void doCreateCursors();
+    virtual void doUpdateCursor(TEditMode mode);
+    virtual void doDeleteCursors();
+
+    virtual void doShowAbout();
+    virtual void doShowHelp();
+
 public:
 	/** 
 	 * PaintView class constructor.
@@ -358,10 +368,10 @@ public:
 	 */
 
 	/** FLTK draw() method virtual override. */
-    void draw();    
+    //void draw();
 
 	/** FLTK handle() method virtual override. */
-	int handle(int event);
+    //int handle(int event);
 
 	/*
 	 *    Methods
@@ -380,6 +390,7 @@ public:
 	void openModel();
 	void openModel(const std::string filename);
 	void expandImageToWindow();
+    void expandImage();
 
 	void showAbout();
 	void showHelp();

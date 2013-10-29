@@ -40,7 +40,7 @@ private:
 	unsigned long getlong(FILE *inf);
 	unsigned char getbyte(FILE *inf);
 	void expandrow(unsigned char *optr, unsigned char *iptr, int z);
-	void convertLong(GLuint *array, unsigned int length);
+    void convertLong(unsigned int *array, unsigned int length);
 public:
 	CSgiImage();
 	virtual ~CSgiImage();

@@ -24,6 +24,14 @@
 
 #include "Force.h"
 
+#ifdef __APPLE__
+#include <OpenGL/glu.h>
+#include <OpenGL/gl.h>
+#else
+#include <GL/glu.h>
+#include <GL/gl.h>
+#endif
+
 #include "UiSettings.h"
 
 // ------------------------------------------------------------
@@ -93,8 +101,9 @@ void CForce::doGeometry()
 	double y;
 	double length;
 	double arrowLength;
-	double oldLength;
-	double oldArrowLength;
+
+    double oldLength = m_length;
+    double oldArrowLength = m_arrowSize;
 
 	this->getPosition(x, y);
 	
@@ -110,8 +119,6 @@ void CForce::doGeometry()
 			length = CUiSettings::getInstance()->getSymbolLength();
 			arrowLength = 0.25*length;
 
-			oldLength = m_length;
-			oldArrowLength = m_arrowSize;
 
 			this->setLength(length);
 			this->setArrowSize(arrowLength);

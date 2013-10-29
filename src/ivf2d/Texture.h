@@ -38,12 +38,12 @@ IvfSmartPointer(CTexture);
  */
 class CTexture : public CBase {
 private:
-	GLenum m_wrapT;
-	GLenum m_wrapS;
-	GLenum m_textureMode;
-	GLenum m_magFilter;
-	GLenum m_minFilter;
-	GLuint m_textureName;
+    unsigned int m_wrapT;
+    unsigned int m_wrapS;
+    unsigned int m_textureMode;
+    unsigned int m_magFilter;
+    unsigned int m_minFilter;
+    unsigned int m_textureName;
 	float m_textureEnvColor[4];
 	bool m_bound;
 	CImagePtr m_image;

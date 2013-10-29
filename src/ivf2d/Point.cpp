@@ -24,6 +24,14 @@
 
 #include "Point.h"
 
+#ifdef __APPLE__
+#include <OpenGL/glu.h>
+#include <OpenGL/gl.h>
+#else
+#include <GL/glu.h>
+#include <GL/gl.h>
+#endif
+
 CPoint::CPoint()
 {
 	m_pos[0] = 0.0;

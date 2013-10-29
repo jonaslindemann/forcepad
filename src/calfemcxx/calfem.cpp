@@ -190,8 +190,8 @@ void plants(
 {
 	int ptype = (int) ep(1);
 		
-	int rowed = ed.Nrows();
-	int rowex = ex.Nrows(); 
+	//int rowed = ed.Nrows();
+	//int rowex = ex.Nrows();
 				
 	Matrix B(3,6);
 	Matrix Cm;
@@ -979,7 +979,7 @@ void plani4s(
 			Matrix &et)
 {
 	int ptype = (int)ep(1); 
-	double t = ep(2);  
+	//double t = ep(2);
 	int ir = (int)ep(3);  
 	int ngp = ir*ir;
 
@@ -1138,7 +1138,7 @@ void plani4s(
 		{
 			Matrix J = (JT.row(2*i-1) & JT.row(2*i));
 			PrintMatrix(J);
-			double detJ = J.determinant();
+			//double detJ = J.determinant();
 
 			Matrix Jinv = J.i();
 			PrintMatrix(Jinv);

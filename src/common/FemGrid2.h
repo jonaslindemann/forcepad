@@ -137,7 +137,7 @@ private:
 
 	double m_pixelArea;
 
-	GLubyte m_colorMapTex1D[384];
+    unsigned char m_colorMapTex1D[384];
 
 	void calcMaxMin(int* arr, int size, int &maxVal, int &minVal );
 

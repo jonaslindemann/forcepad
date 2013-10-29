@@ -31,7 +31,7 @@ IvfSmartPointer(CEllipse);
 
 class CEllipse : public CShape {
 private:
-	int m_size[2];
+    double m_size[2];
 	int m_sectors;
 public:
 	CEllipse();
@@ -43,6 +43,7 @@ public:
 
 	void setSectors(int sectors);
 	void setSize(int width, int height);
+    void setSizeDouble(double width, double height);
 };
 
 #endif 

@@ -26,10 +26,18 @@
 
 #include <cmath>
 
+#ifdef __APPLE__
+#include <OpenGL/glu.h>
+#include <OpenGL/gl.h>
+#else
+#include <GL/glu.h>
+#include <GL/gl.h>
+#endif
+
 CEllipse::CEllipse()
 {
-	m_size[0] = 25;
-	m_size[1] = 25;
+    m_size[0] = 25.0;
+    m_size[1] = 25.0;
 	m_sectors = 12;
 }
 
@@ -40,8 +48,14 @@ CEllipse::~CEllipse()
 
 void CEllipse::setSize(int width, int height)
 {
-	m_size[0] = width;
-	m_size[1] = height;
+    m_size[0] = (double)width;
+    m_size[1] = (double)height;
+}
+
+void CEllipse::setSizeDouble(double width, double height)
+{
+    m_size[0] = width;
+    m_size[1] = height;
 }
 
 void CEllipse::doGeometry()

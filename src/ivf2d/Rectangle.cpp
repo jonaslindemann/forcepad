@@ -24,6 +24,14 @@
 
 #include "Rectangle.h"
 
+#ifdef __APPLE__
+#include <OpenGL/glu.h>
+#include <OpenGL/gl.h>
+#else
+#include <GL/glu.h>
+#include <GL/gl.h>
+#endif
+
 CRectangle::CRectangle()
 {
 	m_size[0] = 1.0;
