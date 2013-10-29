@@ -24,6 +24,14 @@
 
 #include "ReactionForce.h"
 
+#ifdef __APPLE__
+#include <OpenGL/glu.h>
+#include <OpenGL/gl.h>
+#else
+#include <GL/glu.h>
+#include <GL/gl.h>
+#endif
+
 #include "UiSettings.h"
 
 // ------------------------------------------------------------
@@ -93,7 +101,7 @@ void CReactionForce::doGeometry()
 	double x;
 	double y;
 
-	double oldArrowSize;
+    double oldArrowSize = m_arrowSize;
 	
 	this->getPosition(x, y);
 
@@ -104,7 +112,6 @@ void CReactionForce::doGeometry()
 
 	if (CUiSettings::getInstance()->getSymbolLength()>0.0)
 	{
-		oldArrowSize = m_arrowSize;
 		this->setArrowSize(CUiSettings::getInstance()->getSymbolLength() * 0.25);
 	}
 	

@@ -14,9 +14,10 @@ LIST(REMOVE_ITEM INCLUDE_FILES ${to_remove_h})
 
 ADD_DEFINITIONS(-DFORCEPAD_KIOSK)
 
-IF(CMAKE_BUILD_TYPE STREQUAL Debug)
-	ADD_EXECUTABLE(forcepadd ${INCLUDE_FILES} ${SOURCE_FILES})
-ELSE(CMAKE_BUILD_TYPE STREQUAL Debug)
+#IF(CMAKE_BUILD_TYPE STREQUAL Debug)
+#	ADD_EXECUTABLE(forcepadd ${INCLUDE_FILES} ${SOURCE_FILES})
+#ELSE(CMAKE_BUILD_TYPE STREQUAL Debug)
+
 IF(APPLE)
 #ADD_EXECUTABLE(forcepad ${INCLUDE_FILES} ${SOURCE_FILES})
 ADD_EXECUTABLE(
@@ -114,11 +115,12 @@ SET_SOURCE_FILES_PROPERTIES(
 	MACOSX_PACKAGE_LOCATION Resources
 )
 ELSE(APPLE)
-	ADD_EXECUTABLE(forcepad_kiosk ${INCLUDE_FILES} ${SOURCE_FILES})
+	if (CMAKE_BUILD_TYPE STREQUAL Release)
+		ADD_EXECUTABLE(forcepad_kiosk ${INCLUDE_FILES} ${SOURCE_FILES})
+	else()
+		ADD_EXECUTABLE(forcepad_kioskd ${INCLUDE_FILES} ${SOURCE_FILES})
+	endif()
 ENDIF(APPLE)
-ENDIF(CMAKE_BUILD_TYPE STREQUAL Debug)
-
-
 
 IF(WIN32)
 	IF(CMAKE_BUILD_TYPE STREQUAL Debug)
@@ -128,8 +130,14 @@ IF(WIN32)
 	ENDIF(CMAKE_BUILD_TYPE STREQUAL Debug)
 ELSE(WIN32)
 	IF(APPLE)
-		TARGET_LINK_LIBRARIES(ForcePAD_Kiosk common ivf2d fltk fltk_gl fltk_images fltk_forms fltk_jpeg fltk_png calfemcxx newmat "-framework Cocoa" "-framework ApplicationServices" "-framework AGL" "-framework OpenGL" z)
-	ELSE(APPLE)
+                if (CMAKE_BUILD_TYPE STREQUAL Release)
+                    TARGET_LINK_LIBRARIES(ForcePAD_Kiosk common ivf2d fltk fltk_gl fltk_images fltk_forms fltk fltk calfemcxx newmat
+jpeg png "-framework Cocoa" "-framework ApplicationServices" "-framework AGL" "-framework OpenGL" z)
+                else()
+                    TARGET_LINK_LIBRARIES(ForcePAD_Kiosk commond ivf2dd fltk fltk_gl fltk_images fltk_forms fltk fltk calfemcxxd newmatd
+jpeg png "-framework Cocoa" "-framework ApplicationServices" "-framework AGL" "-framework OpenGL" z)
+                endif()
+        ELSE(APPLE)
 		TARGET_LINK_LIBRARIES(forcepad_kiosk common ivf2d fltk fltk_gl fltk_images fltk_forms jpeg png calfemcxx newmat z GLU GL)
 	ENDIF(APPLE)
 ENDIF(WIN32)

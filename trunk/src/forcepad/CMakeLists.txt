@@ -12,9 +12,9 @@ FILE(GLOB to_remove_h "TabletToolbar_kiosk.h")
 LIST(REMOVE_ITEM SOURCE_FILES ${to_remove_cpp})
 LIST(REMOVE_ITEM INCLUDE_FILES ${to_remove_h})
 
-IF(CMAKE_BUILD_TYPE STREQUAL Debug)
-	ADD_EXECUTABLE(forcepadd ${INCLUDE_FILES} ${SOURCE_FILES})
-ELSE(CMAKE_BUILD_TYPE STREQUAL Debug)
+#IF(CMAKE_BUILD_TYPE STREQUAL Debug)
+#	ADD_EXECUTABLE(forcepadd ${INCLUDE_FILES} ${SOURCE_FILES})
+#ELSE(CMAKE_BUILD_TYPE STREQUAL Debug)
 
 IF(APPLE)
 ADD_EXECUTABLE(
@@ -31,9 +31,9 @@ ADD_EXECUTABLE(
 	../../bin/release/brushes/sbrush4.rgb
 	../../bin/release/brushes/sbrush64.rgb
 	../../bin/release/brushes/sbrush8.rgb
-    ../../bin/release/colormaps/colormap1.map
-    ../../bin/release/colormaps/colormap2.map
-    ../../images/forcepad_icon.icns
+        ../../bin/release/colormaps/colormap1.map
+        ../../bin/release/colormaps/colormap2.map
+        ../../images/forcepad_icon.icns
 	../../bin/release/kiosk/ex1.fp2
 	../../bin/release/kiosk/ex1.png
 	../../bin/release/kiosk/ex2.fp2
@@ -108,11 +108,12 @@ SET_SOURCE_FILES_PROPERTIES(
 	MACOSX_PACKAGE_LOCATION MacOS/kiosk
 )
 ELSE(APPLE)
-	ADD_EXECUTABLE(forcepad ${INCLUDE_FILES} ${SOURCE_FILES})
+	if (CMAKE_BUILD_TYPE STREQUAL Release)
+		ADD_EXECUTABLE(forcepad ${INCLUDE_FILES} ${SOURCE_FILES})
+	else()
+		ADD_EXECUTABLE(forcepadd ${INCLUDE_FILES} ${SOURCE_FILES})
+	endif()
 ENDIF(APPLE)
-ENDIF(CMAKE_BUILD_TYPE STREQUAL Debug)
-
-
 
 IF(WIN32)
 	IF(CMAKE_BUILD_TYPE STREQUAL Debug)
@@ -122,7 +123,13 @@ IF(WIN32)
 	ENDIF(CMAKE_BUILD_TYPE STREQUAL Debug)
 ELSE(WIN32)
 	IF(APPLE)
-		TARGET_LINK_LIBRARIES(ForcePAD common ivf2d fltk fltk_gl fltk_images fltk_forms fltk_jpeg fltk_png calfemcxx newmat "-framework Cocoa" "-framework ApplicationServices" "-framework AGL" "-framework OpenGL" z)
+                if (CMAKE_BUILD_TYPE STREQUAL Release)
+                    TARGET_LINK_LIBRARIES(ForcePAD common ivf2d fltk fltk_gl fltk_images fltk_forms fltk fltk calfemcxx newmat
+jpeg png "-framework Cocoa" "-framework ApplicationServices" "-framework AGL" "-framework OpenGL" z)
+                else()
+                    TARGET_LINK_LIBRARIES(ForcePAD commond ivf2dd fltk fltk_gl fltk_images fltk_forms fltk fltk calfemcxxd newmatd
+jpeg png "-framework Cocoa" "-framework ApplicationServices" "-framework AGL" "-framework OpenGL" z)
+                endif()
 	ELSE(APPLE)
 		TARGET_LINK_LIBRARIES(forcepad common ivf2d fltk fltk_gl fltk_images fltk_forms jpeg png calfemcxx newmat z GLU GL)
 	ENDIF(APPLE)

@@ -2,6 +2,8 @@
 
 #include "LogWindow.h"
 #include <iostream>
+#include <string>
+
 CLogWindow* CLogWindow::m_instance = 0; 
 
 CLogWindow::CLogWindow() {
@@ -25,12 +27,12 @@ else
 }
 }
 
-void CLogWindow::print(const char* txt) {
+void CLogWindow::print(const std::string& txt) {
   using namespace std;
 cout << txt << endl;
 }
 
-void CLogWindow::print(const char* context, const char* txt) {
+void CLogWindow::print(const std::string &context, const std::string &txt) {
   using namespace std;
 cout << context << ": " << txt << endl;
 }

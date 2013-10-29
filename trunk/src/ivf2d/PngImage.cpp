@@ -55,9 +55,8 @@ bool CPngImage::read()
 {
 	png_structp png_ptr;
 	png_infop info_ptr;
-	unsigned int sig_read = 0;
 	png_uint_32 width, height;
-	int bit_depth, color_type;
+	int color_type;
 	FILE *fp;
 	
 	if ((fp = fopen(getFileName(), "rb")) == NULL)
@@ -92,7 +91,7 @@ bool CPngImage::read()
 	
     width            = png_get_image_width(png_ptr, info_ptr);
     height           = png_get_image_height(png_ptr, info_ptr);
-    bit_depth        = png_get_bit_depth(png_ptr, info_ptr);
+    //bit_depth        = png_get_bit_depth(png_ptr, info_ptr);
     color_type       = png_get_color_type(png_ptr, info_ptr);
 
 	bool supported = true;

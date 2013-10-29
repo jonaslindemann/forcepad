@@ -1,11 +1,11 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0300 
+version 1.0302 
 header_name {.h} 
 code_name {.cpp}
-decl {\#include <string>} {global
+decl {\#include <string>} {private global
 } 
 
-decl {\#include "forcepad_config.h"} {global
+decl {\#include "forcepad_config.h"} {private global
 } 
 
 Function {cbHide(void* w)} {open
@@ -16,22 +16,23 @@ window->hide();} {}
 
 class CSplashFrame {open
 } {
-  decl {bool m_timer} {}
+  decl {bool m_timer} {private local
+  }
   Function {CSplashFrame()} {open
   } {
-    Fl_Window wndSplash {open
-      xywh {444 111 402 302} type Double modal noborder visible
+    Fl_Window wndSplash {open selected
+      xywh {973 445 402 302} type Double modal noborder visible
     } {
       Fl_Box boxImage {
-        image {../../images/new_splash.png} xywh {0 0 402 302}
+        image {../../images/splash.png} xywh {0 0 402 302}
       }
       Fl_Button btnClose {
         label Close
         callback {wndSplash->hide();}
-        xywh {335 265 55 25} box THIN_UP_FRAME down_box THIN_DOWN_FRAME labelsize 12
+        xywh {10 265 55 25} box THIN_UP_FRAME down_box THIN_DOWN_FRAME labelsize 12
       }
-      Fl_Output versionBox {selected
-        xywh {15 118 235 52} type Multiline box NO_BOX labelsize 11 align 0 textsize 11
+      Fl_Output versionBox {
+        xywh {35 143 235 52} type Multiline box NO_BOX labelsize 11 align 0 textsize 11
       }
     }
   }

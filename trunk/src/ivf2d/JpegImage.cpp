@@ -25,7 +25,11 @@
 #include "JpegImage.h"
 
 extern "C" {
+#ifndef __APPLE__
 #include "jpeglib.h"
+#else
+#include <jpeglib.h>
+#endif
 }
 
 CJpegImage::CJpegImage()
@@ -94,7 +98,7 @@ bool CJpegImage::read()
 
 		for (i=0; i<cinfo.output_width; i++)
 			for (j=0; j<(unsigned int)cinfo.output_components; j++)
-				this->setValue(i, cinfo.output_height - cinfo.output_scanline, j, (GLubyte)buffer[0][i*cinfo.output_components+j]);
+                this->setValue(i, cinfo.output_height - cinfo.output_scanline, j, (unsigned char)buffer[0][i*cinfo.output_components+j]);
 	}
 
 	jpeg_finish_decompress(&cinfo);

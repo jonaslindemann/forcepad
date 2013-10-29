@@ -80,7 +80,7 @@ void CSgiImage::expandrow(unsigned char *optr, unsigned char *iptr, int z)
 	}
 }
 
-void CSgiImage::convertLong(GLuint *array, unsigned int length)
+void CSgiImage::convertLong(unsigned int *array, unsigned int length)
 {
     unsigned long b1, b2, b3, b4;
     unsigned char *ptr;
@@ -185,7 +185,7 @@ bool CSgiImage::read()
 					if (bpc==1)
 					{
 						byteValue = getbyte(inf);
-						this->setValue(k, i, j, (GLubyte)byteValue);
+                        this->setValue(k, i, j, (unsigned char)byteValue);
 						if (feof(inf))
 						{
 							fclose(inf);
@@ -195,7 +195,7 @@ bool CSgiImage::read()
 					else
 					{
 						shortValue = getshort(inf);
-						this->setValue(k, i, j, (GLubyte)shortValue);
+                        this->setValue(k, i, j, (unsigned char)shortValue);
 						if (feof(inf))
 						{
 							fclose(inf);
@@ -249,7 +249,7 @@ bool CSgiImage::read()
 				this->expandrow(outputRow, inputRow, z);
 
 				for (x=0; x<xSize; x++)
-					this->setValue(x, y, z, (GLubyte)outputRow[x]);
+                    this->setValue(x, y, z, (unsigned char)outputRow[x]);
 			}
 		}
 			

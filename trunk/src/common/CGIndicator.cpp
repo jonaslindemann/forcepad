@@ -24,6 +24,14 @@
 
 #include "CGIndicator.h"
 
+#ifdef __APPLE__
+#include <OpenGL/glu.h>
+#include <OpenGL/gl.h>
+#else
+#include <GL/glu.h>
+#include <GL/gl.h>
+#endif
+
 CCGIndicator::CCGIndicator()
 {
 	m_gravityArrow = false;

@@ -63,7 +63,7 @@ public:
 	virtual void cut(int x1, int y1, int x2, int y2);
 	virtual void paste(int x, int y);
 	
-	void copyImage(int width, int height, GLubyte* imageMap);
+    void copyImage(int width, int height, unsigned char* imageMap);
 
 	void setPasteMode(TPasteMode mode);
 	void setImage(CImage* image);

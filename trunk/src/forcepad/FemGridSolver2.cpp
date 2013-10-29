@@ -205,8 +205,8 @@ void CFemGridSolver2::execute_old()
 	else
 		maxBandwidth = bwBottomTop;
 
-	so_print("CFemGridSolver2",so_format("Total dofs = %d",m_nDof));
-	so_print("CFemGridSolver2",so_format("Bandwidth  = %d",maxBandwidth));
+    //so_print("CFemGridSolver2",so_format("Total dofs = %d",m_nDof));
+    //so_print("CFemGridSolver2",so_format("Bandwidth  = %d",maxBandwidth));
 	
 	if (m_nDof==0)
 	{
@@ -401,7 +401,7 @@ void CFemGridSolver2::execute_old()
 		cf.close();
 	}
 
-	so_print("CFemGridSolver2",so_format("%d elements assembled.",nElements));
+    //so_print("CFemGridSolver2",so_format("%d elements assembled.",nElements));
 	//cout << "Model size" << endl;
 	//cout << "\t x,max = " << m_maxX << endl;
 	//cout << "\t x,min = " << m_minX << endl;
@@ -463,7 +463,7 @@ void CFemGridSolver2::execute_old()
 
 		if (dofs[0]>0)
 		{
-			so_print("CFemGridSolver2",so_format("\tLoad found at [ %g, %g ], dofs = [ %d, %d ]",x, y, dofs[0], dofs[1]));
+            //so_print("CFemGridSolver2",so_format("\tLoad found at [ %g, %g ], dofs = [ %d, %d ]",x, y, dofs[0], dofs[1]));
 
 			m_f(dofs[0]) += vx*value*m_forceMagnitude;
 			m_f(dofs[1]) += vy*value*m_forceMagnitude;
@@ -500,7 +500,6 @@ void CFemGridSolver2::execute_old()
 		return;
 	}
 
-	int nConstraints = m_femGrid->getPointConstraintsSize();
 	pointConstraint = m_femGrid->getFirstPointConstraint();
 
 	set<int> uniqueDofs;
@@ -517,12 +516,11 @@ void CFemGridSolver2::execute_old()
 	while (pointConstraint!=NULL) 
 	{
 		pointConstraint->getPosition(x, y);
-		value = pointConstraint->getValue();
 		m_femGrid->getNearestDofs((int)x, (int)y, dofs);
 
 		if (dofs[0]>0)
 		{
-			so_print("CFemGridSolver2",so_format("\tConstraint found at [ %g, %g ], dofs = [ %d, %d ]",x, y, dofs[0], dofs[1]));
+            //so_print("CFemGridSolver2",so_format("\tConstraint found at [ %g, %g ], dofs = [ %d, %d ]",x, y, dofs[0], dofs[1]));
 
 			switch (pointConstraint->getConstraintType()) {
 			case CConstraint::CT_XY:
@@ -612,7 +610,7 @@ void CFemGridSolver2::execute_old()
 	for (si=uniqueDofs.begin(); si!=uniqueDofs.end(); si++)
 	{
 		int dof = (*si);
-		so_print("CFemGridSolver2",so_format("\t%d",dof));
+        //so_print("CFemGridSolver2",so_format("\t%d",dof));
 		
 		Bc(bcCount,1) = dof;
 		Bc(bcCount,2) = prescribedValues[dof];
@@ -767,7 +765,6 @@ void CFemGridSolver2::execute_old()
 
 					double sig1 = (sigx+sigy)/2.0+R; 
 					double sig2 = (sigx+sigy)/2.0-R; 
-					double alfa = atan2(tau,ds)/2.0;
 
 					ipStress[ip-1] = sqrt( pow(sig1,2) - sig1*sig2 + pow(sig2,2) );
 				}
@@ -1293,7 +1290,6 @@ void CFemGridSolver2::setupForcesAndConstraints(bool& loadsDefined, bool& bcsDef
 	//so_print("CFemGridSolver2","Defining constraints.");
 	progressMessage("Setting up boundary conditions.", 40);
 
-	int nConstraints = m_femGrid->getPointConstraintsSize();
 	CConstraint* pointConstraint = m_femGrid->getFirstPointConstraint();
 
 	set<int>::iterator si;
@@ -1308,7 +1304,6 @@ void CFemGridSolver2::setupForcesAndConstraints(bool& loadsDefined, bool& bcsDef
 	while (pointConstraint!=NULL) 
 	{
 		pointConstraint->getPosition(x, y);
-		value = pointConstraint->getValue();
 		m_femGrid->getNearestDofs((int)x, (int)y, dofs);
 
 		if (dofs[0]>0)
@@ -1422,7 +1417,6 @@ void CFemGridSolver2::computeElementForces()
 	int topo[8];
 	int ptype = m_ptype;    // Plane stress
 	int ir = 2; // Integration rule
-	int elementsWithWeight = 0;
 
 	double E = m_elasticModulus;
 	double v = m_youngsModulus;
@@ -1520,7 +1514,6 @@ void CFemGridSolver2::computeElementForces()
 
 					double sig1 = (sigx+sigy)/2.0+R; 
 					double sig2 = (sigx+sigy)/2.0-R; 
-					double alfa = atan2(tau,ds)/2.0;
 
 					ipStress[ip-1] = sqrt( pow(sig1,2) - sig1*sig2 + pow(sig2,2) );
 				}
@@ -1610,7 +1603,6 @@ void CFemGridSolver2::computeElementForcesOpt(Matrix& X, double penalty)
 	int topo[8];
 	int ptype = m_ptype;    // Plane stress
 	int ir = 2; // Integration rule
-	int elementsWithWeight = 0;
 
 	double E = m_elasticModulus;
 	double v = m_youngsModulus;
@@ -1708,7 +1700,6 @@ void CFemGridSolver2::computeElementForcesOpt(Matrix& X, double penalty)
 
 					double sig1 = (sigx+sigy)/2.0+R; 
 					double sig2 = (sigx+sigy)/2.0-R; 
-					double alfa = atan2(tau,ds)/2.0;
 
 					ipStress[ip-1] = sqrt( pow(sig1,2) - sig1*sig2 + pow(sig2,2) );
 				}
@@ -1845,7 +1836,6 @@ void CFemGridSolver2::objectiveFunctionAndSensitivity(Matrix& X, Matrix& dC, Mat
 	int topo[8];
 	int ptype = m_ptype;    // Plane stress
 	int ir = 2; // Integration rule
-	int elementsWithWeight = 0;
 
 	double E = m_elasticModulus;
 	double v = m_youngsModulus;
@@ -1964,8 +1954,6 @@ ReturnMatrix CFemGridSolver2::optimalityCriteriaUpdate(Matrix& X, Matrix& dC, Ma
 	double l1 = 0.0;
 	double l2 = 100000;
 	double move = 0.2;
-	int rows = X.nrows();
-	int cols = X.ncols();
 
 	Matrix Xnew;
 
@@ -2088,9 +2076,6 @@ void CFemGridSolver2::executeOptimizer()
 	int i;
 	int maxBandwidth;
 	int rows, cols;
-	double E = m_elasticModulus;
-	double v = m_youngsModulus;
-	double t = m_thickness;
 	bool loadsDefined, bcsDefined, vectorBcsDefined;
 	set<int> uniqueDofs;
 	set<int> uniqueVectorDofs;
@@ -2107,9 +2092,6 @@ void CFemGridSolver2::executeOptimizer()
 	ColumnVector ldof;
 	ColumnVector GlobalA;
 
-	int ptype = m_ptype;    // Plane stress
-	int ir = 2; // Integration rule
-	int elementsWithWeight = 0;
 	int nElements;
 
 	//
@@ -2152,7 +2134,6 @@ void CFemGridSolver2::executeOptimizer()
 	double volfrac = m_optVolfrac;
 	double c = 0.0;
 	int loop = 0;
-	bool terminated = false;
 
 	m_femGrid->getGridSize(rows, cols);
 	X.ReSize(rows, cols);
@@ -2280,7 +2261,6 @@ void CFemGridSolver2::executeOptimizer()
 
 		if (!this->continueCalc())
 		{
-			terminated = true;
 			break;
 		}
 
@@ -2414,7 +2394,6 @@ void CFemGridSolver2::executeUpdate()
 		return;
 	}
 
-	int nConstraints = m_femGrid->getPointConstraintsSize();
 	CConstraint* pointConstraint = m_femGrid->getFirstPointConstraint();
 
 	set<int> uniqueDofs;
@@ -2425,7 +2404,6 @@ void CFemGridSolver2::executeUpdate()
 	vector<CConstraint*>::iterator vci;
 
 	double* prescribedValues = new double[m_nDof+1];
-	bool bcsDefined = false;
 	bool vectorBcsDefined = false;
 	double x, y, value;
 	int dofs[2];
@@ -2433,7 +2411,6 @@ void CFemGridSolver2::executeUpdate()
 	while (pointConstraint!=NULL) 
 	{
 		pointConstraint->getPosition(x, y);
-		value = pointConstraint->getValue();
 		m_femGrid->getNearestDofs((int)x, (int)y, dofs);
 
 		if (dofs[0]>0)
@@ -2444,17 +2421,14 @@ void CFemGridSolver2::executeUpdate()
 				uniqueDofs.insert(dofs[1]);
 				prescribedValues[dofs[0]] = 0.0;
 				prescribedValues[dofs[1]] = 0.0;
-				bcsDefined = true;
 				break;
 			case CConstraint::CT_X:
 				uniqueDofs.insert(dofs[0]);
 				prescribedValues[dofs[0]] = 0.0;
-				bcsDefined = true;
 				break;
 			case CConstraint::CT_Y:
 				uniqueDofs.insert(dofs[1]);
 				prescribedValues[dofs[1]] = 0.0;
-				bcsDefined = true;
 				break;
 			case CConstraint::CT_VECTOR:
 				uniqueVectorDofs.insert(dofs[0]);
@@ -2641,7 +2615,6 @@ void CFemGridSolver2::executeUpdate()
 
 					double sig1 = (sigx+sigy)/2.0+R; 
 					double sig2 = (sigx+sigy)/2.0-R; 
-					double alfa = atan2(tau,ds)/2.0;
 
 					ipStress[ip-1] = sqrt( pow(sig1,2) - sig1*sig2 + pow(sig2,2) );
 				}
@@ -2969,12 +2942,6 @@ void CFemGridSolver2::execute()
 	ColumnVector ldof;
 	ColumnVector GlobalA;
 
-	double E = m_elasticModulus;
-	double v = m_youngsModulus;
-	double t = m_thickness;
-	int ptype = m_ptype;    // Plane stress
-	int ir = 2; // Integration rule
-	int elementsWithWeight = 0;
 	int nElements;
 
 	SymmetricBandMatrix K(m_nDof,maxBandwidth);

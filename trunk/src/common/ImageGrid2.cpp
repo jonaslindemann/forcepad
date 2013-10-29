@@ -24,6 +24,14 @@
 
 #include "ImageGrid2.h"
 
+#ifdef __APPLE__
+#include <OpenGL/glu.h>
+#include <OpenGL/gl.h>
+#else
+#include <GL/glu.h>
+#include <GL/gl.h>
+#endif
+
 CImageGrid2::CImageGrid2()
 {
 	m_fieldLayers = 2;
@@ -422,7 +430,7 @@ void CImageGrid2::assignFieldFromImage(int imageLayer, int toFieldLayer)
 		int i, j, k, l;
 		double gridSum1;
 		double nGridValues1;
-		GLubyte gridValue, red, green, blue;
+		GLubyte red, green, blue;
 
 		int nNonZeroValues = 0;
 

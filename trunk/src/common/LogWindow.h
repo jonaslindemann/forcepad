@@ -14,6 +14,9 @@
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Text_Display.H>
 
+#include <iostream>
+#include <string>
+
 class CLogWindow {
 #ifdef WIN32
   std::basic_streambuf<char>* m_oldBuf; 
@@ -27,7 +30,7 @@ public:
   void hide();
   void show();
   static CLogWindow* getInstance();
-  void print(const char* txt);
-  void print(const char* context, const char* txt);
+  void print(const std::string& txt);
+  void print(const std::string& context, const std::string& txt);
 };
 #endif
