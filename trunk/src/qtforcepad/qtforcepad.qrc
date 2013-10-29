@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/toolbar">
+        <file>images/action_add_bc2_black_grd.png</file>
+    </qresource>
+</RCC>
