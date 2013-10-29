@@ -1,0 +1,2 @@
+dylibbundler -od -b -x ./bin/release/ForcePAD.app/Contents/MacOS/ForcePAD -d ./bin/release/ForcePAD.app/Contents/libs/ -p @executable_path/../libs/
+dylibbundler -od -b -x ./bin/release/ForcePAD_Kiosk.app/Contents/MacOS/ForcePAD_Kiosk -d ./bin/release/ForcePAD_Kiosk.app/Contents/libs/ -p @executable_path/../libs/
