@@ -22,14 +22,29 @@
 
 #include "calfem.h"
 
+#ifdef USE_NEWMAT
+
 #include <iostream>
+
+#define _i1 1
+#define _i2 2
+#define _i3 3
+#define _i4 4
+#define _i5 5
+#define _i6 6
+#define _i7 7
+#define _i8 8
+#define _i9 9
+#define _i10 10
+#define _i11 11
+#define _i12 12
 
 namespace calfem {
 
 void printMatrix(std::string name, Matrix & A)
 {
 	std::cout << name << " = [" << A.nrows() << "x" << A.ncols() << "]" << std::endl;
-	std::cout << std::setw(10) << std::setprecision(4) << std::scientific << A;
+	std::cout << std::setw(10) << std::setprecision(_i4) << std::scientific << A;
 	std::cout << std::endl;
 }
 
@@ -86,26 +101,26 @@ void plante(
 			Matrix &Ke,
 			ColumnVector &fe)
 {
-	int ptype = (int)ep(1);
-	double t=ep(2);
+	int ptype = (int)ep(_i1);
+	double t=ep(_i2);
 	
-	double bx = eq(1);
-	double by = eq(2);
+	double bx = eq(_i1);
+	double by = eq(_i2);
 	
 	Matrix C(6,6);
 	
-	C << 1.0 << ex(1) << ey(1) << 0.0 << 0.0 << 0.0
-		<< 0.0 << 0.0 << 0.0 << 1.0 << ex(1) << ey(1)
-		<< 1.0 << ex(2) << ey(2) << 0.0 << 0.0 << 0.0
-		<< 0.0 << 0.0 << 0.0 << 1.0 << ex(2) << ey(2)
-		<< 1.0 << ex(3) << ey(3) << 0.0 << 0.0 << 0.0
-		<< 0.0 << 0.0 << 0.0 << 1.0 << ex(3) << ey(3);
+	C << 1.0 << ex(_i1) << ey(_i1) << 0.0 << 0.0 << 0.0
+		<< 0.0 << 0.0 << 0.0 << 1.0 << ex(_i1) << ey(_i1)
+		<< 1.0 << ex(_i2) << ey(_i2) << 0.0 << 0.0 << 0.0
+		<< 0.0 << 0.0 << 0.0 << 1.0 << ex(_i2) << ey(_i2)
+		<< 1.0 << ex(_i3) << ey(_i3) << 0.0 << 0.0 << 0.0
+		<< 0.0 << 0.0 << 0.0 << 1.0 << ex(_i3) << ey(_i3);
 	
 	Matrix AA(3,3);
 	
-	AA.Column(1) = 1.0;
-	AA.Column(2) = ex.AsColumn();
-	AA.Column(3) = ey.AsColumn();
+	AA.Column(_i1) = 1.0;
+	AA.Column(_i2) = ex.AsColumn();
+	AA.Column(_i3) = ey.AsColumn();
 	
 	double A = 0.5*AA.LogDeterminant().Value();
 	Matrix B(3,6);
@@ -139,7 +154,7 @@ void plante(
 		Ke.ReSize(6,6);
 		
 		Ke = B.t()*Dm*B*A*t;
-		fe.ReSize(6);
+		fe.ReSize(_i6);
 		
 		fe << bx << by << bx << by << bx << by;
 		fe = fe*t*A/3.0;
@@ -168,7 +183,7 @@ void plante(
 		Ke.ReSize(6,6);
 		
 		Ke = B.t()*Dm*B*A*t;
-		fe.ReSize(6);
+		fe.ReSize(_i6);
 		
 		fe << bx << by << bx << by << bx << by;
 		fe = fe*t*A/3.0;
@@ -188,7 +203,7 @@ void plants(
 	RowVector &es,
 	RowVector &et)
 {
-	int ptype = (int) ep(1);
+	int ptype = (int) ep(_i1);
 		
 	//int rowed = ed.Nrows();
 	//int rowex = ex.Nrows();
@@ -219,12 +234,12 @@ void plants(
 					
 		Matrix C(6,6);
 					
-		C << 1.0 << ex(1) << ey(1) << 0.0 << 0.0 << 0.0
-		<< 0.0 << 0.0 << 0.0 << 1.0 << ex(1) << ey(1)
-		<< 1.0 << ex(2) << ey(2) << 0.0 << 0.0 << 0.0
-		<< 0.0 << 0.0 << 0.0 << 1.0 << ex(2) << ey(2)
-		<< 1.0 << ex(3) << ey(3) << 0.0 << 0.0 << 0.0
-		<< 0.0 << 0.0 << 0.0 << 1.0 << ex(3) << ey(3);
+		C << 1.0 << ex(_i1) << ey(_i1) << 0.0 << 0.0 << 0.0
+		<< 0.0 << 0.0 << 0.0 << 1.0 << ex(_i1) << ey(_i1)
+		<< 1.0 << ex(_i2) << ey(_i2) << 0.0 << 0.0 << 0.0
+		<< 0.0 << 0.0 << 0.0 << 1.0 << ex(_i2) << ey(_i2)
+		<< 1.0 << ex(_i3) << ey(_i3) << 0.0 << 0.0 << 0.0
+		<< 0.0 << 0.0 << 0.0 << 1.0 << ex(_i3) << ey(_i3);
 					
 		B << 0.0 << 1.0 << 0.0 << 0.0 << 0.0 << 0.0
 		<< 0.0 << 0.0 << 0.0 << 0.0 << 0.0 << 1.0
@@ -232,21 +247,21 @@ void plants(
 					
 		B = B*C.i();
 					
-		ColumnVector ee(3);
+		ColumnVector ee(_i3);
 		ColumnVector ss;
 		ss.ReSize(colD);
 		ss = 0.0;
 					
-		ColumnVector ss_special(3);
+		ColumnVector ss_special(_i3);
 					
 		ee = B*ed.AsColumn(); // [3x6][6x1] = [3x1]
 					
 		if (colD>3)
 		{
 			ss_special = Dm*ee; 
-			ss(1) = ss_special(1);
-			ss(2) = ss_special(2);
-			ss(4) = ss_special(3);
+			ss(_i1) = ss_special(_i1);
+			ss(_i2) = ss_special(_i2);
+			ss(_i4) = ss_special(_i3);
 			ee = Cm*ss;
 		}
 		else
@@ -264,12 +279,12 @@ void plants(
 				
 		Matrix C(6,6);
 					
-		C << 1.0 << ex(1) << ey(1) << 0.0 << 0.0 << 0.0
-		<< 0.0 << 0.0 << 0.0 << 1.0 << ex(1) << ey(1)
-		<< 1.0 << ex(2) << ey(2) << 0.0 << 0.0 << 0.0
-		<< 0.0 << 0.0 << 0.0 << 1.0 << ex(2) << ey(2)
-		<< 1.0 << ex(3) << ey(3) << 0.0 << 0.0 << 0.0
-		<< 0.0 << 0.0 << 0.0 << 1.0 << ex(3) << ey(3);
+		C << 1.0 << ex(_i1) << ey(_i1) << 0.0 << 0.0 << 0.0
+		<< 0.0 << 0.0 << 0.0 << 1.0 << ex(_i1) << ey(_i1)
+		<< 1.0 << ex(_i2) << ey(_i2) << 0.0 << 0.0 << 0.0
+		<< 0.0 << 0.0 << 0.0 << 1.0 << ex(_i2) << ey(_i2)
+		<< 1.0 << ex(_i3) << ey(_i3) << 0.0 << 0.0 << 0.0
+		<< 0.0 << 0.0 << 0.0 << 1.0 << ex(_i3) << ey(_i3);
 					
 		B << 0.0 << 1.0 << 0.0 << 0.0 << 0.0 << 0.0
 		<< 0.0 << 0.0 << 0.0 << 0.0 << 0.0 << 1.0
@@ -277,7 +292,7 @@ void plants(
 			
 		B = B*C.i();
 					
-		ColumnVector e(6);
+		ColumnVector e(_i6);
 		e = 0.0;
 		ColumnVector ee(colD);
 		ee = 0.0;
@@ -286,9 +301,9 @@ void plants(
 					
 		if (colD>3)
 		{
-			ee(1) = e(1);
-			ee(2) = e(2);
-			ee(4) = e(3);
+			ee(_i1) = e(_i1);
+			ee(_i2) = e(_i2);
+			ee(_i4) = e(_i3);
 		}
 		else
 			ee = e;
@@ -305,9 +320,9 @@ void bar2s(
    RowVector &ed,
    double &es)
 {
-   //E=ep(1);  A=ep(2);
+   //E=ep(_i1);  A=ep(_i2);
  
-   //b=[ ex(2)-ex(1); ey(2)-ey(1) ];
+   //b=[ ex(_i2)-ex(_i1); ey(_i2)-ey(_i1) ];
    //L=sqrt(b'*b);
 
    //Kle=E*A/L*[1 -1 ;
@@ -320,27 +335,27 @@ void bar2s(
    //N=E*A/L*[-1 1]*G*u;
    //es=N;
 
-	double E = ep(1);
-	double A = ep(2);
-	ColumnVector b(2);
-	b << ex(2)-ex(1) << ey(2)-ey(1);
+	double E = ep(_i1);
+	double A = ep(_i2);
+	ColumnVector b(_i2);
+	b << ex(_i2)-ex(_i1) << ey(_i2)-ey(_i1);
 	double L = sqrt((b.t()*b).AsScalar());
 	Matrix Kle(2,2);
 	Kle << 1.0 << -1.0 
 		<< -1.0 << 1.0;
 	Kle = Kle * E * A / L;
 
-	RowVector n(2);
+	RowVector n(_i2);
 	n = b.t()/L; 
 
 	Matrix G(2,4);
 
-	G << n(1) << n(2) << 0.0  << 0.0
-		<< 0.0  << 0.0  << n(1) << n(2);
+	G << n(_i1) << n(_i2) << 0.0  << 0.0
+		<< 0.0  << 0.0  << n(_i1) << n(_i2);
 
-	ColumnVector u(4);
+	ColumnVector u(_i4);
 	u = ed.t();
-	RowVector v(2);
+	RowVector v(_i2);
 	v << -1.0 << 1.0;
 	es = E*A*(v*G*u).AsScalar()/L;
 }
@@ -351,9 +366,9 @@ void bar2e(
    RowVector &ep,
    Matrix &Ke)
 {
-  //E=ep(1);  A=ep(2); 
+  //E=ep(_i1);  A=ep(_i2); 
   //
-  //b=[ ex(2)-ex(1); ey(2)-ey(1) ];
+  //b=[ ex(_i2)-ex(_i1); ey(_i2)-ey(_i1) ];
   //L=sqrt(b'*b);
   //
   //Kle=E*A/L*[ 1 -1; 
@@ -363,21 +378,21 @@ void bar2e(
   //            zeros(size(n))     n   ];
   //
   //Ke=G'*Kle*G;
-	double E = ep(1);
-	double A = ep(2);
-	ColumnVector b(2);
-	b << ex(2)-ex(1) << ey(2)-ey(1);
+	double E = ep(_i1);
+	double A = ep(_i2);
+	ColumnVector b(_i2);
+	b << ex(_i2)-ex(_i1) << ey(_i2)-ey(_i1);
 	double L = sqrt((b.t()*b).AsScalar());
 	Matrix Kle(2,2);
 	Kle << 1.0 << -1.0 << -1.0 << 1.0;
 	Kle = Kle * E * A / L;
-	RowVector n(2);
+	RowVector n(_i2);
 	n = b.t()/L; 
 
 	Matrix G(2,4);
 
-	G << n(1) << n(2) << 0.0  << 0.0
-	  << 0.0  << 0.0  << n(1) << n(2);
+	G << n(_i1) << n(_i2) << 0.0  << 0.0
+	  << 0.0  << 0.0  << n(_i1) << n(_i2);
 
 	Ke = G.t()*Kle*G;
 }
@@ -393,8 +408,8 @@ void beam3e(
 			Matrix &Ke,
 			ColumnVector &fe)
 {
-	ColumnVector bb(3);
-	bb << ex(2)-ex(1) << ey(2)-ey(1) << ez(2)-ez(1);
+	ColumnVector bb(_i3);
+	bb << ex(_i2)-ex(_i1) << ey(_i2)-ey(_i1) << ez(_i2)-ez(_i1);
 	double L = sqrt( (bb.t() * bb).AsScalar() );
 	
 	RowVector n1 = (bb/L).t();
@@ -402,15 +417,15 @@ void beam3e(
 	double lc = sqrt((eo*eo.t()).AsScalar());
 	RowVector n3 = eo/lc;
 	
-	double qx = eq(1);
-	double qy = eq(2);
-	double qz = eq(3);
-	double qw = eq(4);
+	double qx = eq(_i1);
+	double qy = eq(_i2);
+	double qz = eq(_i3);
+	double qw = eq(_i4);
 	
-	double E = ep(1);   double Gs = ep(2);
-	double A = ep(3);
-	double Iy = ep(4);	double Iz = ep(5);
-	double Kv = ep(6);
+	double E = ep(_i1);   double Gs = ep(_i2);
+	double A = ep(_i3);
+	double Iy = ep(_i4);	double Iz = ep(_i5);
+	double Kv = ep(_i6);
 	
 	double a = E*A/L;   
 	double b = 12.0*E*Iz/pow(L,3);
@@ -452,17 +467,17 @@ void beam3e(
 		<< -qy*L/6.0;
 	fle = fle*L/2.0;
 	
-	RowVector n2(3);
+	RowVector n2(_i3);
 	
-	n2 <<  n3(2)*n1(3)-n3(3)*n1(2)
-		<< -n1(3)*n3(1)+n1(1)*n3(3)
-		<< n3(1)*n1(2)-n1(1)*n3(2);
+	n2 <<  n3(_i2)*n1(_i3)-n3(_i3)*n1(_i2)
+		<< -n1(_i3)*n3(_i1)+n1(_i1)*n3(_i3)
+		<< n3(_i1)*n1(_i2)-n1(_i1)*n3(_i2);
 	
 	Matrix An(3,3);
 	
-	An.Row(1) = n1;
-	An.Row(2) = n2;
-	An.Row(3) = n3;
+	An.Row(_i1) = n1;
+	An.Row(_i2) = n2;
+	An.Row(_i3) = n3;
 	
 	Matrix G(12,12);
 	
@@ -490,8 +505,8 @@ void beam3s(
 			Matrix &edi,
 			ColumnVector &eci)
 {
-	ColumnVector bb(3);
-	bb << ex(2)-ex(1) << ey(2)-ey(1) << ez(2)-ez(1);
+	ColumnVector bb(_i3);
+	bb << ex(_i2)-ex(_i1) << ey(_i2)-ey(_i1) << ez(_i2)-ez(_i1);
 	double L = sqrt( (bb.t() * bb).AsScalar() );
 	
 	RowVector n1 = (bb/L).t();
@@ -499,27 +514,27 @@ void beam3s(
 	double lc = sqrt((eo*eo.t()).AsScalar());
 	RowVector n3 = eo/lc;
 	
-	double qx = eq(1);
-	double qy = eq(2);
-	double qz = eq(3);
-	double qw = eq(4);
+	double qx = eq(_i1);
+	double qy = eq(_i2);
+	double qz = eq(_i3);
+	double qw = eq(_i4);
 	
-	double E = ep(1);   double Gs = ep(2);
-	double A = ep(3);
-	double Iy = ep(4);	double Iz = ep(5);
-	double Kv = ep(6);
+	double E = ep(_i1);   double Gs = ep(_i2);
+	double A = ep(_i3);
+	double Iy = ep(_i4);	double Iz = ep(_i5);
+	double Kv = ep(_i6);
 	
-	RowVector n2(3);
+	RowVector n2(_i3);
 	
-	n2 <<  n3(2)*n1(3)-n3(3)*n1(2)
-		<< -n1(3)*n3(1)+n1(1)*n3(3)
-		<< n3(1)*n1(2)-n1(1)*n3(2);
+	n2 <<  n3(_i2)*n1(_i3)-n3(_i3)*n1(_i2)
+		<< -n1(_i3)*n3(_i1)+n1(_i1)*n3(_i3)
+		<< n3(_i1)*n1(_i2)-n1(_i1)*n3(_i2);
 	
 	Matrix An(3,3);
 	
-	An.Row(1) = n1;
-	An.Row(2) = n2;
-	An.Row(3) = n3;
+	An.Row(_i1) = n1;
+	An.Row(_i2) = n2;
+	An.Row(_i3) = n3;
 	
 	Matrix G(12,12);
 	
@@ -589,7 +604,7 @@ void beam3s(
 			<< 0.0 << 0.0 << 0.0 << 0.0 << 0.0 << 0.0 << -6.0*E*Iy*x << -2.0*E*Iy << 0.0 << 0.0 << 0.0 << 0.0
 			<< 0.0 << 0.0 << 6.0*E*Iz*x << 2.0*E*Iz << 0.0 << 0.0 << 0.0 << 0.0 << 0.0 << 0.0 << 0.0 << 0.0;		
 		
-		ColumnVector T2(6);
+		ColumnVector T2(_i6);
 
 		T2 << -qx*x
 			<< -qy*x
@@ -607,7 +622,7 @@ void beam3s(
 			<< 0.0 << 0.0  << 0.0   << 0.0  << 0.0 << 0.0 << pow(x,3) << pow(x,2) << x << 1.0 << 0.0 << 0.0
 			<< 0.0 << 0.0  << 0.0   << 0.0  << 0.0 << 0.0  << 0.0   << 0.0  << 0.0 << 0.0 << x << 1.0;
 		
-		ColumnVector T4(4);
+		ColumnVector T4(_i4);
 		
 		T4 << -qx*pow(x,2)/2.0/E/A
 			<< qy*pow(x,4)/24.0/E/Iz
@@ -631,9 +646,9 @@ void flw2te(
 
 	Matrix C(3,3);
 	
-	C << 1.0 << ex(1) << ey(1) 
-		<< 1.0 << ex(2) << ey(2) 
-		<< 1.0 << ex(3) << ey(3);
+	C << 1.0 << ex(_i1) << ey(_i1) 
+		<< 1.0 << ex(_i2) << ey(_i2) 
+		<< 1.0 << ex(_i3) << ey(_i3);
 
 	Matrix B(2,3);
 
@@ -648,7 +663,7 @@ void flw2te(
 	Ke.ReSize(3,3);
 	Ke = B.t()*D*B*A*t;
 	
-	fe.ReSize(3);
+	fe.ReSize(_i3);
 	
 	double f = eq*A*t/3.0;
 
@@ -666,9 +681,9 @@ void flw2ts(
 {
 	Matrix C(3,3);
 	
-	C << 1.0 << ex(1) << ey(1) 
-		<< 1.0 << ex(2) << ey(2) 
-		<< 1.0 << ex(3) << ey(3);
+	C << 1.0 << ex(_i1) << ey(_i1) 
+		<< 1.0 << ex(_i2) << ey(_i2) 
+		<< 1.0 << ex(_i3) << ey(_i3);
 
 	Matrix B(2,3);
 
@@ -771,9 +786,9 @@ void plani4e(
 			Matrix &Ke,
 			ColumnVector &fe)
 {
-	int ptype = (int)ep(1); 
-	double t = ep(2);  
-	int ir = (int)ep(3);  
+	int ptype = (int)ep(_i1); 
+	double t = ep(_i2);  
+	int ir = (int)ep(_i3);  
 	int ngp = ir*ir;
 
 	RowVector b = eq;
@@ -848,16 +863,16 @@ void plani4e(
 	}
 
 	ColumnVector wp(gp.nrows());
-	wp = SP(w.column(1), w.column(2));
-	ColumnVector xsi = gp.column(1);
-	ColumnVector eta = gp.column(2);
+	wp = SP(w.column(_i1), w.column(_i2));
+	ColumnVector xsi = gp.column(_i1);
+	ColumnVector eta = gp.column(_i2);
 	int r2 = ngp*2;
 
 	Matrix N(gp.nrows(),4);
-	N.column(1) = SP(1-xsi,1-eta)/4.0;
-	N.column(2) = SP(1+xsi,1-eta)/4.0;
-	N.column(3) = SP(1+xsi,1+eta)/4.0;
-	N.column(4) = SP(1-xsi,1+eta)/4.0;
+	N.column(_i1) = SP(1-xsi,1-eta)/4.0;
+	N.column(_i2) = SP(1+xsi,1-eta)/4.0;
+	N.column(_i3) = SP(1+xsi,1+eta)/4.0;
+	N.column(_i4) = SP(1-xsi,1+eta)/4.0;
 
 	PrintMatrix(N);
 
@@ -978,9 +993,9 @@ void plani4s(
 			Matrix &es,
 			Matrix &et)
 {
-	int ptype = (int)ep(1); 
-	//double t = ep(2);
-	int ir = (int)ep(3);  
+	int ptype = (int)ep(_i1); 
+	//double t = ep(_i2);
+	int ir = (int)ep(_i3);  
 	int ngp = ir*ir;
 
 	double g1, g2;
@@ -1053,16 +1068,16 @@ void plani4s(
 	}
 
 	ColumnVector wp(gp.nrows());
-	wp = SP(w.column(1), w.column(2));
-	ColumnVector xsi = gp.column(1);
-	ColumnVector eta = gp.column(2);
+	wp = SP(w.column(_i1), w.column(_i2));
+	ColumnVector xsi = gp.column(_i1);
+	ColumnVector eta = gp.column(_i2);
 	int r2 = ngp*2;
 
 	Matrix N(gp.nrows(),4);
-	N.column(1) = SP(1-xsi,1-eta)/4.0;
-	N.column(2) = SP(1+xsi,1-eta)/4.0;
-	N.column(3) = SP(1+xsi,1+eta)/4.0;
-	N.column(4) = SP(1-xsi,1+eta)/4.0;
+	N.column(_i1) = SP(1-xsi,1-eta)/4.0;
+	N.column(_i2) = SP(1+xsi,1-eta)/4.0;
+	N.column(_i3) = SP(1+xsi,1+eta)/4.0;
+	N.column(_i4) = SP(1-xsi,1+eta)/4.0;
 
 	PrintMatrix(N);
 
@@ -1491,4 +1506,5 @@ void writeMatrix(const std::string& name, SymmetricBandMatrix &m, std::ostream &
 }
 
 } // namespace calfem
+#endif
 
