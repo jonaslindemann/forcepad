@@ -16,6 +16,7 @@
 #else
 #include <FL/fl_ask.h>
 #include <FL/fl_file_chooser.h>
+#include <FL/Fl_Native_File_Chooser.H>
 #endif
 
 
@@ -28,16 +29,16 @@
 using namespace std;
 
 CFlPaintView::CFlPaintView(int x,int y,int w,int h,const char *l)
-    : Fl_Gl_Window(x,y,w,h,l), CPaintView(x, y, w, h, l)
+: Fl_Gl_Window(x,y,w,h,l), CPaintView(x, y, w, h, l)
 {
     //so_print("CFlPaintView","CPaintView(...)");
-
+    
     this->doCreateCursors();
 }
 
 CFlPaintView::~CFlPaintView()
 {
-
+    
 }
 
 /////////////////////////////////////////////////////////////
@@ -78,10 +79,10 @@ void CFlPaintView::doCreateCursors()
 {
 #ifndef __APPLE__
     int i;
-
+    
     for (i=0; i<20; i++)
         m_cursors[i] = new Fl_Cursor_Shape();
-
+    
     m_cursors[0]->shape( rshape4_hotX, rshape4_hotY, rshape4_and, rshape4_xor );
     m_cursors[1]->shape( rshape8_hotX, rshape8_hotY, rshape8_and, rshape8_xor );
     m_cursors[2]->shape( rshape16_hotX, rshape16_hotY, rshape16_and, rshape16_xor );
@@ -107,44 +108,44 @@ void CFlPaintView::doUpdateCursor(TEditMode mode)
 {
 #ifndef __APPLE__
     switch (mode) {
-    //case EM_BRUSH:
-    case EM_DIRECT_BRUSH:
-    //case EM_ERASE:
-    case EM_DIRECT_ERASE:
-        fl_cursor_ex( m_cursors[m_currentBrushIdx] );
-        break;
-    case EM_SELECT_BOX:
-        fl_cursor_ex( m_cursors[10] );
-        break;
-    case EM_FORCE:
-        fl_cursor_ex( m_cursors[11] );
-        break;
-    case EM_CONSTRAINT:
-        fl_cursor_ex( m_cursors[12] );
-        break;
-    case EM_CONSTRAINT_VECTOR:
-        fl_cursor_ex( m_cursors[12] );
-        break;
-    case EM_CONSTRAINT_HINGE:
-        fl_cursor_ex( m_cursors[12] );
-        break;
-    case EM_LINE:
-        fl_cursor_ex( m_cursors[13] );
-        break;
-    case EM_RECTANGLE:
-        fl_cursor_ex( m_cursors[14] );
-        break;
-    case EM_ELLIPSE:
-        fl_cursor_ex( m_cursors[15] );
-        break;
-    case EM_FLOODFILL:
-        fl_cursor_ex( m_cursors[16] );
-        break;
-    case EM_ERASE_CONSTRAINTS_FORCES:
-        fl_cursor_ex( m_cursors[17] );
-        break;
-    default:
-        fl_cursor( FL_CURSOR_DEFAULT );
+            //case EM_BRUSH:
+        case EM_DIRECT_BRUSH:
+            //case EM_ERASE:
+        case EM_DIRECT_ERASE:
+            fl_cursor_ex( m_cursors[m_currentBrushIdx] );
+            break;
+        case EM_SELECT_BOX:
+            fl_cursor_ex( m_cursors[10] );
+            break;
+        case EM_FORCE:
+            fl_cursor_ex( m_cursors[11] );
+            break;
+        case EM_CONSTRAINT:
+            fl_cursor_ex( m_cursors[12] );
+            break;
+        case EM_CONSTRAINT_VECTOR:
+            fl_cursor_ex( m_cursors[12] );
+            break;
+        case EM_CONSTRAINT_HINGE:
+            fl_cursor_ex( m_cursors[12] );
+            break;
+        case EM_LINE:
+            fl_cursor_ex( m_cursors[13] );
+            break;
+        case EM_RECTANGLE:
+            fl_cursor_ex( m_cursors[14] );
+            break;
+        case EM_ELLIPSE:
+            fl_cursor_ex( m_cursors[15] );
+            break;
+        case EM_FLOODFILL:
+            fl_cursor_ex( m_cursors[16] );
+            break;
+        case EM_ERASE_CONSTRAINTS_FORCES:
+            fl_cursor_ex( m_cursors[17] );
+            break;
+        default:
+            fl_cursor( FL_CURSOR_DEFAULT );
     }
 #endif
 }
@@ -153,7 +154,7 @@ void CFlPaintView::doDeleteCursors()
 {
 #ifndef __APPLE__
     int i;
-
+    
     for (i=0; i<20; i++)
         delete m_cursors[i];
 #endif
@@ -162,17 +163,17 @@ void CFlPaintView::doDeleteCursors()
 void CFlPaintView::draw()
 {
     // Clear screen
-
+    
     if (m_runOnce)
     {
         m_runOnce = false;
     }
-
+    
     onClear();
-
+    
     if (!Fl_Gl_Window::valid())
         onInitContext();
-
+    
     glPushMatrix();
     onDraw();
     glPopMatrix();
@@ -185,15 +186,15 @@ int CFlPaintView::handle(int event)
     // Overridden FLTK handle method for capturing
     // events.
     //
-
+    
     int x = Fl::event_x();
     int y = Fl::event_y();
-
+    
     int sx, sy;
-
+    
     // If the SHIFT button is down coordinates are snapped
     // to a grid
-
+    
     if ((Fl::event_state()&FL_SHIFT)>0)
     {
         sx = x - m_drawingOffsetX;
@@ -213,59 +214,81 @@ int CFlPaintView::handle(int event)
             y = sy + m_drawingOffsetY;
         }
     }
-
+    
     /*
-    if ((Fl::event_state()&FL_CTRL)>0)
-        m_zoomResults = true;
-    else
-        m_zoomResults = false;
-    */
-
+     if ((Fl::event_state()&FL_CTRL)>0)
+     m_zoomResults = true;
+     else
+     m_zoomResults = false;
+     */
+    
     // Call the different event methods
-
+    
     switch (event) {
-    case FL_PUSH:
-        m_leftMouseDown = true;
-        onPush(x, y);
-        return 1;
-        break;
-    case FL_DRAG:
-        onDrag(x, y);
-        return 1;
-    case FL_RELEASE:
-        if (!m_danglingRelease)
-            onRelease(x, y);
-        else
-            m_danglingRelease = false;
-        return 1;
-        break;
-    case FL_MOVE:
-        onMove(x, y);
-        return 1;
-        break;
-    case FL_ENTER:
-        updateCursor();
-        return 1;
-        break;
-    case FL_LEAVE:
+        case FL_PUSH:
+            m_leftMouseDown = true;
+            onPush(x, y);
+            return 1;
+            break;
+        case FL_DRAG:
+            onDrag(x, y);
+            return 1;
+        case FL_RELEASE:
+            if (!m_danglingRelease)
+                onRelease(x, y);
+            else
+                m_danglingRelease = false;
+            return 1;
+            break;
+        case FL_MOVE:
+            onMove(x, y);
+            return 1;
+            break;
+        case FL_ENTER:
+            updateCursor();
+            return 1;
+            break;
+        case FL_LEAVE:
 #ifndef __APPLE__
-        fl_cursor( FL_CURSOR_DEFAULT );
+            fl_cursor( FL_CURSOR_DEFAULT );
 #endif
-        return 1;
-        break;
-    case FL_MOUSEWHEEL:
-        onMouseWheel(Fl::event_dx(), Fl::event_dy());
-        return 1;
-        break;
-    default:
-        return Fl_Gl_Window::handle(event);
+            return 1;
+            break;
+        case FL_MOUSEWHEEL:
+            onMouseWheel(Fl::event_dx(), Fl::event_dy());
+            return 1;
+            break;
+        default:
+            return Fl_Gl_Window::handle(event);
     }
     return Fl_Gl_Window::handle(event);
 }
 
 const std::string CFlPaintView::doSaveDialog(const string title, const string filter, const string defaultFilename)
 {
-    std::string fname = fl_file_chooser(title.c_str(), filter.c_str(), defaultFilename.c_str());
+    // Create native chooser
+    Fl_Native_File_Chooser native;
+    
+    std::string fname;
+    
+    native.title("Save model");
+    native.type(Fl_Native_File_Chooser::BROWSE_SAVE_FILE);
+    native.filter("ForcePAD\t*.fp2\n");
+    native.preset_file(defaultFilename.c_str());
+    // Show native chooser
+    switch ( native.show() ) {
+        case -1: fprintf(stderr, "ERROR: %s\n", native.errmsg()); break;    // ERROR
+        case  1: fprintf(stderr, "*** CANCEL\n"); fl_beep(); break;         // CANCEL
+        default:                                                            // PICKED FILE
+            if ( native.filename() ) {
+                fname = native.filename();
+            } else {
+                fname = "";
+            }
+            break;
+    }
+    
+    //std::string fname = fl_file_chooser(title.c_str(), filter.c_str(), defaultFilename.c_str());
     return fname;
 }
 
@@ -275,12 +298,12 @@ bool CFlPaintView::doNewModel(int &width, int &height, int& initialStiffness)
     dlg->setSize(640, 480);
     dlg->centerWindow(this->window());
     dlg->show();
-
+    
     if (dlg->getModalResult()!=MR_CANCEL)
     {
         dlg->getSize(width, height);
         initialStiffness = dlg->getInitialStiffness();
-
+        
         delete dlg;
         return true;
     }
@@ -303,7 +326,29 @@ bool CFlPaintView::doAskYesNo(const string question)
 
 const std::string CFlPaintView::doOpenDialog(const string title, const string filter)
 {
-    std::string fname = fl_file_chooser(title.c_str(), filter.c_str(), "");
+    // Create native chooser
+    Fl_Native_File_Chooser native;
+    
+    std::string fname;
+    
+    native.title("Pick a file");
+    native.type(Fl_Native_File_Chooser::BROWSE_FILE);
+    native.filter("ForcePAD\t*.fp2\n");
+    native.preset_file("");
+    // Show native chooser
+    switch ( native.show() ) {
+        case -1: fprintf(stderr, "ERROR: %s\n", native.errmsg()); break;    // ERROR
+        case  1: fprintf(stderr, "*** CANCEL\n"); fl_beep(); break;         // CANCEL
+        default:                                                            // PICKED FILE
+            if ( native.filename() ) {
+                fname = native.filename();
+            } else {
+                fname = "";
+            }
+            break;
+    }
+    
+    //std::string fname = fl_file_chooser(title.c_str(), filter.c_str(), "");
     return fname;
 }
 

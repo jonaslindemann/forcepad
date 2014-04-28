@@ -10,9 +10,9 @@ if(WIN32)
     set(PNG_PNG_INCLUDE_DIR "d:/Libraries/depends/png/include")
 endif(WIN32)
 
-find_package(Qt4 COMPONENTS QtMain QtCore QtGui QtSql QtXml QtNetwork QtOpenGL REQUIRED)
+#find_package(Qt4 COMPONENTS QtMain QtCore QtGui QtSql QtXml QtNetwork QtOpenGL REQUIRED)
 
-INCLUDE(${QT_USE_FILE})
+#INCLUDE(${QT_USE_FILE})
 
 find_package(OpenGL)
 find_package(JPEG)

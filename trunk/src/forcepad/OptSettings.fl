@@ -1,61 +1,62 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0300 
+version 1.0302 
 header_name {.h} 
 code_name {.cpp}
-decl {\#include "PaintView.h"} {global
+decl {\#include "FlPaintView.h"} {selected private global
 } 
 
 class COptSettings {open
 } {
-  decl {void* m_paintView;} {}
+  decl {void* m_paintView;} {private local
+  }
   Function {COptSettings()} {open
   } {
     Fl_Window mainWindow {
       label {Optimisation Settings} open
-      xywh {635 229 318 291} type Double modal visible
+      xywh {635 229 318 291} type Double color 0 labelcolor 7 modal visible
     } {
       Fl_Button cancelButton {
         label Cancel
         callback {mainWindow->hide();}
-        xywh {230 255 70 25} labelsize 11
+        xywh {230 255 70 25} box FLAT_BOX color 39 labelsize 11
       }
       Fl_Button okButton {
         label OK
         callback {this->getData();
-mainWindow->hide();} selected
-        xywh {154 255 70 25} labelsize 11
+mainWindow->hide();}
+        xywh {154 255 70 25} box FLAT_BOX color 39 labelsize 11
       }
       Fl_Value_Slider volFrac {
         label {Volume fraction}
-        xywh {14 25 286 20} type {Horz Knob} labelsize 11 align 5 value 0.5 textsize 11
+        xywh {14 25 286 20} type Horizontal box FLAT_BOX color 37 labelsize 11 labelcolor 7 align 5 value 0.5 textsize 11 textcolor 7
       }
       Fl_Value_Slider rmin {
         label {Filter r,min (elements)}
-        xywh {14 65 286 20} type {Horz Knob} labelsize 11 align 5 minimum 1 maximum 5 value 2.75 textsize 11
+        xywh {14 65 286 20} type Horizontal box FLAT_BOX color 37 labelsize 11 labelcolor 7 align 5 minimum 1 maximum 5 value 2.75 textsize 11 textcolor 7
       }
       Fl_Value_Slider minChange {
         label {Min change stop criteria}
-        xywh {15 105 286 20} type {Horz Knob} labelsize 11 align 5 minimum 0.01 maximum 0.1 value 0.01 textsize 11
+        xywh {15 105 286 20} type Horizontal box FLAT_BOX color 37 labelsize 11 labelcolor 7 align 5 minimum 0.01 maximum 0.1 value 0.01 textsize 11 textcolor 7
       }
       Fl_Value_Slider maxLoops {
         label {Max loops stop criteria}
-        xywh {15 147 286 20} type {Horz Knob} labelsize 11 align 5 minimum 1 maximum 1000 step 1 value 50 textsize 11
+        xywh {15 147 286 20} type Horizontal box FLAT_BOX color 37 labelsize 11 labelcolor 7 align 5 minimum 1 maximum 1000 step 1 value 50 textsize 11 textcolor 7
       }
       Fl_Group {} {
         label {Sensitivity filter} open
-        xywh {15 187 285 56} box DOWN_BOX labelsize 11 align 5
+        xywh {15 187 285 56} box FLAT_BOX color 37 labelsize 11 labelcolor 7 align 5
       } {
         Fl_Round_Button noFilter {
           label {No filter}
-          xywh {22 193 64 15} type Radio down_box ROUND_DOWN_BOX labelsize 11
+          xywh {22 193 64 15} type Radio down_box ROUND_DOWN_BOX labelsize 11 labelcolor 7
         }
         Fl_Round_Button sigmundFilter {
           label {Ole Sigmund}
-          xywh {22 208 88 15} type Radio down_box ROUND_DOWN_BOX labelsize 11
+          xywh {22 208 88 15} type Radio down_box ROUND_DOWN_BOX labelsize 11 labelcolor 7
         }
         Fl_Round_Button backPedersenFilter {
           label {Sharp Contouring Filter}
-          xywh {22 223 93 15} type Radio down_box ROUND_DOWN_BOX value 1 labelsize 11
+          xywh {22 223 93 15} type Radio down_box ROUND_DOWN_BOX labelsize 11 labelcolor 7
         }
       }
     }
@@ -73,13 +74,13 @@ while (mainWindow->visible()) Fl::wait();} {}
   }
   Function {setView(void* view)} {open
   } {
-    code {m_paintView = (CPaintView*)view;} {}
+    code {m_paintView = (CFlPaintView*)view;} {}
   }
   Function {setData()} {open
   } {
     code {if (m_paintView!=NULL)
 {
-	CPaintView* view = (CPaintView*)m_paintView;
+	CFlPaintView* view = (CFlPaintView*)m_paintView;
 	
 	volFrac->value(view->getOptVolumeFraction());
 	rmin->value(view->getOptRmin());
@@ -99,7 +100,7 @@ while (mainWindow->visible()) Fl::wait();} {}
   } {
     code {if (m_paintView!=NULL)
 {
-	CPaintView* view = (CPaintView*)m_paintView;
+	CFlPaintView* view = (CFlPaintView*)m_paintView;
 	
 	view->setOptVolumeFraction(volFrac->value());
 	view->setOptRmin(rmin->value());
