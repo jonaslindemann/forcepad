@@ -89,10 +89,10 @@ class CMainFrame {open : {CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusM
   } {
     Fl_Window wndMain {
       label {ForcePAD 2} open
-      xywh {748 205 861 685} type Double color 0 align 80 resizable visible
+      xywh {327 183 861 685} type Double color 0 align 80 resizable visible
     } {
-      Fl_Menu_Bar mainMenu {open
-        xywh {0 0 858 26} box FLAT_BOX down_box FLAT_BOX color 32 labelsize 11 textsize 11 textcolor 7
+      Fl_Menu_Bar mainMenu {open selected
+        xywh {0 0 858 26} box BORDER_BOX down_box FLAT_BOX color 32 labelsize 11 labelcolor 1 textsize 11 textcolor 7
       } {
         Submenu fileMenu {
           label {&File} open
@@ -312,7 +312,7 @@ if (btnLine->value()==1)
 if (btnArch->value()==1)
 	paintView->setEditMode(CPaintView::EM_ARCH);
 	
-m_sketchEditMode = paintView->getEditMode();} selected
+m_sketchEditMode = paintView->getEditMode();}
           tooltip {Geometric drawing tools} image {../../images/drawing_tools_black.png} xywh {5 126 42 42} type Radio box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton

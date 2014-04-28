@@ -35,6 +35,7 @@
 #include <cstdlib>
 #include <cmath>
 #include <climits>
+#include <ctime>
 
 #include <FL/Fl.h>
 
@@ -144,7 +145,7 @@ void CFemGridSolver2::execute_old()
 #ifdef WIN32
 	DWORD startTime = timeGetTime();
 #endif
-
+    
 	//
 	// Reset error status
 	//
@@ -286,6 +287,8 @@ void CFemGridSolver2::execute_old()
 	//
 	///////////////////////////////////////////////////////////////////////////
 
+    clock_t t0 = clock();
+    
 	for (i=0; i<rows; i++)
 	{
 		for (j=0; j<cols; j++)
@@ -370,6 +373,10 @@ void CFemGridSolver2::execute_old()
 			}
 		}
 	}
+    clock_t t1 = clock();
+    clock_t dt = t1-t0;
+    
+    std::cout << "Element assemblage = " << dt << " tics." << std::endl;
 
 	//
 	// If no elements where assembled something was wrong return 
@@ -2174,7 +2181,10 @@ void CFemGridSolver2::executeOptimizer()
 		// Assemble system
 		//
 
+        clock_t t0 = clock();
 		nElements = this->assembleSystemOpt(K, X, L, penalty);
+        clock_t t1 = clock();
+        std::cout << "Assemble system = " << t1-t0 << std::endl;
 
 		//
 		// If no elements where assembled something was wrong return 
@@ -2237,6 +2247,7 @@ void CFemGridSolver2::executeOptimizer()
 
 		progressMessage("Solving system.", 50);
 
+        t0 = clock();
 		Try 
 		{
 			m_X = K; // LU decomposition
@@ -2247,8 +2258,12 @@ void CFemGridSolver2::executeOptimizer()
 			m_errorStatus = ET_INVALID_MODEL;
 			return;
 		}
+        t1 = clock();
+        cout << "Equation system = " << t1-t0 << endl;
 
 		// Objective functions
+
+        t0 = clock();
 
 		c = 0.0;
 		dC = 0.0;
@@ -2256,6 +2271,8 @@ void CFemGridSolver2::executeOptimizer()
 		cout << "objectiveFunctionAndSensitivity()" << endl;
 		this->progressMessage("Objective function and sensitivity.", 60);
 		this->objectiveFunctionAndSensitivity(X, dC, L, m_optPenalty, c);
+        t1 = clock();
+        cout << "Objective function = " << t1-t0 << endl;
 
 		// Filter sensitivities
 

@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0300 
+version 1.0302 
 header_name {.h} 
 code_name {.cpp}
 decl {\#include "FlPaintView.h"} {private global
@@ -12,19 +12,19 @@ class CCalcSettings {open
   Function {CCalcSettings()} {open
   } {
     Fl_Window mainWindow {
-      label {Calculation Settings} open
-      xywh {611 486 318 247} type Double modal visible
+      label {Calculation Settings} open selected
+      xywh {433 183 318 247} type Double color 0 modal visible
     } {
       Fl_Tabs {} {open
-        tooltip {the various index cards test different aspects of the Fl_Tabs widget} xywh {7 5 303 202} box UP_BOX selection_color 4 labelcolor 7
+        tooltip {the various index cards test different aspects of the Fl_Tabs widget} xywh {7 5 303 202} box FLAT_BOX color 39 selection_color 39 labelcolor 7
       } {
         Fl_Group meshGroup {
           label Mesh open
-          tooltip {tab2 tests among other things the cooperation of modal windows and tabs} xywh {12 26 294 176} labelsize 11 hide
+          tooltip {tab2 tests among other things the cooperation of modal windows and tabs} xywh {12 26 294 176} color 38 selection_color 37 labelsize 11
         } {
           Fl_Value_Slider gridStep {
             label {Grid step:}
-            xywh {98 107 160 20} type {Horz Knob} labelsize 11 align 4 minimum 2 maximum 16 step 1 value 8 textsize 11
+            xywh {98 107 160 20} type {Horz Knob} labelsize 11 align 4 minimum 2 maximum 16 step 1 value 6 textsize 11
           }
           Fl_Box {} {
             label Fine
@@ -37,7 +37,7 @@ class CCalcSettings {open
         }
         Fl_Group generalGroup {
           label General open
-          tooltip {tab2 tests among other things the cooperation of modal windows and tabs} xywh {12 26 294 176} labelsize 11 hide
+          tooltip {tab2 tests among other things the cooperation of modal windows and tabs} xywh {12 26 294 176} color 39 selection_color 37 labelsize 11 hide
         } {
           Fl_Value_Input elasticModulus {
             label {Elastic modulus}
@@ -62,7 +62,7 @@ class CCalcSettings {open
         }
         Fl_Group constraintGroup {
           label Constraints open
-          tooltip {tab3 checks for correct keyboard navigation} xywh {12 26 294 176} labelsize 11
+          tooltip {tab3 checks for correct keyboard navigation} xywh {12 26 294 176} color 39 selection_color 37 labelsize 11 hide
         } {
           Fl_Value_Input constraintStiffnessScaleFactor {
             label {Vector constraint stiffness scale}
@@ -81,13 +81,13 @@ class CCalcSettings {open
       Fl_Button cancelButton {
         label Cancel
         callback {mainWindow->hide();}
-        xywh {240 215 70 25} labelsize 11
+        xywh {240 213 70 24} box FLAT_BOX color 39 labelsize 11
       }
       Fl_Button okButton {
         label OK
         callback {this->getData();
 mainWindow->hide();}
-        xywh {164 215 70 25} labelsize 11
+        xywh {164 213 70 24} box FLAT_BOX color 39 labelsize 11
       }
     }
     code {m_paintView = NULL;} {}
@@ -136,8 +136,7 @@ while (mainWindow->visible()) Fl::wait();} {}
 	view->setWeight(weight->value());
 	
 	view->setGridStride(gridStep->value());
-}} {selected
-    }
+}} {}
   }
   Function {centerWindow(Fl_Window* window)} {open
   } {
