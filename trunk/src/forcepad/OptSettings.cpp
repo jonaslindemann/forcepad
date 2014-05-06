@@ -19,26 +19,28 @@ void COptSettings::cb_okButton(Fl_Button* o, void* v) {
 }
 
 COptSettings::COptSettings() {
-  { mainWindow = new Fl_Double_Window(318, 291, "Optimisation Settings");
+  { mainWindow = new Fl_Double_Window(312, 290, "Optimisation Settings");
     mainWindow->color(FL_FOREGROUND_COLOR);
     mainWindow->labelcolor(FL_BACKGROUND2_COLOR);
     mainWindow->user_data((void*)(this));
     { cancelButton = new Fl_Button(230, 255, 70, 25, "Cancel");
       cancelButton->box(FL_FLAT_BOX);
-      cancelButton->color(FL_DARK3);
+      cancelButton->color(FL_INACTIVE_COLOR);
       cancelButton->labelsize(11);
+      cancelButton->labelcolor(FL_BACKGROUND2_COLOR);
       cancelButton->callback((Fl_Callback*)cb_cancelButton);
     } // Fl_Button* cancelButton
     { okButton = new Fl_Button(154, 255, 70, 25, "OK");
       okButton->box(FL_FLAT_BOX);
-      okButton->color(FL_DARK3);
+      okButton->color(FL_INACTIVE_COLOR);
       okButton->labelsize(11);
+      okButton->labelcolor(FL_BACKGROUND2_COLOR);
       okButton->callback((Fl_Callback*)cb_okButton);
     } // Fl_Button* okButton
     { volFrac = new Fl_Value_Slider(14, 25, 286, 20, "Volume fraction");
       volFrac->type(1);
       volFrac->box(FL_FLAT_BOX);
-      volFrac->color((Fl_Color)37);
+      volFrac->color(FL_INACTIVE_COLOR);
       volFrac->labelsize(11);
       volFrac->labelcolor(FL_BACKGROUND2_COLOR);
       volFrac->value(0.5);
@@ -49,7 +51,7 @@ COptSettings::COptSettings() {
     { rmin = new Fl_Value_Slider(14, 65, 286, 20, "Filter r,min (elements)");
       rmin->type(1);
       rmin->box(FL_FLAT_BOX);
-      rmin->color((Fl_Color)37);
+      rmin->color(FL_INACTIVE_COLOR);
       rmin->labelsize(11);
       rmin->labelcolor(FL_BACKGROUND2_COLOR);
       rmin->minimum(1);
@@ -62,7 +64,7 @@ COptSettings::COptSettings() {
     { minChange = new Fl_Value_Slider(15, 105, 286, 20, "Min change stop criteria");
       minChange->type(1);
       minChange->box(FL_FLAT_BOX);
-      minChange->color((Fl_Color)37);
+      minChange->color(FL_INACTIVE_COLOR);
       minChange->labelsize(11);
       minChange->labelcolor(FL_BACKGROUND2_COLOR);
       minChange->minimum(0.01);
@@ -75,7 +77,7 @@ COptSettings::COptSettings() {
     { maxLoops = new Fl_Value_Slider(15, 147, 286, 20, "Max loops stop criteria");
       maxLoops->type(1);
       maxLoops->box(FL_FLAT_BOX);
-      maxLoops->color((Fl_Color)37);
+      maxLoops->color(FL_INACTIVE_COLOR);
       maxLoops->labelsize(11);
       maxLoops->labelcolor(FL_BACKGROUND2_COLOR);
       maxLoops->minimum(1);
@@ -88,7 +90,7 @@ COptSettings::COptSettings() {
     } // Fl_Value_Slider* maxLoops
     { Fl_Group* o = new Fl_Group(15, 187, 285, 56, "Sensitivity filter");
       o->box(FL_FLAT_BOX);
-      o->color((Fl_Color)37);
+      o->color(FL_INACTIVE_COLOR);
       o->labelsize(11);
       o->labelcolor(FL_BACKGROUND2_COLOR);
       o->align(Fl_Align(FL_ALIGN_TOP_LEFT));

@@ -19,82 +19,113 @@ void CCalcSettings::cb_okButton(Fl_Button* o, void* v) {
 }
 
 CCalcSettings::CCalcSettings() {
-  { mainWindow = new Fl_Double_Window(318, 247, "Calculation Settings");
+  { mainWindow = new Fl_Double_Window(318, 244, "Calculation Settings");
     mainWindow->color(FL_FOREGROUND_COLOR);
     mainWindow->user_data((void*)(this));
     { Fl_Tabs* o = new Fl_Tabs(7, 5, 303, 202);
       o->tooltip("the various index cards test different aspects of the Fl_Tabs widget");
       o->box(FL_FLAT_BOX);
-      o->color(FL_DARK3);
-      o->selection_color(FL_DARK3);
+      o->color(FL_INACTIVE_COLOR);
+      o->selection_color(FL_INACTIVE_COLOR);
       o->labelcolor(FL_BACKGROUND2_COLOR);
       { meshGroup = new Fl_Group(12, 26, 294, 176, "Mesh");
         meshGroup->tooltip("tab2 tests among other things the cooperation of modal windows and tabs");
-        meshGroup->color((Fl_Color)38);
-        meshGroup->selection_color((Fl_Color)37);
+        meshGroup->color(FL_INACTIVE_COLOR);
+        meshGroup->selection_color(FL_INACTIVE_COLOR);
         meshGroup->labelsize(11);
         { gridStep = new Fl_Value_Slider(98, 107, 160, 20, "Grid step:");
-          gridStep->type(5);
+          gridStep->type(1);
+          gridStep->box(FL_FLAT_BOX);
+          gridStep->color((Fl_Color)28);
+          gridStep->selection_color((Fl_Color)29);
           gridStep->labelsize(11);
+          gridStep->labelcolor(FL_BACKGROUND2_COLOR);
           gridStep->minimum(2);
           gridStep->maximum(16);
           gridStep->step(1);
           gridStep->value(6);
           gridStep->textsize(11);
+          gridStep->textcolor(FL_BACKGROUND2_COLOR);
           gridStep->align(Fl_Align(FL_ALIGN_LEFT));
         } // Fl_Value_Slider* gridStep
         { Fl_Box* o = new Fl_Box(110, 84, 45, 21, "Fine");
           o->labelsize(11);
+          o->labelcolor(FL_BACKGROUND2_COLOR);
         } // Fl_Box* o
         { Fl_Box* o = new Fl_Box(231, 84, 45, 21, "Coarse");
           o->labelsize(11);
+          o->labelcolor(FL_BACKGROUND2_COLOR);
         } // Fl_Box* o
         meshGroup->end();
       } // Fl_Group* meshGroup
       { generalGroup = new Fl_Group(12, 26, 294, 176, "General");
         generalGroup->tooltip("tab2 tests among other things the cooperation of modal windows and tabs");
-        generalGroup->color(FL_DARK3);
-        generalGroup->selection_color((Fl_Color)37);
+        generalGroup->color(FL_INACTIVE_COLOR);
+        generalGroup->selection_color(FL_INACTIVE_COLOR);
         generalGroup->labelsize(11);
         generalGroup->hide();
-        { elasticModulus = new Fl_Value_Input(161, 51, 99, 22, "Elastic modulus");
+        { elasticModulus = new Fl_Value_Input(161, 51, 99, 22, "Elastic modulus ");
+          elasticModulus->box(FL_FLAT_BOX);
+          elasticModulus->color((Fl_Color)29);
           elasticModulus->labelsize(11);
+          elasticModulus->labelcolor(FL_BACKGROUND2_COLOR);
           elasticModulus->textsize(11);
         } // Fl_Value_Input* elasticModulus
-        { stiffnessScaleFactor = new Fl_Value_Input(161, 77, 99, 22, "Stiffness scale factor");
+        { stiffnessScaleFactor = new Fl_Value_Input(161, 77, 99, 22, "Stiffness scale factor ");
+          stiffnessScaleFactor->box(FL_FLAT_BOX);
+          stiffnessScaleFactor->color((Fl_Color)29);
           stiffnessScaleFactor->labelsize(11);
+          stiffnessScaleFactor->labelcolor(FL_BACKGROUND2_COLOR);
           stiffnessScaleFactor->textsize(11);
         } // Fl_Value_Input* stiffnessScaleFactor
-        { youngsModulus = new Fl_Value_Input(161, 103, 99, 22, "Young\'s modulus");
+        { youngsModulus = new Fl_Value_Input(161, 103, 99, 22, "Young\'s modulus ");
+          youngsModulus->box(FL_FLAT_BOX);
+          youngsModulus->color((Fl_Color)29);
           youngsModulus->labelsize(11);
+          youngsModulus->labelcolor(FL_BACKGROUND2_COLOR);
           youngsModulus->textsize(11);
         } // Fl_Value_Input* youngsModulus
-        { thickness = new Fl_Value_Input(161, 129, 99, 22, "Thickness");
+        { thickness = new Fl_Value_Input(161, 129, 99, 22, "Thickness ");
+          thickness->box(FL_FLAT_BOX);
+          thickness->color((Fl_Color)29);
           thickness->labelsize(11);
+          thickness->labelcolor(FL_BACKGROUND2_COLOR);
           thickness->textsize(11);
         } // Fl_Value_Input* thickness
-        { elementTreshold = new Fl_Value_Input(161, 155, 99, 22, "Element treshold");
+        { elementTreshold = new Fl_Value_Input(161, 155, 99, 22, "Element treshold ");
+          elementTreshold->box(FL_FLAT_BOX);
+          elementTreshold->color((Fl_Color)29);
           elementTreshold->labelsize(11);
+          elementTreshold->labelcolor(FL_BACKGROUND2_COLOR);
           elementTreshold->textsize(11);
         } // Fl_Value_Input* elementTreshold
         generalGroup->end();
       } // Fl_Group* generalGroup
       { constraintGroup = new Fl_Group(12, 26, 294, 176, "Constraints");
         constraintGroup->tooltip("tab3 checks for correct keyboard navigation");
-        constraintGroup->color(FL_DARK3);
-        constraintGroup->selection_color((Fl_Color)37);
+        constraintGroup->color(FL_INACTIVE_COLOR);
+        constraintGroup->selection_color(FL_INACTIVE_COLOR);
         constraintGroup->labelsize(11);
         constraintGroup->hide();
-        { constraintStiffnessScaleFactor = new Fl_Value_Input(189, 78, 99, 22, "Vector constraint stiffness scale");
+        { constraintStiffnessScaleFactor = new Fl_Value_Input(189, 78, 99, 22, "Vector constraint stiffness scale ");
+          constraintStiffnessScaleFactor->box(FL_FLAT_BOX);
+          constraintStiffnessScaleFactor->color((Fl_Color)29);
           constraintStiffnessScaleFactor->labelsize(11);
+          constraintStiffnessScaleFactor->labelcolor(FL_BACKGROUND2_COLOR);
           constraintStiffnessScaleFactor->textsize(11);
         } // Fl_Value_Input* constraintStiffnessScaleFactor
-        { forceMagnitude = new Fl_Value_Input(189, 105, 99, 22, "Force magnitude (N)");
+        { forceMagnitude = new Fl_Value_Input(189, 105, 99, 22, "Force magnitude (N) ");
+          forceMagnitude->box(FL_FLAT_BOX);
+          forceMagnitude->color((Fl_Color)29);
           forceMagnitude->labelsize(11);
+          forceMagnitude->labelcolor(FL_BACKGROUND2_COLOR);
           forceMagnitude->textsize(11);
         } // Fl_Value_Input* forceMagnitude
-        { weight = new Fl_Value_Input(189, 132, 99, 22, "Weight (N)");
+        { weight = new Fl_Value_Input(189, 132, 99, 22, "Weight (N) ");
+          weight->box(FL_FLAT_BOX);
+          weight->color((Fl_Color)29);
           weight->labelsize(11);
+          weight->labelcolor(FL_BACKGROUND2_COLOR);
           weight->textsize(11);
         } // Fl_Value_Input* weight
         constraintGroup->end();
@@ -103,17 +134,20 @@ CCalcSettings::CCalcSettings() {
     } // Fl_Tabs* o
     { cancelButton = new Fl_Button(240, 213, 70, 24, "Cancel");
       cancelButton->box(FL_FLAT_BOX);
-      cancelButton->color(FL_DARK3);
+      cancelButton->color(FL_INACTIVE_COLOR);
       cancelButton->labelsize(11);
+      cancelButton->labelcolor(FL_BACKGROUND2_COLOR);
       cancelButton->callback((Fl_Callback*)cb_cancelButton);
     } // Fl_Button* cancelButton
     { okButton = new Fl_Button(164, 213, 70, 24, "OK");
       okButton->box(FL_FLAT_BOX);
-      okButton->color(FL_DARK3);
+      okButton->color(FL_INACTIVE_COLOR);
       okButton->labelsize(11);
+      okButton->labelcolor(FL_BACKGROUND2_COLOR);
       okButton->callback((Fl_Callback*)cb_okButton);
     } // Fl_Button* okButton
     mainWindow->set_modal();
+    mainWindow->size_range(318, 244);
     mainWindow->end();
   } // Fl_Double_Window* mainWindow
   m_paintView = NULL;

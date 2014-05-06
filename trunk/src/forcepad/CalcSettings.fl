@@ -12,82 +12,82 @@ class CCalcSettings {open
   Function {CCalcSettings()} {open
   } {
     Fl_Window mainWindow {
-      label {Calculation Settings} open selected
-      xywh {433 183 318 247} type Double color 0 modal visible
+      label {Calculation Settings} open
+      xywh {886 466 318 244} type Double color 0 modal size_range {318 244 0 0} visible
     } {
       Fl_Tabs {} {open
-        tooltip {the various index cards test different aspects of the Fl_Tabs widget} xywh {7 5 303 202} box FLAT_BOX color 39 selection_color 39 labelcolor 7
+        tooltip {the various index cards test different aspects of the Fl_Tabs widget} xywh {7 5 303 202} box FLAT_BOX color 8 selection_color 8 labelcolor 7
       } {
         Fl_Group meshGroup {
-          label Mesh open
-          tooltip {tab2 tests among other things the cooperation of modal windows and tabs} xywh {12 26 294 176} color 38 selection_color 37 labelsize 11
+          label Mesh open selected
+          tooltip {tab2 tests among other things the cooperation of modal windows and tabs} xywh {12 26 294 176} color 8 selection_color 8 labelsize 11
         } {
           Fl_Value_Slider gridStep {
             label {Grid step:}
-            xywh {98 107 160 20} type {Horz Knob} labelsize 11 align 4 minimum 2 maximum 16 step 1 value 6 textsize 11
+            xywh {98 107 160 20} type Horizontal box FLAT_BOX color 28 selection_color 29 labelsize 11 labelcolor 7 align 4 minimum 2 maximum 16 step 1 value 6 textsize 11 textcolor 7
           }
           Fl_Box {} {
             label Fine
-            xywh {110 84 45 21} labelsize 11
+            xywh {110 84 45 21} labelsize 11 labelcolor 7
           }
           Fl_Box {} {
             label Coarse
-            xywh {231 84 45 21} labelsize 11
+            xywh {231 84 45 21} labelsize 11 labelcolor 7
           }
         }
         Fl_Group generalGroup {
           label General open
-          tooltip {tab2 tests among other things the cooperation of modal windows and tabs} xywh {12 26 294 176} color 39 selection_color 37 labelsize 11 hide
+          tooltip {tab2 tests among other things the cooperation of modal windows and tabs} xywh {12 26 294 176} color 8 selection_color 8 labelsize 11 hide
         } {
           Fl_Value_Input elasticModulus {
-            label {Elastic modulus}
-            xywh {161 51 99 22} labelsize 11 textsize 11
+            label {Elastic modulus }
+            xywh {161 51 99 22} box FLAT_BOX color 29 labelsize 11 labelcolor 7 textsize 11
           }
           Fl_Value_Input stiffnessScaleFactor {
-            label {Stiffness scale factor}
-            xywh {161 77 99 22} labelsize 11 textsize 11
+            label {Stiffness scale factor }
+            xywh {161 77 99 22} box FLAT_BOX color 29 labelsize 11 labelcolor 7 textsize 11
           }
           Fl_Value_Input youngsModulus {
-            label {Young's modulus}
-            xywh {161 103 99 22} labelsize 11 textsize 11
+            label {Young's modulus }
+            xywh {161 103 99 22} box FLAT_BOX color 29 labelsize 11 labelcolor 7 textsize 11
           }
           Fl_Value_Input thickness {
-            label Thickness
-            xywh {161 129 99 22} labelsize 11 textsize 11
+            label {Thickness }
+            xywh {161 129 99 22} box FLAT_BOX color 29 labelsize 11 labelcolor 7 textsize 11
           }
           Fl_Value_Input elementTreshold {
-            label {Element treshold}
-            xywh {161 155 99 22} labelsize 11 textsize 11
+            label {Element treshold }
+            xywh {161 155 99 22} box FLAT_BOX color 29 labelsize 11 labelcolor 7 textsize 11
           }
         }
         Fl_Group constraintGroup {
           label Constraints open
-          tooltip {tab3 checks for correct keyboard navigation} xywh {12 26 294 176} color 39 selection_color 37 labelsize 11 hide
+          tooltip {tab3 checks for correct keyboard navigation} xywh {12 26 294 176} color 8 selection_color 8 labelsize 11 hide
         } {
           Fl_Value_Input constraintStiffnessScaleFactor {
-            label {Vector constraint stiffness scale}
-            xywh {189 78 99 22} labelsize 11 textsize 11
+            label {Vector constraint stiffness scale }
+            xywh {189 78 99 22} box FLAT_BOX color 29 labelsize 11 labelcolor 7 textsize 11
           }
           Fl_Value_Input forceMagnitude {
-            label {Force magnitude (N)}
-            xywh {189 105 99 22} labelsize 11 textsize 11
+            label {Force magnitude (N) }
+            xywh {189 105 99 22} box FLAT_BOX color 29 labelsize 11 labelcolor 7 textsize 11
           }
           Fl_Value_Input weight {
-            label {Weight (N)}
-            xywh {189 132 99 22} labelsize 11 textsize 11
+            label {Weight (N) }
+            xywh {189 132 99 22} box FLAT_BOX color 29 labelsize 11 labelcolor 7 textsize 11
           }
         }
       }
       Fl_Button cancelButton {
         label Cancel
         callback {mainWindow->hide();}
-        xywh {240 213 70 24} box FLAT_BOX color 39 labelsize 11
+        xywh {240 213 70 24} box FLAT_BOX color 8 labelsize 11 labelcolor 7
       }
       Fl_Button okButton {
         label OK
         callback {this->getData();
 mainWindow->hide();}
-        xywh {164 213 70 24} box FLAT_BOX color 39 labelsize 11
+        xywh {164 213 70 24} box FLAT_BOX color 8 labelsize 11 labelcolor 7
       }
     }
     code {m_paintView = NULL;} {}

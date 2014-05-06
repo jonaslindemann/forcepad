@@ -89,9 +89,9 @@ class CMainFrame {open : {CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusM
   } {
     Fl_Window wndMain {
       label {ForcePAD 2} open
-      xywh {327 183 861 685} type Double color 0 align 80 resizable visible
+      xywh {331 187 853 686} type Double color 0 align 80 resizable visible
     } {
-      Fl_Menu_Bar mainMenu {open selected
+      Fl_Menu_Bar mainMenu {open
         xywh {0 0 858 26} box BORDER_BOX down_box FLAT_BOX color 32 labelsize 11 labelcolor 1 textsize 11 textcolor 7
       } {
         Submenu fileMenu {
@@ -351,8 +351,8 @@ if (btnPaste->value()==1)
           class CFlPaintView
         }
       }
-      Fl_Scroll scrLeftResultToolbar {open
-        xywh {365 194 53 460} box FLAT_BOX color 0 labelcolor 7
+      Fl_Scroll scrLeftResultToolbar {open selected
+        xywh {365 183 53 471} box FLAT_BOX color 0 labelcolor 7
       } {
         Fl_Button btnStress {
           callback {//showRightToolbar(scrRightStressToolbar);
@@ -361,7 +361,7 @@ paintView->setVisualisationMode(CPaintView::VM_PRINCIPAL_STRESS);
 //paintView->setStressType(CFemGrid2::ST_PRINCIPAL);
 //paintView->setDrawStress(true);
 //paintView->setDrawForcesAndConstraints(true);}
-          tooltip {Stress visualisation} image {../../images/stress2_black.png} xywh {370 200 42 42} type Radio box THIN_UP_BOX down_box THIN_DOWN_FRAME value 1 color 0 selection_color 1
+          tooltip {Stress visualisation} image {../../images/stress2_black.png} xywh {370 188 42 42} type Radio box THIN_UP_BOX down_box THIN_DOWN_FRAME value 1 color 0 selection_color 1
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
         }
@@ -371,7 +371,7 @@ paintView->setVisualisationMode(CPaintView::VM_DISPLACEMENTS);
 //paintView->setDrawDisplacements(true);
 //paintView->setDrawStress(false);
 //paintView->setDrawForcesAndConstraints(true);}
-          tooltip {Displacement visualisation} image {../../images/displacements_black.png} xywh {370 290 42 42} type Radio box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1
+          tooltip {Displacement visualisation} image {../../images/displacements_black.png} xywh {370 278 42 42} type Radio box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
         }
@@ -382,22 +382,22 @@ paintView->setVisualisationMode(CPaintView::VM_MISES_STRESS);
 //paintView->setStressType(CFemGrid2::ST_MISES_SMOOTH);
 //paintView->setDrawStress(true);
 //paintView->setDrawForcesAndConstraints(true);}
-          tooltip {Mises stress visualisation} image {../../images/stress_mises_black.png} xywh {370 245 42 42} type Radio box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1
+          tooltip {Mises stress visualisation} image {../../images/stress_mises_black.png} xywh {370 233 42 42} type Radio box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
         }
         Fl_Group {} {open
-          xywh {370 494 48 95}
+          xywh {370 482 45 95}
         } {
           Fl_Button btnMoveLoad {
             callback {paintView->setMoveLoad(true);}
-            tooltip {Toggle between moving and rotating loads} image {../../images/action_move_force_black.png} xywh {371 547 42 42} type Radio box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1 labelsize 11 align 128
+            tooltip {Toggle between moving and rotating loads} image {../../images/action_move_force_black.png} xywh {371 535 42 42} type Radio box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1 labelsize 11 align 128
             code0 {\#include "Fl_HoverButton.h"}
             class Fl_HoverButton
           }
           Fl_Button btnRotateLoad {
             callback {paintView->setMoveLoad(false);}
-            tooltip {Toggle between moving and rotating loads} image {../../images/action_rotate_force_black.png} xywh {371 503 42 42} type Radio box THIN_UP_BOX down_box THIN_DOWN_FRAME value 1 color 0 selection_color 1 labelsize 11 align 128
+            tooltip {Toggle between moving and rotating loads} image {../../images/action_rotate_force_black.png} xywh {371 491 42 42} type Radio box THIN_UP_BOX down_box THIN_DOWN_FRAME value 1 color 0 selection_color 1 labelsize 11 align 128
             code0 {\#include "Fl_HoverButton.h"}
             class Fl_HoverButton
           }
@@ -413,7 +413,7 @@ m_optSettings->show();
 disableUserInterface();
 m_vizMixer->hide();
 paintView->executeOpt();}
-          tooltip Optimisation image {../../images/optimise_black.png} xywh {370 448 42 42} box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1 labelsize 11
+          tooltip Optimisation image {../../images/optimise_black.png} xywh {370 436 42 42} box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1 labelsize 11
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
         }
@@ -423,7 +423,7 @@ paintView->setVisualisationMode(CPaintView::VM_STRUCTURE);
 //paintView->setDrawDisplacements(false);
 //paintView->setDrawStress(false);
 //paintView->setDrawForcesAndConstraints(false);}
-          tooltip {Show structure only} image {../../images/structure_black_grd.png} xywh {370 334 42 42} type Radio box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1 labelcolor 7
+          tooltip {Show structure only} image {../../images/structure_black_grd.png} xywh {370 322 42 42} type Radio box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1 labelcolor 7
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
         }
@@ -431,7 +431,7 @@ paintView->setVisualisationMode(CPaintView::VM_STRUCTURE);
           callback {m_vizMixer->setView(paintView);
 m_vizMixer->show();
 m_vizMixer->placeWindow(wndMain);}
-          tooltip {Visualisation mixer} image {../../images/visualisation_mixer_black.png} xywh {370 388 42 42} box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1 labelsize 11 labelcolor 7 align 128
+          tooltip {Visualisation mixer} image {../../images/visualisation_mixer_black.png} xywh {370 376 42 42} box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1 labelsize 11 labelcolor 7 align 128
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
         }
@@ -440,7 +440,7 @@ m_vizMixer->placeWindow(wndMain);}
 	paintView->setZoomResults(true);
 else
 	paintView->setZoomResults(false);}
-          tooltip {Toggle between moving and rotating loads} image {../../images/zoom.png} xywh {371 599 42 42} type Toggle box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1 labelsize 11 align 128
+          tooltip {Toggle between moving and rotating loads} image {../../images/zoom.png} xywh {371 587 42 42} type Toggle box THIN_UP_BOX down_box THIN_DOWN_FRAME color 0 selection_color 1 labelsize 11 align 128
           code0 {\#include "Fl_HoverButton.h"}
           class Fl_HoverButton
         }

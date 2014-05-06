@@ -1,8 +1,6 @@
 @echo off
 
 set BUILD_TYPE=%1
-set FLTK_ROOT="C:\Users\Jonas Lindemann\Libraries\fltk-1.3.0"
-set GENERATOR="Visual Studio 10"
 
 if %BUILD_TYPE%==Debug (
 	set BUILD_DIR=win32_build_debug
@@ -19,7 +17,7 @@ if exist %BUILD_DIR% (
 
 mkdir %BUILD_DIR%
 pushd %BUILD_DIR%
-cmake -G %GENERATOR% -DCMAKE_BUILD_TYPE="%BUILD_TYPE%" -DFLTK_ROOT=%FLTK_ROOT% ..
+cmake -DCMAKE_BUILD_TYPE="%BUILD_TYPE%" ..
 popd
 goto end
 

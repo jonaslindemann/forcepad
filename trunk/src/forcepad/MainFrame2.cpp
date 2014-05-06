@@ -9352,7 +9352,7 @@ static const char *idata_transferStructure[] = {
 static Fl_Pixmap image_transferStructure(idata_transferStructure);
 
 CMainFrame::CMainFrame() {
-  { wndMain = new Fl_Double_Window(861, 685, "ForcePAD 2");
+  { wndMain = new Fl_Double_Window(853, 686, "ForcePAD 2");
     wndMain->color(FL_FOREGROUND_COLOR);
     wndMain->user_data((void*)(this));
     wndMain->align(Fl_Align(FL_ALIGN_CLIP|FL_ALIGN_INSIDE));
@@ -9474,11 +9474,11 @@ CMainFrame::CMainFrame() {
       paintGroup->end();
       Fl_Group::current()->resizable(paintGroup);
     } // Fl_Group* paintGroup
-    { scrLeftResultToolbar = new Fl_Scroll(365, 194, 53, 460);
+    { scrLeftResultToolbar = new Fl_Scroll(365, 183, 53, 471);
       scrLeftResultToolbar->box(FL_FLAT_BOX);
       scrLeftResultToolbar->color(FL_FOREGROUND_COLOR);
       scrLeftResultToolbar->labelcolor(FL_BACKGROUND2_COLOR);
-      { btnStress = new Fl_HoverButton(370, 200, 42, 42);
+      { btnStress = new Fl_HoverButton(370, 188, 42, 42);
         btnStress->tooltip("Stress visualisation");
         btnStress->type(102);
         btnStress->box(FL_THIN_UP_BOX);
@@ -9495,7 +9495,7 @@ CMainFrame::CMainFrame() {
         btnStress->align(Fl_Align(FL_ALIGN_CENTER));
         btnStress->when(FL_WHEN_RELEASE);
       } // Fl_HoverButton* btnStress
-      { btnDisplacements = new Fl_HoverButton(370, 290, 42, 42);
+      { btnDisplacements = new Fl_HoverButton(370, 278, 42, 42);
         btnDisplacements->tooltip("Displacement visualisation");
         btnDisplacements->type(102);
         btnDisplacements->box(FL_THIN_UP_BOX);
@@ -9511,7 +9511,7 @@ CMainFrame::CMainFrame() {
         btnDisplacements->align(Fl_Align(FL_ALIGN_CENTER));
         btnDisplacements->when(FL_WHEN_RELEASE);
       } // Fl_HoverButton* btnDisplacements
-      { btnMisesStress = new Fl_HoverButton(370, 245, 42, 42);
+      { btnMisesStress = new Fl_HoverButton(370, 233, 42, 42);
         btnMisesStress->tooltip("Mises stress visualisation");
         btnMisesStress->type(102);
         btnMisesStress->box(FL_THIN_UP_BOX);
@@ -9527,8 +9527,8 @@ CMainFrame::CMainFrame() {
         btnMisesStress->align(Fl_Align(FL_ALIGN_CENTER));
         btnMisesStress->when(FL_WHEN_RELEASE);
       } // Fl_HoverButton* btnMisesStress
-      { Fl_Group* o = new Fl_Group(370, 494, 48, 95);
-        { btnMoveLoad = new Fl_HoverButton(371, 547, 42, 42);
+      { Fl_Group* o = new Fl_Group(370, 482, 45, 95);
+        { btnMoveLoad = new Fl_HoverButton(371, 535, 42, 42);
           btnMoveLoad->tooltip("Toggle between moving and rotating loads");
           btnMoveLoad->type(102);
           btnMoveLoad->box(FL_THIN_UP_BOX);
@@ -9544,7 +9544,7 @@ CMainFrame::CMainFrame() {
           btnMoveLoad->align(Fl_Align(FL_ALIGN_WRAP));
           btnMoveLoad->when(FL_WHEN_RELEASE);
         } // Fl_HoverButton* btnMoveLoad
-        { btnRotateLoad = new Fl_HoverButton(371, 503, 42, 42);
+        { btnRotateLoad = new Fl_HoverButton(371, 491, 42, 42);
           btnRotateLoad->tooltip("Toggle between moving and rotating loads");
           btnRotateLoad->type(102);
           btnRotateLoad->box(FL_THIN_UP_BOX);
@@ -9563,7 +9563,7 @@ CMainFrame::CMainFrame() {
         } // Fl_HoverButton* btnRotateLoad
         o->end();
       } // Fl_Group* o
-      { btnOptimize = new Fl_HoverButton(370, 448, 42, 42);
+      { btnOptimize = new Fl_HoverButton(370, 436, 42, 42);
         btnOptimize->tooltip("Optimisation");
         btnOptimize->box(FL_THIN_UP_BOX);
         btnOptimize->down_box(FL_THIN_DOWN_FRAME);
@@ -9578,7 +9578,7 @@ CMainFrame::CMainFrame() {
         btnOptimize->align(Fl_Align(FL_ALIGN_CENTER));
         btnOptimize->when(FL_WHEN_RELEASE);
       } // Fl_HoverButton* btnOptimize
-      { btnStructure = new Fl_HoverButton(370, 334, 42, 42);
+      { btnStructure = new Fl_HoverButton(370, 322, 42, 42);
         btnStructure->tooltip("Show structure only");
         btnStructure->type(102);
         btnStructure->box(FL_THIN_UP_BOX);
@@ -9594,7 +9594,7 @@ CMainFrame::CMainFrame() {
         btnStructure->align(Fl_Align(FL_ALIGN_CENTER));
         btnStructure->when(FL_WHEN_RELEASE);
       } // Fl_HoverButton* btnStructure
-      { btnVizMixer = new Fl_HoverButton(370, 388, 42, 42);
+      { btnVizMixer = new Fl_HoverButton(370, 376, 42, 42);
         btnVizMixer->tooltip("Visualisation mixer");
         btnVizMixer->box(FL_THIN_UP_BOX);
         btnVizMixer->down_box(FL_THIN_DOWN_FRAME);
@@ -9609,7 +9609,7 @@ CMainFrame::CMainFrame() {
         btnVizMixer->align(Fl_Align(FL_ALIGN_WRAP));
         btnVizMixer->when(FL_WHEN_RELEASE);
       } // Fl_HoverButton* btnVizMixer
-      { btnZoomResults = new Fl_HoverButton(371, 599, 42, 42);
+      { btnZoomResults = new Fl_HoverButton(371, 587, 42, 42);
         btnZoomResults->tooltip("Toggle between moving and rotating loads");
         btnZoomResults->type(1);
         btnZoomResults->box(FL_THIN_UP_BOX);
