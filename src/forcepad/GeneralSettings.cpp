@@ -29,19 +29,20 @@ void CGeneralSettings::cb_symbolLength(Fl_Value_Slider* o, void* v) {
 }
 
 CGeneralSettings::CGeneralSettings() {
-  { mainWindow = new Fl_Double_Window(311, 170, "General Settings");
+  { mainWindow = new Fl_Double_Window(309, 167, "General Settings");
     mainWindow->color(FL_FOREGROUND_COLOR);
     mainWindow->user_data((void*)(this));
     { okButton = new Fl_Button(230, 135, 70, 25, "Close");
       okButton->box(FL_FLAT_BOX);
-      okButton->color(FL_DARK3);
+      okButton->color(FL_INACTIVE_COLOR);
       okButton->labelsize(11);
+      okButton->labelcolor(FL_BACKGROUND2_COLOR);
       okButton->callback((Fl_Callback*)cb_okButton);
     } // Fl_Button* okButton
     { lineThickness = new Fl_Value_Slider(14, 25, 286, 20, "Line thickness (pixels)");
-      lineThickness->type(5);
+      lineThickness->type(1);
       lineThickness->box(FL_FLAT_BOX);
-      lineThickness->color((Fl_Color)37);
+      lineThickness->color(FL_INACTIVE_COLOR);
       lineThickness->selection_color(FL_DARK3);
       lineThickness->labelsize(11);
       lineThickness->labelcolor(FL_BACKGROUND2_COLOR);
@@ -55,9 +56,9 @@ CGeneralSettings::CGeneralSettings() {
       lineThickness->align(Fl_Align(FL_ALIGN_TOP_LEFT));
     } // Fl_Value_Slider* lineThickness
     { symbolLength = new Fl_Value_Slider(14, 65, 286, 20, "Symbol length (pixels)");
-      symbolLength->type(5);
+      symbolLength->type(1);
       symbolLength->box(FL_FLAT_BOX);
-      symbolLength->color((Fl_Color)37);
+      symbolLength->color(FL_INACTIVE_COLOR);
       symbolLength->selection_color(FL_DARK3);
       symbolLength->labelsize(11);
       symbolLength->labelcolor(FL_BACKGROUND2_COLOR);
@@ -76,6 +77,7 @@ CGeneralSettings::CGeneralSettings() {
       showTabletPCToolbar->labelcolor(FL_BACKGROUND2_COLOR);
     } // Fl_Check_Button* showTabletPCToolbar
     mainWindow->set_modal();
+    mainWindow->size_range(309, 167);
     mainWindow->end();
   } // Fl_Double_Window* mainWindow
   m_paintView = NULL;

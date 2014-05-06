@@ -2,22 +2,9 @@
 
 #include <string>
 
-#ifdef WIN32
-#ifdef WIN32_COMMON_DIALOGS
-#include <windows.h>
-#include "fl_ask_win.h"
-#include "fl_message_win.h"
-#include "fl_file_chooser_win.H"
-#else
-#include <FL/fl_ask.h>
-#include <FL/fl_message.h>
-#include <FL/fl_file_chooser.h>
-#endif
-#else
 #include <FL/fl_ask.h>
 #include <FL/fl_file_chooser.h>
 #include <FL/Fl_Native_File_Chooser.H>
-#endif
 
 
 #include "NewModelDlg.h"
