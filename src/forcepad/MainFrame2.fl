@@ -38,6 +38,9 @@ decl {\#include "dwmapi.h"} {private local
 decl {\#endif} {private local
 } 
 
+decl {\#include <Fl/Fl_Sys_Menu_Bar.H>} {public global
+} 
+
 decl {\#include "PlatformInfo.h"} {private local
 } 
 
@@ -89,10 +92,11 @@ class CMainFrame {open : {CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusM
   } {
     Fl_Window wndMain {
       label {ForcePAD 2} open
-      xywh {331 187 853 686} type Double color 0 align 80 resizable visible
+      xywh {580 253 861 686} type Double color 0 align 80 resizable visible
     } {
       Fl_Menu_Bar mainMenu {open
         xywh {0 0 858 26} box BORDER_BOX down_box FLAT_BOX color 32 labelsize 11 labelcolor 1 textsize 11 textcolor 7
+        class Fl_Sys_Menu_Bar
       } {
         Submenu fileMenu {
           label {&File} open
@@ -351,7 +355,7 @@ if (btnPaste->value()==1)
           class CFlPaintView
         }
       }
-      Fl_Scroll scrLeftResultToolbar {open selected
+      Fl_Scroll scrLeftResultToolbar {open
         xywh {365 183 53 471} box FLAT_BOX color 0 labelcolor 7
       } {
         Fl_Button btnStress {
@@ -1214,6 +1218,13 @@ else
 	btnTabletToolbar->hide();
 }
 
+\#ifdef __APPLE__
+int x, y;
+x = paintView->x();
+y = paintView->y();
+paintView->position(x, 0);
+\#endif
+
 // Initialise toolbars
 
 scrRightToolbar->show();
@@ -1238,7 +1249,8 @@ showRightToolbar(scrRightDrawToolbar);
 
 paintView->setModelName("noname.fp2");
 thickness->value(paintView->getThickness());
-forceMagnitude->value(paintView->getForceMagnitude());} {}
+forceMagnitude->value(paintView->getForceMagnitude());} {selected
+    }
   }
   Function {close()} {} {
     code {m_tabletToolbar->hide();
@@ -1492,7 +1504,12 @@ scrRightStructureToolbar->deactivate();} {}
     code {hideLeftToolbars();
 
 wndMain->remove(*toolbar);
+\#ifdef __APPLE__
+toolbar->resize(scrLeftToolbar->x(), paintView->y(), toolbar->w(), toolbar->h());
+
+\#else
 toolbar->resize(scrLeftToolbar->x(), scrLeftToolbar->y(), toolbar->w(), toolbar->h());
+\#endif
 toolbar->show();
 toolbar->activate();
 wndMain->insert(*toolbar,0);} {}
@@ -1504,7 +1521,11 @@ wndMain->insert(*toolbar,0);} {}
 wndMain->remove(*toolbar);
 toolbar->show();
 //toolbar->resize(scrRightDrawToolbar->x(), scrRightDrawToolbar->y(), toolbar->w(), toolbar->h());
+\#ifdef __APPLE__
 toolbar->resize(paintView->x()+paintView->w()+2, paintView->y(), toolbar->w(), toolbar->h());
+\#else
+toolbar->resize(paintView->x()+paintView->w()+2, paintView->y(), toolbar->w(), toolbar->h());
+\#endif
 toolbar->activate();
 toolbar->redraw();
 wndMain->insert(*toolbar,0);} {}

@@ -8,12 +8,12 @@
 #include "forcepad_config.h"
 #include <iostream>
 #include <string>
+#include <Fl/Fl_Sys_Menu_Bar.H>
 #include "SplashFrame.h"
 #include "OptSettings.h"
 #include "TabletToolbar.h"
 #include "VizMixerToolbar.h"
 #include <FL/Fl_Double_Window.H>
-#include <FL/Fl_Menu_Bar.H>
 #include <FL/Fl_Scroll.H>
 #include "Fl_HoverButton.h"
 #include <FL/Fl_Box.H>
@@ -40,7 +40,7 @@ class CMainFrame : CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusMessageE
 public:
   CMainFrame();
   Fl_Double_Window *wndMain;
-  Fl_Menu_Bar *mainMenu;
+  Fl_Sys_Menu_Bar *mainMenu;
   static Fl_Menu_Item menu_mainMenu[];
   static Fl_Menu_Item *fileMenu;
   static Fl_Menu_Item *fileMenuNew;

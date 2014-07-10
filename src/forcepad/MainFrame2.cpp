@@ -9352,20 +9352,25 @@ static const char *idata_transferStructure[] = {
 static Fl_Pixmap image_transferStructure(idata_transferStructure);
 
 CMainFrame::CMainFrame() {
-  { wndMain = new Fl_Double_Window(853, 686, "ForcePAD 2");
+  { wndMain = new Fl_Double_Window(861, 686, "ForcePAD 2");
     wndMain->color(FL_FOREGROUND_COLOR);
     wndMain->user_data((void*)(this));
     wndMain->align(Fl_Align(FL_ALIGN_CLIP|FL_ALIGN_INSIDE));
-    { mainMenu = new Fl_Menu_Bar(0, 0, 858, 26);
+    { mainMenu = new Fl_Sys_Menu_Bar(0, 0, 858, 26);
       mainMenu->box(FL_BORDER_BOX);
       mainMenu->down_box(FL_FLAT_BOX);
       mainMenu->color(FL_GRAY0);
+      mainMenu->selection_color(FL_SELECTION_COLOR);
+      mainMenu->labeltype(FL_NORMAL_LABEL);
+      mainMenu->labelfont(0);
       mainMenu->labelsize(11);
       mainMenu->labelcolor((Fl_Color)1);
       mainMenu->textsize(11);
       mainMenu->textcolor(FL_BACKGROUND2_COLOR);
+      mainMenu->align(Fl_Align(FL_ALIGN_CENTER));
+      mainMenu->when(FL_WHEN_RELEASE_ALWAYS);
       mainMenu->menu(menu_mainMenu);
-    } // Fl_Menu_Bar* mainMenu
+    } // Fl_Sys_Menu_Bar* mainMenu
     { scrLeftToolbar = new Fl_Scroll(0, 26, 52, 500);
       scrLeftToolbar->box(FL_FLAT_BOX);
       scrLeftToolbar->color(FL_FOREGROUND_COLOR);
@@ -11123,6 +11128,13 @@ void CMainFrame::show() {
   	btnTabletToolbar->hide();
   }
   
+  #ifdef __APPLE__
+  int x, y;
+  x = paintView->x();
+  y = paintView->y();
+  paintView->position(x, 0);
+  #endif
+  
   // Initialise toolbars
   
   scrRightToolbar->show();
@@ -11405,7 +11417,12 @@ void CMainFrame::showLeftToolbar(Fl_Widget* toolbar) {
   hideLeftToolbars();
   
   wndMain->remove(*toolbar);
+  #ifdef __APPLE__
+  toolbar->resize(scrLeftToolbar->x(), paintView->y(), toolbar->w(), toolbar->h());
+  
+  #else
   toolbar->resize(scrLeftToolbar->x(), scrLeftToolbar->y(), toolbar->w(), toolbar->h());
+  #endif
   toolbar->show();
   toolbar->activate();
   wndMain->insert(*toolbar,0);
@@ -11417,7 +11434,11 @@ void CMainFrame::showRightToolbar(Fl_Widget* toolbar) {
   wndMain->remove(*toolbar);
   toolbar->show();
   //toolbar->resize(scrRightDrawToolbar->x(), scrRightDrawToolbar->y(), toolbar->w(), toolbar->h());
+  #ifdef __APPLE__
   toolbar->resize(paintView->x()+paintView->w()+2, paintView->y(), toolbar->w(), toolbar->h());
+  #else
+  toolbar->resize(paintView->x()+paintView->w()+2, paintView->y(), toolbar->w(), toolbar->h());
+  #endif
   toolbar->activate();
   toolbar->redraw();
   wndMain->insert(*toolbar,0);
