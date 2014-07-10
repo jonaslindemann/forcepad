@@ -13,6 +13,8 @@
 #include "Cursors.h"
 #endif
 
+#undef NATIVE_FS
+
 using namespace std;
 
 CFlPaintView::CFlPaintView(int x,int y,int w,int h,const char *l)
@@ -253,6 +255,7 @@ int CFlPaintView::handle(int event)
 
 const std::string CFlPaintView::doSaveDialog(const string title, const string filter, const string defaultFilename)
 {
+#ifdef NATIVE_FS
     // Create native chooser
     Fl_Native_File_Chooser native;
     
@@ -274,8 +277,9 @@ const std::string CFlPaintView::doSaveDialog(const string title, const string fi
             }
             break;
     }
-    
-    //std::string fname = fl_file_chooser(title.c_str(), filter.c_str(), defaultFilename.c_str());
+#else
+    std::string fname = fl_file_chooser(title.c_str(), filter.c_str(), defaultFilename.c_str());
+#endif
     return fname;
 }
 
@@ -313,6 +317,7 @@ bool CFlPaintView::doAskYesNo(const string question)
 
 const std::string CFlPaintView::doOpenDialog(const string title, const string filter)
 {
+#ifdef NATIVE_FS
     // Create native chooser
     Fl_Native_File_Chooser native;
     
@@ -321,7 +326,7 @@ const std::string CFlPaintView::doOpenDialog(const string title, const string fi
     native.title("Pick a file");
     native.type(Fl_Native_File_Chooser::BROWSE_FILE);
     native.filter("ForcePAD\t*.fp2\n");
-    native.preset_file("");
+    native.preset_file("noname.fp2");
     // Show native chooser
     switch ( native.show() ) {
         case -1: fprintf(stderr, "ERROR: %s\n", native.errmsg()); break;    // ERROR
@@ -335,7 +340,12 @@ const std::string CFlPaintView::doOpenDialog(const string title, const string fi
             break;
     }
     
-    //std::string fname = fl_file_chooser(title.c_str(), filter.c_str(), "");
+#else
+    const char *name;
+    name = fl_file_chooser(title.c_str(), filter.c_str(), "");
+    std::string fname = name;
+#endif
+    cout << "selected filename = " << fname << endl;
     return fname;
 }
 

@@ -2263,6 +2263,7 @@ void CPaintView::openModel(const std::string filename)
 	disableDrawing();
 	
 	so_print("CPaintView", "openModel()");
+	so_print("CPatinView", filename.c_str());
 	
 	m_danglingRelease = true;
 	
