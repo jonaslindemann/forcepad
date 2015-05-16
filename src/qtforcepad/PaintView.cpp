@@ -1388,7 +1388,13 @@ void CPaintView::loadBrushes()
     string brushName = "";
 
 #ifdef __APPLE__
+
+#ifndef USE_QT
     string exePath = m_argv[0];
+#else
+    string exePath = m_arguments[0].toStdString();
+#endif
+
     int lastSlash = exePath.rfind("/");
     brushPath = exePath.substr(0,lastSlash)+"/brushes/";
 #else
@@ -3041,6 +3047,7 @@ CPaintView::TVisualisationMode CPaintView::getVisualisationMode()
     return m_visualisationMode;
 }
 
+#ifndef USE_QT
 void CPaintView::setCommandLine(int argc, char **argv)
 {
     m_argc = argc;
@@ -3057,10 +3064,32 @@ void CPaintView::setCommandLine(int argc, char **argv)
 
     setCurrentBrush(3);
 }
+#else
+void CPaintView::setCommandLine(QStringList arguments)
+{
+    m_arguments = arguments;
+
+    // Initialize brush lists and variables
+
+    loadBrushes();
+    m_brushScale = 1;
+    m_brushColor[0] = 0.0f;
+    m_brushColor[1] = 0.0f;
+    m_brushColor[2] = 0.0f;
+    m_blendFactor = 255;
+
+    setCurrentBrush(3);
+}
+#endif
 
 const std::string CPaintView::getApplicationPath()
 {
+#ifndef USE_QT
     std::string exePath = m_argv[0];
+#else
+    std::string exePath = m_arguments[0].toStdString();
+#endif
+
 #ifdef WIN32
     int lastSlash = exePath.rfind("\\");
 #else
@@ -3264,7 +3293,11 @@ void CPaintView::setColorMap(int index)
         ::GetModuleFileName(NULL, cfilename, sizeof(cfilename));
         string applicationExeLocation = cfilename;
 #else
+#ifndef USE_QT
         string applicationExeLocation = this->m_argv[0];
+#else
+        string applicationExeLocation = this->m_arguments[0].toStdString();
+#endif
 #endif
         cout << "applicationExeLocation = " << applicationExeLocation << endl;
 #ifndef __APPLE__

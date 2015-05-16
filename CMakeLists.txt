@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 PROJECT(forcepad_project)
 
 if(WIN32)
@@ -11,6 +11,15 @@ if(WIN32)
 	set(FLTK_INCLUDE_DIR "D:/Users/Jonas/Libraries/fltk-1.3.x")
 	set(FLTK_LIBRARY "D:/Users/Jonas/Libraries/fltk-1.3.x/lib")
 endif(WIN32)
+
+find_package( Qt5Core REQUIRED )
+find_package( Qt5Gui REQUIRED )
+find_package( Qt5Widgets REQUIRED )
+find_package( Qt5OpenGL REQUIRED )
+
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
 
 #find_package(Qt4 COMPONENTS QtMain QtCore QtGui QtSql QtXml QtNetwork QtOpenGL REQUIRED)
 
@@ -46,7 +55,7 @@ ELSE(WIN32)
 ENDIF(WIN32)
 
 if (APPLE)
-LINK_DIRECTORIES(/opt/local/lib ${FLTK_LIBRARY}/lib ${PROJECT_SOURCE_DIR}/lib )
+LINK_DIRECTORIES(/opt/local/lib ${PROJECT_SOURCE_DIR}/lib )
 else(APPLE)
 	if(WIN32)
 		LINK_DIRECTORIES(${PROJECT_SOURCE_DIR}/lib ) 

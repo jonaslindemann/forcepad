@@ -43,6 +43,12 @@
 #include "FemGridSolver2.h"
 #include "CGIndicator.h"
 
+#define USE_QT
+
+#ifdef USE_QT
+#include <QStringList>
+#endif
+
 class CPVModeChangeEvent;
 class CPVViewModeChangeEvent;
 class CPVViewModeErrorEvent;
@@ -101,8 +107,12 @@ protected:
 	 *    Command line arguments
 	 */
 
+#ifndef USE_QT
 	int m_argc;
 	char** m_argv;
+#else
+    QStringList m_arguments;
+#endif
 
 	TEditMode m_editMode;
 	TViewMode m_viewMode;
@@ -426,7 +436,11 @@ public:
 	// Child/Parent relationship
 
 	void setMainFrame(void* frame);
+#ifdef USE_QT
+    void setCommandLine(QStringList arguments);
+#else
 	void setCommandLine(int argc, char** argv);
+#endif
 
 	// ExecutablePath
 
