@@ -6,7 +6,7 @@
 QtPaintView::QtPaintView(QWidget *parent) :
     QGLWidget(QGLFormat(QGL::SampleBuffers), parent), CPaintView()
 {
-    this->setCommandLine(QApplication::arguments().count(), QApplication::argv());
+    this->setCommandLine(QApplication::arguments());
 }
 
 void QtPaintView::initializeGL()
@@ -17,7 +17,7 @@ void QtPaintView::initializeGL()
 
 void QtPaintView::resizeGL(int width, int height)
 {
-    glViewport(0,0,width,height);
+    glViewport(0,0,width*this->devicePixelRatio(),height*this->devicePixelRatio());
     onInitContext();
 }
 
@@ -38,12 +38,12 @@ void QtPaintView::paintGL()
 
 int QtPaintView::height()
 {
-    return QGLWidget::height();
+    return QGLWidget::height()*this->devicePixelRatio();
 }
 
 int QtPaintView::width()
 {
-    return QGLWidget::width();
+    return QGLWidget::width()*this->devicePixelRatio();
 }
 
 void QtPaintView::doRedraw()
@@ -179,13 +179,13 @@ return Fl_Gl_Window::handle(event);
 void QtPaintView::mousePressEvent(QMouseEvent *event)
 {
     CPaintView::m_leftMouseDown = true;
-    this->onPush(event->x(), event->y());
+    this->onPush(event->x()*this->devicePixelRatio(), event->y()*this->devicePixelRatio());
 }
 
 void QtPaintView::mouseReleaseEvent(QMouseEvent *event)
 {
     if (!CPaintView::m_danglingRelease)
-        CPaintView::onRelease(event->x(), event->y());
+        CPaintView::onRelease(event->x()*this->devicePixelRatio(), event->y()*this->devicePixelRatio());
     else
         m_danglingRelease = false;
 }
@@ -193,9 +193,9 @@ void QtPaintView::mouseReleaseEvent(QMouseEvent *event)
 void QtPaintView::mouseMoveEvent(QMouseEvent *event)
 {
     if (event->buttons() & Qt::LeftButton)
-        CPaintView::onDrag(event->x(), event->y());
+        CPaintView::onDrag(event->x()*this->devicePixelRatio(), event->y()*this->devicePixelRatio());
     else
-        CPaintView::onMove(event->x(), event->y());
+        CPaintView::onMove(event->x()*this->devicePixelRatio(), event->y()*this->devicePixelRatio());
     /*
     int dx = event->x() - lastPos.x();
     int dy = event->y() - lastPos.y();
