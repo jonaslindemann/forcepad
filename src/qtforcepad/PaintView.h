@@ -47,6 +47,7 @@
 
 #ifdef USE_QT
 #include <QStringList>
+#include <QtDebug>
 #endif
 
 class CPVModeChangeEvent;
