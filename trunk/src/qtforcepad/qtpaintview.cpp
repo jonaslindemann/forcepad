@@ -2,11 +2,13 @@
 
 #include <QFileDialog>
 #include <QApplication>
+#include <QtDebug>
 
 QtPaintView::QtPaintView(QWidget *parent) :
     QGLWidget(QGLFormat(QGL::SampleBuffers), parent), CPaintView()
 {
     this->setCommandLine(QApplication::arguments());
+    QApplication::instance()->installEventFilter(this);
 }
 
 void QtPaintView::initializeGL()
@@ -176,6 +178,22 @@ default:
 return Fl_Gl_Window::handle(event);
 */
 
+bool QtPaintView::eventFilter(QObject *obj, QEvent *event)
+{
+    if (event->type() == QEvent::MouseMove)
+    {
+        QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+
+        if (mouseEvent->buttons() & Qt::LeftButton)
+            CPaintView::onDrag(mouseEvent->x()*this->devicePixelRatio(), mouseEvent->y()*this->devicePixelRatio());
+        else
+            CPaintView::onMove(mouseEvent->x()*this->devicePixelRatio(), mouseEvent->y()*this->devicePixelRatio());
+
+        //CPaintView::onMove(mouseEvent->x()*this->devicePixelRatio(), mouseEvent->y()*this->devicePixelRatio());
+    }
+    return false;
+}
+
 void QtPaintView::mousePressEvent(QMouseEvent *event)
 {
     CPaintView::m_leftMouseDown = true;
@@ -192,10 +210,7 @@ void QtPaintView::mouseReleaseEvent(QMouseEvent *event)
 
 void QtPaintView::mouseMoveEvent(QMouseEvent *event)
 {
-    if (event->buttons() & Qt::LeftButton)
-        CPaintView::onDrag(event->x()*this->devicePixelRatio(), event->y()*this->devicePixelRatio());
-    else
-        CPaintView::onMove(event->x()*this->devicePixelRatio(), event->y()*this->devicePixelRatio());
+    qDebug() << "mouseMoveEvent()";
     /*
     int dx = event->x() - lastPos.x();
     int dy = event->y() - lastPos.y();

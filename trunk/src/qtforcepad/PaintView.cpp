@@ -56,6 +56,25 @@
 using namespace NEWMAT;
 #endif
 
+#ifdef USE_QT
+
+#ifdef so_print
+#undef so_print
+#endif
+
+#define so_print(a,b) qDebug() << a << " : " << b;
+
+void fpLog(const std::string msg)
+{
+    qDebug() << msg.c_str();
+}
+#else
+void fpLog(const std::string& msg)
+{
+    std::cout << msg << endl;
+}
+#endif
+
 /////////////////////////////////////////////////////////////
 // Structures used for copy and paste in Windows
 /////////////////////////////////////////////////////////////

@@ -41,7 +41,7 @@ public:
 	CDrawableBase();
 
 	/** DrawableBase class destructor. */
-	virtual ~CDrawableBase();
+    virtual  ~CDrawableBase();
 
 	/** 
 	 * virtual render method
