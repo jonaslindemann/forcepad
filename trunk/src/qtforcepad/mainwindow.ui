@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>817</width>
+    <width>834</width>
     <height>620</height>
    </rect>
   </property>
@@ -32,16 +32,7 @@ background-color: rgb(104, 104, 104);
     <property name="spacing">
      <number>0</number>
     </property>
-    <property name="leftMargin">
-     <number>0</number>
-    </property>
-    <property name="topMargin">
-     <number>0</number>
-    </property>
-    <property name="rightMargin">
-     <number>0</number>
-    </property>
-    <property name="bottomMargin">
+    <property name="margin">
      <number>0</number>
     </property>
     <item>
@@ -168,16 +159,7 @@ color:white;
            <string>Models</string>
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_6">
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
+           <property name="margin">
             <number>0</number>
            </property>
            <item>
@@ -200,16 +182,7 @@ color:white;
               <enum>QFrame::Raised</enum>
              </property>
              <layout class="QHBoxLayout" name="horizontalLayout">
-              <property name="leftMargin">
-               <number>4</number>
-              </property>
-              <property name="topMargin">
-               <number>4</number>
-              </property>
-              <property name="rightMargin">
-               <number>4</number>
-              </property>
-              <property name="bottomMargin">
+              <property name="margin">
                <number>4</number>
               </property>
               <item>
@@ -280,16 +253,7 @@ color:white;
            <string>Structure</string>
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_2">
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
+           <property name="margin">
             <number>0</number>
            </property>
            <item>
@@ -321,166 +285,279 @@ color:white;
                  <enum>QFrame::Raised</enum>
                 </property>
                 <layout class="QHBoxLayout" name="horizontalLayout_6">
+                 <property name="topMargin">
+                  <number>5</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>5</number>
+                 </property>
                  <item>
-                  <widget class="QToolButton" name="toolButton_13">
+                  <widget class="QToolButton" name="structSelectButton">
                    <property name="text">
                     <string>Select</string>
                    </property>
+                   <property name="icon">
+                    <iconset resource="qtforcepad.qrc">
+                     <normaloff>:/ribbon/selection7.svg</normaloff>:/ribbon/selection7.svg</iconset>
+                   </property>
+                   <property name="iconSize">
+                    <size>
+                     <width>30</width>
+                     <height>30</height>
+                    </size>
+                   </property>
                    <property name="checkable">
+                    <bool>true</bool>
+                   </property>
+                   <property name="checked">
+                    <bool>false</bool>
+                   </property>
+                   <property name="autoExclusive">
+                    <bool>true</bool>
+                   </property>
+                   <property name="toolButtonStyle">
+                    <enum>Qt::ToolButtonIconOnly</enum>
+                   </property>
+                   <property name="autoRaise">
                     <bool>true</bool>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QToolButton" name="toolButton_12">
+                  <widget class="QToolButton" name="structCutButton">
                    <property name="text">
                     <string>Cut</string>
                    </property>
+                   <property name="icon">
+                    <iconset resource="qtforcepad.qrc">
+                     <normaloff>:/ribbon/scissors4.svg</normaloff>:/ribbon/scissors4.svg</iconset>
+                   </property>
+                   <property name="iconSize">
+                    <size>
+                     <width>30</width>
+                     <height>30</height>
+                    </size>
+                   </property>
+                   <property name="autoRaise">
+                    <bool>true</bool>
+                   </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QToolButton" name="toolButton_4">
+                  <widget class="QToolButton" name="structCopyButton">
                    <property name="text">
                     <string>Copy</string>
                    </property>
+                   <property name="icon">
+                    <iconset resource="qtforcepad.qrc">
+                     <normaloff>:/ribbon/copy13.svg</normaloff>:/ribbon/copy13.svg</iconset>
+                   </property>
+                   <property name="iconSize">
+                    <size>
+                     <width>30</width>
+                     <height>30</height>
+                    </size>
+                   </property>
+                   <property name="autoRaise">
+                    <bool>true</bool>
+                   </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QToolButton" name="toolButton_3">
+                  <widget class="QToolButton" name="structPasteButton">
                    <property name="text">
                     <string>Paste</string>
                    </property>
+                   <property name="icon">
+                    <iconset resource="qtforcepad.qrc">
+                     <normaloff>:/ribbon/paste2.svg</normaloff>:/ribbon/paste2.svg</iconset>
+                   </property>
+                   <property name="iconSize">
+                    <size>
+                     <width>30</width>
+                     <height>30</height>
+                    </size>
+                   </property>
+                   <property name="autoRaise">
+                    <bool>true</bool>
+                   </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QToolButton" name="toolButton_2">
+                  <widget class="QToolButton" name="structExpandButton">
                    <property name="text">
                     <string>Expand</string>
                    </property>
+                   <property name="icon">
+                    <iconset resource="qtforcepad.qrc">
+                     <normaloff>:/ribbon/expand41.svg</normaloff>:/ribbon/expand41.svg</iconset>
+                   </property>
+                   <property name="iconSize">
+                    <size>
+                     <width>30</width>
+                     <height>30</height>
+                    </size>
+                   </property>
+                   <property name="autoRaise">
+                    <bool>true</bool>
+                   </property>
                   </widget>
                  </item>
                  <item>
-                  <spacer name="horizontalSpacer_2">
+                  <widget class="Line" name="line_2">
                    <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
+                    <enum>Qt::Vertical</enum>
                    </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>40</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                  </spacer>
+                  </widget>
                  </item>
-                </layout>
-               </widget>
-              </item>
-              <item>
-               <widget class="Line" name="line_2">
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QFrame" name="frame_9">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                  <horstretch>1</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="frameShape">
-                 <enum>QFrame::StyledPanel</enum>
-                </property>
-                <property name="frameShadow">
-                 <enum>QFrame::Raised</enum>
-                </property>
-                <layout class="QHBoxLayout" name="horizontalLayout_7">
                  <item>
-                  <widget class="QToolButton" name="toolButton_19">
+                  <widget class="QToolButton" name="structBrushButton">
                    <property name="text">
                     <string>Brush</string>
                    </property>
+                   <property name="icon">
+                    <iconset resource="qtforcepad.qrc">
+                     <normaloff>:/ribbon/brushes3.svg</normaloff>:/ribbon/brushes3.svg</iconset>
+                   </property>
+                   <property name="iconSize">
+                    <size>
+                     <width>30</width>
+                     <height>30</height>
+                    </size>
+                   </property>
                    <property name="checkable">
+                    <bool>true</bool>
+                   </property>
+                   <property name="checked">
+                    <bool>true</bool>
+                   </property>
+                   <property name="autoExclusive">
+                    <bool>true</bool>
+                   </property>
+                   <property name="toolButtonStyle">
+                    <enum>Qt::ToolButtonIconOnly</enum>
+                   </property>
+                   <property name="autoRaise">
                     <bool>true</bool>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QToolButton" name="toolButton_18">
+                  <widget class="QToolButton" name="structEraseButton">
                    <property name="text">
                     <string>Erase</string>
                    </property>
+                   <property name="icon">
+                    <iconset resource="qtforcepad.qrc">
+                     <normaloff>:/ribbon/rubber2.svg</normaloff>:/ribbon/rubber2.svg</iconset>
+                   </property>
+                   <property name="iconSize">
+                    <size>
+                     <width>30</width>
+                     <height>30</height>
+                    </size>
+                   </property>
                    <property name="checkable">
+                    <bool>true</bool>
+                   </property>
+                   <property name="autoExclusive">
+                    <bool>true</bool>
+                   </property>
+                   <property name="autoRaise">
                     <bool>true</bool>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QComboBox" name="comboBox"/>
+                  <widget class="QComboBox" name="structBrushCombo"/>
                  </item>
                  <item>
-                  <spacer name="horizontalSpacer_3">
+                  <widget class="Line" name="line_3">
                    <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
+                    <enum>Qt::Vertical</enum>
                    </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>40</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                  </spacer>
+                  </widget>
                  </item>
-                </layout>
-               </widget>
-              </item>
-              <item>
-               <widget class="Line" name="line_3">
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QFrame" name="frame_10">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                  <horstretch>1</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="frameShape">
-                 <enum>QFrame::StyledPanel</enum>
-                </property>
-                <property name="frameShadow">
-                 <enum>QFrame::Raised</enum>
-                </property>
-                <layout class="QHBoxLayout" name="horizontalLayout_8">
                  <item>
-                  <widget class="QToolButton" name="toolButton_22">
+                  <widget class="QToolButton" name="structRectButton">
                    <property name="text">
                     <string>Rect</string>
                    </property>
+                   <property name="icon">
+                    <iconset resource="qtforcepad.qrc">
+                     <normaloff>:/ribbon/rectangular43.svg</normaloff>:/ribbon/rectangular43.svg</iconset>
+                   </property>
+                   <property name="iconSize">
+                    <size>
+                     <width>30</width>
+                     <height>30</height>
+                    </size>
+                   </property>
+                   <property name="checkable">
+                    <bool>true</bool>
+                   </property>
+                   <property name="autoExclusive">
+                    <bool>true</bool>
+                   </property>
+                   <property name="autoRaise">
+                    <bool>true</bool>
+                   </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QToolButton" name="toolButton_21">
+                  <widget class="QToolButton" name="structOvalButton">
                    <property name="text">
                     <string>Oval</string>
                    </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QToolButton" name="toolButton_20">
-                   <property name="text">
-                    <string>Line</string>
+                   <property name="icon">
+                    <iconset resource="qtforcepad.qrc">
+                     <normaloff>:/ribbon/ellipse.svg</normaloff>:/ribbon/ellipse.svg</iconset>
+                   </property>
+                   <property name="iconSize">
+                    <size>
+                     <width>30</width>
+                     <height>30</height>
+                    </size>
+                   </property>
+                   <property name="checkable">
+                    <bool>true</bool>
+                   </property>
+                   <property name="autoExclusive">
+                    <bool>true</bool>
+                   </property>
+                   <property name="autoRaise">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QSpinBox" name="spinBox_2">
+                  <widget class="QToolButton" name="structLineButton">
+                   <property name="text">
+                    <string>Line</string>
+                   </property>
+                   <property name="icon">
+                    <iconset resource="qtforcepad.qrc">
+                     <normaloff>:/ribbon/polygonal75.svg</normaloff>:/ribbon/polygonal75.svg</iconset>
+                   </property>
+                   <property name="iconSize">
+                    <size>
+                     <width>30</width>
+                     <height>30</height>
+                    </size>
+                   </property>
+                   <property name="checkable">
+                    <bool>true</bool>
+                   </property>
+                   <property name="autoExclusive">
+                    <bool>true</bool>
+                   </property>
+                   <property name="autoRaise">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QSpinBox" name="lineWidthSpin">
                    <property name="frame">
                     <bool>false</bool>
                    </property>
@@ -496,7 +573,7 @@ color:white;
                   </widget>
                  </item>
                  <item>
-                  <spacer name="horizontalSpacer_4">
+                  <spacer name="horizontalSpacer_2">
                    <property name="orientation">
                     <enum>Qt::Horizontal</enum>
                    </property>
@@ -521,8 +598,8 @@ color:white;
               <item>
                <widget class="QFrame" name="frame_12">
                 <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                  <horstretch>1</horstretch>
+                 <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
                 </property>
@@ -533,60 +610,12 @@ color:white;
                  <enum>QFrame::Raised</enum>
                 </property>
                 <layout class="QGridLayout" name="gridLayout">
-                 <property name="leftMargin">
-                  <number>4</number>
-                 </property>
-                 <property name="topMargin">
-                  <number>4</number>
-                 </property>
-                 <property name="rightMargin">
-                  <number>4</number>
-                 </property>
-                 <property name="bottomMargin">
+                 <property name="margin">
                   <number>4</number>
                  </property>
                  <property name="spacing">
                   <number>0</number>
                  </property>
-                 <item row="0" column="0">
-                  <widget class="QToolButton" name="toolButton">
-                   <property name="minimumSize">
-                    <size>
-                     <width>16</width>
-                     <height>16</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string/>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="1">
-                  <widget class="QToolButton" name="toolButton_16">
-                   <property name="minimumSize">
-                    <size>
-                     <width>16</width>
-                     <height>16</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string/>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="1">
-                  <widget class="QToolButton" name="toolButton_15">
-                   <property name="minimumSize">
-                    <size>
-                     <width>16</width>
-                     <height>16</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string/>
-                   </property>
-                  </widget>
-                 </item>
                  <item row="1" column="2">
                   <widget class="QToolButton" name="toolButton_23">
                    <property name="minimumSize">
@@ -600,8 +629,8 @@ color:white;
                    </property>
                   </widget>
                  </item>
-                 <item row="0" column="3">
-                  <widget class="QToolButton" name="toolButton_24">
+                 <item row="0" column="0">
+                  <widget class="QToolButton" name="toolButton">
                    <property name="minimumSize">
                     <size>
                      <width>16</width>
@@ -626,8 +655,34 @@ color:white;
                    </property>
                   </widget>
                  </item>
-                 <item row="0" column="4">
-                  <widget class="QToolButton" name="toolButton_25">
+                 <item row="0" column="3">
+                  <widget class="QToolButton" name="toolButton_24">
+                   <property name="minimumSize">
+                    <size>
+                     <width>16</width>
+                     <height>16</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QToolButton" name="toolButton_15">
+                   <property name="minimumSize">
+                    <size>
+                     <width>16</width>
+                     <height>16</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QToolButton" name="toolButton_16">
                    <property name="minimumSize">
                     <size>
                      <width>16</width>
@@ -654,6 +709,19 @@ color:white;
                  </item>
                  <item row="0" column="2">
                   <widget class="QToolButton" name="toolButton_17">
+                   <property name="minimumSize">
+                    <size>
+                     <width>16</width>
+                     <height>16</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="4">
+                  <widget class="QToolButton" name="toolButton_25">
                    <property name="minimumSize">
                     <size>
                      <width>16</width>
@@ -707,6 +775,19 @@ color:white;
                 </layout>
                </widget>
               </item>
+              <item>
+               <spacer name="horizontalSpacer_5">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
              </layout>
             </widget>
            </item>
@@ -717,16 +798,7 @@ color:white;
            <string>Physics</string>
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_3">
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
+           <property name="margin">
             <number>0</number>
            </property>
            <item>
@@ -757,16 +829,7 @@ color:white;
            <string>Action</string>
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_5">
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
+           <property name="margin">
             <number>0</number>
            </property>
            <item>
@@ -814,16 +877,7 @@ color:white;
          <property name="spacing">
           <number>0</number>
          </property>
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
+         <property name="margin">
           <number>0</number>
          </property>
          <item>
@@ -841,16 +895,7 @@ color:white;
            <property name="spacing">
             <number>0</number>
            </property>
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
+           <property name="margin">
             <number>0</number>
            </property>
            <item>
@@ -1075,6 +1120,8 @@ background-color: white;
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="qtforcepad.qrc"/>
+ </resources>
  <connections/>
 </ui>

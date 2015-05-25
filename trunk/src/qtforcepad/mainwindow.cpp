@@ -23,6 +23,62 @@ void MainWindow::on_openModelButton_clicked()
     ui->paintView->openModel();
 }
 
+void MainWindow::on_structBrushButton_clicked()
+{
+    ui->paintView->setEditMode(CPaintView::EM_DIRECT_BRUSH);
+}
+
+void MainWindow::on_structEraseButton_clicked()
+{
+    ui->paintView->setEditMode(CPaintView::EM_DIRECT_ERASE);
+}
+
+void MainWindow::on_structRectButton_clicked()
+{
+    ui->paintView->setEditMode(CPaintView::EM_RECTANGLE);
+}
+
+void MainWindow::on_structOvalButton_clicked()
+{
+    ui->paintView->setEditMode(CPaintView::EM_ELLIPSE);
+}
+
+void MainWindow::on_structLineButton_clicked()
+{
+    ui->paintView->setEditMode(CPaintView::EM_LINE);
+}
+
+void MainWindow::on_lineWidthSpin_valueChanged(int idx)
+{
+    ui->paintView->setLineWidth(idx);
+}
+
+void MainWindow::on_structSelectButton_clicked()
+{
+    ui->paintView->setEditMode(CPaintView::EM_SELECT_BOX);
+}
+
+void MainWindow::on_structCutButton_clicked()
+{
+    ui->paintView->cut();
+}
+
+void MainWindow::on_structCopyButton_clicked()
+{
+    ui->paintView->copy();
+}
+
+void MainWindow::on_structPasteButton_clicked()
+{
+    ui->paintView->setEditMode(CPaintView::EM_PASTE);
+}
+
+void MainWindow::on_structExpandButton_clicked()
+{
+    ui->paintView->expandImageToWindow();
+}
+
+
 void MainWindow::on_tabWidget_currentChanged(int idx)
 {
     qDebug() << "current changed " << idx;
