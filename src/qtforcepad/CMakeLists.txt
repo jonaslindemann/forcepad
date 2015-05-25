@@ -23,18 +23,20 @@ SET(qtforcepad_HEADERS
 	mainwindow.h
 )
 
-add_executable(qtforcepad ${qtforcepad_SOURCES})
+
+
+add_executable(qtforcepad ${qtforcepad_SOURCES} qtforcepad.qrc)
 
 if(CMAKE_BUILD_TYPE STREQUAL Debug)
 if (WIN32)
-    target_link_libraries(qtforcepad Qt5::Core Qt5::Gui Qt5::Widgets Qt5::OpenGL commond ivf2dd calfemcxxd newmatd ${JPEG_LIBRARIES} ${PNG_LIBRARIES} ${ZLIB_LIBRARIES} winmm.lib )
+    target_link_libraries(qtforcepad Qt5::Core Qt5::Gui Qt5::Widgets Qt5::OpenGL Qt5::Svg commond ivf2dd calfemcxxd newmatd ${JPEG_LIBRARIES} ${PNG_LIBRARIES} ${ZLIB_LIBRARIES} ${RESOURCES_ADDED} winmm.lib )
 else()
-    target_link_libraries(qtforcepad Qt5::Core Qt5::Gui Qt5::Widgets Qt5::OpenGL "-framework Cocoa" "-framework ApplicationServices" "-framework AGL" "-framework OpenGL" commond ivf2dd calfemcxxd newmatd ${JPEG_LIBRARIES} ${PNG_LIBRARIES} ${ZLIB_LIBRARIES} )
+    target_link_libraries(qtforcepad Qt5::Core Qt5::Gui Qt5::Widgets Qt5::OpenGL Qt5::Svg "-framework Cocoa" "-framework ApplicationServices" "-framework AGL" "-framework OpenGL" commond ivf2dd calfemcxxd newmatd ${JPEG_LIBRARIES} ${PNG_LIBRARIES} )
 endif()
 else(CMAKE_BUILD_TYPE STREQUAL Debug)
 if (WIN32)
-    target_link_libraries(qtforcepad Qt5::Core Qt5::Gui Qt5::Widgets Qt5::OpenGL common ivf2d calfemcxx newmat ${JPEG_LIBRARIES} ${PNG_LIBRARIES} ${ZLIB_LIBRARIES} winmm.lib )
+    target_link_libraries(qtforcepad Qt5::Core Qt5::Gui Qt5::Widgets Qt5::OpenGL Qt5::Svg common ivf2d calfemcxx newmat ${JPEG_LIBRARIES} ${PNG_LIBRARIES} ${ZLIB_LIBRARIES} winmm.lib )
 else()
-    target_link_libraries(qtforcepad Qt5::Core Qt5::Gui Qt5::Widgets Qt5::OpenGL "-framework Cocoa" "-framework ApplicationServices" "-framework AGL" "-framework OpenGL" common ivf2d calfemcxx newmat ${JPEG_LIBRARIES} ${PNG_LIBRARIES} ${ZLIB_LIBRARIES} )
+    target_link_libraries(qtforcepad Qt5::Core Qt5::Gui Qt5::Widgets Qt5::OpenGL Qt5::Svg "-framework Cocoa" "-framework ApplicationServices" "-framework AGL" "-framework OpenGL" common ivf2d calfemcxx newmat ${JPEG_LIBRARIES} ${PNG_LIBRARIES} ${ZLIB_LIBRARIES} )
 endif()
 endif(CMAKE_BUILD_TYPE STREQUAL Debug)

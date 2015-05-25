@@ -1,5 +1,17 @@
 <RCC>
-    <qresource prefix="/toolbar">
-        <file>images/action_add_bc2_black_grd.png</file>
-    </qresource>
+  <qresource prefix="ribbon">
+    <file>rectangular43.svg</file>
+    <file>screen77.svg</file>
+    <file>arrows1.svg</file>
+    <file>brushes3.svg</file>
+    <file>copy13.svg</file>
+    <file>ellipse.svg</file>
+    <file>eraser11.svg</file>
+    <file>expand41.svg</file>
+    <file>paste2.svg</file>
+    <file>polygonal75.svg</file>
+    <file>rubber2.svg</file>
+    <file>scissors4.svg</file>
+    <file>selection7.svg</file>
+  </qresource>
 </RCC>

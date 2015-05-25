@@ -20,6 +20,20 @@ private Q_SLOTS:
     void on_openModelButton_clicked();
     void on_tabWidget_currentChanged(int idx);
 
+    void on_structBrushButton_clicked();
+    void on_structEraseButton_clicked();
+    void on_structRectButton_clicked();
+    void on_structOvalButton_clicked();
+    void on_structLineButton_clicked();
+
+    void on_structSelectButton_clicked();
+    void on_structCutButton_clicked();
+    void on_structCopyButton_clicked();
+    void on_structPasteButton_clicked();
+    void on_structExpandButton_clicked();
+
+    void on_lineWidthSpin_valueChanged(int idx);
+
 private:
     Ui::MainWindow *ui;
 };
