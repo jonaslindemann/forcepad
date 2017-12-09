@@ -469,7 +469,36 @@ color:white;
                   </widget>
                  </item>
                  <item>
-                  <widget class="QComboBox" name="structBrushCombo"/>
+                  <widget class="QComboBox" name="structBrushCombo">
+                   <property name="currentIndex">
+                    <number>3</number>
+                   </property>
+                   <item>
+                    <property name="text">
+                     <string>4 px</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>8 px </string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>16 px</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>32 px </string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>48 px</string>
+                    </property>
+                   </item>
+                  </widget>
                  </item>
                  <item>
                   <widget class="Line" name="line_3">
@@ -557,19 +586,107 @@ color:white;
                   </widget>
                  </item>
                  <item>
-                  <widget class="QSpinBox" name="lineWidthSpin">
-                   <property name="frame">
-                    <bool>false</bool>
-                   </property>
-                   <property name="buttonSymbols">
-                    <enum>QAbstractSpinBox::PlusMinus</enum>
-                   </property>
-                   <property name="minimum">
-                    <number>1</number>
-                   </property>
-                   <property name="value">
-                    <number>5</number>
-                   </property>
+                  <widget class="QComboBox" name="structLineWidthCombo">
+                   <item>
+                    <property name="text">
+                     <string>1 px</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>2 px </string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>3 px</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>4 px</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>5 px</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>6 px </string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>7 px </string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>8 px</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>9 px</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>10 px</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>11 px</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>12 px</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>13 px</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>14 ppx</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>15 px</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>16 px</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>17 px</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>18 px</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>19 px</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>20 px</string>
+                    </property>
+                   </item>
                   </widget>
                  </item>
                  <item>
@@ -617,158 +734,230 @@ color:white;
                   <number>0</number>
                  </property>
                  <item row="1" column="2">
-                  <widget class="QToolButton" name="toolButton_23">
+                  <widget class="QToolButton" name="color9Button">
                    <property name="minimumSize">
                     <size>
                      <width>16</width>
                      <height>16</height>
                     </size>
                    </property>
+                   <property name="styleSheet">
+                    <string notr="true">background-color: #888888;</string>
+                   </property>
                    <property name="text">
                     <string/>
+                   </property>
+                   <property name="autoRaise">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
                  <item row="0" column="0">
-                  <widget class="QToolButton" name="toolButton">
+                  <widget class="QToolButton" name="color1Button">
                    <property name="minimumSize">
                     <size>
                      <width>16</width>
                      <height>16</height>
                     </size>
                    </property>
+                   <property name="styleSheet">
+                    <string notr="true">background-color: #000000;</string>
+                   </property>
                    <property name="text">
                     <string/>
+                   </property>
+                   <property name="autoRaise">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
                  <item row="1" column="0">
-                  <widget class="QToolButton" name="toolButton_14">
+                  <widget class="QToolButton" name="color7Button">
                    <property name="minimumSize">
                     <size>
                      <width>16</width>
                      <height>16</height>
                     </size>
                    </property>
+                   <property name="styleSheet">
+                    <string notr="true">background-color: #666666;</string>
+                   </property>
                    <property name="text">
                     <string/>
+                   </property>
+                   <property name="autoRaise">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
                  <item row="0" column="3">
-                  <widget class="QToolButton" name="toolButton_24">
+                  <widget class="QToolButton" name="color4Button">
                    <property name="minimumSize">
                     <size>
                      <width>16</width>
                      <height>16</height>
                     </size>
                    </property>
+                   <property name="styleSheet">
+                    <string notr="true">background-color: #333333;</string>
+                   </property>
                    <property name="text">
                     <string/>
+                   </property>
+                   <property name="autoRaise">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
                  <item row="0" column="1">
-                  <widget class="QToolButton" name="toolButton_15">
+                  <widget class="QToolButton" name="color2Button">
                    <property name="minimumSize">
                     <size>
                      <width>16</width>
                      <height>16</height>
                     </size>
                    </property>
+                   <property name="styleSheet">
+                    <string notr="true">background-color: #111111;</string>
+                   </property>
                    <property name="text">
                     <string/>
+                   </property>
+                   <property name="autoRaise">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
                  <item row="1" column="1">
-                  <widget class="QToolButton" name="toolButton_16">
+                  <widget class="QToolButton" name="color8Button">
                    <property name="minimumSize">
                     <size>
                      <width>16</width>
                      <height>16</height>
                     </size>
                    </property>
+                   <property name="styleSheet">
+                    <string notr="true">background-color: #777777;</string>
+                   </property>
                    <property name="text">
                     <string/>
+                   </property>
+                   <property name="autoRaise">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
                  <item row="1" column="3">
-                  <widget class="QToolButton" name="toolButton_26">
+                  <widget class="QToolButton" name="color10Button">
                    <property name="minimumSize">
                     <size>
                      <width>16</width>
                      <height>16</height>
                     </size>
                    </property>
+                   <property name="styleSheet">
+                    <string notr="true">background-color: #AAAAAA;</string>
+                   </property>
                    <property name="text">
                     <string/>
+                   </property>
+                   <property name="autoRaise">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
                  <item row="0" column="2">
-                  <widget class="QToolButton" name="toolButton_17">
+                  <widget class="QToolButton" name="color3Button">
                    <property name="minimumSize">
                     <size>
                      <width>16</width>
                      <height>16</height>
                     </size>
                    </property>
+                   <property name="styleSheet">
+                    <string notr="true">background-color: #222222;</string>
+                   </property>
                    <property name="text">
                     <string/>
+                   </property>
+                   <property name="autoRaise">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
                  <item row="0" column="4">
-                  <widget class="QToolButton" name="toolButton_25">
+                  <widget class="QToolButton" name="color5Button">
                    <property name="minimumSize">
                     <size>
                      <width>16</width>
                      <height>16</height>
                     </size>
                    </property>
+                   <property name="styleSheet">
+                    <string notr="true">background-color: #444444;</string>
+                   </property>
                    <property name="text">
                     <string/>
+                   </property>
+                   <property name="autoRaise">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
                  <item row="1" column="4">
-                  <widget class="QToolButton" name="toolButton_27">
+                  <widget class="QToolButton" name="color11Button">
                    <property name="minimumSize">
                     <size>
                      <width>16</width>
                      <height>16</height>
                     </size>
                    </property>
+                   <property name="styleSheet">
+                    <string notr="true">background-color: #DDDDDD;</string>
+                   </property>
                    <property name="text">
                     <string/>
+                   </property>
+                   <property name="autoRaise">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
                  <item row="1" column="5">
-                  <widget class="QToolButton" name="toolButton_28">
+                  <widget class="QToolButton" name="color12Button">
                    <property name="minimumSize">
                     <size>
                      <width>16</width>
                      <height>16</height>
                     </size>
                    </property>
+                   <property name="styleSheet">
+                    <string notr="true">background-color: #FFFFFF;</string>
+                   </property>
                    <property name="text">
                     <string/>
+                   </property>
+                   <property name="autoRaise">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
                  <item row="0" column="5">
-                  <widget class="QToolButton" name="toolButton_29">
+                  <widget class="QToolButton" name="color6Button">
                    <property name="minimumSize">
                     <size>
                      <width>16</width>
                      <height>16</height>
                     </size>
                    </property>
+                   <property name="styleSheet">
+                    <string notr="true">background-color: #555555;</string>
+                   </property>
                    <property name="text">
                     <string/>
+                   </property>
+                   <property name="autoRaise">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>

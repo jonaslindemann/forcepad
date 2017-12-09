@@ -1,0 +1,10 @@
+
+*.exe
+*.ilk
+*.pdb
+*.am
+*.in
+*.manifest
+build/
+build_release/
+*.lib

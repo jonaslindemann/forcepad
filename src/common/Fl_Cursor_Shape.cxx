@@ -69,7 +69,7 @@ void fl_cursor_ex(Fl_Cursor_Shape *c) {
   if ( !win ) 
 	  return;
 #ifdef WIN32
-  Fl_X::i( win )->cursor = c->handle();
+  //Fl_X::i( win )->cursor = c->handle();
   SetCursor( c->handle() );
 #elif defined(__APPLE__)
   //SetCursor( c->handle() );

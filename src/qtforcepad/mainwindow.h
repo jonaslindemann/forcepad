@@ -32,7 +32,21 @@ private Q_SLOTS:
     void on_structPasteButton_clicked();
     void on_structExpandButton_clicked();
 
-    void on_lineWidthSpin_valueChanged(int idx);
+    void on_color1Button_clicked();
+    void on_color2Button_clicked();
+    void on_color3Button_clicked();
+    void on_color4Button_clicked();
+    void on_color5Button_clicked();
+    void on_color6Button_clicked();
+    void on_color7Button_clicked();
+    void on_color8Button_clicked();
+    void on_color9Button_clicked();
+    void on_color10Button_clicked();
+    void on_color11Button_clicked();
+    void on_color12Button_clicked();
+
+    void on_structBrushCombo_currentIndexChanged(int idx);
+    void on_structLineWidthCombo_currentIndexChanged(int idx);
 
 private:
     Ui::MainWindow *ui;

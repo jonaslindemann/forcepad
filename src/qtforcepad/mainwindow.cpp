@@ -48,11 +48,6 @@ void MainWindow::on_structLineButton_clicked()
     ui->paintView->setEditMode(CPaintView::EM_LINE);
 }
 
-void MainWindow::on_lineWidthSpin_valueChanged(int idx)
-{
-    ui->paintView->setLineWidth(idx);
-}
-
 void MainWindow::on_structSelectButton_clicked()
 {
     ui->paintView->setEditMode(CPaintView::EM_SELECT_BOX);
@@ -78,6 +73,78 @@ void MainWindow::on_structExpandButton_clicked()
     ui->paintView->expandImageToWindow();
 }
 
+void MainWindow::on_structBrushCombo_currentIndexChanged(int idx)
+{
+    ui->paintView->setCurrentBrush(idx);
+}
+
+void MainWindow::on_structLineWidthCombo_currentIndexChanged(int idx)
+{
+    ui->paintView->setLineWidth(idx);
+}
+
+// |----|----|----|----|----|----|----|----|----|----|----|----|
+//  1.0                                                    0.0
+
+void MainWindow::on_color1Button_clicked()
+{
+    ui->paintView->setStiffness(1.0);
+}
+
+void MainWindow::on_color2Button_clicked()
+{
+    ui->paintView->setStiffness(0.9);
+}
+
+void MainWindow::on_color3Button_clicked()
+{
+    ui->paintView->setStiffness(0.8);
+}
+
+void MainWindow::on_color4Button_clicked()
+{
+    ui->paintView->setStiffness(0.7);
+}
+
+void MainWindow::on_color5Button_clicked()
+{
+    ui->paintView->setStiffness(0.6);
+}
+
+void MainWindow::on_color6Button_clicked()
+{
+    ui->paintView->setStiffness(0.5);
+}
+
+void MainWindow::on_color7Button_clicked()
+{
+    ui->paintView->setStiffness(0.4);
+}
+
+void MainWindow::on_color8Button_clicked()
+{
+    ui->paintView->setStiffness(0.3);
+}
+
+void MainWindow::on_color9Button_clicked()
+{
+    ui->paintView->setStiffness(0.2);
+}
+
+void MainWindow::on_color10Button_clicked()
+{
+    ui->paintView->setStiffness(0.1);
+}
+
+void MainWindow::on_color11Button_clicked()
+{
+    ui->paintView->setStiffness(0.0);
+}
+
+void MainWindow::on_color12Button_clicked()
+{
+    ui->paintView->setStiffness(0.0);
+}
 
 void MainWindow::on_tabWidget_currentChanged(int idx)
 {

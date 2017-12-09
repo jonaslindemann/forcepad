@@ -1338,6 +1338,12 @@ void CPaintView::loadBrushes()
 	string exePath = m_argv[0];
 	int lastSlash = exePath.rfind("/");
 	brushPath = exePath.substr(0,lastSlash)+"/brushes/";
+#endif
+
+#ifdef WIN32
+	string exePath = getApplicationPath();
+	string fullPath = exePath + "\\brushes";
+	brushPath = fullPath + "\\";
 #else
     FILE* f = fopen("/usr/share/forcepad/brushes/rbrush4.rgb", "rb");
 	if (!f)

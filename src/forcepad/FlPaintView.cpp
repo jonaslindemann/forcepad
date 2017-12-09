@@ -13,7 +13,7 @@
 #include "Cursors.h"
 #endif
 
-#undef NATIVE_FS
+#define NATIVE_FS
 
 using namespace std;
 
@@ -343,7 +343,11 @@ const std::string CFlPaintView::doOpenDialog(const string title, const string fi
 #else
     const char *name;
     name = fl_file_chooser(title.c_str(), filter.c_str(), "");
-    std::string fname = name;
+	std::string fname;
+	if (name != nullptr)
+		fname = name;
+	else
+		fname = "";
 #endif
     cout << "selected filename = " << fname << endl;
     return fname;
@@ -352,7 +356,7 @@ const std::string CFlPaintView::doOpenDialog(const string title, const string fi
 void CFlPaintView::doShowAbout()
 {
 #ifdef WIN32
-    ShellExecute(0, "open", "http://forcepad.sourceforge.net", NULL, NULL, SW_SHOWNORMAL);
+    ShellExecute(0, "open", "https://structarch.org/forcepad", NULL, NULL, SW_SHOWNORMAL);
 #endif
 }
 
