@@ -8,3 +8,5 @@
 build/
 build_release/
 *.lib
+/Win32
+/Win32/Debug

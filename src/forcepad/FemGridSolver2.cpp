@@ -65,8 +65,11 @@ CFemGridSolver2::CFemGridSolver2()
 	m_optVolfrac = 0.5;
 	m_optMinChange = 0.01;
 	m_optMaxLoops = 100;
-	m_optRmin = 2.75;
+	//m_optRmin = 2.75;
+	m_optRmin = 1.75;
 	m_filterType = FT_SHARP_CONTOURING;
+	m_scaleToAbsoluteSize = true;
+	m_rminInPixels = true;
 
 	// Events
 
@@ -1986,6 +1989,13 @@ ReturnMatrix CFemGridSolver2::optimalityCriteriaUpdate(Matrix& X, Matrix& dC, Ma
 	Xnew.release(); return Xnew;
 }
 
+int CFemGridSolver2::scaleToAbsoluteSize(int r)
+{
+	auto grid_stride = m_femGrid->getStride();
+	r = r * 6 / grid_stride; // 6 is default grid size, this should scale the filter radius to be constant wrt. canvas size
+	return r;
+}
+
 ReturnMatrix CFemGridSolver2::sensitivityFilter1(Matrix& X, Matrix& dC, double rmin)
 {
 	//function [dcn]=Ole_Sigmund(nelx,nely,rmin,x,dc)                                   % ved rmin<1 deaktiveres filtreringen
@@ -2011,6 +2021,10 @@ ReturnMatrix CFemGridSolver2::sensitivityFilter1(Matrix& X, Matrix& dC, double r
 
 	dCnew = Matrix(rows, cols);
 	dCnew = 0.0;
+
+	if (m_rminInPixels)
+		rmin = rmin / (double)m_femGrid->getStride();
+  	//	rmin = scaleToAbsoluteSize(rmin);
 
 	for (i=1; i<=cols; i++)
 	{
@@ -2058,6 +2072,9 @@ ReturnMatrix CFemGridSolver2::sensitivityFilter2(Matrix& dC, double rmin)
 
 	dCnew = Matrix(rows, cols);
 	dCnew = 0.0;
+
+	if (m_rminInPixels)
+		rmin = rmin / (double)m_femGrid->getStride();
 
 	for (i=1; i<=cols; i++)
 	{

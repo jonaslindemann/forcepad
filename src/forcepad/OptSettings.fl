@@ -1,9 +1,9 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0302 
-header_name {.h} 
+version 1.0400
+header_name {.h}
 code_name {.cpp}
 decl {\#include "FlPaintView.h"} {private global
-} 
+}
 
 class COptSettings {open
 } {
@@ -12,7 +12,7 @@ class COptSettings {open
   Function {COptSettings()} {open
   } {
     Fl_Window mainWindow {
-      label {Optimisation Settings} open selected
+      label {Optimisation Settings} open
       xywh {639 233 312 290} type Double color 0 labelcolor 7 modal visible
     } {
       Fl_Button cancelButton {
@@ -31,8 +31,8 @@ mainWindow->hide();}
         xywh {14 25 286 20} type Horizontal box FLAT_BOX color 8 labelsize 11 labelcolor 7 align 5 value 0.5 textsize 11 textcolor 7
       }
       Fl_Value_Slider rmin {
-        label {Filter r,min (elements)}
-        xywh {14 65 286 20} type Horizontal box FLAT_BOX color 8 labelsize 11 labelcolor 7 align 5 minimum 1 maximum 5 value 2.75 textsize 11 textcolor 7
+        label {Filter r,min (pixels)} selected
+        xywh {14 65 286 20} type Horizontal box FLAT_BOX color 8 labelsize 11 labelcolor 7 align 5 minimum 1 maximum 100 step 1 value 20 textsize 11 textcolor 7
       }
       Fl_Value_Slider minChange {
         label {Min change stop criteria}
@@ -124,4 +124,4 @@ while (mainWindow->visible()) Fl::wait();} {}
   } {
     code {mainWindow->hide();} {}
   }
-} 
+}

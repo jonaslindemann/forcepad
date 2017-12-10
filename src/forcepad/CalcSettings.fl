@@ -1,9 +1,9 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0302 
-header_name {.h} 
+version 1.0400
+header_name {.h}
 code_name {.cpp}
 decl {\#include "FlPaintView.h"} {private global
-} 
+}
 
 class CCalcSettings {open
 } {
@@ -19,7 +19,7 @@ class CCalcSettings {open
         tooltip {the various index cards test different aspects of the Fl_Tabs widget} xywh {7 5 303 202} box FLAT_BOX color 8 selection_color 8 labelcolor 7
       } {
         Fl_Group meshGroup {
-          label Mesh open selected
+          label Mesh open
           tooltip {tab2 tests among other things the cooperation of modal windows and tabs} xywh {12 26 294 176} color 8 selection_color 8 labelsize 11
         } {
           Fl_Value_Slider gridStep {
@@ -33,6 +33,10 @@ class CCalcSettings {open
           Fl_Box {} {
             label Coarse
             xywh {231 84 45 21} labelsize 11 labelcolor 7
+          }
+          Fl_Check_Button warnOnLargeModel {
+            label {Warn on large models}
+            xywh {97 135 145 25} down_box DOWN_BOX value 1 color 0 labelsize 11 labelcolor 7
           }
         }
         Fl_Group generalGroup {
@@ -117,6 +121,7 @@ while (mainWindow->visible()) Fl::wait();} {}
 	forceMagnitude->value(view->getForceMagnitude());
 	weight->value(view->getWeight());
 	gridStep->value(view->getGridStride());
+	warnOnLargeModel->value(view->getWarnOnLargeModels());
 }} {}
   }
   Function {getData()} {open
@@ -136,10 +141,12 @@ while (mainWindow->visible()) Fl::wait();} {}
 	view->setWeight(weight->value());
 	
 	view->setGridStride(gridStep->value());
-}} {}
+	view->setWarnOnLargeModels(warnOnLargeModel->value());
+}} {selected
+    }
   }
   Function {centerWindow(Fl_Window* window)} {open
   } {
     code {mainWindow->position(window->x()+window->w()/2-mainWindow->w()/2, window->y()+window->h()/2-mainWindow->h()/2);} {}
   }
-} 
+}

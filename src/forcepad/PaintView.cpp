@@ -150,6 +150,7 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 	m_thickness = 0.1;
 	m_constraintStiffnessScale = 1e3;
 	m_moveLoad = false;
+	m_warnOnLargeModels = true;
 
 	// Optimisation parameters
 
@@ -1683,10 +1684,10 @@ bool CPaintView::execute()
 	// Check for long computational times >10000 dofs. (today...)
 	//
 	
-	if (m_femGrid->enumerateDofs(ED_BOTTOM_TOP)>10000)
-        if (!doAskYesNo("Model contains >10000 degrees of freedom.\nCalculation can take a long time.\nContinue?"))
-			return false;
-		
+	if (m_warnOnLargeModels)
+		if (m_femGrid->enumerateDofs(ED_BOTTOM_TOP)>10000)
+	        if (!doAskYesNo("Model contains >10000 degrees of freedom.\nCalculation can take a long time.\nContinue?"))
+				return false;
 	//
 	// Initiate solver
 	//
@@ -1792,9 +1793,10 @@ bool CPaintView::executeOpt()
 	// Check for long computational times >10000 dofs. (today...)
 	//
 	
-	if (m_femGrid->enumerateDofs(ED_BOTTOM_TOP)>10000)
-        if (!doAskYesNo("Model contains >10000 degrees of freedom.\nCalculation can take a long time.\nContinue?"))
-			return false;
+	if (m_warnOnLargeModels)
+		if (m_femGrid->enumerateDofs(ED_BOTTOM_TOP)>10000)
+			if (!doAskYesNo("Model contains >10000 degrees of freedom.\nCalculation can take a long time.\nContinue?"))
+				return false;
 		
 	//
 	// Initiate solver
@@ -3527,6 +3529,16 @@ void CPaintView::setOptFilterType(CFemGridSolver2::TFilterType filterType)
 CFemGridSolver2::TFilterType CPaintView::getOptFilterType()
 {
 	return m_optFilterType;
+}
+
+void CPaintView::setWarnOnLargeModels(bool flag)
+{
+	m_warnOnLargeModels = flag;
+}
+
+bool CPaintView::getWarnOnLargeModels()
+{
+	return m_warnOnLargeModels;
 }
 
 void CPaintView::setModeChangeEvent(CPVModeChangeEvent* eventMethod)

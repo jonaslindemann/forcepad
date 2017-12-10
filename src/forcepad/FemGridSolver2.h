@@ -132,6 +132,8 @@ private:
 	double m_optMinChange;
 	int m_optMaxLoops;
 	TFilterType m_filterType;
+	bool m_scaleToAbsoluteSize;
+	bool m_rminInPixels;
 
 
 	CGSStatusMessageEvent* m_statusMessageEvent;
@@ -164,6 +166,7 @@ public:
 
 	void objectiveFunctionAndSensitivity(Matrix& X, Matrix& dC, Matrix& L, double penalty, double& c);
 	ReturnMatrix optimalityCriteriaUpdate(Matrix& X, Matrix& dC, Matrix& L, double volfrac, int nElements);
+	int scaleToAbsoluteSize(int r);
 	ReturnMatrix sensitivityFilter1(Matrix& X, Matrix& dC, double rmin);
 	ReturnMatrix sensitivityFilter2(Matrix& dC, double rmin);
 

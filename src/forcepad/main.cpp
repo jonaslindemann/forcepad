@@ -64,7 +64,7 @@ main(int argc, char **argv)
 	// Setup window visuals
 	//
 
-	Fl::visual(FL_DOUBLE|FL_RGB|FL_ALPHA);
+	Fl::visual(FL_DOUBLE|FL_RGB|FL_ALPHA|FL_MULTISAMPLE);
 	Fl::get_system_colors();
 	//Fl::background(236, 233, 216);
 #ifdef __APPLE__

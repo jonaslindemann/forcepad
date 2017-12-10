@@ -193,6 +193,7 @@ protected:
 	double m_thickness;
 	double m_constraintStiffnessScale;
 	bool m_moveLoad;
+	bool m_warnOnLargeModels;
 
 	double m_optVolfrac;
 	double m_optRmin;
@@ -527,6 +528,9 @@ public:
 
 	void setMoveLoad(bool flag);
 	bool getMoveLoad();
+
+	void setWarnOnLargeModels(bool flag);
+	bool getWarnOnLargeModels();
 
 	// Optmisation properties
 

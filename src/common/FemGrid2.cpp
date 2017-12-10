@@ -1333,6 +1333,7 @@ void CFemGrid2::drawStress()
 	{
 		glPushAttrib(GL_COLOR_BUFFER_BIT);
 		glEnable(GL_BLEND);
+		glEnable(GL_LINE_SMOOTH);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		for (i=0; i<m_rows; i+=m_stressStep)
 		{
@@ -1358,6 +1359,12 @@ void CFemGrid2::drawForces()
 	int i;
 	int height = getImage()->getHeight();
 
+	glPushAttrib(GL_COLOR_BUFFER_BIT);
+	glEnable(GL_BLEND);
+	glEnable(GL_LINE_SMOOTH);
+	glEnable(GL_POLYGON_SMOOTH);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	CForceQueIter fi;
 
 	for (i=0; i<height; i++)
@@ -1365,6 +1372,7 @@ void CFemGrid2::drawForces()
 		for (fi=m_pointForces[i].begin(); (!m_pointForces[i].empty())&&(fi!=m_pointForces[i].end()); fi++)
 			(*fi)->render();
 	}
+	glPopAttrib();
 }
 
 void CFemGrid2::drawConstraints()
@@ -1374,6 +1382,12 @@ void CFemGrid2::drawConstraints()
 	int i;
 	int height = getImage()->getHeight();
 
+	glPushAttrib(GL_COLOR_BUFFER_BIT);
+	glEnable(GL_BLEND);
+	glEnable(GL_LINE_SMOOTH);
+	glEnable(GL_POLYGON_SMOOTH);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	CConstraintQueIter ci;
 
 	for (i=0; i<height; i++)
@@ -1381,6 +1395,7 @@ void CFemGrid2::drawConstraints()
 		for (ci=m_pointConstraints[i].begin(); (!m_pointConstraints[i].empty())&&(ci!=m_pointConstraints[i].end()); ci++)
 			(*ci)->render();
 	}
+	glPopAttrib();
 }
 
 void CFemGrid2::drawDebugPoints()
