@@ -1,34 +1,41 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0300 
-header_name {.h} 
+version 1.0400
+header_name {.h}
 code_name {.cpp}
-decl {\#include "PaintView.h"} {global
-} 
+decl {\#include "PaintView.h"} {private global
+}
 
-decl {\#include "CalcSettings.h"} {global
-} 
+decl {\#include "CalcSettings.h"} {private global
+}
 
-decl {\#include "PlatformInfo.h"} {global
-} 
+decl {\#include "PlatformInfo.h"} {private global
+}
 
-decl {\#ifdef WIN32} {} 
+decl {\#ifdef WIN32} {private local
+}
 
-decl {\#include "resource.h"} {} 
+decl {\#include "resource.h"} {private local
+}
 
-decl {\#include "dwmapi.h"} {} 
+decl {\#include "dwmapi.h"} {private local
+}
 
-decl {\#endif} {} 
+decl {\#endif} {private local
+}
 
-decl {\#ifndef __APPLE__} {} 
+decl {\#ifndef __APPLE__} {private local
+}
 
-decl {\#include <FL/x.H>} {} 
+decl {\#include <FL/x.H>} {private local
+}
 
-decl {\#endif} {selected
-} 
+decl {\#endif} {private local
+}
 
 class CTabletToolbar {open
 } {
-  decl {void* m_paintView;} {}
+  decl {void* m_paintView;} {private local
+  }
   Function {CTabletToolbar()} {open
   } {
     Fl_Window mainWindow {
@@ -38,47 +45,51 @@ class CTabletToolbar {open
       Fl_Button btnOpen {
         callback {if (m_paintView!=NULL)
 {
-	CPaintView* view = (CPaintView*)m_paintView;
+	CFlPaintView* view = (CFlPaintView*)m_paintView;
 	view->openModel();
 }}
         tooltip {Open model} image {../../images/open_black.xpm} xywh {50 3 42 42} box THIN_UP_BOX color 0
         code0 {\#include "Fl_HoverButton.h"}
+        code1 {\#include "FlPaintView.h"}
         class Fl_HoverButton
       }
       Fl_Button btnNew {
         callback {if (m_paintView!=NULL)
 {
-	CPaintView* view = (CPaintView*)m_paintView;
+	CFlPaintView* view = (CFlPaintView*)m_paintView;
 	view->newModel();
 }}
         tooltip {New model} image {../../images/new_model_black.xpm} xywh {5 3 42 42} box THIN_UP_BOX color 0
         code0 {\#include "Fl_HoverButton.h"}
+        code1 {\#include "FlPaintView.h"}
         class Fl_HoverButton
       }
       Fl_Button btnSaveAs {
         callback {if (m_paintView!=NULL)
 {
-	CPaintView* view = (CPaintView*)m_paintView;
+	CFlPaintView* view = (CFlPaintView*)m_paintView;
 	view->saveModelAs();
 }}
         tooltip {Save model as...} image {../../images/save_black.xpm} xywh {95 3 42 42} box THIN_UP_BOX color 0
         code0 {\#include "Fl_HoverButton.h"}
+        code1 {\#include "FlPaintView.h"}
         class Fl_HoverButton
       }
       Fl_Button btnUndo {
         callback {if (m_paintView!=NULL)
 {
-	CPaintView* view = (CPaintView*)m_paintView;
+	CFlPaintView* view = (CFlPaintView*)m_paintView;
 	view->undo();
 }}
         tooltip Undo image {../../images/undo_black.xpm} xywh {140 3 42 42} box THIN_UP_BOX color 0
         code0 {\#include "Fl_HoverButton.h"}
+        code1 {\#include "FlPaintView.h"}
         class Fl_HoverButton
       }
       Fl_Button btnSettings {
         callback {if (m_paintView!=NULL)
 {
-	CPaintView* view = (CPaintView*)m_paintView;
+	CFlPaintView* view = (CFlPaintView*)m_paintView;
 	
 	CCalcSettings* calcSettings = new CCalcSettings();
 	calcSettings->setView(view);
@@ -86,9 +97,10 @@ class CTabletToolbar {open
 	calcSettings->show();
 	delete calcSettings;
 	view->setViewMode(CPaintView::VM_SKETCH);
-}}
+}} selected
         tooltip {Calculation settings} image {../../images/settings_black.xpm} xywh {185 3 42 42} box THIN_UP_BOX color 0
         code0 {\#include "Fl_HoverButton.h"}
+        code1 {\#include "FlPaintView.h"}
         class Fl_HoverButton
       }
     }
@@ -125,4 +137,4 @@ SetWindowLongPtr(handle, GWL_EXSTYLE, oldStyle | WS_EX_TOOLWINDOW);
   } {
     code {mainWindow->hide();} {}
   }
-} 
+}
