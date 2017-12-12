@@ -136,6 +136,10 @@ private:
 public:
   static Fl_Menu_Item *helpMenu;
   static Fl_Menu_Item *helpMenuContents;
+private:
+  inline void cb_helpMenuContents_i(Fl_Menu_*, void*);
+  static void cb_helpMenuContents(Fl_Menu_*, void*);
+public:
   static Fl_Menu_Item *helpMenuAbout;
 private:
   inline void cb_helpMenuAbout_i(Fl_Menu_*, void*);

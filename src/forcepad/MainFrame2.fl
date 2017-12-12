@@ -95,7 +95,7 @@ class CMainFrame {open : {CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusM
       xywh {580 253 861 686} type Double color 0 align 80 resizable visible
     } {
       Fl_Menu_Bar mainMenu {open
-        xywh {0 0 858 26} box BORDER_BOX down_box FLAT_BOX color 32 labelsize 11 labelcolor 1 textsize 11 textcolor 7
+        xywh {0 0 862 26} box BORDER_BOX down_box FLAT_BOX color 32 labelsize 11 labelcolor 1 textsize 11 textcolor 7
         class Fl_Sys_Menu_Bar
       } {
         Submenu fileMenu {
@@ -254,7 +254,8 @@ else
           xywh {0 0 62 20} labelsize 12
         } {
           MenuItem helpMenuContents {
-            label {&Contents}
+            label {&Documentation}
+            callback {paintView->showAbout()} selected
             xywh {0 0 30 20} labelsize 12
           }
           MenuItem helpMenuAbout {
@@ -1175,12 +1176,11 @@ delete m_vizMixer;
 delete m_optSettings;
 delete paintView;} {}
   }
-  Function {onContinueCalc()} {open return_type bool
+  Function {onContinueCalc()} {return_type bool
   } {
     code {return m_continueCalc;} {}
   }
-  Function {show()} {open
-  } {
+  Function {show()} {} {
     code {\#ifdef WIN32
 extern HINSTANCE fl_display;
 wndMain->icon((char *)LoadIcon(fl_display, MAKEINTRESOURCE(IDI_FORCEPAD)));
@@ -1251,8 +1251,7 @@ showRightToolbar(scrRightDrawToolbar);
 
 paintView->setModelName("noname.fp2");
 thickness->value(paintView->getThickness());
-forceMagnitude->value(paintView->getForceMagnitude());} {selected
-    }
+forceMagnitude->value(paintView->getForceMagnitude());} {}
   }
   Function {close()} {} {
     code {m_tabletToolbar->hide();
@@ -1260,14 +1259,13 @@ m_vizMixer->hide();
 wndMain->hide();
 so_hide();} {}
   }
-  Function {resetButtons()} {open private
+  Function {resetButtons()} {private
   } {
     code {btnDrawingTools->value(0);
 //btnConstraint->value(0);
 btnConstraint2->value(0);} {}
   }
-  Function {resetButtons(Fl_HoverButton* self)} {open
-  } {
+  Function {resetButtons(Fl_HoverButton* self)} {} {
     code {if (self!=btnBrush)
 	btnBrush->value(0);
 if (self!=btnFloodFill)
@@ -1331,7 +1329,7 @@ else
 	btnCopy->deactivate();
 }} {}
   }
-  Function {onViewModeChange(CPaintView::TViewMode oldMode, CPaintView::TViewMode newMode)} {open return_type void
+  Function {onViewModeChange(CPaintView::TViewMode oldMode, CPaintView::TViewMode newMode)} {return_type void
   } {
     code {if (newMode == CPaintView::VM_SKETCH)
 {
@@ -1463,7 +1461,7 @@ Fl::check();
   } {
     code {std::cout << context << ": " << message << std::endl;} {}
   }
-  Function {hideLeftToolbars()} {open return_type void
+  Function {hideLeftToolbars()} {return_type void
   } {
     code {scrLeftToolbar->hide();
 scrLeftToolbar->deactivate();
@@ -1472,7 +1470,7 @@ scrLeftResultToolbar->deactivate();
 scrLeftPhysicsToolbar->hide();
 scrLeftPhysicsToolbar->deactivate();} {}
   }
-  Function {hideRightToolbars()} {open return_type void
+  Function {hideRightToolbars()} {return_type void
   } {
     code {scrRightForceToolbar->hide();
 scrRightForceToolbar->deactivate();

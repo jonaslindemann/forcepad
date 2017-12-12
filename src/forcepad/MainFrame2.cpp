@@ -171,6 +171,13 @@ void CMainFrame::cb_settingsMenuSnapToGrid(Fl_Menu_* o, void* v) {
   ((CMainFrame*)(o->parent()->user_data()))->cb_settingsMenuSnapToGrid_i(o,v);
 }
 
+void CMainFrame::cb_helpMenuContents_i(Fl_Menu_*, void*) {
+  paintView->showAbout();
+}
+void CMainFrame::cb_helpMenuContents(Fl_Menu_* o, void* v) {
+  ((CMainFrame*)(o->parent()->user_data()))->cb_helpMenuContents_i(o,v);
+}
+
 void CMainFrame::cb_helpMenuAbout_i(Fl_Menu_*, void*) {
   CSplashFrame* splashFrame = new CSplashFrame();
 splashFrame->centerWindow(wndMain);
@@ -219,7 +226,7 @@ Fl_Menu_Item CMainFrame::menu_mainMenu[] = {
  {"&Snap to grid", 0x40067,  (Fl_Callback*)CMainFrame::cb_settingsMenuSnapToGrid, 0, 2, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
  {0,0,0,0,0,0,0,0,0},
  {"&Help", 0,  0, 0, 64, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
- {"&Contents", 0,  0, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
+ {"&Documentation", 0,  (Fl_Callback*)CMainFrame::cb_helpMenuContents, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
  {"&About", 0,  (Fl_Callback*)CMainFrame::cb_helpMenuAbout, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
  {"Application &Log", 0,  (Fl_Callback*)CMainFrame::cb_helpMenuLog, 0, 16, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
  {0,0,0,0,0,0,0,0,0},
@@ -9509,7 +9516,7 @@ CMainFrame::CMainFrame() {
     wndMain->color(FL_FOREGROUND_COLOR);
     wndMain->user_data((void*)(this));
     wndMain->align(Fl_Align(FL_ALIGN_CLIP|FL_ALIGN_INSIDE));
-    { mainMenu = new Fl_Sys_Menu_Bar(0, 0, 858, 26);
+    { mainMenu = new Fl_Sys_Menu_Bar(0, 0, 862, 26);
       mainMenu->box(FL_BORDER_BOX);
       mainMenu->down_box(FL_FLAT_BOX);
       mainMenu->color(FL_GRAY0);

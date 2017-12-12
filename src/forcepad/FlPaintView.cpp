@@ -356,7 +356,7 @@ const std::string CFlPaintView::doOpenDialog(const string title, const string fi
 void CFlPaintView::doShowAbout()
 {
 #ifdef WIN32
-    ShellExecute(0, "open", "https://structarch.org/forcepad", NULL, NULL, SW_SHOWNORMAL);
+    ShellExecute(0, "open", "https://structarch.org/forcepad/documentation/", NULL, NULL, SW_SHOWNORMAL);
 #endif
 }
 
