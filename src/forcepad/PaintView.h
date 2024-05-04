@@ -55,283 +55,279 @@ class CPVNewModelEvent;
 
 class CPaintView {
 public:
-	/*
-	 *    Edit modes
-	 */
-	enum TEditMode { 
-		EM_BRUSH, 
-		EM_DIRECT_BRUSH,
-		EM_ERASE, 
-		EM_DIRECT_ERASE,
-		EM_FORCE, 
-		EM_CONSTRAINT,
-		EM_CONSTRAINT_VECTOR,
-		EM_CONSTRAINT_HINGE,
-		EM_DYNAMIC_FORCE_UPDATE,
-		EM_ROTATE_CONSTRAINT_VECTOR,
-		EM_LINE,
-		EM_RECTANGLE,
-		EM_ELLIPSE,
-		EM_FLOODFILL,
-		EM_ERASE_CONSTRAINTS_FORCES,
-		EM_SELECT_BOX,
-		EM_PASTE,
-		EM_RESULT,
+    /*
+     *    Edit modes
+     */
+    enum TEditMode {
+        EM_BRUSH,
+        EM_DIRECT_BRUSH,
+        EM_ERASE,
+        EM_DIRECT_ERASE,
+        EM_FORCE,
+        EM_CONSTRAINT,
+        EM_CONSTRAINT_VECTOR,
+        EM_CONSTRAINT_HINGE,
+        EM_DYNAMIC_FORCE_UPDATE,
+        EM_ROTATE_CONSTRAINT_VECTOR,
+        EM_LINE,
+        EM_RECTANGLE,
+        EM_ELLIPSE,
+        EM_FLOODFILL,
+        EM_ERASE_CONSTRAINTS_FORCES,
+        EM_SELECT_BOX,
+        EM_PASTE,
+        EM_RESULT,
         EM_RULER,
         EM_ARCH
-	};
+    };
 
-	enum TImportMode {
-		IM_NEW_MODEL,
-		IM_PASTE
-	};
+    enum TImportMode {
+        IM_NEW_MODEL,
+        IM_PASTE
+    };
 
-	enum TViewMode {
-		VM_SKETCH,
-		VM_PHYSICS, 
-		VM_ACTION
-	};
+    enum TViewMode {
+        VM_SKETCH,
+        VM_PHYSICS,
+        VM_ACTION
+    };
 
-	enum TVisualisationMode {
-		VM_PRINCIPAL_STRESS,
-		VM_MISES_STRESS,
-		VM_DISPLACEMENTS,
-		VM_STRUCTURE
-	};
+    enum TVisualisationMode {
+        VM_PRINCIPAL_STRESS,
+        VM_MISES_STRESS,
+        VM_DISPLACEMENTS,
+        VM_STRUCTURE
+    };
+
 protected:
-	/*
-	 *    Command line arguments
-	 */
+    /*
+     *    Command line arguments
+     */
 
-	int m_argc;
-	char** m_argv;
+    int m_argc;
+    char **m_argv;
 
-	TEditMode m_editMode;
-	TViewMode m_viewMode;
-	TVisualisationMode m_visualisationMode;
+    TEditMode m_editMode;
+    TViewMode m_viewMode;
+    TVisualisationMode m_visualisationMode;
 
-	/*
-	 *    Mouse state variables
-	 */
+    /*
+     *    Mouse state variables
+     */
 
-	bool m_leftMouseDown;
-	int m_current[2];
-	int m_start[2];
-	int m_oldPos[2];
+    bool m_leftMouseDown;
+    int m_current[2];
+    int m_start[2];
+    int m_oldPos[2];
 
-	int m_selectionStart[2];
-	int m_selectionEnd[2];
+    int m_selectionStart[2];
+    int m_selectionEnd[2];
 
-	int m_undoStart[2];
-	int m_undoEnd[2];
+    int m_undoStart[2];
+    int m_undoEnd[2];
 
-	bool m_runOnce;
+    bool m_runOnce;
 
-	/*
-	 * Optimisation constraint definition
-	 */
+    /*
+     * Optimisation constraint definition
+     */
 
-	bool m_optLayerActive;
+    bool m_optLayerActive;
 
+    /*
+     *    Drawing surface and computational grid
+     */
 
-	/*
-	 *    Drawing surface and computational grid
-	 */
+    int m_drawingOffsetX;
+    int m_drawingOffsetY;
+    bool m_dirty;
+    bool m_showMesh;
+    float m_maxIntensity;
 
-	int m_drawingOffsetX;
-	int m_drawingOffsetY;
-	bool m_dirty;
-	bool m_showMesh;
-	float m_maxIntensity;
+    bool m_snapToGrid;
+    int m_gridSpacing;
 
-	bool m_snapToGrid;
-	int m_gridSpacing;
+    std::string m_modelName;
 
-	std::string m_modelName;
+    bool m_useWeight;
 
-	bool m_useWeight;
+    int m_cg[2];
 
-	int m_cg[2];
+    /*
+     *    Brush management
+     */
 
-	/*
-	 *    Brush management
-	 */
+    std::vector<CSgiImagePtr> m_brushes;
+    std::vector<CSgiImagePtr> m_invertedBrushes;
 
-	std::vector<CSgiImagePtr> m_brushes;
-	std::vector<CSgiImagePtr> m_invertedBrushes;
-	
-	CSgiImagePtr m_currentBrush;
-	CSgiImagePtr m_currentInvertedBrush;
+    CSgiImagePtr m_currentBrush;
+    CSgiImagePtr m_currentInvertedBrush;
 
-//#ifndef __APPLE__
-//	Fl_Cursor_Shape* m_cursors[20];
-//#endif
+    float m_brushColor[3];
+    float m_optConstraintColor[3];
+    float m_backColor[3];
+    int m_brushScale;
+    int m_blendFactor;
+    int m_currentBrushIdx;
+    bool m_useBlendingExtension;
+    bool m_lockDrawing;
 
-	float m_brushColor[3];
-	float m_optConstraintColor[3];
-	float m_backColor[3];
-	int m_brushScale;
-	int m_blendFactor;
-	int m_currentBrushIdx;
-	bool m_useBlendingExtension;
-	bool m_lockDrawing;
+    TImportMode m_importMode;
 
-	TImportMode m_importMode;
-	
-	bool m_danglingRelease;
+    bool m_danglingRelease;
 
-	/*
-	 *    Calculation settings
-	 */
+    /*
+     *    Calculation settings
+     */
 
-	double m_forceMagnitude;
-	double m_weight;
-	bool m_outputMatlab;
-	double m_stiffnessScalefactor;
-	double m_elasticModulus;
-	double m_youngsModulus;
-	double m_thickness;
-	double m_constraintStiffnessScale;
-	bool m_moveLoad;
-	bool m_warnOnLargeModels;
+    double m_forceMagnitude;
+    double m_weight;
+    bool m_outputMatlab;
+    double m_stiffnessScalefactor;
+    double m_elasticModulus;
+    double m_youngsModulus;
+    double m_thickness;
+    double m_constraintStiffnessScale;
+    bool m_moveLoad;
+    bool m_warnOnLargeModels;
 
-	double m_optVolfrac;
-	double m_optRmin;
-	double m_optMinChange;
-	int m_optMaxLoops;
-	CFemGridSolver2::TFilterType m_optFilterType;
+    double m_optVolfrac;
+    double m_optRmin;
+    double m_optMinChange;
+    int m_optMaxLoops;
+    CFemGridSolver2::TFilterType m_optFilterType;
 
-	CFemGridSolver2Ptr m_solver;
+    CFemGridSolver2Ptr m_solver;
 
-	/*
-	 *    Drawing tools
-	 */
+    /*
+     *    Drawing tools
+     */
 
-	CRectanglePtr m_rectangle;
-	CEllipsePtr m_ellipse;
-	CLinePtr m_line;
+    CRectanglePtr m_rectangle;
+    CEllipsePtr m_ellipse;
+    CLinePtr m_line;
     CArchPtr m_arch;
-	CForcePtr m_newForce;
-	CConstraintPtr m_newConstraint;
-	CConstraint::TConstraintType m_constraintType;
+    CForcePtr m_newForce;
+    CConstraintPtr m_newConstraint;
+    CConstraint::TConstraintType m_constraintType;
 
-	CRectanglePtr m_selectionBox;
-	CForcePadClipboardPtr m_clipboard;
-	CClipboardPtr m_undoClipboard;
+    CRectanglePtr m_selectionBox;
+    CForcePadClipboardPtr m_clipboard;
+    CClipboardPtr m_undoClipboard;
 
-	CImagePtr m_drawing;
-	CImagePtr m_optConstraintImage;
-	CImagePtr m_buffer;
-	CScreenImagePtr m_screenImage;
+    CImagePtr m_drawing;
+    CImagePtr m_optConstraintImage;
+    CImagePtr m_buffer;
+    CScreenImagePtr m_screenImage;
 
-	CFemGrid2Ptr m_femGrid;
+    CFemGrid2Ptr m_femGrid;
 
-	CRulerPtr m_ruler;
+    CRulerPtr m_ruler;
 
-	/*
-	 *    Dynamic force update variables
-	 */
+    /*
+     *    Dynamic force update variables
+     */
 
-	CForcePtr m_selectedForce;
+    CForcePtr m_selectedForce;
 
-	/*
-	 *    Rigid body tools
-	 */
+    /*
+     *    Rigid body tools
+     */
 
-	CCGIndicatorPtr m_cgIndicator;
-	bool m_calcCG;
-	double m_relativeForceSize;
-	bool m_checkOpenGL;
+    CCGIndicatorPtr m_cgIndicator;
+    bool m_calcCG;
+    double m_relativeForceSize;
+    bool m_checkOpenGL;
 
-	void* m_mainFrame;
+    void *m_mainFrame;
 
-	/*
-	 *    Misc
-	 */
+    /*
+     *    Misc
+     */
 
-	bool m_resized;
-	bool m_drawImage;
+    bool m_resized;
+    bool m_drawImage;
 
-	int m_lastSize[2];
+    int m_lastSize[2];
 
-	bool m_zoomResults;
-	double m_zoomFactor;
-	int m_zoomPos[2];
-	int m_zoomStart[2];
+    bool m_zoomResults;
+    double m_zoomFactor;
+    int m_zoomPos[2];
+    int m_zoomStart[2];
 
-	/*
-	 *    Private methods
-	 */
+    /*
+     *    Private methods
+     */
 
-	/*
-	 *    Events
-	 */
+    /*
+     *    Events
+     */
 
-	CPVModeChangeEvent* m_modeChangeEvent;
-	CPVViewModeChangeEvent* m_viewModeChangeEvent;
-	CPVViewModeErrorEvent* m_viewModeErrorEvent;
-	CPVModelChangedEvent* m_modelChangedEvent;
-	CPVRulerChangedEvent* m_rulerChangedEvent;
-	CPVVisualisationModeChangedEvent* m_visualisationModeChangedEvent;
-	CPVModelLoadedEvent* m_modelLoadedEvent;
-	CPVNewModelEvent* m_newModelEvent;
+    CPVModeChangeEvent *m_modeChangeEvent;
+    CPVViewModeChangeEvent *m_viewModeChangeEvent;
+    CPVViewModeErrorEvent *m_viewModeErrorEvent;
+    CPVModelChangedEvent *m_modelChangedEvent;
+    CPVRulerChangedEvent *m_rulerChangedEvent;
+    CPVVisualisationModeChangedEvent *m_visualisationModeChangedEvent;
+    CPVModelLoadedEvent *m_modelLoadedEvent;
+    CPVNewModelEvent *m_newModelEvent;
 
-	CGSStatusMessageEvent* m_statusMessageEvent;
-	CGSLogMessageEvent* m_logMessageEvent;
-	CGSContinueCalcEvent* m_continueCalcEvent;
+    CGSStatusMessageEvent *m_statusMessageEvent;
+    CGSLogMessageEvent *m_logMessageEvent;
+    CGSContinueCalcEvent *m_continueCalcEvent;
 
-	/*
-	 *    Private event handlers
-	 */
+    /*
+     *    Private event handlers
+     */
 
-	/** Handles mouse wheel.  */
-	void onMouseWheel(int dx, int dy);
+    /** Handles mouse wheel.  */
+    void onMouseWheel(int dx, int dy);
 
-	/** Handles mouse dragging. (Mouse move with button down) */
-	void onDrag(int x, int y);
+    /** Handles mouse dragging. (Mouse move with button down) */
+    void onDrag(int x, int y);
 
-	/** Handles mouse click. */
-	void onPush(int x, int y);
+    /** Handles mouse click. */
+    void onPush(int x, int y);
 
-	/** Handles mouse up. */
-	void onRelease(int x, int y);
+    /** Handles mouse up. */
+    void onRelease(int x, int y);
 
-	/** Handles passive mouse movement */
-	void onMove(int x, int y);
+    /** Handles passive mouse movement */
+    void onMove(int x, int y);
 
-	/** Handles passive mouse movement */
-	void onResize(int w, int h);
+    /** Handles passive mouse movement */
+    void onResize(int w, int h);
 
-	/** Handles OpenGL drawing */
-	void onDraw();
+    /** Handles OpenGL drawing */
+    void onDraw();
 
-	/** Clear frame buffer **/
-	void onClear();
+    /** Clear frame buffer **/
+    void onClear();
 
-	/** Handles initialisation of OpenGL context **/
-	void onInitContext();
+    /** Handles initialisation of OpenGL context **/
+    void onInitContext();
 
-	/** Check for OpenGL version **/
-	void checkOpenGLVersion();
+    /** Check for OpenGL version **/
+    void checkOpenGLVersion();
 
-	void deleteCursors();
-	void createCursors();
-	void updateCursor();
-	void resetUndoArea();
-	void updateUndoArea(int x, int y, int brushSize);
-	void updateUndo();
+    void deleteCursors();
+    void createCursors();
+    void updateCursor();
+    void resetUndoArea();
+    void updateUndoArea(int x, int y, int brushSize);
+    void updateUndo();
 
-	/** Loads brushes from /brushes */
-	void loadBrushes();
+    /** Loads brushes from /brushes */
+    void loadBrushes();
 
-	/** Clean up brush lists */
-	void deleteBrushes();
+    /** Clean up brush lists */
+    void deleteBrushes();
 
-	void clearMesh();
-	void clearResults();
-	void updateSelectionBox();
-	void enableDrawing();
-	void disableDrawing();
+    void clearMesh();
+    void clearResults();
+    void updateSelectionBox();
+    void enableDrawing();
+    void disableDrawing();
 
     virtual int height();
     virtual int width();
@@ -339,8 +335,9 @@ protected:
     virtual void doFlush();
     virtual void doInvalidate();
     virtual void doMakeCurrent();
-    virtual const std::string doSaveDialog(const std::string title, const std::string filter, const std::string defaultFilename);
-    virtual bool doNewModel(int& width, int& height, int& initialStiffness);
+    virtual const std::string doSaveDialog(const std::string title, const std::string filter,
+                                           const std::string defaultFilename);
+    virtual bool doNewModel(int &width, int &height, int &initialStiffness);
     virtual void doInfoMessage(const std::string message);
     virtual bool doAskYesNo(const std::string question);
     virtual const std::string doOpenDialog(const std::string title, const std::string filter);
@@ -353,271 +350,262 @@ protected:
     virtual void doShowHelp();
 
 public:
-	/** 
-	 * PaintView class constructor.
-	 *
-	 * This is constructor corresponds to a standard FLTK
-	 * window constructor.
-	 */
-	CPaintView(int x,int y,int w,int h,const char *l=0);
+    /**
+     * PaintView class constructor.
+     *
+     * This is constructor corresponds to a standard FLTK
+     * window constructor.
+     */
+    CPaintView(int x, int y, int w, int h, const char *l = 0);
 
-	/** ForcePadView class destructor. */
-	virtual ~CPaintView();
+    /** ForcePadView class destructor. */
+    virtual ~CPaintView();
 
-	/*
-	 *    Virtual overrides from FLTK 
-	 */
+    /*
+     *    Methods
+     */
 
-	/** FLTK draw() method virtual override. */
-    //void draw();
+    void executeCorba();
+    bool execute();
+    bool executeOpt();
 
-	/** FLTK handle() method virtual override. */
-    //int handle(int event);
+    void undoToDrawing();
 
-	/*
-	 *    Methods
-	 */
-
-	void executeCorba();
-	bool execute();
-	bool executeOpt();
-
-	void undoToDrawing();
-
-	void newModel();
-	void saveModel();
-	void saveModelAs();
-	void openImage();
-	void openModel();
-	void openModel(const std::string filename);
-	void expandImageToWindow();
+    void newModel();
+    void saveModel();
+    void saveModelAs();
+    void openImage();
+    void openModel();
+    void openModel(const std::string filename);
+    void expandImageToWindow();
     void expandImage();
 
-	void showAbout();
-	void showHelp();
-	void updateModel();
-	void pasteFromWindows();
-	void copyToWindows();
-	void transferViewToImage();
-	void undo();
-	void cut();
-	void copy();
-	void lockScaleFactor();
-	void unlockScaleFactor();
-	void applyElementScale();
-	void setRulerLength(double actualLength);
-	double getRulerLength();
-	void setOptLayer(bool active);
+    void showAbout();
+    void showHelp();
+    void updateModel();
+    void pasteFromWindows();
+    void copyToWindows();
+    void transferViewToImage();
+    void undo();
+    void cut();
+    void copy();
+    void lockScaleFactor();
+    void unlockScaleFactor();
+    void applyElementScale();
+    void setRulerLength(double actualLength);
+    double getRulerLength();
+    void setOptLayer(bool active);
 
-	void zoomIn();
-	void zoomOut();
+    void zoomIn();
+    void zoomOut();
 
-	/*
-	 *    Properties
-	 */
+    /*
+     *    Properties
+     */
 
-	// Application modes
+    // Application modes
 
-	void setViewMode(TViewMode mode);
-	void setEditMode(TEditMode mode);
-	TEditMode getEditMode();
-	void setImportMode(TImportMode mode);
-	TImportMode getImportMode();
+    void setViewMode(TViewMode mode);
+    void setEditMode(TEditMode mode);
+    TEditMode getEditMode();
+    void setImportMode(TImportMode mode);
+    TImportMode getImportMode();
 
-	// Child/Parent relationship
+    // Child/Parent relationship
 
-	void setMainFrame(void* frame);
-	void setCommandLine(int argc, char** argv);
+    void setMainFrame(void *frame);
+    void setCommandLine(int argc, char **argv);
 
-	// ExecutablePath
+    // ExecutablePath
 
-	const std::string getApplicationPath();
+    const std::string getApplicationPath();
 
-	// Model related settings
+    // Model related settings
 
-	void setModelName(const std::string& modelName);
-	//const char* getModelName();
+    void setModelName(const std::string &modelName);
+    // const char* getModelName();
 
-	// Drawing settings
+    // Drawing settings
 
-	int getCurrentBrushIdx();
-	int getBlendFactor();
-	void setStiffness(double stiffness);
-	double getStiffness();
-	void setCurrentBrush(int idx);
-	void setBlendFactor(int factor);
-	void getForegroundColor(float &red, float &green, float &blue);
-	void setBackgroundColor(float red, float green, float blue);
-	void setForegroundColor(float red, float green, float blue);
-	void setBrushMagnification(int factor);
-	void setConstraintType(CConstraint::TConstraintType constraintType);
-	void setRelativeForceSize(double size);
-	void setCalcCG(bool flag);
-	bool getCalcCG();
-	void setSnapToGrid(bool flag);
-	bool getSnapToGrid();
-	void setGridStride(int stride);
-	int getGridStride();
+    int getCurrentBrushIdx();
+    int getBlendFactor();
+    void setStiffness(double stiffness);
+    double getStiffness();
+    void setCurrentBrush(int idx);
+    void setBlendFactor(int factor);
+    void getForegroundColor(float &red, float &green, float &blue);
+    void setBackgroundColor(float red, float green, float blue);
+    void setForegroundColor(float red, float green, float blue);
+    void setBrushMagnification(int factor);
+    void setConstraintType(CConstraint::TConstraintType constraintType);
+    void setRelativeForceSize(double size);
+    void setCalcCG(bool flag);
+    bool getCalcCG();
+    void setSnapToGrid(bool flag);
+    bool getSnapToGrid();
+    void setGridStride(int stride);
+    int getGridStride();
 
-	// Visualisation settings
+    // Visualisation settings
 
-	void setStressMode(CFemGrid2::TStressMode mode);
-	void setStressStep(int step);
-	int getStressStep();
-	void setMaxIntensity(float intensity);
-	void setLockScaling(bool flag);
-	void setStressTreshold(double lower, double upper);
-	void setStressWidth(double width);
-	void setStressSize(double size);
-	void setStressAlpha(double alpha);
-	void setDisplacementScale(double value);
-	void setLineWidth(int width);
-	int getLineWidth();
+    void setStressMode(CFemGrid2::TStressMode mode);
+    void setStressStep(int step);
+    int getStressStep();
+    void setMaxIntensity(float intensity);
+    void setLockScaling(bool flag);
+    void setStressTreshold(double lower, double upper);
+    void setStressWidth(double width);
+    void setStressSize(double size);
+    void setStressAlpha(double alpha);
+    void setDisplacementScale(double value);
+    void setLineWidth(int width);
+    int getLineWidth();
 
-	void setDrawStress(bool flag);
-	bool getDrawStress();
+    void setDrawStress(bool flag);
+    bool getDrawStress();
 
-	void setZoomResults(bool flag);
-	bool getZoomResults();
+    void setZoomResults(bool flag);
+    bool getZoomResults();
 
-	void setDrawDisplacements(bool flag);
-	bool getDrawDisplacements();
+    void setDrawDisplacements(bool flag);
+    bool getDrawDisplacements();
 
-	void setDrawForcesAndConstraints(bool flag);
+    void setDrawForcesAndConstraints(bool flag);
 
-	void setStressType(CFemGrid2::TStressType stressType);
-	void setColorMap(int index);
-	void setInvertColorMap(bool flag);
+    void setStressType(CFemGrid2::TStressType stressType);
+    void setColorMap(int index);
+    void setInvertColorMap(bool flag);
 
-	void setUpperMisesTreshold(double upper);
+    void setUpperMisesTreshold(double upper);
 
-	void setVisualisationMode(TVisualisationMode mode);
-	TVisualisationMode getVisualisationMode();
+    void setVisualisationMode(TVisualisationMode mode);
+    TVisualisationMode getVisualisationMode();
 
-	// Calculation settings
+    // Calculation settings
 
-	void setUseWeight(bool flag);
-	bool getUseWeight();
+    void setUseWeight(bool flag);
+    bool getUseWeight();
 
-	void setElementTreshold(double value);
-	double getElementTreshold();
-	
-	void setForceMagnitude(double value);
-	double getForceMagnitude();
-	
-	void setOutputMatlab(bool flag);
-	bool getOutputMatlab();
+    void setElementTreshold(double value);
+    double getElementTreshold();
 
-	void setStiffnessScaleFactor(double value);
-	double getStiffnessScaleFactor();
+    void setForceMagnitude(double value);
+    double getForceMagnitude();
 
-	void setElasticModulus(double value);
-	double getElasticModulus();
+    void setOutputMatlab(bool flag);
+    bool getOutputMatlab();
 
-	void setYoungsModulus(double value);
-	double getYoungsModulus();
+    void setStiffnessScaleFactor(double value);
+    double getStiffnessScaleFactor();
 
-	void setThickness(double value);
-	double getThickness();
+    void setElasticModulus(double value);
+    double getElasticModulus();
 
-	void setConstraintStiffnessScale(double value);
-	double getConstraintStiffnessScale();
+    void setYoungsModulus(double value);
+    double getYoungsModulus();
 
-	void setWeight(double value);
-	double getWeight();
+    void setThickness(double value);
+    double getThickness();
 
-	void setMoveLoad(bool flag);
-	bool getMoveLoad();
+    void setConstraintStiffnessScale(double value);
+    double getConstraintStiffnessScale();
 
-	void setWarnOnLargeModels(bool flag);
-	bool getWarnOnLargeModels();
+    void setWeight(double value);
+    double getWeight();
 
-	// Optmisation properties
+    void setMoveLoad(bool flag);
+    bool getMoveLoad();
 
-	void setOptVolumeFraction(double fraction);
-	double getOptVolumeFraction();
+    void setWarnOnLargeModels(bool flag);
+    bool getWarnOnLargeModels();
 
-	void setOptRmin(double rmin);
-	double getOptRmin();
+    // Optmisation properties
 
-	void setOptMinChange(double minChange);
-	double getOptMinChange();
+    void setOptVolumeFraction(double fraction);
+    double getOptVolumeFraction();
 
-	void setOptMaxLoops(int loops);
-	int getOptMaxLoops();
+    void setOptRmin(double rmin);
+    double getOptRmin();
 
-	void setOptFilterType(CFemGridSolver2::TFilterType filterType);
-	CFemGridSolver2::TFilterType getOptFilterType();
+    void setOptMinChange(double minChange);
+    double getOptMinChange();
 
-	// User interface properties
+    void setOptMaxLoops(int loops);
+    int getOptMaxLoops();
 
-	void setUiLineThickness(double thickness);
-	double getUiLineThickness();
+    void setOptFilterType(CFemGridSolver2::TFilterType filterType);
+    CFemGridSolver2::TFilterType getOptFilterType();
 
-	void setUiSymbolLength(double length);
-	double getUiSymbolLength();
+    // User interface properties
 
-	// Events
+    void setUiLineThickness(double thickness);
+    double getUiLineThickness();
 
-	void setModeChangeEvent(CPVModeChangeEvent* eventMethod);
-	void setViewModeChangeEvent(CPVViewModeChangeEvent* eventMethod);
-	void setViewModeErrorEvent(CPVViewModeErrorEvent* eventMethod);
-	void setStatusMessageEvent(CGSStatusMessageEvent* eventMethod);
-	void setLogMessageEvent(CGSLogMessageEvent* eventMethod);
-	void setContinueCalcEvent(CGSContinueCalcEvent* eventMethod);
-	void setModelChangedEvent(CPVModelChangedEvent* eventMethod);
-	void setRulerChangedEvent(CPVRulerChangedEvent* eventMethod);
-	void setVisualisationModeChangedEvent(CPVVisualisationModeChangedEvent* eventMethod);
-	void setModelLoadedEvent(CPVModelLoadedEvent* eventMethod);
-	void setNewModelEvent(CPVNewModelEvent* eventMethod);
+    void setUiSymbolLength(double length);
+    double getUiSymbolLength();
+
+    // Events
+
+    void setModeChangeEvent(CPVModeChangeEvent *eventMethod);
+    void setViewModeChangeEvent(CPVViewModeChangeEvent *eventMethod);
+    void setViewModeErrorEvent(CPVViewModeErrorEvent *eventMethod);
+    void setStatusMessageEvent(CGSStatusMessageEvent *eventMethod);
+    void setLogMessageEvent(CGSLogMessageEvent *eventMethod);
+    void setContinueCalcEvent(CGSContinueCalcEvent *eventMethod);
+    void setModelChangedEvent(CPVModelChangedEvent *eventMethod);
+    void setRulerChangedEvent(CPVRulerChangedEvent *eventMethod);
+    void setVisualisationModeChangedEvent(CPVVisualisationModeChangedEvent *eventMethod);
+    void setModelLoadedEvent(CPVModelLoadedEvent *eventMethod);
+    void setNewModelEvent(CPVNewModelEvent *eventMethod);
 };
 
 class CPVModeChangeEvent {
 public:
-	virtual ~CPVModeChangeEvent() {};
-	virtual void onModeChange(CPaintView::TEditMode oldMode, CPaintView::TEditMode newMode) = 0;
+    virtual ~CPVModeChangeEvent(){};
+    virtual void onModeChange(CPaintView::TEditMode oldMode, CPaintView::TEditMode newMode) = 0;
 };
 
 class CPVViewModeChangeEvent {
 public:
-	virtual ~CPVViewModeChangeEvent() {};
-	virtual void onViewModeChange(CPaintView::TViewMode oldMode, CPaintView::TViewMode newMode) = 0;
+    virtual ~CPVViewModeChangeEvent(){};
+    virtual void onViewModeChange(CPaintView::TViewMode oldMode, CPaintView::TViewMode newMode) = 0;
 };
 
 class CPVViewModeErrorEvent {
 public:
-	virtual ~CPVViewModeErrorEvent() {};
-	virtual void onViewModeError(CPaintView::TViewMode oldMode, CPaintView::TViewMode newMode) = 0;
+    virtual ~CPVViewModeErrorEvent(){};
+    virtual void onViewModeError(CPaintView::TViewMode oldMode, CPaintView::TViewMode newMode) = 0;
 };
 
 class CPVModelChangedEvent {
 public:
-	virtual ~CPVModelChangedEvent() {};
-	virtual void onModelChanged(const std::string& newModelName) = 0;
+    virtual ~CPVModelChangedEvent(){};
+    virtual void onModelChanged(const std::string &newModelName) = 0;
 };
 
 class CPVRulerChangedEvent {
 public:
-	virtual ~CPVRulerChangedEvent() {};
-	virtual void onRulerChanged(CRuler* ruler) = 0;
+    virtual ~CPVRulerChangedEvent(){};
+    virtual void onRulerChanged(CRuler *ruler) = 0;
 };
 
 class CPVVisualisationModeChangedEvent {
 public:
-	virtual ~CPVVisualisationModeChangedEvent() {};
-	virtual void onVisualisationModeChanged(CPaintView::TVisualisationMode oldMode, CPaintView::TVisualisationMode newMode) = 0;
+    virtual ~CPVVisualisationModeChangedEvent(){};
+    virtual void onVisualisationModeChanged(CPaintView::TVisualisationMode oldMode,
+                                            CPaintView::TVisualisationMode newMode) = 0;
 };
 
 class CPVModelLoadedEvent {
 public:
-	virtual ~CPVModelLoadedEvent() {};
-	virtual void onModelLoaded() = 0;
+    virtual ~CPVModelLoadedEvent(){};
+    virtual void onModelLoaded() = 0;
 };
 
 class CPVNewModelEvent {
 public:
-	virtual ~CPVNewModelEvent() {};
-	virtual void onNewModel() = 0;
+    virtual ~CPVNewModelEvent(){};
+    virtual void onNewModel() = 0;
 };
 
-#endif 
+#endif

@@ -1,0 +1,29 @@
+# Format Style Options - Created with Clang Power Tools
+---
+AccessModifierOffset: -4
+AllowAllConstructorInitializersOnNextLine: true
+BasedOnStyle: Microsoft
+BraceWrapping: 
+  AfterCaseLabel: false
+  AfterClass: false
+  AfterControlStatement: true
+  AfterEnum: false
+  AfterFunction: true
+  AfterNamespace: false
+  AfterObjCDeclaration: false
+  AfterStruct: false
+  AfterUnion: false
+  AfterExternBlock: false
+  BeforeCatch: false
+  BeforeElse: true
+  IndentBraces: false
+  SplitEmptyFunction: false
+  SplitEmptyRecord: false
+  SplitEmptyNamespace: false
+  BeforeLambdaBody: false
+  BeforeWhile: false
+BreakBeforeBraces: Custom
+BreakConstructorInitializers: BeforeColon
+IndentWidth: 4
+SortIncludes: false
+...

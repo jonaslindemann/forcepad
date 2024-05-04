@@ -1,0 +1,12 @@
+{
+    "name": "forcepad",
+    "version": "0",
+    "dependencies":
+    [
+        "fltk",
+        "libjpeg-turbo",
+        "libpng",
+        "zlib",
+        "opengl"
+    ]
+}

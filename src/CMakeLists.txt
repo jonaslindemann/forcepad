@@ -1,3 +1,5 @@
-
-SUBDIRS(ivf2d common forcepad forcepad_kiosk calfemcxx newmat)
-#SUBDIRS(ivf2d common forcepad forcepad_kiosk qtforcepad calfemcxx newmat)
+add_subdirectory(newmat)
+add_subdirectory(calfemcxx)
+add_subdirectory(ivf2d)
+add_subdirectory(common)
+add_subdirectory(forcepad)

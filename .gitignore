@@ -5,9 +5,13 @@
 *.am
 *.in
 *.manifest
+*.dll
 build/
-build_release/
-build_debug/
+build-release/
+build-debug/
 *.lib
 /Win32
 /Win32/Debug
+win32_build_release/
+win32_build_debug/
+vcpkg_installed/
