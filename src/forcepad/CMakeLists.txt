@@ -1,6 +1,6 @@
 include_directories(../common ../ivf2d)
-file(GLOB SOURCE_FILES *.cpp)
-file(GLOB INCLUDE_FILES *.h)
+file(GLOB SOURCE_FILES CONFIGURE_DEPENDS *.cpp)
+file(GLOB INCLUDE_FILES CONFIGURE_DEPENDS *.h)
 
 file(GLOB to_remove_cpp "MainFrame2_kiosk.cpp")
 file(GLOB to_remove_h "MainFrame2_kiosk.h")
@@ -108,17 +108,28 @@ set_source_files_properties(
 	MACOSX_PACKAGE_LOCATION MacOS/kiosk
 )
 else(APPLE)
-	if (CMAKE_BUILD_TYPE STREQUAL Release)
-		add_executable(forcepad ${INCLUDE_FILES} ${SOURCE_FILES})
-	else()
-		add_executable(forcepadd ${INCLUDE_FILES} ${SOURCE_FILES})
-	endif()
+	add_executable(forcepad ${INCLUDE_FILES} ${SOURCE_FILES})
 endif(APPLE)
 
-if(CMAKE_BUILD_TYPE STREQUAL Debug)
-	target_link_libraries(forcepadd PRIVATE commond ivf2dd fltk fltk_gl fltk_forms fltk_images JPEG::JPEG PNG::PNG ZLIB::ZLIB calfemcxxd newmatd wsock32 comctl32 winmm gdiplus)
-else(CMAKE_BUILD_TYPE STREQUAL Debug)
-	target_link_libraries(forcepad common ivf2d fltk fltk_gl fltk_forms fltk_images JPEG::JPEG PNG::PNG ZLIB::ZLIB calfemcxx newmat wsock32 comctl32 winmm gdiplus)
-endif(CMAKE_BUILD_TYPE STREQUAL Debug)
+set_target_properties(forcepad PROPERTIES DEBUG_POSTFIX d)
+
+target_link_libraries(forcepad PRIVATE
+	common
+	ivf2d
+	fltk
+	fltk_gl
+	fltk_forms
+	fltk_images
+	OpenGL::GL
+	JPEG::JPEG
+	PNG::PNG
+	ZLIB::ZLIB
+	calfemcxx
+	newmat
+)
+
+if(WIN32)
+	target_link_libraries(forcepad PRIVATE wsock32 comctl32 winmm gdiplus)
+endif()
 
 #target_link_libraries(forcepad common ivf2d fltk fltk_gl fltk_images fltk_forms fltk_jpeg fltk_png calfemcxx newmat "-framework Carbon" "-framework Cocoa" "-framework ApplicationServices" "-framework AGL" "-framework OpenGL" z)

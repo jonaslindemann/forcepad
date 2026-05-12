@@ -1,6 +1,7 @@
 {
     "name": "forcepad",
     "version": "0",
+    "builtin-baseline": "5fac54d01f7fb8ed490ad91dfbe252028227221b",
     "dependencies":
     [
         "fltk",
