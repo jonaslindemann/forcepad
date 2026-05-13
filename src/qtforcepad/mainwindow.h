@@ -1,55 +1,98 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#pragma once
 
 #include <QMainWindow>
+#include "QtPaintView.h"
 
-namespace Ui {
-class MainWindow;
-}
+class QAction;
+class QToolBar;
+class QLabel;
 
-class MainWindow : public QMainWindow
+class MainWindow : public QMainWindow,
+                   public CPVModeChangeEvent,
+                   public CPVViewModeChangeEvent,
+                   public CPVModelLoadedEvent,
+                   public CPVNewModelEvent
 {
     Q_OBJECT
-    
 public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
-    
+    explicit MainWindow(QWidget *parent = nullptr);
+    virtual ~MainWindow() = default;
+
+    // CPVModeChangeEvent
+    void onModeChange(CPaintView::TEditMode oldMode, CPaintView::TEditMode newMode) override;
+
+    // CPVViewModeChangeEvent
+    void onViewModeChange(CPaintView::TViewMode oldMode, CPaintView::TViewMode newMode) override;
+
+    // CPVModelLoadedEvent
+    void onModelLoaded() override;
+
+    // CPVNewModelEvent
+    void onNewModel() override;
+
 private Q_SLOTS:
-    void on_actionOpen_triggered();
-    void on_openModelButton_clicked();
-    void on_tabWidget_currentChanged(int idx);
-
-    void on_structBrushButton_clicked();
-    void on_structEraseButton_clicked();
-    void on_structRectButton_clicked();
-    void on_structOvalButton_clicked();
-    void on_structLineButton_clicked();
-
-    void on_structSelectButton_clicked();
-    void on_structCutButton_clicked();
-    void on_structCopyButton_clicked();
-    void on_structPasteButton_clicked();
-    void on_structExpandButton_clicked();
-
-    void on_color1Button_clicked();
-    void on_color2Button_clicked();
-    void on_color3Button_clicked();
-    void on_color4Button_clicked();
-    void on_color5Button_clicked();
-    void on_color6Button_clicked();
-    void on_color7Button_clicked();
-    void on_color8Button_clicked();
-    void on_color9Button_clicked();
-    void on_color10Button_clicked();
-    void on_color11Button_clicked();
-    void on_color12Button_clicked();
-
-    void on_structBrushCombo_currentIndexChanged(int idx);
-    void on_structLineWidthCombo_currentIndexChanged(int idx);
+    void fileNew();
+    void fileOpen();
+    void fileSave();
+    void fileSaveAs();
+    void editUndo();
+    void runCalculate();
+    void runOptimise();
+    void setModeBrush();
+    void setModeErase();
+    void setModeForce();
+    void setModeConstraint();
+    void setModeConstraintVector();
+    void setModeConstraintHinge();
+    void setModeFloodFill();
+    void setModeRectangle();
+    void setModeEllipse();
+    void setModeLine();
+    void setViewSketch();
+    void setViewPhysics();
+    void setViewAction();
 
 private:
-    Ui::MainWindow *ui;
-};
+    void createActions();
+    void createMenus();
+    void createToolBars();
+    void createStatusBar();
+    void updateWindowTitle();
 
-#endif // MAINWINDOW_H
+    QtPaintView *m_paintView;
+
+    // File actions
+    QAction *m_actNew;
+    QAction *m_actOpen;
+    QAction *m_actSave;
+    QAction *m_actSaveAs;
+    QAction *m_actQuit;
+
+    // Edit actions
+    QAction *m_actUndo;
+
+    // Run actions
+    QAction *m_actCalculate;
+    QAction *m_actOptimise;
+
+    // Mode actions
+    QAction *m_actBrush;
+    QAction *m_actErase;
+    QAction *m_actForce;
+    QAction *m_actConstraint;
+    QAction *m_actConstraintVector;
+    QAction *m_actConstraintHinge;
+    QAction *m_actFloodFill;
+    QAction *m_actRectangle;
+    QAction *m_actEllipse;
+    QAction *m_actLine;
+
+    // View actions
+    QAction *m_actViewSketch;
+    QAction *m_actViewPhysics;
+    QAction *m_actViewAction;
+
+    // Status bar labels
+    QLabel *m_statusMode;
+    QLabel *m_statusModel;
+};

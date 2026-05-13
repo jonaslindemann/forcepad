@@ -25,8 +25,10 @@
 #include "PaintView.h"
 
 #include "FemGridSolver2.h"
+#ifndef USE_QT
 #include "MainFrame2.h"
 #include "LogWindow.h"
+#endif
 #include "JpegImage.h"
 #include "PngImage.h"
 
@@ -1375,6 +1377,10 @@ void CPaintView::loadBrushes()
 #endif
 	
 	brushName = brushPath+"rbrush4.rgb";	
+
+	std::cout << "Loading brushes from: " << brushPath << std::endl;
+
+	std::cout << "Loading brush: " << brushName << std::endl;
 	
 	brush = new CSgiImage();
 	brush->setFileName(brushName.c_str());
@@ -1615,12 +1621,14 @@ void CPaintView::enableDrawing()
 void CPaintView::updateModel()
 {
 	so_print("CPaintView","updateModel()");
+#ifndef USE_QT
 	if (m_mainFrame!=NULL)
 	{
 		((CMainFrame*)m_mainFrame)->setPixelWeight(m_femGrid->getPixelArea()*1e-3);
 		((CMainFrame*)m_mainFrame)->setExternalForce(m_femGrid->getPixelArea()*m_relativeForceSize*1e-3);
         this->doRedraw();
 	}
+#endif
 }
 
 void CPaintView::updateCursor()
@@ -2699,6 +2707,7 @@ void CPaintView::pasteFromWindows()
 	{ 
 		// Lock handle 
 		
+		
 		char *pData = (char *) GlobalLock(hglb); 
 		
 		if (pData==NULL)
@@ -2766,7 +2775,7 @@ void CPaintView::pasteFromWindows()
 			}
 			
 			// Copy to clipboard
-			
+						
 			m_clipboard->setCopyImageMode(CClipboard::IM_GRAYSCALE);
 			m_clipboard->copyImage(header->biWidth, header->biHeight, pPixelData);
 			
@@ -3092,13 +3101,17 @@ void CPaintView::setCommandLine(int argc, char **argv)
 
 const std::string CPaintView::getApplicationPath()
 {
-	std::string exePath = m_argv[0];
+    std::string exePath = m_argv[0];
 #ifdef WIN32
-	int lastSlash = exePath.rfind("\\");
+    int lastSlash = exePath.rfind("\\");
 #else
-	int lastSlash = exePath.rfind("/");
+    int lastSlash = exePath.rfind("/");
 #endif
-	return exePath.substr(0,lastSlash);
+    if (lastSlash == std::string::npos) {
+        // No slash found, return current directory
+        return ".";
+    }
+    return exePath.substr(0, lastSlash);
 }
 
 
@@ -3149,8 +3162,7 @@ void CPaintView::setCalcCG(bool flag)
 		m_femGrid->calcCenterOfGravity(cgx, cgy);
 		
 		m_cgIndicator->setPosition(m_drawingOffsetX+cgx, m_drawingOffsetY+cgy);
-		m_cg[0] = cgx;
-		m_cg[1] = cgy;
+        this->doRedraw();
 	}
 	else
 		m_femGrid->updatePixelArea();

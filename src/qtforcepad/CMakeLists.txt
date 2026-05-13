@@ -1,42 +1,40 @@
-include_directories(../common ../ivf2d)
+include_directories(../forcepad ../common ../ivf2d ../calfemcxx ../newmat ../defs)
 
-add_definitions(-DQT_NO_KEYWORDS)
+add_definitions(-DQT_NO_KEYWORDS -DUSE_QT)
 
-SET(qtforcepad_FORMS
-    mainwindow.ui
+set(SOURCES
+    main.cpp
+    MainWindow.cpp
+    QtPaintView.cpp
+    ../forcepad/PaintView.cpp
 )
 
-SET(qtforcepad_SOURCES
-  matlabgen.cpp
-  FemGridSolver2.cpp
-  PaintView.cpp
-  qtpaintview.cpp
-  mainwindow.cpp
-  main.cpp
+set(HEADERS
+    MainWindow.h
+    QtPaintView.h
 )
 
-SET(qtforcepad_HEADERS 
-	matlabgen.h
-	FemGridSolver2.h
-	PaintView.h
-	qtpaintview.h
-	mainwindow.h
+qt_add_executable(qtforcepad ${SOURCES} ${HEADERS})
+
+set_target_properties(qtforcepad PROPERTIES DEBUG_POSTFIX d)
+
+target_link_libraries(qtforcepad PRIVATE
+    Qt6::Core
+    Qt6::Gui
+    Qt6::Widgets
+    Qt6::OpenGL
+    Qt6::OpenGLWidgets
+    Qt6::Svg
+    common
+    ivf2d
+    calfemcxx
+    newmat
+    JPEG::JPEG
+    PNG::PNG
+    ZLIB::ZLIB
+    OpenGL::GL
 )
 
-
-
-add_executable(qtforcepad ${qtforcepad_SOURCES} qtforcepad.qrc)
-
-if(CMAKE_BUILD_TYPE STREQUAL Debug)
-if (WIN32)
-    target_link_libraries(qtforcepad Qt5::Core Qt5::Gui Qt5::Widgets Qt5::OpenGL Qt5::Svg commond ivf2dd calfemcxxd newmatd ${JPEG_LIBRARIES} ${PNG_LIBRARIES} ${ZLIB_LIBRARIES} ${RESOURCES_ADDED} winmm.lib )
-else()
-    target_link_libraries(qtforcepad Qt5::Core Qt5::Gui Qt5::Widgets Qt5::OpenGL Qt5::Svg "-framework Cocoa" "-framework ApplicationServices" "-framework AGL" "-framework OpenGL" commond ivf2dd calfemcxxd newmatd ${JPEG_LIBRARIES} ${PNG_LIBRARIES} )
+if(WIN32)
+    target_link_libraries(qtforcepad PRIVATE winmm comctl32 gdiplus)
 endif()
-else(CMAKE_BUILD_TYPE STREQUAL Debug)
-if (WIN32)
-    target_link_libraries(qtforcepad Qt5::Core Qt5::Gui Qt5::Widgets Qt5::OpenGL Qt5::Svg common ivf2d calfemcxx newmat ${JPEG_LIBRARIES} ${PNG_LIBRARIES} ${ZLIB_LIBRARIES} winmm.lib )
-else()
-    target_link_libraries(qtforcepad Qt5::Core Qt5::Gui Qt5::Widgets Qt5::OpenGL Qt5::Svg "-framework Cocoa" "-framework ApplicationServices" "-framework AGL" "-framework OpenGL" common ivf2d calfemcxx newmat ${JPEG_LIBRARIES} ${PNG_LIBRARIES} ${ZLIB_LIBRARIES} )
-endif()
-endif(CMAKE_BUILD_TYPE STREQUAL Debug)
