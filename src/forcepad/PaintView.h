@@ -471,6 +471,7 @@ public:
     bool getDrawDisplacements();
 
     void setDrawForcesAndConstraints(bool flag);
+    void setDimmedConstraints(bool flag);
 
     void setStressType(CFemGrid2::TStressType stressType);
     void setColorMap(int index);

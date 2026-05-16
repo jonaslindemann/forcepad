@@ -1,6 +1,7 @@
 INCLUDE_DIRECTORIES(../common ../ivf2d ../forcepad)
 FILE(GLOB SOURCE_FILES ../forcepad/*.cpp)
 FILE(GLOB INCLUDE_FILES ../forcepad/*.h)
+LIST(APPEND SOURCE_FILES ../common/FemGridSolver2.cpp)
 
 FILE(GLOB to_remove_cpp "../forcepad/MainFrame2.cpp")
 FILE(GLOB to_remove_h "../forcepad/MainFrame2.h")

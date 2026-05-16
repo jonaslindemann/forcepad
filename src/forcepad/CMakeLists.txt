@@ -1,6 +1,7 @@
 include_directories(../common ../ivf2d)
 file(GLOB SOURCE_FILES CONFIGURE_DEPENDS *.cpp)
 file(GLOB INCLUDE_FILES CONFIGURE_DEPENDS *.h)
+list(APPEND SOURCE_FILES ../common/FemGridSolver2.cpp)
 
 file(GLOB to_remove_cpp "MainFrame2_kiosk.cpp")
 file(GLOB to_remove_h "MainFrame2_kiosk.h")

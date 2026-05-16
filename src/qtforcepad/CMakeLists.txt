@@ -7,6 +7,7 @@ set(SOURCES
     MainWindow.cpp
     QtPaintView.cpp
     ../forcepad/PaintView.cpp
+    ../common/FemGridSolver2.cpp
 )
 
 set(HEADERS
@@ -37,4 +38,25 @@ target_link_libraries(qtforcepad PRIVATE
 
 if(WIN32)
     target_link_libraries(qtforcepad PRIVATE winmm comctl32 gdiplus)
+
+    # Copy Qt plugin subdirectories next to the executable.
+    # vcpkg's applocal.ps1 handles the Qt DLLs; we copy the plugin dirs it misses.
+    set(_vcpkg_debug   "${CMAKE_BINARY_DIR}/vcpkg_installed/x64-windows/debug")
+    set(_vcpkg_release "${CMAKE_BINARY_DIR}/vcpkg_installed/x64-windows")
+    set(_vcpkg    "$<IF:$<CONFIG:Debug>,${_vcpkg_debug},${_vcpkg_release}>")
+    set(_qt_plugins "${_vcpkg}/Qt6/plugins")
+    add_custom_command(TARGET qtforcepad POST_BUILD
+        # Plugin subdirectories (applocal.ps1 only copies top-level DLLs)
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${_qt_plugins}/platforms"
+            "$<TARGET_FILE_DIR:qtforcepad>/platforms"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${_qt_plugins}/styles"
+            "$<TARGET_FILE_DIR:qtforcepad>/styles"
+        # Qt6Svg is a direct link dep but applocal.ps1 sometimes misses it
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${_vcpkg}/bin/$<IF:$<CONFIG:Debug>,Qt6Svgd.dll,Qt6Svg.dll>"
+            "$<TARGET_FILE_DIR:qtforcepad>/"
+        COMMENT "Copying Qt plugins and missing DLLs..."
+    )
 endif()

@@ -28,6 +28,11 @@
 #ifndef USE_QT
 #include "MainFrame2.h"
 #include "LogWindow.h"
+#else
+#define so_print(a, b)  ((void)0)
+#define so_show()       ((void)0)
+#define so_println()    ((void)0)
+#define so_hide()       ((void)0)
 #endif
 #include "JpegImage.h"
 #include "PngImage.h"
@@ -186,7 +191,11 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 	m_selectionBox->setPosition(50.0, 50.0);
 	
 	CColorPtr color = new CColor();
+#ifdef USE_QT
+	color->setColor(0.0f, 0.0f, 0.0f, 1.0f);
+#else
 	color->setColor(0.0f, 0.0f, 0.0f, 0.5f);
+#endif
 	
 	m_rectangle = new CRectangle();
 	m_rectangle->setColor(color);
@@ -573,7 +582,11 @@ void CPaintView::onDrag(int x, int y)
 
 		if (m_selectedForce!=NULL)
 		{	
+#ifndef USE_QT
 			if (Fl::event_key(FL_Alt_L)||m_moveLoad)
+#else
+			if (m_moveLoad)
+#endif
 			{
 				// Update the position of the force
 
@@ -3284,6 +3297,12 @@ void CPaintView::setDrawForcesAndConstraints(bool flag)
     this->doRedraw();
 }
 
+void CPaintView::setDimmedConstraints(bool flag)
+{
+	m_femGrid->setDimmedConstraints(flag);
+    this->doRedraw();
+}
+
 
 void CPaintView::setStressType(CFemGrid2::TStressType stressType)
 {
@@ -3305,7 +3324,7 @@ void CPaintView::setColorMap(int index)
 		string filenameIndex = "";
 #ifdef WIN32
 		char cfilename[512];
-		::GetModuleFileName(NULL, cfilename, sizeof(cfilename));
+		::GetModuleFileNameA(NULL, cfilename, sizeof(cfilename));
 		string applicationExeLocation = cfilename;
 #else
 		string applicationExeLocation = this->m_argv[0];

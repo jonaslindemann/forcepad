@@ -28,7 +28,17 @@
 
 #include "FemGridSolver2.h"
 #include "matlabgen.h"
+
+#ifndef USE_QT
 #include "LogWindow.h"
+#include <FL/Fl.h>
+#else
+#include <QCoreApplication>
+#define so_print(a, b)  ((void)0)
+#define so_show()       ((void)0)
+#define so_println()    ((void)0)
+#define so_hide()       ((void)0)
+#endif
 
 #include <set>
 #include <fstream>
@@ -36,8 +46,6 @@
 #include <cmath>
 #include <climits>
 #include <ctime>
-
-#include <FL/Fl.h>
 
 CFemGridSolver2::CFemGridSolver2()
 {
@@ -85,8 +93,12 @@ CFemGridSolver2::~CFemGridSolver2()
 
 bool CFemGridSolver2::continueCalc()
 {
+#ifndef USE_QT
 	Fl::check();
 	Fl::flush();
+#else
+	QCoreApplication::processEvents();
+#endif
 	if (m_continueCalcEvent!=NULL)
 		return m_continueCalcEvent->onContinueCalc();
 	else

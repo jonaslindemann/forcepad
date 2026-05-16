@@ -22,6 +22,7 @@ QtPaintView::QtPaintView(QWidget *parent)
 {
     setMouseTracking(true);
     setFocusPolicy(Qt::StrongFocus);
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     doCreateCursors();
 }
 
@@ -52,12 +53,25 @@ void QtPaintView::initializeGL()
 void QtPaintView::paintGL()
 {
     onClear();
+
+    // m_drawing layer 0 stores alpha as a layer marker (0 = background,
+    // 128 = undo region), not as opacity.  Qt composites the QOpenGLWidget
+    // FBO over the window background using the FBO alpha channel, so any
+    // pixel with alpha < 255 would bleed through and look gray.
+    // glPixelTransfer forces every glDrawPixels call inside onDraw() to
+    // emit alpha=1.0 regardless of the stored value.
+    glPixelTransferf(GL_ALPHA_SCALE, 0.0f);
+    glPixelTransferf(GL_ALPHA_BIAS,  1.0f);
+
     onDraw();
+
+    glPixelTransferf(GL_ALPHA_SCALE, 1.0f);
+    glPixelTransferf(GL_ALPHA_BIAS,  0.0f);
 }
 
 void QtPaintView::resizeGL(int w, int h)
 {
-    onResize(w, h);
+    onInitContext();  // Recalculates drawing offset and scissor for the actual widget size
 }
 
 void QtPaintView::mousePressEvent(QMouseEvent *event)
@@ -124,11 +138,24 @@ void QtPaintView::mouseReleaseEvent(QMouseEvent *event)
 
     if (event->button() == Qt::LeftButton)
     {
-        m_leftMouseDown = false;
         if (!m_danglingRelease)
+        {
+            // Ensure the GL context is current and the FBO holds the final
+            // draw state before onRelease() calls glReadPixels to commit the
+            // geometry to the canvas image.  Qt does NOT make the context
+            // current in mouse-event handlers, so we must do it explicitly.
+            makeCurrent();
+            onClear();
+            onDraw();   // m_leftMouseDown still true → line/rect/ellipse rendered
+            m_leftMouseDown = false;
             onRelease(x, y);
+        }
         else
+        {
+            m_leftMouseDown = false;
             m_danglingRelease = false;
+        }
+        update();
     }
 }
 
