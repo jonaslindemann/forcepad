@@ -6,6 +6,9 @@ set(SOURCES
     main.cpp
     MainWindow.cpp
     QtPaintView.cpp
+    CalcSettingsDialog.cpp
+    GeneralSettingsDialog.cpp
+    AboutDialog.cpp
     ../forcepad/PaintView.cpp
     ../common/FemGridSolver2.cpp
 )
@@ -13,9 +16,17 @@ set(SOURCES
 set(HEADERS
     MainWindow.h
     QtPaintView.h
+    CalcSettingsDialog.h
+    GeneralSettingsDialog.h
+    AboutDialog.h
 )
 
 qt_add_executable(qtforcepad ${SOURCES} ${HEADERS})
+
+qt_add_resources(qtforcepad "qtforcepad_resources"
+    PREFIX "/"
+    FILES ../../images/splash.png
+)
 
 set_target_properties(qtforcepad PROPERTIES DEBUG_POSTFIX d)
 

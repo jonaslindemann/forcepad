@@ -1,5 +1,8 @@
 #include "MainWindow.h"
 #include "../common/FemGrid2.h"
+#include "CalcSettingsDialog.h"
+#include "GeneralSettingsDialog.h"
+#include "AboutDialog.h"
 
 #include <QMenuBar>
 #include <QMenu>
@@ -523,12 +526,43 @@ void MainWindow::onDisplacementScaleChanged(int value)
 }
 
 // ---------------------------------------------------------------------------
-// Legacy view slots (used by View menu)
+// Legacy view slots
 // ---------------------------------------------------------------------------
 
 void MainWindow::setViewSketch()  { m_paintView->setViewMode(CPaintView::VM_SKETCH); }
 void MainWindow::setViewPhysics() { m_paintView->setViewMode(CPaintView::VM_PHYSICS); }
 void MainWindow::setViewAction()  { m_paintView->setViewMode(CPaintView::VM_ACTION); }
+
+// ---------------------------------------------------------------------------
+// Slots — Settings menu
+// ---------------------------------------------------------------------------
+
+void MainWindow::settingsCalc()
+{
+    CalcSettingsDialog dlg(m_paintView, this);
+    dlg.exec();
+}
+
+void MainWindow::settingsGeneral()
+{
+    GeneralSettingsDialog dlg(m_paintView, this);
+    dlg.exec();
+}
+
+// ---------------------------------------------------------------------------
+// Slots — Help menu
+// ---------------------------------------------------------------------------
+
+void MainWindow::helpDocumentation()
+{
+    m_paintView->showAbout();
+}
+
+void MainWindow::helpAbout()
+{
+    AboutDialog dlg(this);
+    dlg.exec();
+}
 
 // ---------------------------------------------------------------------------
 // UI setup — actions
@@ -549,25 +583,31 @@ void MainWindow::createActions()
     m_actPaste->setEnabled(false);
     m_actCalculate = new QAction("Calculate", this);  m_actCalculate->setShortcut(Qt::Key_F5);
     m_actOptimise  = new QAction("Optimise",  this);  m_actOptimise->setShortcut(Qt::Key_F6);
+    // Keep Calculate/Optimise actions alive for keyboard shortcuts even without a menu
+    addAction(m_actCalculate);
+    addAction(m_actOptimise);
 
-    m_actViewSketch  = new QAction("Sketch",  this);
-    m_actViewPhysics = new QAction("Physics", this);
-    m_actViewAction  = new QAction("Action",  this);
+    m_actSettingsCalc    = new QAction("Calculation...", this);
+    m_actSettingsGeneral = new QAction("General...",     this);
 
-    connect(m_actNew,          &QAction::triggered, this, &MainWindow::fileNew);
-    connect(m_actOpen,         &QAction::triggered, this, &MainWindow::fileOpen);
-    connect(m_actSave,         &QAction::triggered, this, &MainWindow::fileSave);
-    connect(m_actSaveAs,       &QAction::triggered, this, &MainWindow::fileSaveAs);
-    connect(m_actQuit,         &QAction::triggered, this, &MainWindow::close);
-    connect(m_actUndo,         &QAction::triggered, this, &MainWindow::editUndo);
-    connect(m_actCopy,         &QAction::triggered, this, &MainWindow::editCopy);
-    connect(m_actCut,          &QAction::triggered, this, &MainWindow::editCut);
-    connect(m_actPaste,        &QAction::triggered, this, &MainWindow::editPaste);
-    connect(m_actCalculate,    &QAction::triggered, this, &MainWindow::runCalculate);
-    connect(m_actOptimise,     &QAction::triggered, this, &MainWindow::runOptimise);
-    connect(m_actViewSketch,   &QAction::triggered, this, &MainWindow::setViewSketch);
-    connect(m_actViewPhysics,  &QAction::triggered, this, &MainWindow::setViewPhysics);
-    connect(m_actViewAction,   &QAction::triggered, this, &MainWindow::setViewAction);
+    m_actHelpDocumentation = new QAction("Documentation", this);
+    m_actHelpAbout         = new QAction("About",         this);
+
+    connect(m_actNew,              &QAction::triggered, this, &MainWindow::fileNew);
+    connect(m_actOpen,             &QAction::triggered, this, &MainWindow::fileOpen);
+    connect(m_actSave,             &QAction::triggered, this, &MainWindow::fileSave);
+    connect(m_actSaveAs,           &QAction::triggered, this, &MainWindow::fileSaveAs);
+    connect(m_actQuit,             &QAction::triggered, this, &MainWindow::close);
+    connect(m_actUndo,             &QAction::triggered, this, &MainWindow::editUndo);
+    connect(m_actCopy,             &QAction::triggered, this, &MainWindow::editCopy);
+    connect(m_actCut,              &QAction::triggered, this, &MainWindow::editCut);
+    connect(m_actPaste,            &QAction::triggered, this, &MainWindow::editPaste);
+    connect(m_actCalculate,        &QAction::triggered, this, &MainWindow::runCalculate);
+    connect(m_actOptimise,         &QAction::triggered, this, &MainWindow::runOptimise);
+    connect(m_actSettingsCalc,     &QAction::triggered, this, &MainWindow::settingsCalc);
+    connect(m_actSettingsGeneral,  &QAction::triggered, this, &MainWindow::settingsGeneral);
+    connect(m_actHelpDocumentation,&QAction::triggered, this, &MainWindow::helpDocumentation);
+    connect(m_actHelpAbout,        &QAction::triggered, this, &MainWindow::helpAbout);
 }
 
 // ---------------------------------------------------------------------------
@@ -592,14 +632,13 @@ void MainWindow::createMenus()
     editMenu->addAction(m_actCut);
     editMenu->addAction(m_actPaste);
 
-    QMenu *runMenu = menuBar()->addMenu("Run");
-    runMenu->addAction(m_actCalculate);
-    runMenu->addAction(m_actOptimise);
+    QMenu *settingsMenu = menuBar()->addMenu("Settings");
+    settingsMenu->addAction(m_actSettingsCalc);
+    settingsMenu->addAction(m_actSettingsGeneral);
 
-    QMenu *viewMenu = menuBar()->addMenu("View");
-    viewMenu->addAction(m_actViewSketch);
-    viewMenu->addAction(m_actViewPhysics);
-    viewMenu->addAction(m_actViewAction);
+    QMenu *helpMenu = menuBar()->addMenu("Help");
+    helpMenu->addAction(m_actHelpDocumentation);
+    helpMenu->addAction(m_actHelpAbout);
 }
 
 // ---------------------------------------------------------------------------

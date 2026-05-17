@@ -51,6 +51,10 @@ private Q_SLOTS:
     void editPaste();
     void runCalculate();
     void runOptimise();
+    void settingsCalc();
+    void settingsGeneral();
+    void helpDocumentation();
+    void helpAbout();
 
     // Mode tab switching
     void onModeTabChanged(int index);
@@ -96,7 +100,7 @@ private Q_SLOTS:
     void onMisesMaxChanged(int value);
     void onDisplacementScaleChanged(int value);
 
-    // Legacy view slots (kept for View menu)
+    // Legacy view slots
     void setViewSketch();
     void setViewPhysics();
     void setViewAction();
@@ -164,14 +168,17 @@ private:
     QAction *m_actCut{nullptr};
     QAction *m_actPaste{nullptr};
 
-    // Run actions
+    // Run actions (keyboard shortcuts only — not in a menu)
     QAction *m_actCalculate{nullptr};
     QAction *m_actOptimise{nullptr};
 
-    // View actions (menu only)
-    QAction *m_actViewSketch{nullptr};
-    QAction *m_actViewPhysics{nullptr};
-    QAction *m_actViewAction{nullptr};
+    // Settings actions
+    QAction *m_actSettingsCalc{nullptr};
+    QAction *m_actSettingsGeneral{nullptr};
+
+    // Help actions
+    QAction *m_actHelpDocumentation{nullptr};
+    QAction *m_actHelpAbout{nullptr};
 
     // Sketch props
     QSlider        *m_stiffnessSlider{nullptr};
