@@ -46,17 +46,13 @@ if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
     set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS Debug Release RelWithDebInfo MinSizeRel)
 endif()
 
-option(BUILD_QT_APP "Build Qt6 version of ForcePAD" OFF)
-
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-if(BUILD_QT_APP)
-    find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets OpenGL OpenGLWidgets Svg)
-    set(CMAKE_AUTOMOC ON)
-    set(CMAKE_AUTOUIC ON)
-    set(CMAKE_AUTORCC ON)
-    message(STATUS "Qt6 version: ${Qt6_VERSION}")
-endif()
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets OpenGL OpenGLWidgets Svg)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
+message(STATUS "Qt6 version: ${Qt6_VERSION}")
 
 find_package(OpenGL REQUIRED)
 find_package(ZLIB REQUIRED)

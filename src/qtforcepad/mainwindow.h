@@ -71,11 +71,17 @@ private Q_SLOTS:
     void setModeHinge();
     void setModeCut();
     void setModeEraseForcesConstraints();
+    void toggleSelfLoad();
 
     // Action tool buttons
+    void showPrincipalStress();
     void showStress();
     void showDisplacement();
     void showStructure();
+    void setModeMoveLoad();
+    void setModeRotateLoad();
+    void toggleZoomMode();
+    void expandToWindow();
 
     // Right panel property controls
     void onStiffnessChanged(int value);
@@ -85,6 +91,10 @@ private Q_SLOTS:
     void onTransparencyChanged(int value);
     void onStepsChanged(int value);
     void onAutoScale();
+    void onStressModeChanged(int mode);
+    void onColorScaleChanged(int index);
+    void onMisesMaxChanged(int value);
+    void onDisplacementScaleChanged(int value);
 
     // Legacy view slots (kept for View menu)
     void setViewSketch();
@@ -106,6 +116,11 @@ private:
     QWidget* createSketchPropsPanel();
     QWidget* createPhysicksPropsPanel();
     QWidget* createActionPropsPanel();
+    QWidget* createPrincipalPropsWidget();
+    QWidget* createMisesPropsWidget();
+    QWidget* createDeflectionPropsWidget();
+    void setVisButton(QToolButton *active);
+    void setActionModeButton(QToolButton *active);
 
     QtPaintView *m_paintView{nullptr};
 
@@ -121,6 +136,20 @@ private:
     // Per-mode button groups (for exclusive tool selection sync)
     QButtonGroup   *m_sketchBtnGroup{nullptr};
     QButtonGroup   *m_physicksBtnGroup{nullptr};
+
+    // Action visualisation buttons (stored so slots can sync check state)
+    QToolButton    *m_btnVisPrincipal{nullptr};
+    QToolButton    *m_btnVisMises{nullptr};
+    QToolButton    *m_btnVisDisp{nullptr};
+    QToolButton    *m_btnVisStruct{nullptr};
+
+    // Physics toggle buttons
+    QToolButton    *m_btnSelfLoad{nullptr};
+
+    // Action interaction mode buttons
+    QToolButton    *m_btnMoveLoad{nullptr};
+    QToolButton    *m_btnRotateLoad{nullptr};
+    QToolButton    *m_btnZoom{nullptr};
 
     // File actions
     QAction *m_actNew{nullptr};
@@ -153,11 +182,22 @@ private:
     QDoubleSpinBox *m_forceMagnitudeSpinBox{nullptr};
     QComboBox      *m_forceDirectionCombo{nullptr};
 
-    // Action props
-    QSlider     *m_sizeSlider{nullptr};
-    QSlider     *m_transparencySlider{nullptr};
-    QSpinBox    *m_stepsSpinBox{nullptr};
-    QPushButton *m_autoScaleBtn{nullptr};
+    // Action props — stacked sub-panel
+    QStackedWidget *m_actionPropsStack{nullptr};
+
+    // Principal stress page
+    QSlider      *m_sizeSlider{nullptr};
+    QSlider      *m_transparencySlider{nullptr};
+    QSlider      *m_stepsSlider{nullptr};
+    QPushButton  *m_autoScaleBtn{nullptr};
+    QButtonGroup *m_stressModeGroup{nullptr};
+
+    // Mises page
+    QButtonGroup *m_colorScaleGroup{nullptr};
+    QSlider      *m_misesMaxSlider{nullptr};
+
+    // Deflections page
+    QSlider      *m_dispScaleSlider{nullptr};
 
     // Status bar labels
     QLabel *m_statusMode{nullptr};

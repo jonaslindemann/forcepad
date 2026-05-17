@@ -16,6 +16,8 @@ public:
     QSize minimumSizeHint() const override;
     QSize sizeHint() const override;
 
+    void reinitGL();  // Re-runs onInitContext() after canvas resize, then repaints
+
 Q_SIGNALS:
     void editModeChanged(CPaintView::TEditMode newMode);
     void viewModeChanged(CPaintView::TViewMode newMode);

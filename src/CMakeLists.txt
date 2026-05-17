@@ -4,6 +4,4 @@ add_subdirectory(ivf2d)
 add_subdirectory(common)
 add_subdirectory(forcepad)
 
-if(BUILD_QT_APP)
-    add_subdirectory(qtforcepad)
-endif()
+add_subdirectory(qtforcepad)

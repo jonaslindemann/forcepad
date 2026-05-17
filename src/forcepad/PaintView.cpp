@@ -393,7 +393,12 @@ void CPaintView::doShowHelp()
 
 void CPaintView::onMouseWheel(int dx, int dy)
 {
-	if (m_zoomResults && (m_viewMode == VM_ACTION))
+#ifndef USE_QT
+	const bool inActionView = (m_viewMode == VM_ACTION);
+#else
+	const bool inActionView = true;
+#endif
+	if (m_zoomResults && inActionView)
 	{
 		if (dy>0)
 		{

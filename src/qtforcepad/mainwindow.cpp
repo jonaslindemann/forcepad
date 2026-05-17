@@ -1,4 +1,5 @@
 #include "MainWindow.h"
+#include "../common/FemGrid2.h"
 
 #include <QMenuBar>
 #include <QMenu>
@@ -22,6 +23,7 @@
 #include <QPushButton>
 #include <QFormLayout>
 #include <QSizePolicy>
+#include <QSplitter>
 #include <QPainter>
 #include <QLinearGradient>
 #include <QIcon>
@@ -247,7 +249,12 @@ void MainWindow::onViewModeChange(CPaintView::TViewMode /*oldMode*/, CPaintView:
     }
 }
 
-void MainWindow::onModelLoaded()  { updateWindowTitle(); }
+void MainWindow::onModelLoaded()
+{
+    updateWindowTitle();
+    if (m_btnSelfLoad)
+        m_btnSelfLoad->setChecked(m_paintView->getUseWeight());
+}
 void MainWindow::onNewModel()     { updateWindowTitle(); }
 
 void MainWindow::updateWindowTitle()
@@ -307,18 +314,22 @@ void MainWindow::onModeTabChanged(int index)
     switch (index)
     {
         case 0:
+            m_paintView->setZoomResults(false);
+            if (m_btnZoom) m_btnZoom->setChecked(false);
             m_paintView->setViewMode(CPaintView::VM_SKETCH);
             m_paintView->setEditMode(CPaintView::EM_DIRECT_BRUSH);
             break;
         case 1:
+            m_paintView->setZoomResults(false);
+            if (m_btnZoom) m_btnZoom->setChecked(false);
             m_paintView->setViewMode(CPaintView::VM_PHYSICS);
             m_paintView->setEditMode(CPaintView::EM_SELECT_BOX);
             break;
         case 2:
             m_paintView->setViewMode(CPaintView::VM_PHYSICS);
             m_paintView->execute();
-            m_paintView->setVisualisationMode(CPaintView::VM_PRINCIPAL_STRESS);
-            m_paintView->update();
+            showPrincipalStress();
+            setModeRotateLoad();
             break;
     }
 }
@@ -356,32 +367,95 @@ void MainWindow::setModeEraseForcesConstraints()
     m_paintView->setEditMode(CPaintView::EM_ERASE_CONSTRAINTS_FORCES);
 }
 
+void MainWindow::toggleSelfLoad()
+{
+    m_paintView->setUseWeight(m_btnSelfLoad->isChecked());
+}
+
+// ---------------------------------------------------------------------------
+// Helpers — action visualisation
+// ---------------------------------------------------------------------------
+
+void MainWindow::setVisButton(QToolButton *active)
+{
+    for (auto *btn : {m_btnVisPrincipal, m_btnVisMises, m_btnVisDisp, m_btnVisStruct})
+        if (btn) btn->setChecked(btn == active);
+}
+
+void MainWindow::setActionModeButton(QToolButton *active)
+{
+    for (auto *btn : {m_btnMoveLoad, m_btnRotateLoad})
+        if (btn) btn->setChecked(btn == active);
+}
+
 // ---------------------------------------------------------------------------
 // Slots — action tools
 // ---------------------------------------------------------------------------
 
+void MainWindow::showPrincipalStress()
+{
+    setVisButton(m_btnVisPrincipal);
+    m_paintView->setVisualisationMode(CPaintView::VM_PRINCIPAL_STRESS);
+    if (m_actionPropsStack)
+        m_actionPropsStack->setCurrentIndex(0);
+    m_paintView->update();
+    m_paintView->repaint();
+}
+
 void MainWindow::showStress()
 {
-    m_paintView->setViewMode(CPaintView::VM_PHYSICS);
+    setVisButton(m_btnVisMises);
     m_paintView->setVisualisationMode(CPaintView::VM_MISES_STRESS);
+    if (m_actionPropsStack)
+        m_actionPropsStack->setCurrentIndex(1);
     m_paintView->update();
     m_paintView->repaint();
 }
 
 void MainWindow::showDisplacement()
 {
-    m_paintView->setViewMode(CPaintView::VM_PHYSICS);
+    setVisButton(m_btnVisDisp);
     m_paintView->setVisualisationMode(CPaintView::VM_DISPLACEMENTS);
+    if (m_actionPropsStack)
+        m_actionPropsStack->setCurrentIndex(2);
     m_paintView->update();
     m_paintView->repaint();
 }
 
 void MainWindow::showStructure()
 {
-    m_paintView->setViewMode(CPaintView::VM_PHYSICS);
+    setVisButton(m_btnVisStruct);
     m_paintView->setVisualisationMode(CPaintView::VM_STRUCTURE);
+    if (m_actionPropsStack)
+        m_actionPropsStack->setCurrentIndex(0);
     m_paintView->update();
     m_paintView->repaint();
+}
+
+void MainWindow::setModeMoveLoad()
+{
+    setActionModeButton(m_btnMoveLoad);
+    m_paintView->setEditMode(CPaintView::EM_DYNAMIC_FORCE_UPDATE);
+    m_paintView->setMoveLoad(true);
+}
+
+void MainWindow::setModeRotateLoad()
+{
+    setActionModeButton(m_btnRotateLoad);
+    m_paintView->setEditMode(CPaintView::EM_DYNAMIC_FORCE_UPDATE);
+    m_paintView->setMoveLoad(false);
+}
+
+void MainWindow::toggleZoomMode()
+{
+    const bool on = m_btnZoom->isChecked();
+    m_paintView->setZoomResults(on);
+}
+
+void MainWindow::expandToWindow()
+{
+    m_paintView->expandImageToWindow();
+    m_paintView->reinitGL();
 }
 
 // ---------------------------------------------------------------------------
@@ -421,6 +495,30 @@ void MainWindow::onStepsChanged(int value)
 void MainWindow::onAutoScale()
 {
     m_paintView->setLockScaling(false);
+    m_paintView->update();
+}
+
+void MainWindow::onStressModeChanged(int mode)
+{
+    m_paintView->setStressMode(static_cast<CFemGrid2::TStressMode>(mode));
+    m_paintView->update();
+}
+
+void MainWindow::onColorScaleChanged(int index)
+{
+    m_paintView->setColorMap(index);
+    m_paintView->update();
+}
+
+void MainWindow::onMisesMaxChanged(int value)
+{
+    m_paintView->setUpperMisesTreshold(value / 100.0);
+    m_paintView->update();
+}
+
+void MainWindow::onDisplacementScaleChanged(int value)
+{
+    m_paintView->setDisplacementScale(value / 10.0);
     m_paintView->update();
 }
 
@@ -553,13 +651,17 @@ void MainWindow::createCentralWidget()
 
     hbox->addWidget(m_leftPanel);
 
-    // --- Canvas ---
-    hbox->addWidget(m_paintView, 1);
+    // --- Splitter: canvas | right panel ---
+    auto *splitter = new QSplitter(Qt::Horizontal);
+    splitter->setHandleWidth(4);
+    splitter->setChildrenCollapsible(false);
+
+    splitter->addWidget(m_paintView);
 
     // --- Right panel ---
     m_rightPanel = new QWidget;
     m_rightPanel->setObjectName("rightPanel");
-    m_rightPanel->setFixedWidth(256);
+    m_rightPanel->setMinimumWidth(160);
 
     auto *rightVBox = new QVBoxLayout(m_rightPanel);
     rightVBox->setContentsMargins(0, 0, 0, 0);
@@ -579,7 +681,12 @@ void MainWindow::createCentralWidget()
     rightVBox->addWidget(m_rightStack);
     rightVBox->addStretch();
 
-    hbox->addWidget(m_rightPanel);
+    splitter->addWidget(m_rightPanel);
+    splitter->setStretchFactor(0, 1);
+    splitter->setStretchFactor(1, 0);
+    splitter->setSizes({1024, 256});
+
+    hbox->addWidget(splitter, 1);
 
     setCentralWidget(central);
 }
@@ -606,21 +713,23 @@ QWidget* MainWindow::createSketchToolPanel()
     auto *btnEllipse = makeSvgToolBtn("icons/ellipse.svg", "Ellipse");
     auto *btnFill = makeSvgToolBtn("icons/flood_fill.svg", "Flood Fill");
     auto *btnLine = makeSvgToolBtn("icons/line.svg", "Line");
-    auto *btnErase = makeSvgToolBtn("icons/delete_force_bc.svg", "Erase");
-
+    auto *btnErase  = makeSvgToolBtn("icons/delete_force_bc.svg", "Erase");
+    auto *btnExpand = makeSvgToolBtn("icons/expand_image.svg",    "Expand image to window");
 
     btnDraw->setChecked(true);
+    btnExpand->setCheckable(false);
 
     for (auto *b : {btnSelect, btnDraw, btnRect, btnEllipse, btnFill, btnLine, btnErase})
         m_sketchBtnGroup->addButton(b);
 
-    connect(btnSelect, &QToolButton::clicked, this, &MainWindow::setModeSelect);
-    connect(btnDraw,   &QToolButton::clicked, this, &MainWindow::setModeDrawBeam);
-    connect(btnRect,   &QToolButton::clicked, this, &MainWindow::setModeRectangle);
+    connect(btnSelect,  &QToolButton::clicked, this, &MainWindow::setModeSelect);
+    connect(btnDraw,    &QToolButton::clicked, this, &MainWindow::setModeDrawBeam);
+    connect(btnRect,    &QToolButton::clicked, this, &MainWindow::setModeRectangle);
     connect(btnEllipse, &QToolButton::clicked, this, &MainWindow::setModeEllipse);
-    connect(btnFill,   &QToolButton::clicked, this, &MainWindow::setModeFloodFill);
-    connect(btnLine,   &QToolButton::clicked, this, &MainWindow::setModeLine);
-    connect(btnErase,  &QToolButton::clicked, this, &MainWindow::setModeErase);
+    connect(btnFill,    &QToolButton::clicked, this, &MainWindow::setModeFloodFill);
+    connect(btnLine,    &QToolButton::clicked, this, &MainWindow::setModeLine);
+    connect(btnErase,   &QToolButton::clicked, this, &MainWindow::setModeErase);
+    connect(btnExpand,  &QToolButton::clicked, this, &MainWindow::expandToWindow);
 
     vbox->addWidget(btnSelect);
     vbox->addWidget(btnDraw);
@@ -631,6 +740,8 @@ QWidget* MainWindow::createSketchToolPanel()
     vbox->addWidget(btnFill);
     vbox->addWidget(makeSeparator());
     vbox->addWidget(btnErase);
+    vbox->addWidget(makeSeparator());
+    vbox->addWidget(btnExpand);
     vbox->addStretch();
 
     return panel;
@@ -656,10 +767,14 @@ QWidget* MainWindow::createPhysicksToolPanel()
     for (auto *b : {btnSelect, btnForce, btnRoller, btnDeleteForceBc})
         m_physicksBtnGroup->addButton(b);
 
+    // Self-load toggle — not part of the exclusive mode group
+    m_btnSelfLoad = makeSvgToolBtn("icons/dist_load.svg", "Self-loading (weight)");
+
     connect(btnSelect,        &QToolButton::clicked, this, &MainWindow::setModeSelect);
     connect(btnForce,         &QToolButton::clicked, this, &MainWindow::setModeForce);
     connect(btnRoller,        &QToolButton::clicked, this, &MainWindow::setModeRollerSupport);
     connect(btnDeleteForceBc, &QToolButton::clicked, this, &MainWindow::setModeEraseForcesConstraints);
+    connect(m_btnSelfLoad,    &QToolButton::clicked, this, &MainWindow::toggleSelfLoad);
 
     vbox->addWidget(btnSelect);
     vbox->addWidget(makeSeparator());
@@ -667,6 +782,8 @@ QWidget* MainWindow::createPhysicksToolPanel()
     vbox->addWidget(btnRoller);
     vbox->addWidget(makeSeparator());
     vbox->addWidget(btnDeleteForceBc);
+    vbox->addWidget(makeSeparator());
+    vbox->addWidget(m_btnSelfLoad);
     vbox->addStretch();
 
     return panel;
@@ -681,30 +798,38 @@ QWidget* MainWindow::createActionToolPanel()
     vbox->setSpacing(4);
     vbox->setAlignment(Qt::AlignHCenter | Qt::AlignTop);
 
-    auto *btnStress  = makeToolBtn("Stress",  "Show Stress");
-    auto *btnDisp    = makeToolBtn("Displacement",  "Show Displacement");
-    auto *btnStruct  = makeToolBtn("Structure",  "Show Structure");
-    auto *btnCalc    = makeToolBtn("Calc",  "Calculate (F5)");
-    auto *btnOpt     = makeToolBtn("Optimise",  "Optimise (F6)");
+    m_btnVisPrincipal = makeSvgToolBtn("icons/principal.svg", "Show Principal Stresses");
+    m_btnVisMises     = makeSvgToolBtn("icons/mises.svg",     "Show Mises Stress");
+    m_btnVisDisp      = makeSvgToolBtn("icons/deflections.svg","Show Displacement");
+    m_btnVisStruct    = makeSvgToolBtn("icons/structure.svg", "Show Structure");
+    auto *btnOpt      = makeSvgToolBtn("icons/optimisation.svg", "Optimise (F6)");
 
-    // Visualisation buttons are not exclusive with each other
-    btnStress->setCheckable(false);
-    btnDisp->setCheckable(false);
-    btnStruct->setCheckable(false);
-    btnCalc->setCheckable(false);
+    m_btnMoveLoad   = makeSvgToolBtn("icons/move_load.svg",   "Move Load");
+    m_btnRotateLoad = makeSvgToolBtn("icons/rotate_load.svg", "Rotate Load");
+    m_btnZoom       = makeSvgToolBtn("icons/zoom_mesh.svg",   "Zoom Mode (scroll wheel to zoom)");
+
+    m_btnVisPrincipal->setChecked(true);
+    m_btnRotateLoad->setChecked(true);
     btnOpt->setCheckable(false);
 
-    connect(btnStress, &QToolButton::clicked, this, &MainWindow::showStress);
-    connect(btnDisp,   &QToolButton::clicked, this, &MainWindow::showDisplacement);
-    connect(btnStruct, &QToolButton::clicked, this, &MainWindow::showStructure);
-    connect(btnCalc,   &QToolButton::clicked, this, &MainWindow::runCalculate);
-    connect(btnOpt,    &QToolButton::clicked, this, &MainWindow::runOptimise);
+    connect(m_btnVisPrincipal, &QToolButton::clicked, this, &MainWindow::showPrincipalStress);
+    connect(m_btnVisMises,     &QToolButton::clicked, this, &MainWindow::showStress);
+    connect(m_btnVisDisp,      &QToolButton::clicked, this, &MainWindow::showDisplacement);
+    connect(m_btnVisStruct,    &QToolButton::clicked, this, &MainWindow::showStructure);
+    connect(m_btnMoveLoad,     &QToolButton::clicked, this, &MainWindow::setModeMoveLoad);
+    connect(m_btnRotateLoad,   &QToolButton::clicked, this, &MainWindow::setModeRotateLoad);
+    connect(m_btnZoom,         &QToolButton::clicked, this, &MainWindow::toggleZoomMode);
+    connect(btnOpt,            &QToolButton::clicked, this, &MainWindow::runOptimise);
 
-    vbox->addWidget(btnStress);
-    vbox->addWidget(btnDisp);
-    vbox->addWidget(btnStruct);
+    vbox->addWidget(m_btnVisPrincipal);
+    vbox->addWidget(m_btnVisMises);
+    vbox->addWidget(m_btnVisDisp);
+    vbox->addWidget(m_btnVisStruct);
     vbox->addWidget(makeSeparator());
-    vbox->addWidget(btnCalc);
+    vbox->addWidget(m_btnMoveLoad);
+    vbox->addWidget(m_btnRotateLoad);
+    vbox->addWidget(m_btnZoom);
+    vbox->addWidget(makeSeparator());
     vbox->addWidget(btnOpt);
     vbox->addStretch();
 
@@ -860,35 +985,223 @@ QWidget* MainWindow::createPhysicksPropsPanel()
 
 QWidget* MainWindow::createActionPropsPanel()
 {
+    auto *container = new QWidget;
+    auto *vbox = new QVBoxLayout(container);
+    vbox->setContentsMargins(0, 0, 0, 0);
+    vbox->setSpacing(0);
+
+    m_actionPropsStack = new QStackedWidget;
+    m_actionPropsStack->addWidget(createPrincipalPropsWidget());  // index 0
+    m_actionPropsStack->addWidget(createMisesPropsWidget());      // index 1
+    m_actionPropsStack->addWidget(createDeflectionPropsWidget()); // index 2
+
+    vbox->addWidget(m_actionPropsStack);
+    return container;
+}
+
+QWidget* MainWindow::createPrincipalPropsWidget()
+{
     auto *panel = new QWidget;
-    auto *form = new QFormLayout(panel);
-    form->setContentsMargins(12, 12, 12, 12);
-    form->setSpacing(10);
-    form->setLabelAlignment(Qt::AlignLeft);
+    auto *vbox = new QVBoxLayout(panel);
+    vbox->setContentsMargins(12, 12, 12, 12);
+    vbox->setSpacing(8);
+    vbox->setAlignment(Qt::AlignTop);
 
+    auto addLabel = [&](const QString &txt) {
+        auto *lbl = new QLabel(txt);
+        lbl->setStyleSheet("color: #525252; font-size: 11px; font-weight: bold; margin-top: 4px;");
+        vbox->addWidget(lbl);
+    };
+
+    // Helper: SVG icon button styled for the light right-panel background
+    auto makePanelIconBtn = [](const QString &svgPath, const QString &tip) -> QToolButton* {
+        QPixmap px(44, 44);
+        px.fill(Qt::transparent);
+        QSvgRenderer renderer(svgPath);
+        if (renderer.isValid()) { QPainter p(&px); renderer.render(&p); }
+
+        QPixmap tinted = px.copy();
+        QPainter t(&tinted);
+        t.setCompositionMode(QPainter::CompositionMode_SourceIn);
+        t.fillRect(tinted.rect(), QColor("#2563eb"));
+        t.end();
+
+        QIcon icon;
+        icon.addPixmap(px,     QIcon::Normal, QIcon::Off);
+        icon.addPixmap(tinted, QIcon::Normal, QIcon::On);
+
+        auto *btn = new QToolButton;
+        btn->setIcon(icon);
+        btn->setIconSize(QSize(44, 44));
+        btn->setFixedHeight(44);
+        btn->setCheckable(true);
+        btn->setToolTip(tip);
+        btn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        btn->setStyleSheet(
+            "QToolButton { background: #f5f5f5; border: 1px solid #d4d4d4; border-radius: 4px; }"
+            "QToolButton:checked { background: #dbeafe; border: 2px solid #2563eb; }"
+            "QToolButton:hover:!checked { background: #e5e5e5; }");
+        return btn;
+    };
+
+    // Size: range matches FLTK rolArrowSize (0–200), default 50; slider value / 10.0
+    addLabel("Size");
     m_sizeSlider = new QSlider(Qt::Horizontal);
-    m_sizeSlider->setRange(1, 100);
-    m_sizeSlider->setValue(10);
+    m_sizeSlider->setRange(1, 2000);
+    m_sizeSlider->setValue(500);
     connect(m_sizeSlider, &QSlider::valueChanged, this, &MainWindow::onSizeChanged);
-    form->addRow("Size", m_sizeSlider);
+    vbox->addWidget(m_sizeSlider);
 
+    addLabel("Transparency");
     m_transparencySlider = new QSlider(Qt::Horizontal);
     m_transparencySlider->setRange(0, 100);
     m_transparencySlider->setValue(0);
     connect(m_transparencySlider, &QSlider::valueChanged, this, &MainWindow::onTransparencyChanged);
-    form->addRow("Transparency", m_transparencySlider);
+    vbox->addWidget(m_transparencySlider);
 
-    m_stepsSpinBox = new QSpinBox;
-    m_stepsSpinBox->setRange(1, 1000);
-    m_stepsSpinBox->setValue(1);
-    connect(m_stepsSpinBox, &QSpinBox::valueChanged, this, &MainWindow::onStepsChanged);
-    form->addRow("Steps", m_stepsSpinBox);
+    // Step: FLTK maximum is 20
+    addLabel("Step");
+    m_stepsSlider = new QSlider(Qt::Horizontal);
+    m_stepsSlider->setRange(1, 20);
+    m_stepsSlider->setValue(1);
+    connect(m_stepsSlider, &QSlider::valueChanged, this, &MainWindow::onStepsChanged);
+    vbox->addWidget(m_stepsSlider);
 
     m_autoScaleBtn = new QPushButton("Auto Scale");
     m_autoScaleBtn->setObjectName("autoScaleBtn");
     connect(m_autoScaleBtn, &QPushButton::clicked, this, &MainWindow::onAutoScale);
-    form->addRow(m_autoScaleBtn);
+    vbox->addWidget(m_autoScaleBtn);
 
+    vbox->addWidget([]{
+        auto *f = new QFrame; f->setFrameShape(QFrame::HLine);
+        f->setFixedHeight(1);
+        f->setStyleSheet("background: #e5e5e5; border: none;");
+        return f;
+    }());
+
+    addLabel("Show");
+
+    m_stressModeGroup = new QButtonGroup(this);
+    m_stressModeGroup->setExclusive(true);
+
+    auto *btnAll  = makePanelIconBtn("icons/compression_tension.svg", "Tensile & Compression");
+    auto *btnTens = makePanelIconBtn("icons/tension.svg",              "Tensile only");
+    auto *btnComp = makePanelIconBtn("icons/compression.svg",          "Compression only");
+
+    m_stressModeGroup->addButton(btnAll,  CFemGrid2::SM_ALL);
+    m_stressModeGroup->addButton(btnTens, CFemGrid2::SM_POSITIVE);
+    m_stressModeGroup->addButton(btnComp, CFemGrid2::SM_NEGATIVE);
+    btnAll->setChecked(true);
+
+    connect(m_stressModeGroup, &QButtonGroup::idClicked, this, &MainWindow::onStressModeChanged);
+
+    auto *iconRow = new QHBoxLayout;
+    iconRow->setSpacing(4);
+    iconRow->setContentsMargins(0, 0, 0, 0);
+    iconRow->addWidget(btnAll);
+    iconRow->addWidget(btnTens);
+    iconRow->addWidget(btnComp);
+    vbox->addLayout(iconRow);
+
+    vbox->addStretch();
+    return panel;
+}
+
+QWidget* MainWindow::createMisesPropsWidget()
+{
+    auto *panel = new QWidget;
+    auto *vbox = new QVBoxLayout(panel);
+    vbox->setContentsMargins(12, 12, 12, 12);
+    vbox->setSpacing(8);
+    vbox->setAlignment(Qt::AlignTop);
+
+    auto addLabel = [&](const QString &txt) {
+        auto *lbl = new QLabel(txt);
+        lbl->setStyleSheet("color: #525252; font-size: 11px; font-weight: bold; margin-top: 4px;");
+        vbox->addWidget(lbl);
+    };
+
+    addLabel("Color Scale");
+
+    m_colorScaleGroup = new QButtonGroup(this);
+    m_colorScaleGroup->setExclusive(true);
+
+    auto makePanelIconBtn2 = [](const QString &svgPath, const QString &tip) -> QToolButton* {
+        QPixmap px(44, 44);
+        px.fill(Qt::transparent);
+        QSvgRenderer renderer(svgPath);
+        if (renderer.isValid()) { QPainter p(&px); renderer.render(&p); }
+
+        QPixmap tinted = px.copy();
+        QPainter t(&tinted);
+        t.setCompositionMode(QPainter::CompositionMode_SourceIn);
+        t.fillRect(tinted.rect(), QColor("#2563eb"));
+        t.end();
+
+        QIcon icon;
+        icon.addPixmap(px,     QIcon::Normal, QIcon::Off);
+        icon.addPixmap(tinted, QIcon::Normal, QIcon::On);
+
+        auto *btn = new QToolButton;
+        btn->setIcon(icon);
+        btn->setIconSize(QSize(44, 44));
+        btn->setFixedHeight(44);
+        btn->setCheckable(true);
+        btn->setToolTip(tip);
+        btn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        btn->setStyleSheet(
+            "QToolButton { background: #f5f5f5; border: 1px solid #d4d4d4; border-radius: 4px; }"
+            "QToolButton:checked { background: #dbeafe; border: 2px solid #2563eb; }"
+            "QToolButton:hover:!checked { background: #e5e5e5; }");
+        return btn;
+    };
+
+    auto *btnSpectrum = makePanelIconBtn2("icons/rainbow.svg", "Spectrum color scale");
+    btnSpectrum->setChecked(true);
+    auto *btnHeat     = makePanelIconBtn2("icons/heat.svg",    "Heat color scale");
+
+    m_colorScaleGroup->addButton(btnSpectrum, 1);
+    m_colorScaleGroup->addButton(btnHeat,     2);
+
+    auto *colorRow = new QHBoxLayout;
+    colorRow->setSpacing(4);
+    colorRow->setContentsMargins(0, 0, 0, 0);
+    colorRow->addWidget(btnSpectrum);
+    colorRow->addWidget(btnHeat);
+    vbox->addLayout(colorRow);
+
+    connect(m_colorScaleGroup, &QButtonGroup::idClicked, this, &MainWindow::onColorScaleChanged);
+
+    addLabel("Max Value");
+    m_misesMaxSlider = new QSlider(Qt::Horizontal);
+    m_misesMaxSlider->setRange(1, 200);
+    m_misesMaxSlider->setValue(100);
+    connect(m_misesMaxSlider, &QSlider::valueChanged, this, &MainWindow::onMisesMaxChanged);
+    vbox->addWidget(m_misesMaxSlider);
+
+    vbox->addStretch();
+    return panel;
+}
+
+QWidget* MainWindow::createDeflectionPropsWidget()
+{
+    auto *panel = new QWidget;
+    auto *vbox = new QVBoxLayout(panel);
+    vbox->setContentsMargins(12, 12, 12, 12);
+    vbox->setSpacing(8);
+    vbox->setAlignment(Qt::AlignTop);
+
+    auto *lbl = new QLabel("Scale");
+    lbl->setStyleSheet("color: #525252; font-size: 11px; font-weight: bold; margin-top: 4px;");
+    vbox->addWidget(lbl);
+
+    m_dispScaleSlider = new QSlider(Qt::Horizontal);
+    m_dispScaleSlider->setRange(1, 1000);
+    m_dispScaleSlider->setValue(1);
+    connect(m_dispScaleSlider, &QSlider::valueChanged, this, &MainWindow::onDisplacementScaleChanged);
+    vbox->addWidget(m_dispScaleSlider);
+
+    vbox->addStretch();
     return panel;
 }
 
@@ -930,6 +1243,11 @@ void MainWindow::applyStyleSheet()
 
     // Left dark panel + tool buttons
     m_leftPanel->setStyleSheet("#leftPanel { background: #1a1a1a; }");
+
+    // Splitter handle
+    setStyleSheet(styleSheet() +
+        "QSplitter::handle { background: #d4d4d4; }"
+        "QSplitter::handle:hover { background: #2563eb; }");
 
     // Right panel
     m_rightPanel->setStyleSheet(

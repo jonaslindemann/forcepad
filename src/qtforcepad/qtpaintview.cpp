@@ -74,6 +74,13 @@ void QtPaintView::resizeGL(int w, int h)
     onInitContext();  // Recalculates drawing offset and scissor for the actual widget size
 }
 
+void QtPaintView::reinitGL()
+{
+    makeCurrent();
+    onInitContext();
+    update();
+}
+
 void QtPaintView::mousePressEvent(QMouseEvent *event)
 {
     int x = event->pos().x();
@@ -241,8 +248,8 @@ bool QtPaintView::doNewModel(int &w, int &h, int &initialStiffness)
     form->addRow("Height:", hSpin);
 
     QSpinBox *stiffSpin = new QSpinBox(&dlg);
-    stiffSpin->setRange(1, 255);
-    stiffSpin->setValue(128);
+    stiffSpin->setRange(0, 255);
+    stiffSpin->setValue(0);
     form->addRow("Initial stiffness:", stiffSpin);
 
     QDialogButtonBox *buttons = new QDialogButtonBox(
