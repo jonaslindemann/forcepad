@@ -25,7 +25,7 @@
 #ifndef _CFemGridSolver2_h_
 #define _CFemGridSolver2_h_
 
-#define BS_NO_ERROR			0 
+#define BS_NO_ERROR			0
 #define BS_NO_NODES			1
 #define BS_NO_ELEMENTS		2
 #define BS_NO_BC			3
@@ -35,7 +35,8 @@
 #define BS_LOAD_OUTSIDE_AE  7
 #define BS_BC_OUTSIDE_AE    8
 
-//#include "FemModel.h"
+#include <set>
+#include <vector>
 
 #include "Base.h"
 #include "FemGrid2.h"
@@ -63,7 +64,7 @@ public:
 
 IvfSmartPointer(CFemGridSolver2);
 
-/** 
+/**
  * Fem Internal solver class.
  *
  * This class is responsible for converting the FemModel class
@@ -118,10 +119,12 @@ private:
 	double m_forceMagnitude;
 	bool m_useWeight;
 
-	BandLUMatrix			m_X;
-	ColumnVector			m_a;
-	ColumnVector			m_f;
-	RowVector				m_Eq;
+	calfem::ColVec          m_a;
+	calfem::ColVec          m_f;
+	calfem::RowVec          m_Eq;
+	calfem::SpMatrix        m_K_sparse;
+	calfem::IntColVec       m_bcDofs;
+	calfem::ColVec          m_bcVals;
 	int						m_nDof;
 
 	// Optimisation parameters
@@ -153,22 +156,25 @@ public:
 	void execute_old();
 
 	/** Finite element solver for solving active/inactive elements. */
-	int assembleSystem(SymmetricBandMatrix& K);
-	int assembleSystemOpt(SymmetricBandMatrix& K, Matrix& X, Matrix& L, double penalty);
+	int assembleSystem(calfem::TripletList& Ktriplets);
+	int assembleSystemOpt(calfem::TripletList& Ktriplets, calfem::Matrix& X, calfem::Matrix& L, double penalty);
 	void setupHinges();
 	int calculateOptimalBandwidth();
-	void setupForcesAndConstraints(bool& loadsDefined, bool& bcsDefined, bool& vectorBcsDefined, std::set<int>& uniqueDofs, std::set<int>& uniqueVectorDofs, vector<CConstraint*>& vectorConstraints, RowVector& prescribedValues);
-	void assembleVectorConstraints(SymmetricBandMatrix& K, std::vector<CConstraint*>& vectorConstraints);
-	void removeDoubleDofs(std::set<int>& uniqueDofs, RowVector& prescribedValues, Matrix& Bc);
+	void setupForcesAndConstraints(bool& loadsDefined, bool& bcsDefined, bool& vectorBcsDefined,
+		std::set<int>& uniqueDofs, std::set<int>& uniqueVectorDofs,
+		std::vector<CConstraint*>& vectorConstraints, std::vector<double>& prescribedValues);
+	void assembleVectorConstraints(calfem::TripletList& Ktriplets, std::vector<CConstraint*>& vectorConstraints);
+	void removeDoubleDofs(std::set<int>& uniqueDofs, std::vector<double>& prescribedValues,
+		calfem::IntColVec& bcDofs, calfem::ColVec& bcVals);
 	void computeElementForces();
-	void computeElementForcesOpt(Matrix& X, double penalty);
+	void computeElementForcesOpt(calfem::Matrix& X, double penalty);
 	void computeReactionForces(std::vector<CConstraint*>& vectorConstraints);
 
-	void objectiveFunctionAndSensitivity(Matrix& X, Matrix& dC, Matrix& L, double penalty, double& c);
-	ReturnMatrix optimalityCriteriaUpdate(Matrix& X, Matrix& dC, Matrix& L, double volfrac, int nElements);
+	void objectiveFunctionAndSensitivity(calfem::Matrix& X, calfem::Matrix& dC, calfem::Matrix& L, double penalty, double& c);
+	calfem::Matrix optimalityCriteriaUpdate(calfem::Matrix& X, calfem::Matrix& dC, calfem::Matrix& L, double volfrac, int nElements);
 	int scaleToAbsoluteSize(int r);
-	ReturnMatrix sensitivityFilter1(Matrix& X, Matrix& dC, double rmin);
-	ReturnMatrix sensitivityFilter2(Matrix& dC, double rmin);
+	calfem::Matrix sensitivityFilter1(calfem::Matrix& X, calfem::Matrix& dC, double rmin);
+	calfem::Matrix sensitivityFilter2(calfem::Matrix& dC, double rmin);
 
 	void executeOptimizer();
 
@@ -189,7 +195,7 @@ public:
 	/** Returns error status from finite element solver. */
 	TErrorType getLastError();
 
-	/** 
+	/**
 	 * Sets element treshold for active elements.
 	 *
 	 * All element with stiffness < \c treshold will be
@@ -249,4 +255,4 @@ public:
 	void setContinueCalcEvent(CGSContinueCalcEvent* eventMethod);
 };
 
-#endif 
+#endif

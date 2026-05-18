@@ -1,4 +1,4 @@
-include_directories(../paintview ../forcepad ../common ../ivf2d ../calfemcxx ../newmat ../defs)
+include_directories(../paintview ../forcepad ../common ../ivf2d ../calfem ../defs)
 
 add_definitions(-DQT_NO_KEYWORDS -DUSE_QT)
 
@@ -39,8 +39,8 @@ target_link_libraries(qtforcepad PRIVATE
     Qt6::Svg
     common
     ivf2d
-    calfemcxx
-    newmat
+    calfem
+    Eigen3::Eigen
     JPEG::JPEG
     PNG::PNG
     ZLIB::ZLIB

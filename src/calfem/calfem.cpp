@@ -20,7 +20,7 @@
 //
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 
-#include <ofsolve/calfem.h>
+#include "calfem.h"
 
 namespace calfem {
 
@@ -443,18 +443,22 @@ void spassem(const IntRowVec &Topo, TripletList &Ktriplets, const Matrix &Ke, Co
     int i, j, r, c;
 
     for (i = 0; i < Ke.rows(); i++)
+    {
+        r = Topo(i) - 1;
+        if (r < 0) continue;
         for (j = 0; j < Ke.cols(); j++)
         {
-            r = Topo(i) - 1;
             c = Topo(j) - 1;
-
+            if (c < 0) continue;
             Ktriplets.push_back(Triplet(r, c, Ke(i, j)));
         }
+    }
 
     for (i = 0; i < fe.rows(); i++)
     {
         r = Topo(i) - 1;
-        f(r) = f(r) + fe(i);
+        if (r >= 0)
+            f(r) = f(r) + fe(i);
     }
 }
 
@@ -719,6 +723,306 @@ bool SparseSolver::recompute(const ColVec &f, ColVec &a, ColVec &Q)
     Q = (*m_K) * a - f;
 
     return true;
+}
+
+void hooke(int ptype, double E, double v, Matrix &D)
+{
+    double a;
+    switch (ptype) {
+    case 1:
+        a = E / (1.0 - pow(v, 2));
+        D.resize(3, 3);
+        D << 1.0*a, v*a,   0.0,
+             v*a,   1.0*a, 0.0,
+             0.0,   0.0,   a*(1.0-v)/2.0;
+        break;
+    case 2:
+        a = E / ((1.0+v) * (1.0-2.0*v));
+        D.resize(4, 4);
+        D << a*(1-v),   a*v,       a*v,       0.0,
+             a*v,       (1.0-v)*a, a*v,       0.0,
+             a*v,       a*v,       (1.0-v)*a, 0.0,
+             0.0,       0.0,       0.0,       a*(1.0-2.0*v)/2.0;
+        break;
+    case 3:
+        a = E / ((1.0+v) * (1.0-2.0*v));
+        D.resize(4, 4);
+        D << a*(1-v),   a*v,       a*v,       0.0,
+             a*v,       (1.0-v)*a, a*v,       0.0,
+             a*v,       a*v,       (1.0-v)*a, 0.0,
+             0.0,       0.0,       0.0,       a*(1.0-2.0*v)/2.0;
+        break;
+    case 4:
+        a = E / ((1.0+v) * (1.0-2.0*v));
+        D.resize(6, 6);
+        D << a*(1.0-v), a*v,       a*v,       0.0,                   0.0,                   0.0,
+             a*v,       a*(1.0-v), a*v,       0.0,                   0.0,                   0.0,
+             a*v,       a*v,       a*(1.0-v), 0.0,                   0.0,                   0.0,
+             0.0,       0.0,       0.0,       a*0.5*(1.0-2.0*v),     0.0,                   0.0,
+             0.0,       0.0,       0.0,       0.0,                   a*0.5*(1.0-2.0*v),     0.0,
+             0.0,       0.0,       0.0,       0.0,                   0.0,                   a*0.5*(1.0-2.0*v);
+        break;
+    default:
+        break;
+    }
+}
+
+void bar2e(const RowVec &ex, const RowVec &ey, const RowVec &ep, Matrix &Ke)
+{
+    double E = ep(0);
+    double A = ep(1);
+
+    ColVec b(2);
+    b << ex(1)-ex(0), ey(1)-ey(0);
+    double L = b.norm();
+
+    Matrix Kle(2, 2);
+    Kle << 1.0, -1.0, -1.0, 1.0;
+    Kle *= E * A / L;
+
+    RowVec n(2);
+    n = b.transpose() / L;
+
+    Matrix G(2, 4);
+    G << n(0), n(1), 0.0,  0.0,
+         0.0,  0.0,  n(0), n(1);
+
+    Ke = G.transpose() * Kle * G;
+}
+
+void bar2s(const RowVec &ex, const RowVec &ey, const RowVec &ep, const RowVec &ed, double &es)
+{
+    double E = ep(0);
+    double A = ep(1);
+
+    ColVec b(2);
+    b << ex(1)-ex(0), ey(1)-ey(0);
+    double L = b.norm();
+
+    RowVec n(2);
+    n = b.transpose() / L;
+
+    Matrix G(2, 4);
+    G << n(0), n(1), 0.0,  0.0,
+         0.0,  0.0,  n(0), n(1);
+
+    RowVec v(2);
+    v << -1.0, 1.0;
+
+    ColVec u = ed.transpose();
+    es = E * A * (v * G * u).value() / L;
+}
+
+static void buildGaussPoints(int ir, Matrix &gp, ColVec &wp)
+{
+    double g1, g2, w1, w2;
+
+    if (ir == 1) {
+        g1 = 0.0; w1 = 2.0;
+        gp.resize(1, 2);
+        gp << g1, g1;
+        wp.resize(1);
+        wp << w1 * w1;
+    } else if (ir == 2) {
+        g1 = 0.577350269189626; w1 = 1.0;
+        gp.resize(4, 2);
+        gp << -g1, -g1,
+               g1, -g1,
+              -g1,  g1,
+               g1,  g1;
+        wp.resize(4);
+        wp << w1*w1, w1*w1, w1*w1, w1*w1;
+    } else {
+        g1 = 0.774596669241483; g2 = 0.0;
+        w1 = 0.555555555555555; w2 = 0.888888888888888;
+        gp.resize(9, 2);
+        gp << -g1, -g1,  -g2, -g1,  g1, -g1,
+              -g1,  g2,   g2,  g2,  g1,  g2,
+              -g1,  g1,   g2,  g1,  g1,  g1;
+        double ww[9] = {w1*w1, w2*w1, w1*w1,
+                        w1*w2, w2*w2, w1*w2,
+                        w1*w1, w2*w1, w1*w1};
+        wp = Eigen::Map<ColVec>(ww, 9);
+    }
+}
+
+void plani4e(const RowVec &ex, const RowVec &ey, const RowVec &ep, const Matrix &D,
+             const RowVec &eq, Matrix &Ke, ColVec &fe)
+{
+    int ptype = (int)ep(0);
+    double t  = ep(1);
+    int ir    = (int)ep(2);
+    int ngp   = ir * ir;
+
+    Matrix gp;
+    ColVec wp;
+    buildGaussPoints(ir, gp, wp);
+
+    ColVec xsi = gp.col(0);
+    ColVec eta = gp.col(1);
+
+    Matrix N(ngp, 4);
+    N.col(0) = ((1.0 - xsi.array()) * (1.0 - eta.array())).matrix() / 4.0;
+    N.col(1) = ((1.0 + xsi.array()) * (1.0 - eta.array())).matrix() / 4.0;
+    N.col(2) = ((1.0 + xsi.array()) * (1.0 + eta.array())).matrix() / 4.0;
+    N.col(3) = ((1.0 - xsi.array()) * (1.0 + eta.array())).matrix() / 4.0;
+
+    int r2 = ngp * 2;
+    Matrix dNr(r2, 4);
+    dNr.setZero();
+
+    for (int ip = 0; ip < ngp; ip++) {
+        dNr(2*ip,   0) = -(1.0 - eta(ip)) / 4.0;
+        dNr(2*ip,   1) =  (1.0 - eta(ip)) / 4.0;
+        dNr(2*ip,   2) =  (1.0 + eta(ip)) / 4.0;
+        dNr(2*ip,   3) = -(1.0 + eta(ip)) / 4.0;
+        dNr(2*ip+1, 0) = -(1.0 - xsi(ip)) / 4.0;
+        dNr(2*ip+1, 1) = -(1.0 + xsi(ip)) / 4.0;
+        dNr(2*ip+1, 2) =  (1.0 + xsi(ip)) / 4.0;
+        dNr(2*ip+1, 3) =  (1.0 - xsi(ip)) / 4.0;
+    }
+
+    Matrix exey(4, 2);
+    exey.col(0) = ex.transpose();
+    exey.col(1) = ey.transpose();
+    Matrix JT = dNr * exey;
+
+    Matrix Dm;
+    if (ptype == 1) {
+        if (D.cols() > 3) {
+            Matrix Cm = D.inverse();
+            Dm.resize(3, 3);
+            Dm << Cm(0,0), Cm(0,1), Cm(0,3),
+                  Cm(1,0), Cm(1,1), Cm(1,3),
+                  Cm(3,0), Cm(3,1), Cm(3,3);
+            Dm = Dm.inverse();
+        } else {
+            Dm = D;
+        }
+    } else {
+        Dm = D;
+    }
+
+    Ke.resize(8, 8);
+    Ke.setZero();
+    fe.resize(8);
+    fe.setZero();
+
+    RowVec b = eq;
+
+    for (int ip = 0; ip < ngp; ip++) {
+        Matrix J(2, 2);
+        J.row(0) = JT.row(2*ip);
+        J.row(1) = JT.row(2*ip+1);
+
+        double detJ = J.determinant();
+        Matrix Jinv = J.inverse();
+
+        Matrix dNx_loc(2, 4);
+        dNx_loc.row(0) = dNr.row(2*ip);
+        dNx_loc.row(1) = dNr.row(2*ip+1);
+        Matrix dNx = Jinv * dNx_loc;
+
+        Matrix B(3, 8);
+        B << dNx(0,0), 0.0,       dNx(0,1), 0.0,       dNx(0,2), 0.0,       dNx(0,3), 0.0,
+             0.0,       dNx(1,0), 0.0,       dNx(1,1), 0.0,       dNx(1,2), 0.0,       dNx(1,3),
+             dNx(1,0), dNx(0,0), dNx(1,1), dNx(0,1), dNx(1,2), dNx(0,2), dNx(1,3), dNx(0,3);
+
+        Matrix N2(2, 8);
+        N2 << N(ip,0), 0.0,     N(ip,1), 0.0,     N(ip,2), 0.0,     N(ip,3), 0.0,
+              0.0,     N(ip,0), 0.0,     N(ip,1), 0.0,     N(ip,2), 0.0,     N(ip,3);
+
+        Ke += B.transpose() * Dm * B * detJ * wp(ip) * t;
+        fe += N2.transpose() * b.transpose() * detJ * wp(ip) * t;
+    }
+}
+
+void plani4s(const RowVec &ex, const RowVec &ey, const RowVec &ep, const Matrix &D,
+             const RowVec &ed, Matrix &es, Matrix &et)
+{
+    int ptype = (int)ep(0);
+    int ir    = (int)ep(2);
+    int ngp   = ir * ir;
+
+    Matrix gp;
+    ColVec wp;
+    buildGaussPoints(ir, gp, wp);
+
+    ColVec xsi = gp.col(0);
+    ColVec eta = gp.col(1);
+
+    int r2 = ngp * 2;
+    Matrix dNr(r2, 4);
+    dNr.setZero();
+
+    for (int ip = 0; ip < ngp; ip++) {
+        dNr(2*ip,   0) = -(1.0 - eta(ip)) / 4.0;
+        dNr(2*ip,   1) =  (1.0 - eta(ip)) / 4.0;
+        dNr(2*ip,   2) =  (1.0 + eta(ip)) / 4.0;
+        dNr(2*ip,   3) = -(1.0 + eta(ip)) / 4.0;
+        dNr(2*ip+1, 0) = -(1.0 - xsi(ip)) / 4.0;
+        dNr(2*ip+1, 1) = -(1.0 + xsi(ip)) / 4.0;
+        dNr(2*ip+1, 2) =  (1.0 + xsi(ip)) / 4.0;
+        dNr(2*ip+1, 3) =  (1.0 - xsi(ip)) / 4.0;
+    }
+
+    Matrix exey(4, 2);
+    exey.col(0) = ex.transpose();
+    exey.col(1) = ey.transpose();
+    Matrix JT = dNr * exey;
+
+    Matrix Dm;
+    if (ptype == 1) {
+        if (D.cols() > 3) {
+            Matrix Cm = D.inverse();
+            Dm.resize(3, 3);
+            Dm << Cm(0,0), Cm(0,1), Cm(0,3),
+                  Cm(1,0), Cm(1,1), Cm(1,3),
+                  Cm(3,0), Cm(3,1), Cm(3,3);
+            Dm = Dm.inverse();
+        } else {
+            Dm = D;
+        }
+    } else {
+        Dm = D;
+    }
+
+    es.resize(ngp, Dm.rows());
+    et.resize(ngp, Dm.rows());
+
+    for (int ip = 0; ip < ngp; ip++) {
+        Matrix J(2, 2);
+        J.row(0) = JT.row(2*ip);
+        J.row(1) = JT.row(2*ip+1);
+
+        Matrix Jinv = J.inverse();
+
+        Matrix dNx_loc(2, 4);
+        dNx_loc.row(0) = dNr.row(2*ip);
+        dNx_loc.row(1) = dNr.row(2*ip+1);
+        Matrix dNx = Jinv * dNx_loc;
+
+        Matrix B(3, 8);
+        B << dNx(0,0), 0.0,       dNx(0,1), 0.0,       dNx(0,2), 0.0,       dNx(0,3), 0.0,
+             0.0,       dNx(1,0), 0.0,       dNx(1,1), 0.0,       dNx(1,2), 0.0,       dNx(1,3),
+             dNx(1,0), dNx(0,0), dNx(1,1), dNx(0,1), dNx(1,2), dNx(0,2), dNx(1,3), dNx(0,3);
+
+        et.row(ip) = (B * ed.transpose()).transpose();
+        es.row(ip) = (Dm * et.row(ip).transpose()).transpose();
+    }
+}
+
+void writeMatrix(const std::string &name, Matrix &m, std::ostream &out)
+{
+    out << name << " = [";
+    for (int i = 0; i < m.rows(); i++) {
+        for (int j = 0; j < m.cols(); j++) {
+            out << m(i, j);
+            if (j < m.cols()-1) out << " ";
+        }
+        if (i < m.rows()-1) out << "; ";
+    }
+    out << "];\n";
 }
 
 } // namespace calfem

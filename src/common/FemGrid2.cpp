@@ -2494,19 +2494,19 @@ bool CFemGrid2::getShowDensity()
 }
 
 
-void CFemGrid2::assignNonElements(Matrix& M, double value)
+void CFemGrid2::assignNonElements(Eigen::MatrixXd& M, double value)
 {
 	int rows, cols, i, j;
 
 	this->getGridSize(rows, cols);
 
-	if ((M.ncols() == cols)&&(M.nrows() == rows))
+	if ((M.cols() == cols)&&(M.rows() == rows))
 	{
 		for (i=0; i<rows; i++)
 			for (j=0; j<cols; j++)
 			{
 				if (this->getGridValue(i,j)<m_elementTreshold)
-					M(i+1,j+1) = value;
+					M(i,j) = value;
 			}
 	}
 }

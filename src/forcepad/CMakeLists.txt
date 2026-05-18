@@ -15,6 +15,12 @@ file(GLOB to_remove_h "TabletToolbar_kiosk.h")
 list(REMOVE_ITEM SOURCE_FILES ${to_remove_cpp})
 list(REMOVE_ITEM INCLUDE_FILES ${to_remove_h})
 
+# Exclude legacy FemGridSolver (replaced by FemGridSolver2 in common/)
+file(GLOB _remove_femsolver "FemGridSolver.cpp")
+file(GLOB _remove_femsolver_h "FemGridSolver.h")
+list(REMOVE_ITEM SOURCE_FILES ${_remove_femsolver})
+list(REMOVE_ITEM INCLUDE_FILES ${_remove_femsolver_h})
+
 #if(CMAKE_BUILD_TYPE STREQUAL Debug)
 #	add_executable(forcepadd ${INCLUDE_FILES} ${SOURCE_FILES})
 #else(CMAKE_BUILD_TYPE STREQUAL Debug)
@@ -127,8 +133,8 @@ target_link_libraries(forcepad PRIVATE
 	JPEG::JPEG
 	PNG::PNG
 	ZLIB::ZLIB
-	calfemcxx
-	newmat
+	calfem
+	Eigen3::Eigen
 )
 
 if(WIN32)

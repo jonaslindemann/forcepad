@@ -23,6 +23,7 @@
 //
 
 #ifdef WIN32
+#define NOMINMAX
 #include <windows.h>
 #endif
 
@@ -66,6 +67,7 @@ CFemGridSolver2::CFemGridSolver2()
 	m_ptype = 1;
 	m_constraintStiffnessScale = 1e6;
 	m_reduceSystemMatrix = false;
+	m_nDof = 0;
 
 	// Optimisation parameters
 
@@ -73,7 +75,6 @@ CFemGridSolver2::CFemGridSolver2()
 	m_optVolfrac = 0.5;
 	m_optMinChange = 0.01;
 	m_optMaxLoops = 100;
-	//m_optRmin = 2.75;
 	m_optRmin = 1.75;
 	m_filterType = FT_SHARP_CONTOURING;
 	m_scaleToAbsoluteSize = true;
@@ -146,802 +147,14 @@ double CFemGridSolver2::getMaxNodeValue()
 
 void CFemGridSolver2::execute_old()
 {
-	int i, j, l;
-	int rows, cols;
-	double elementValue;
-	double ex[4];
-	double ey[4];
-	int topo[8];
-
-	int maxBandwidth;
-	int bwLeftRight;
-	int bwBottomTop;
-
-#ifdef WIN32
-	DWORD startTime = timeGetTime();
-#endif
-    
-	//
-	// Reset error status
-	//
-
-	m_errorStatus = CFemGridSolver2::ET_NO_ERROR;
-
-	//
-	// Apply hinge constraints directly to stiffness grid
-	//
-
-	CConstraint* pointConstraint = m_femGrid->getFirstPointConstraint();
-
-	while (pointConstraint!=NULL) 
-	{
-		switch (pointConstraint->getConstraintType()) {
-		case CConstraint::CT_HINGE:
-			double x, y;
-			double x1, y1, x2, y2;
-			double oldValue;
-			double scaleFactor;
-			scaleFactor = 0.1;
-			pointConstraint->getPosition(x, y);
-			pointConstraint->getHingeStart(x1, y1);
-			pointConstraint->getHingeEnd(x2, y2);
-			oldValue = m_femGrid->getStiffness(x, y);
-			m_femGrid->setStiffnessLine(x1, y1, x2, y2, 0.0, (double)m_femGrid->getStride()*0.2);
-			m_femGrid->setStiffness(x, y, oldValue*scaleFactor, 0, false);
-			break;
-		default:
-			break;
-		}
-
-		pointConstraint = m_femGrid->getNextPointConstraint();
-	}
-
-	//
-	// Calculate optimum bandwidth
-	//
-
-	m_femGrid->getGridSize(rows, cols);
-
-	logMessage("CFemGridSolver2","Enumerating dofs and calculating bandwidth.");
-
-	m_femGrid->resetDofs();
-	m_nDof =  m_femGrid->enumerateDofs(ED_LEFT_RIGHT);
-	bwLeftRight = m_femGrid->getBandwidth()-1;
-
-	m_femGrid->resetDofs();
-	m_nDof =  m_femGrid->enumerateDofs(ED_BOTTOM_TOP);
-	bwBottomTop = m_femGrid->getBandwidth()-1;
-
-	if (bwLeftRight<bwBottomTop)
-	{
-		m_femGrid->resetDofs();
-		m_nDof = m_femGrid->enumerateDofs(ED_LEFT_RIGHT);
-		maxBandwidth = bwLeftRight;
-	}
-	else
-		maxBandwidth = bwBottomTop;
-
-    //so_print("CFemGridSolver2",so_format("Total dofs = %d",m_nDof));
-    //so_print("CFemGridSolver2",so_format("Bandwidth  = %d",maxBandwidth));
-	
-	if (m_nDof==0)
-	{
-		m_errorStatus = ET_NO_ELEMENTS;
-		return;
-	}
-
-	//
-	// Setup system matrices
-	//
-
-	SymmetricBandMatrix K(m_nDof,maxBandwidth);
-	K = 0.0;
-
-	this->progressMessage("Assembling system matrix.", 20);
-
-	ColumnVector fsys;
-	ColumnVector gdof;
-	ColumnVector ldof;
-	ColumnVector GlobalA;
-
-	double E = m_elasticModulus;
-	double v = m_youngsModulus;
-	double t = m_thickness;
-	int ptype = m_ptype;    // Plane stress
-	int ir = 2; // Integration rule
-	int elementsWithWeight = 0;
-	int nElements;
-
-	RowVector Ex(4);
-	RowVector Ey(4);
-	m_Eq.ReSize(2);
-	m_Eq = 0.0;
-	if (m_useWeight)
-		m_Eq(2)=-1.0;
-	else
-		m_Eq(2)=0.0;
-
-	RowVector Ep(3);
-	Ep << ptype << t << ir;
-	Matrix Ke(8,8);
-	ColumnVector fe(8);
-	m_f.ReSize(m_nDof,1);
-	m_f = 0.0;
-	RowVector DofTopo(8);
-	Matrix D;
-
-	// 
-	// Setup matrices for MATLAB output
-	//
-
-	Matrix Ex_out;
-	Matrix Ey_out;
-	Matrix Topo_out;
-
-	if (m_outputMatlab)
-	{
-		nElements = m_femGrid->getElementCount();
-		Ex_out.ReSize(nElements, 4);
-		Ey_out.ReSize(nElements, 4);
-		Topo_out.ReSize(nElements, 8);
-	}
-
-	//
-	// Setup variables for assemblation
-	//
-
-	nElements = 0;
-	m_minX = 1e300;
-	m_maxX = -1e300;
-	m_minY = 1e300;
-	m_maxY = -1e300;
-
-	///////////////////////////////////////////////////////////////////////////
-	//
-	// Element assemblation
-	//
-	///////////////////////////////////////////////////////////////////////////
-
-    clock_t t0 = clock();
-    
-	for (i=0; i<rows; i++)
-	{
-		for (j=0; j<cols; j++)
-		{
-			if (m_femGrid->getElement(i, j, elementValue, ex, ey, topo))
-			{
-				//
-				// Get element coordinates
-				//
-
-				Ex(1) = ex[0]; Ey(1) = ey[0];
-				Ex(2) = ex[1]; Ey(2) = ey[1];
-				Ex(3) = ex[2]; Ey(3) = ey[2];
-				Ex(4) = ex[3]; Ey(4) = ey[3];
-
-				//
-				// Determine the size of the model
-				//
-
-				if (Ex.Maximum()>m_maxX)
-					m_maxX = Ex.Maximum();
-				if (Ex.Minimum()<m_minX)
-					m_minX = Ex.Minimum();
-
-				if (Ey.Maximum()>m_maxY)
-					m_maxY = Ey.Maximum();
-				if (Ey.Minimum()<m_minY)
-					m_minY = Ey.Minimum();
-				//
-				// Store element coordinates
-				//
-
-				if (m_outputMatlab)
-				{
-					Ex_out(nElements+1, 1) = Ex(1);
-					Ex_out(nElements+1, 2) = Ex(2);
-					Ex_out(nElements+1, 3) = Ex(3);
-					Ex_out(nElements+1, 4) = Ex(4);
-
-					Ey_out(nElements+1, 1) = Ey(1);
-					Ey_out(nElements+1, 2) = Ey(2);
-					Ey_out(nElements+1, 3) = Ey(3);
-					Ey_out(nElements+1, 4) = Ey(4);
-				}
-
-				// 
-				// Get element properties
-				//
-				
-				calfem::hooke(ptype, E*(double)elementValue*m_stiffnessScalefactor, v, D);
-
-				// 
-				// Get element topology
-				//
-				
-				for (l=0; l<8; l++)
-				{
-					DofTopo(l+1) = topo[l];
-
-					if (m_outputMatlab)
-						Topo_out(nElements+1,l+1) = topo[l];
-				}
-
-				// 
-				// Create element matrix
-				//
-				
-				calfem::plani4e(Ex, Ey, Ep, D, m_Eq, Ke, fe);
-
-				//
-				// Assemble element matrix
-				//
-				
-				calfem::assem(DofTopo, K, Ke, m_f, fe);
-				nElements++;
-
-				//
-				// Add to total weight
-				//
-
-				elementsWithWeight++;
-			}
-		}
-	}
-    clock_t t1 = clock();
-    clock_t dt = t1-t0;
-    
-    std::cout << "Element assemblage = " << dt << " tics." << std::endl;
-
-	//
-	// If no elements where assembled something was wrong return 
-	// with error.
-	//
-
-	if (nElements==0)
-	{
-		m_errorStatus = ET_NO_ELEMENTS;
-		return;
-	}
-
-	//
-	// Export Ex, Ey, and Topo matrices to MATLAB m-file
-	//
-
-	if (m_outputMatlab)
-	{
-		using namespace std;
-		
-		fstream cf;
-
-		cf.open("calfem.m", ios::out);
-
-		calfem::writeMatrix("Ex", Ex_out, cf);
-		calfem::writeMatrix("Ey", Ey_out, cf);
-		calfem::writeMatrix("Topo", Topo_out, cf);
-
-		cf.close();
-	}
-
-    //so_print("CFemGridSolver2",so_format("%d elements assembled.",nElements));
-	//cout << "Model size" << endl;
-	//cout << "\t x,max = " << m_maxX << endl;
-	//cout << "\t x,min = " << m_minX << endl;
-	//cout << "\t y,max = " << m_maxY << endl;
-	//cout << "\t y,min = " << m_minY << endl;
-
-	///////////////////////////////////////////////////////////////////////////
-	//
-	// Setup forces and constraints
-	//
-	///////////////////////////////////////////////////////////////////////////
-
-	//
-	// Scale load vector for body weight
-	//
-
-	if (m_useWeight)
-	{
-		so_print("CFemGridSolver2","Applying weight.");
-		
-		double Fsum = 0.0;
-		
-		for (i=2; i<=m_nDof; i+=2)
-			Fsum+=m_f(i);
-		
-		for (i=2; i<=m_nDof; i+=2)
-			m_f(i) = -m_weight*m_f(i)/Fsum;
-	}
-
-	//
-	// Setup load vector
-	//
-
-	so_print("CFemGridSolver2","Defining load vector.");
-	progressMessage("Defining load vector.", 30);
-
-	bool loadsDefined = false;
-	double x, y;
-	double vx, vy;
-	double value;
-	int dofs[2];
-
-	m_femGrid->clearPoints();
-
-	if ((m_femGrid->getPointLoadSize()==0)&&(m_Eq(1)==0.0)&&(m_Eq(2)==0.0))
-	{
-		m_errorStatus = ET_NO_LOADS;
-		return;
-	}
-
-	CForce* pointLoad = m_femGrid->getFirstPointLoad();
-
-	while (pointLoad!=NULL) 
-	{
-		pointLoad->getPosition(x, y);
-		value = pointLoad->getValue();
-		pointLoad->getDirection(vx, vy);
-		m_femGrid->getNearestDofs((int)x, (int)y, dofs);
-
-		if (dofs[0]>0)
-		{
-            //so_print("CFemGridSolver2",so_format("\tLoad found at [ %g, %g ], dofs = [ %d, %d ]",x, y, dofs[0], dofs[1]));
-
-			m_f(dofs[0]) += vx*value*m_forceMagnitude;
-			m_f(dofs[1]) += vy*value*m_forceMagnitude;
-
-			loadsDefined = true;
-		}
-		
-		pointLoad = m_femGrid->getNextPointLoad();
-	}
-
-	if ((m_Eq(1)!=0.0)||(m_Eq(2)!=0.0))
-		loadsDefined = true;
-
-	//
-	// If no loads have been defined return with an error.
-	//
-
-	if (!loadsDefined)
-	{
-		m_errorStatus = ET_LOAD_OUTSIDE_AE;
-		return;
-	}
-
-	//
-	// Define constraints
-	//
-
-	so_print("CFemGridSolver2","Defining constraints.");
-	progressMessage("Setting up boundary conditions.", 40);
-
-	if (m_femGrid->getPointConstraintsSize()==0)
-	{
-		m_errorStatus = ET_NO_BCS;
-		return;
-	}
-
-	pointConstraint = m_femGrid->getFirstPointConstraint();
-
-	set<int> uniqueDofs;
-	set<int> uniqueVectorDofs;
-	set<int>::iterator si;
-
-	vector<CConstraint*> vectorConstraints;
-	vector<CConstraint*>::iterator vci;
-
-	double* prescribedValues = new double[m_nDof+1];
-	bool bcsDefined = false;
-	bool vectorBcsDefined = false;
-	
-	while (pointConstraint!=NULL) 
-	{
-		pointConstraint->getPosition(x, y);
-		m_femGrid->getNearestDofs((int)x, (int)y, dofs);
-
-		if (dofs[0]>0)
-		{
-            //so_print("CFemGridSolver2",so_format("\tConstraint found at [ %g, %g ], dofs = [ %d, %d ]",x, y, dofs[0], dofs[1]));
-
-			switch (pointConstraint->getConstraintType()) {
-			case CConstraint::CT_XY:
-				uniqueDofs.insert(dofs[0]);
-				uniqueDofs.insert(dofs[1]);
-				prescribedValues[dofs[0]] = 0.0;
-				prescribedValues[dofs[1]] = 0.0;
-				bcsDefined = true;
-				break;
-			case CConstraint::CT_X:
-				uniqueDofs.insert(dofs[0]);
-				prescribedValues[dofs[0]] = 0.0;
-				bcsDefined = true;
-				break;
-			case CConstraint::CT_Y:
-				uniqueDofs.insert(dofs[1]);
-				prescribedValues[dofs[1]] = 0.0;
-				bcsDefined = true;
-				break;
-			case CConstraint::CT_VECTOR:
-				uniqueVectorDofs.insert(dofs[0]);
-				uniqueVectorDofs.insert(dofs[1]);
-				si = uniqueVectorDofs.find(dofs[0]);
-				if (si != uniqueVectorDofs.end())
-					vectorConstraints.push_back(pointConstraint);
-				vectorBcsDefined = true;
-				break;
-			default:
-				break;
-			}
-		}
-			
-		pointConstraint = m_femGrid->getNextPointConstraint();
-	}
-
-	if ((!bcsDefined)&&(!vectorBcsDefined))
-	{
-		m_errorStatus = ET_BC_OUTSIDE_AE;
-		return;
-	}
-
-	//
-	// Assemble Vector Constraints
-	//
-
-	if (vectorBcsDefined)
-	{
-		double x1, y1, x2, y2, ex, ey;
-		RowVector BarEx(2);
-		RowVector BarEy(2);
-		RowVector BarEp(2);
-		Matrix BarKe(4,4);
-		RowVector BarDofTopo(4);
-
-		BarEp << E << m_constraintStiffnessScale;
-
-		for (vci=vectorConstraints.begin(); vci!=vectorConstraints.end(); vci++)
-		{
-			CConstraint* constraint = *vci;
-			constraint->getPosition(x2, y2);
-			m_femGrid->getNearestDofs((int)x2, (int)y2, dofs);
-
-			constraint->getDirection(ex, ey);
-
-			x1 = x2 - ex;
-			y1 = y2 - ey;
-
-			BarEx << x1 << x2;
-			BarEy << y1 << y2;
-			BarDofTopo << -1.0 << -1.0 << dofs[0] << dofs[1];
-
-			calfem::bar2e(BarEx, BarEy, BarEp, BarKe);
-			calfem::assem(BarDofTopo, K, BarKe);
-		}
-	}
-
-	// 
-	// Remove doubly defined dofs
-	//
-
-	so_print("CFemGridSolver2","\tUnique dofs:\n");
-
-	Matrix Bc(uniqueDofs.size(),2);
-	Bc = 0.0;
-	int bcCount = 1;
-
-	for (si=uniqueDofs.begin(); si!=uniqueDofs.end(); si++)
-	{
-		int dof = (*si);
-        //so_print("CFemGridSolver2",so_format("\t%d",dof));
-		
-		Bc(bcCount,1) = dof;
-		Bc(bcCount,2) = prescribedValues[dof];
-		bcCount++;
-	}
-
-	delete [] prescribedValues;
-	uniqueDofs.clear();
-
-	// Variables used when a reduced system matrix is needed.
-
-	RowVector Idx(m_nDof);
-	Idx = 0.0;
-
-	SymmetricBandMatrix Ksys;
-
-
-	///////////////////////////////////////////////////////////////////////////
-	//
-	// Solve system
-	//
-	///////////////////////////////////////////////////////////////////////////
-
-	m_a.ReSize(m_nDof,1);
-	m_a = 0.0;
-
-	so_print("CFemGridSolver2","Solving system.");
-	progressMessage("Solving.", 60);
-
-	Try 
-	{
-		m_X = K; // LU decomposition
-		m_a = m_X.i() * m_f;
-	}
-	CatchAll 
-	{
-		m_errorStatus = ET_INVALID_MODEL;
-		return;
-	}
-
-	so_print("CFemGridSolver2","Done.");
-
-	//
-	// Create global displacement vector
-	//
-
-	so_print("CFemGridSolver2","\tCreating global displacement vector.");
-
-	progressMessage("Storing results.", 80);
-
-	m_maxNodeValue = -1.0e300;
-
-	m_femGrid->setDisplacementSize(m_nDof);
-
-	for (i=1; i<=K.Nrows(); i++)
-	{
-		m_femGrid->setDisplacement(i, m_a(i));
-		if (fabs(m_a(i))>m_maxNodeValue)
-			m_maxNodeValue = fabs(m_a(i));
-	}
-
-	///////////////////////////////////////////////////////////////////////////
-	//
-	// Store element forces in elements
-	//
-	///////////////////////////////////////////////////////////////////////////
-	
-	so_print("CFemGridSolver2","Calculating results.");
-
-	RowVector Ed(8);
-	Matrix Es; 
-	Matrix Et; 
-	Ed = 0.0;
-	m_maxStressValue = -1.0e300;
-	m_maxMisesStressValue = -1.0e300;
-	m_maxPosStressValue = -1.0e300;
-	m_maxNegStressValue = -1.0e300;
-
-	so_print("CFemGridSolver2:","\tCalculating element forces.");
-
-	m_femGrid->zeroNodeResults();
-
-	for (i=0; i<rows; i++)
-	{
-		for (j=0; j<cols; j++)
-		{
-			double sigx;
-			double sigy;
-			double tau;
-
-			if (m_femGrid->getElement(i, j, elementValue, ex, ey, topo))
-			{
-				//
-				// Get element coordinates
-				//
-
-				Ex(1) = ex[0]; Ey(1) = ey[0];
-				Ex(2) = ex[1]; Ey(2) = ey[1];
-				Ex(3) = ex[2]; Ey(3) = ey[2];
-				Ex(4) = ex[3]; Ey(4) = ey[3];
-				
-				// 
-				// Get element properties
-				//
-				
-				calfem::hooke(ptype, E*(double)elementValue*m_stiffnessScalefactor, v, D);
-
-				// 
-				// Get element topology
-				//
-				
-				for (l=0; l<8; l++)
-					DofTopo(l+1) = topo[l];
-
-				//
-				// Get element displacements
-				//
-				
-				for (l=1; l<=8; l++)
-					if (m_reduceSystemMatrix)
-						Ed(l) = GlobalA(DofTopo(l));
-					else
-						Ed(l) = m_a(DofTopo(l));
-
-
-				// 
-				// Calculate element forces 
-				//
-				
-				calfem::plani4s(Ex, Ey, Ep, D, Ed, Es, Et);
-
-				// 
-				// Calculate mises stresses for the integration points and store in 
-				// nodes.
-				//
-
-				//cout << "Ex = " << Ex(1) << ", " << Ex(2) << ", " << Ex(3) << ", " << Ex(4) << endl;
-				//cout << "Ey = " << Ey(1) << ", " << Ey(2) << ", " << Ey(3) << ", " << Ey(4) << endl;
-
-				int ip;
-
-				double ipStress[4];
-
-				for (ip=1; ip<=4; ip++)
-				{
-					sigx=Es(ip,1);
-					sigy=Es(ip,2);
-					tau=Es(ip,3);
-
-					double ds = (sigx-sigy)/2.0;
-					double R = sqrt(pow(ds,2)+pow(tau,2));						
-
-					double sig1 = (sigx+sigy)/2.0+R; 
-					double sig2 = (sigx+sigy)/2.0-R; 
-
-					ipStress[ip-1] = sqrt( pow(sig1,2) - sig1*sig2 + pow(sig2,2) );
-				}
-
-				//     i,j+1    i+1,j+1
-				//     o-----o
-				//     |     |
-				//     |     |
-				//     o-----o
-				//     i,j    i,j+1
-
-				m_femGrid->addNodeResult(i,j,ipStress[0]);
-				m_femGrid->addNodeResult(i,j+1,ipStress[1]);
-				m_femGrid->addNodeResult(i+1,j+1,ipStress[2]);
-				m_femGrid->addNodeResult(i,j+1,ipStress[3]);
-
-				//
-				// Average stresses from integration points. Is this correct?? CHECK!
-				//
-
-				RowVector Es_avg = Es.sum_columns() / 4.0;
-				
-				//
-				// Calculate principal stresses
-				//
-
-				sigx=Es_avg(1);
-				sigy=Es_avg(2);
-				tau=Es_avg(3);
-
-				double ds = (sigx-sigy)/2.0;
-				double R = sqrt(pow(ds,2)+pow(tau,2));						
-
-				double sig1 = (sigx+sigy)/2.0+R; 
-				double sig2 = (sigx+sigy)/2.0-R; 
-				double alfa = atan2(tau,ds)/2.0;
-
-				double misesStress = sqrt(	pow(sig1,2) - sig1*sig2 + pow(sig2,2) );
-
-				m_femGrid->setResult(i, j, 0, sig1);
-				m_femGrid->setResult(i, j, 1, sig2);
-				m_femGrid->setResult(i, j, 2, alfa);
-				m_femGrid->setResult(i, j, 3, misesStress);
-
-				if (misesStress>m_maxMisesStressValue)
-					m_maxMisesStressValue = misesStress;
-				
-				if (fabs(sig1)>m_maxStressValue)
-					m_maxStressValue = fabs(sig1);
-				
-				if (fabs(sig2)>m_maxStressValue)
-					m_maxStressValue = fabs(sig2);
-				
-				if (sig1<0.0)
-					if (fabs(sig1)>m_maxNegStressValue)
-						m_maxNegStressValue = fabs(sig1);
-					
-				if (sig1>0.0)
-					if (fabs(sig1)>m_maxPosStressValue)
-						m_maxPosStressValue = sig1;
-						
-				if (sig2<0.0)
-					if (fabs(sig2)>m_maxNegStressValue)
-						m_maxNegStressValue = fabs(sig2);
-							
-				if (sig2>0.0)
-					if (fabs(sig2)>m_maxPosStressValue)
-						m_maxPosStressValue = sig2;
-			}
-		}
-	}
-
-	m_femGrid->averageNodeResults();
-
-	cout << "Max misses stress = " << m_maxMisesStressValue << endl;
-
-	///////////////////////////////////////////////////////////////////////////
-	//
-	// Calculate reaction forces from vector constraints
-	//
-	///////////////////////////////////////////////////////////////////////////
-
-	if (vectorBcsDefined)
-	{
-		double x1, y1, x2, y2, ex, ey, es;
-		RowVector BarEx(2);
-		RowVector BarEy(2);
-		RowVector BarEp(2);
-		RowVector BarEd(4);
-
-		double maxReactionForce = -1e300;
-
-		BarEp << E << m_constraintStiffnessScale;
-
-		for (vci=vectorConstraints.begin(); vci!=vectorConstraints.end(); vci++)
-		{
-			CConstraint* constraint = *vci;
-			constraint->getPosition(x2, y2);
-			m_femGrid->getNearestDofs((int)x2, (int)y2, dofs);
-
-			constraint->getDirection(ex, ey);
-
-			x1 = x2 - ex;
-			y1 = y2 - ey;
-
-			BarEx << x1 << x2;
-			BarEy << y1 << y2;
-			BarEd << 0.0 << 0.0 << m_a(dofs[0]) << m_a(dofs[1]) ;
-
-			calfem::bar2s(BarEx, BarEy, BarEp, BarEd, es);
-
-			if (fabs(es)>maxReactionForce)
-				maxReactionForce = fabs(es);
-
-			constraint->getReactionForce()->setValue(es);
-		}
-
-		for (vci=vectorConstraints.begin(); vci!=vectorConstraints.end(); vci++)
-		{
-			CConstraint* constraint = *vci;
-
-			double force = 100.0 * constraint->getReactionForce()->getValue()/maxReactionForce;
-			constraint->getReactionForce()->setLength(-force);
-		}
-	}
-
-	//
-	// Store max stress in FEM model
-	//
-
-	m_femGrid->setMaxStressValue(m_maxStressValue);
-	m_femGrid->setMaxPosStressValue(m_maxPosStressValue);
-	m_femGrid->setMaxNegStressValue(m_maxNegStressValue);
-	m_femGrid->setMaxNodeValue(m_maxNodeValue);
-	m_femGrid->setMaxMisesStressValue(m_maxMisesStressValue);
-
-#ifdef WIN32
-	DWORD endTime = timeGetTime();
-	cout << "Total execution time (ms) = " << endTime - startTime << endl;
-#endif
-
-	progressMessage("Finished.", 99);
-	progressMessage("Finished.", 0);
-
+	// Deprecated: use execute() instead.
 }
 
 void CFemGridSolver2::setupHinges()
 {
-	//
-	// Apply hinge constraints directly to stiffness grid
-	//
-
 	CConstraint* pointConstraint = m_femGrid->getFirstPointConstraint();
 
-	while (pointConstraint!=NULL) 
+	while (pointConstraint!=NULL)
 	{
 		switch (pointConstraint->getConstraintType()) {
 		case CConstraint::CT_HINGE:
@@ -967,24 +180,18 @@ void CFemGridSolver2::setupHinges()
 
 int CFemGridSolver2::calculateOptimalBandwidth()
 {
-	//
-	// Calculate optimum bandwidth
-	//
-
 	int rows, cols;
 	int bwLeftRight, bwBottomTop;
 	int maxBandwidth;
 
 	m_femGrid->getGridSize(rows, cols);
 
-	//logMessage("CFemGridSolver2","Enumerating dofs and calculating bandwidth.");
-
 	m_femGrid->resetDofs();
-	m_nDof =  m_femGrid->enumerateDofs(ED_LEFT_RIGHT);
+	m_nDof = m_femGrid->enumerateDofs(ED_LEFT_RIGHT);
 	bwLeftRight = m_femGrid->getBandwidth()-1;
 
 	m_femGrid->resetDofs();
-	m_nDof =  m_femGrid->enumerateDofs(ED_BOTTOM_TOP);
+	m_nDof = m_femGrid->enumerateDofs(ED_BOTTOM_TOP);
 	bwBottomTop = m_femGrid->getBandwidth()-1;
 
 	if (bwLeftRight<bwBottomTop)
@@ -996,21 +203,17 @@ int CFemGridSolver2::calculateOptimalBandwidth()
 	else
 		maxBandwidth = bwBottomTop;
 
-	//so_print("CFemGridSolver2",so_format("Total dofs = %d",m_nDof));
-	//so_print("CFemGridSolver2",so_format("Bandwidth  = %d",maxBandwidth));
-
 	return maxBandwidth;
 }
 
-int CFemGridSolver2::assembleSystem(SymmetricBandMatrix& K)
+int CFemGridSolver2::assembleSystem(calfem::TripletList& Ktriplets)
 {
 	int i, j, l;
 	int rows, cols;
 	int topo[8];
-	int ptype = m_ptype;    // Plane stress
-	int ir = 2; // Integration rule
-	int elementsWithWeight = 0;
-	int nElements;
+	int ptype = m_ptype;
+	int ir = 2;
+	int nElements = 0;
 
 	double elementValue;
 	double ex[4];
@@ -1019,34 +222,23 @@ int CFemGridSolver2::assembleSystem(SymmetricBandMatrix& K)
 	double v = m_youngsModulus;
 	double t = m_thickness;
 
-	RowVector Ep(3);
-	RowVector Ex(4);
-	RowVector Ey(4);
-	RowVector DofTopo(8);
+	calfem::RowVec Ep(3);
+	calfem::RowVec Ex(4);
+	calfem::RowVec Ey(4);
+	calfem::IntRowVec DofTopo(8);
+	calfem::ColVec fe(8);
+	calfem::Matrix Ke(8,8);
+	calfem::Matrix D;
 
-	ColumnVector fe(8);
-
-	Matrix Ke(8,8);
-	Matrix D;
-
-	m_Eq.ReSize(2);
-	m_Eq = 0.0;
+	m_Eq = calfem::RowVec::Zero(2);
 	if (m_useWeight)
-		m_Eq(2)=-1.0;
-	else
-		m_Eq(2)=0.0;
+		m_Eq(1) = -1.0;
 
-	Ep << ptype << t << ir;
-	m_f.ReSize(m_nDof,1);
-	m_f = 0.0;
+	Ep << ptype, t, ir;
+	m_f = calfem::ColVec::Zero(m_nDof);
 
 	m_femGrid->getGridSize(rows, cols);
 
-	//
-	// Setup variables for assemblation
-	//
-
-	nElements = 0;
 	m_minX = 1e300;
 	m_maxX = -1e300;
 	m_minY = 1e300;
@@ -1058,60 +250,22 @@ int CFemGridSolver2::assembleSystem(SymmetricBandMatrix& K)
 		{
 			if (m_femGrid->getElement(i, j, elementValue, ex, ey, topo))
 			{
-				//
-				// Get element coordinates
-				//
+				Ex << ex[0], ex[1], ex[2], ex[3];
+				Ey << ey[0], ey[1], ey[2], ey[3];
 
-				Ex(1) = ex[0]; Ey(1) = ey[0];
-				Ex(2) = ex[1]; Ey(2) = ey[1];
-				Ex(3) = ex[2]; Ey(3) = ey[2];
-				Ex(4) = ex[3]; Ey(4) = ey[3];
+				if (Ex.maxCoeff()>m_maxX) m_maxX = Ex.maxCoeff();
+				if (Ex.minCoeff()<m_minX) m_minX = Ex.minCoeff();
+				if (Ey.maxCoeff()>m_maxY) m_maxY = Ey.maxCoeff();
+				if (Ey.minCoeff()<m_minY) m_minY = Ey.minCoeff();
 
-				//
-				// Determine the size of the model
-				//
-
-				if (Ex.Maximum()>m_maxX)
-					m_maxX = Ex.Maximum();
-				if (Ex.Minimum()<m_minX)
-					m_minX = Ex.Minimum();
-
-				if (Ey.Maximum()>m_maxY)
-					m_maxY = Ey.Maximum();
-				if (Ey.Minimum()<m_minY)
-					m_minY = Ey.Minimum();
-
-				// 
-				// Get element properties
-				//
-				
 				calfem::hooke(ptype, E*(double)elementValue*m_stiffnessScalefactor, v, D);
 
-				// 
-				// Get element topology
-				//
-				
 				for (l=0; l<8; l++)
-					DofTopo(l+1) = topo[l];
+					DofTopo(l) = topo[l];
 
-				// 
-				// Create element matrix
-				//
-				
 				calfem::plani4e(Ex, Ey, Ep, D, m_Eq, Ke, fe);
-
-				//
-				// Assemble element matrix
-				//
-				
-				calfem::assem(DofTopo, K, Ke, m_f, fe);
+				calfem::spassem(DofTopo, Ktriplets, Ke, m_f, fe);
 				nElements++;
-
-				//
-				// Add to total weight
-				//
-
-				elementsWithWeight++;
 			}
 		}
 	}
@@ -1119,15 +273,14 @@ int CFemGridSolver2::assembleSystem(SymmetricBandMatrix& K)
 	return nElements;
 }
 
-int CFemGridSolver2::assembleSystemOpt(SymmetricBandMatrix& K, Matrix& X, Matrix& L, double penalty)
+int CFemGridSolver2::assembleSystemOpt(calfem::TripletList& Ktriplets, calfem::Matrix& X, calfem::Matrix& L, double penalty)
 {
 	int i, j, l;
 	int rows, cols;
 	int topo[8];
-	int ptype = m_ptype;    // Plane stress
-	int ir = 2; // Integration rule
-	int elementsWithWeight = 0;
-	int nElements;
+	int ptype = m_ptype;
+	int ir = 2;
+	int nElements = 0;
 
 	double elementValue;
 	double ex[4];
@@ -1136,34 +289,23 @@ int CFemGridSolver2::assembleSystemOpt(SymmetricBandMatrix& K, Matrix& X, Matrix
 	double v = m_youngsModulus;
 	double t = m_thickness;
 
-	RowVector Ep(3);
-	RowVector Ex(4);
-	RowVector Ey(4);
-	RowVector DofTopo(8);
+	calfem::RowVec Ep(3);
+	calfem::RowVec Ex(4);
+	calfem::RowVec Ey(4);
+	calfem::IntRowVec DofTopo(8);
+	calfem::ColVec fe(8);
+	calfem::Matrix Ke(8,8);
+	calfem::Matrix D;
 
-	ColumnVector fe(8);
-
-	Matrix Ke(8,8);
-	Matrix D;
-
-	m_Eq.ReSize(2);
-	m_Eq = 0.0;
+	m_Eq = calfem::RowVec::Zero(2);
 	if (m_useWeight)
-		m_Eq(2)=-1.0;
-	else
-		m_Eq(2)=0.0;
+		m_Eq(1) = -1.0;
 
-	Ep << ptype << t << ir;
-	m_f.ReSize(m_nDof,1);
-	m_f = 0.0;
+	Ep << ptype, t, ir;
+	m_f = calfem::ColVec::Zero(m_nDof);
 
 	m_femGrid->getGridSize(rows, cols);
 
-	//
-	// Setup variables for assemblation
-	//
-
-	nElements = 0;
 	m_minX = 1e300;
 	m_maxX = -1e300;
 	m_minY = 1e300;
@@ -1175,68 +317,27 @@ int CFemGridSolver2::assembleSystemOpt(SymmetricBandMatrix& K, Matrix& X, Matrix
 		{
 			if (m_femGrid->getElement(i, j, elementValue, ex, ey, topo))
 			{
-				//
-				// Get element coordinates
-				//
+				Ex << ex[0], ex[1], ex[2], ex[3];
+				Ey << ey[0], ey[1], ey[2], ey[3];
 
-				Ex(1) = ex[0]; Ey(1) = ey[0];
-				Ex(2) = ex[1]; Ey(2) = ey[1];
-				Ex(3) = ex[2]; Ey(3) = ey[2];
-				Ex(4) = ex[3]; Ey(4) = ey[3];
-
-				//
-				// Determine the size of the model
-				//
-
-				if (Ex.Maximum()>m_maxX)
-					m_maxX = Ex.Maximum();
-				if (Ex.Minimum()<m_minX)
-					m_minX = Ex.Minimum();
-
-				if (Ey.Maximum()>m_maxY)
-					m_maxY = Ey.Maximum();
-				if (Ey.Minimum()<m_minY)
-					m_minY = Ey.Minimum();
-
-				// 
-				// Get element properties
-				//
-
+				if (Ex.maxCoeff()>m_maxX) m_maxX = Ex.maxCoeff();
+				if (Ex.minCoeff()<m_minX) m_minX = Ex.minCoeff();
+				if (Ey.maxCoeff()>m_maxY) m_maxY = Ey.maxCoeff();
+				if (Ey.minCoeff()<m_minY) m_minY = Ey.minCoeff();
 
 				calfem::hooke(ptype, E, v, D);
-				//calfem::hooke(ptype, pow(E*X(i,j),penalty), v, D);
 
-				// 
-				// Get element topology
-				//
-				
 				for (l=0; l<8; l++)
-					DofTopo(l+1) = topo[l];
+					DofTopo(l) = topo[l];
 
-				// 
-				// Create element matrix
-				//
-				
-				Ke = 0.0;
+				Ke.setZero();
 				calfem::plani4e(Ex, Ey, Ep, D, m_Eq, Ke, fe);
 
-				// Only apply density of L<1.0 
+				if (L(i,j)<1.0)
+					Ke = Ke * pow(X(i,j), penalty);
 
-				if (L(i+1,j+1)<1.0)
-					Ke = Ke * pow(X(i+1,j+1),penalty);
-				
-				//
-				// Assemble element matrix
-				//
-				
-				calfem::assem(DofTopo, K, Ke, m_f, fe);
+				calfem::spassem(DofTopo, Ktriplets, Ke, m_f, fe);
 				nElements++;
-
-				//
-				// Add to total weight
-				//
-
-				elementsWithWeight++;
 			}
 		}
 	}
@@ -1244,12 +345,10 @@ int CFemGridSolver2::assembleSystemOpt(SymmetricBandMatrix& K, Matrix& X, Matrix
 	return nElements;
 }
 
-void CFemGridSolver2::setupForcesAndConstraints(bool& loadsDefined, bool& bcsDefined, bool& vectorBcsDefined, std::set<int>& uniqueDofs, std::set<int>& uniqueVectorDofs, vector<CConstraint*>& vectorConstraints, RowVector& prescribedValues)
+void CFemGridSolver2::setupForcesAndConstraints(bool& loadsDefined, bool& bcsDefined, bool& vectorBcsDefined,
+	std::set<int>& uniqueDofs, std::set<int>& uniqueVectorDofs,
+	std::vector<CConstraint*>& vectorConstraints, std::vector<double>& prescribedValues)
 {
-	//
-	// Scale load vector for body weight
-	//
-
 	int i;
 	int dofs[2];
 	double x, y;
@@ -1260,29 +359,20 @@ void CFemGridSolver2::setupForcesAndConstraints(bool& loadsDefined, bool& bcsDef
 
 	if (m_useWeight)
 	{
-		//so_print("CFemGridSolver2","Applying weight.");
-		
 		double Fsum = 0.0;
-		
-		for (i=2; i<=m_nDof; i+=2)
-			Fsum+=m_f(i);
-		
-		for (i=2; i<=m_nDof; i+=2)
+		for (i=1; i<m_nDof; i+=2)
+			Fsum += m_f(i);
+		for (i=1; i<m_nDof; i+=2)
 			m_f(i) = -m_weight*m_f(i)/Fsum;
 	}
 
-	//
-	// Setup load vector
-	//
-
-	//so_print("CFemGridSolver2","Defining load vector.");
 	progressMessage("Defining load vector.", 30);
 
 	m_femGrid->clearPoints();
 
 	CForce* pointLoad = m_femGrid->getFirstPointLoad();
 
-	while (pointLoad!=NULL) 
+	while (pointLoad!=NULL)
 	{
 		pointLoad->getPosition(x, y);
 		value = pointLoad->getValue();
@@ -1291,98 +381,85 @@ void CFemGridSolver2::setupForcesAndConstraints(bool& loadsDefined, bool& bcsDef
 
 		if (dofs[0]>0)
 		{
-			//so_print("CFemGridSolver2",so_format("\tLoad found at [ %g, %g ], dofs = [ %d, %d ]",x, y, dofs[0], dofs[1]));
-
-			m_f(dofs[0]) += vx*value*m_forceMagnitude;
-			m_f(dofs[1]) += vy*value*m_forceMagnitude;
-
+			m_f(dofs[0]-1) += vx*value*m_forceMagnitude;
+			m_f(dofs[1]-1) += vy*value*m_forceMagnitude;
 			loadsDefined = true;
 		}
-		
+
 		pointLoad = m_femGrid->getNextPointLoad();
 	}
 
-	if ((m_Eq(1)!=0.0)||(m_Eq(2)!=0.0))
+	if ((m_Eq(0)!=0.0)||(m_Eq(1)!=0.0))
 		loadsDefined = true;
 
-	//
-	// Define constraints
-	//
-
-	//so_print("CFemGridSolver2","Defining constraints.");
 	progressMessage("Setting up boundary conditions.", 40);
 
 	CConstraint* pointConstraint = m_femGrid->getFirstPointConstraint();
 
-	set<int>::iterator si;
-
-	vector<CConstraint*>::iterator vci;
-
-	prescribedValues.ReSize(m_nDof);
+	prescribedValues.assign(m_nDof, 0.0);
 
 	bcsDefined = false;
 	vectorBcsDefined = false;
-	
-	while (pointConstraint!=NULL) 
+
+	while (pointConstraint!=NULL)
 	{
 		pointConstraint->getPosition(x, y);
 		m_femGrid->getNearestDofs((int)x, (int)y, dofs);
 
 		if (dofs[0]>0)
 		{
-			//so_print("CFemGridSolver2",so_format("\tConstraint found at [ %g, %g ], dofs = [ %d, %d ]",x, y, dofs[0], dofs[1]));
-
 			switch (pointConstraint->getConstraintType()) {
 			case CConstraint::CT_XY:
 				uniqueDofs.insert(dofs[0]);
 				uniqueDofs.insert(dofs[1]);
-				prescribedValues(dofs[0]) = 0.0;
-				prescribedValues(dofs[1]) = 0.0;
+				prescribedValues[dofs[0]-1] = 0.0;
+				prescribedValues[dofs[1]-1] = 0.0;
 				bcsDefined = true;
 				break;
 			case CConstraint::CT_X:
 				uniqueDofs.insert(dofs[0]);
-				prescribedValues(dofs[0]) = 0.0;
+				prescribedValues[dofs[0]-1] = 0.0;
 				bcsDefined = true;
 				break;
 			case CConstraint::CT_Y:
 				uniqueDofs.insert(dofs[1]);
-				prescribedValues(dofs[1]) = 0.0;
+				prescribedValues[dofs[1]-1] = 0.0;
 				bcsDefined = true;
 				break;
 			case CConstraint::CT_VECTOR:
 				uniqueVectorDofs.insert(dofs[0]);
 				uniqueVectorDofs.insert(dofs[1]);
-				si = uniqueVectorDofs.find(dofs[0]);
-				if (si != uniqueVectorDofs.end())
-					vectorConstraints.push_back(pointConstraint);
+				{
+					auto si = uniqueVectorDofs.find(dofs[0]);
+					if (si != uniqueVectorDofs.end())
+						vectorConstraints.push_back(pointConstraint);
+				}
 				vectorBcsDefined = true;
 				break;
 			default:
 				break;
 			}
 		}
-			
+
 		pointConstraint = m_femGrid->getNextPointConstraint();
 	}
 }
 
-void CFemGridSolver2::assembleVectorConstraints(SymmetricBandMatrix& K, std::vector<CConstraint*>& vectorConstraints)
+void CFemGridSolver2::assembleVectorConstraints(calfem::TripletList& Ktriplets, std::vector<CConstraint*>& vectorConstraints)
 {
 	int dofs[2];
 	double x1, y1, x2, y2, ex, ey;
 	double E = m_elasticModulus;
-	RowVector BarEx(2);
-	RowVector BarEy(2);
-	RowVector BarEp(2);
-	RowVector BarDofTopo(4);
-	Matrix BarKe(4,4);
+	calfem::RowVec BarEx(2);
+	calfem::RowVec BarEy(2);
+	calfem::RowVec BarEp(2);
+	calfem::IntRowVec BarDofTopo(4);
+	calfem::Matrix BarKe(4,4);
+	calfem::ColVec zero_fe = calfem::ColVec::Zero(4);
 
-	BarEp << E << m_constraintStiffnessScale;
+	BarEp << E, m_constraintStiffnessScale;
 
-	vector<CConstraint*>::iterator vci;
-
-	for (vci=vectorConstraints.begin(); vci!=vectorConstraints.end(); vci++)
+	for (auto vci=vectorConstraints.begin(); vci!=vectorConstraints.end(); vci++)
 	{
 		CConstraint* constraint = *vci;
 		constraint->getPosition(x2, y2);
@@ -1393,35 +470,28 @@ void CFemGridSolver2::assembleVectorConstraints(SymmetricBandMatrix& K, std::vec
 		x1 = x2 - ex;
 		y1 = y2 - ey;
 
-		BarEx << x1 << x2;
-		BarEy << y1 << y2;
-		BarDofTopo << -1.0 << -1.0 << dofs[0] << dofs[1];
+		BarEx << x1, x2;
+		BarEy << y1, y2;
+		BarDofTopo << -1, -1, dofs[0], dofs[1];
 
 		calfem::bar2e(BarEx, BarEy, BarEp, BarKe);
-		calfem::assem(BarDofTopo, K, BarKe);
+		calfem::spassem(BarDofTopo, Ktriplets, BarKe, m_f, zero_fe);
 	}
 }
 
-void CFemGridSolver2::removeDoubleDofs(set<int>& uniqueDofs, RowVector& prescribedValues, Matrix& Bc)
+void CFemGridSolver2::removeDoubleDofs(std::set<int>& uniqueDofs, std::vector<double>& prescribedValues,
+	calfem::IntColVec& bcDofs, calfem::ColVec& bcVals)
 {
-	// 
-	// Remove doubly defined dofs
-	//
+	int n = (int)uniqueDofs.size();
+	bcDofs.resize(n);
+	bcVals.resize(n);
+	int k = 0;
 
-	//so_print("CFemGridSolver2","\tUnique dofs:\n");
-
-	Bc = 0.0;
-	int bcCount = 1;
-	set<int>::iterator si;
-
-	for (si=uniqueDofs.begin(); si!=uniqueDofs.end(); si++)
+	for (auto dof : uniqueDofs)
 	{
-		int dof = (*si);
-		//so_print("CFemGridSolver2",so_format("\t%d",dof));
-		
-		Bc(bcCount,1) = dof;
-		Bc(bcCount,2) = prescribedValues(dof);
-		bcCount++;
+		bcDofs(k) = dof;                    // 1-based DOF number
+		bcVals(k) = prescribedValues[dof-1]; // 0-based vector access
+		k++;
 	}
 
 	uniqueDofs.clear();
@@ -1429,42 +499,37 @@ void CFemGridSolver2::removeDoubleDofs(set<int>& uniqueDofs, RowVector& prescrib
 
 void CFemGridSolver2::computeElementForces()
 {
-	//so_print("CFemGridSolver2","Calculating results.");
-
 	int i, j, l;
 	int rows, cols;
 	double elementValue;
 	double ex[4];
 	double ey[4];
 	int topo[8];
-	int ptype = m_ptype;    // Plane stress
-	int ir = 2; // Integration rule
+	int ptype = m_ptype;
+	int ir = 2;
 
 	double E = m_elasticModulus;
 	double v = m_youngsModulus;
 	double t = m_thickness;
 
-	RowVector Ep(3);
-	RowVector Ex(4);
-	RowVector Ey(4);
-	RowVector DofTopo(8);
+	calfem::RowVec Ep(3);
+	calfem::RowVec Ex(4);
+	calfem::RowVec Ey(4);
+	calfem::IntRowVec DofTopo(8);
+	calfem::RowVec Ed(8);
+	calfem::Matrix Es;
+	calfem::Matrix Et;
+	calfem::Matrix D;
 
-	Ep << ptype << t << ir;
+	Ep << ptype, t, ir;
 
 	m_femGrid->getGridSize(rows, cols);
 
-	RowVector Ed(8);
-	Matrix Es; 
-	Matrix Et; 
-	Matrix D;
-
-	Ed = 0.0;
+	Ed.setZero();
 	m_maxStressValue = -1.0e300;
 	m_maxMisesStressValue = -1.0e300;
 	m_maxPosStressValue = -1.0e300;
 	m_maxNegStressValue = -1.0e300;
-
-	//so_print("CFemGridSolver2:","\tCalculating element forces.");
 
 	m_femGrid->zeroNodeResults();
 
@@ -1472,138 +537,73 @@ void CFemGridSolver2::computeElementForces()
 	{
 		for (j=0; j<cols; j++)
 		{
-			double sigx;
-			double sigy;
-			double tau;
+			double sigx, sigy, tau;
 
 			if (m_femGrid->getElement(i, j, elementValue, ex, ey, topo))
 			{
-				//
-				// Get element coordinates
-				//
+				Ex << ex[0], ex[1], ex[2], ex[3];
+				Ey << ey[0], ey[1], ey[2], ey[3];
 
-				Ex(1) = ex[0]; Ey(1) = ey[0];
-				Ex(2) = ex[1]; Ey(2) = ey[1];
-				Ex(3) = ex[2]; Ey(3) = ey[2];
-				Ex(4) = ex[3]; Ey(4) = ey[3];
-				
-				// 
-				// Get element properties
-				//
-				
 				calfem::hooke(ptype, E*(double)elementValue*m_stiffnessScalefactor, v, D);
 
-				// 
-				// Get element topology
-				//
-				
 				for (l=0; l<8; l++)
-					DofTopo(l+1) = topo[l];
+					DofTopo(l) = topo[l];
 
-				//
-				// Get element displacements
-				//
-				
-				for (l=1; l<=8; l++)
-					Ed(l) = m_a(DofTopo(l));
+				for (l=0; l<8; l++)
+					Ed(l) = m_a(DofTopo(l)-1);
 
-				// 
-				// Calculate element forces 
-				//
-				
 				calfem::plani4s(Ex, Ey, Ep, D, Ed, Es, Et);
 
-				// 
-				// Calculate mises stresses for the integration points and store in 
-				// nodes.
-				//
-
-				//cout << "Ex = " << Ex(1) << ", " << Ex(2) << ", " << Ex(3) << ", " << Ex(4) << endl;
-				//cout << "Ey = " << Ey(1) << ", " << Ey(2) << ", " << Ey(3) << ", " << Ey(4) << endl;
-
 				int ip;
-
 				double ipStress[4];
 
-				for (ip=1; ip<=4; ip++)
+				for (ip=0; ip<4; ip++)
 				{
-					sigx=Es(ip,1);
-					sigy=Es(ip,2);
-					tau=Es(ip,3);
+					sigx = Es(ip,0);
+					sigy = Es(ip,1);
+					tau  = Es(ip,2);
 
 					double ds = (sigx-sigy)/2.0;
-					double R = sqrt(pow(ds,2)+pow(tau,2));						
+					double R = sqrt(pow(ds,2)+pow(tau,2));
 
-					double sig1 = (sigx+sigy)/2.0+R; 
-					double sig2 = (sigx+sigy)/2.0-R; 
+					double sig1 = (sigx+sigy)/2.0+R;
+					double sig2 = (sigx+sigy)/2.0-R;
 
-					ipStress[ip-1] = sqrt( pow(sig1,2) - sig1*sig2 + pow(sig2,2) );
+					ipStress[ip] = sqrt( pow(sig1,2) - sig1*sig2 + pow(sig2,2) );
 				}
 
-				//     i,j+1    i+1,j+1
-				//     o-----o
-				//     |     |
-				//     |     |
-				//     o-----o
-				//     i,j    i,j+1
+				m_femGrid->addNodeResult(i,   j,   ipStress[0]);
+				m_femGrid->addNodeResult(i,   j+1, ipStress[1]);
+				m_femGrid->addNodeResult(i+1, j+1, ipStress[2]);
+				m_femGrid->addNodeResult(i,   j+1, ipStress[3]);
 
-				m_femGrid->addNodeResult(i,j,ipStress[0]);
-				m_femGrid->addNodeResult(i,j+1,ipStress[1]);
-				m_femGrid->addNodeResult(i+1,j+1,ipStress[2]);
-				m_femGrid->addNodeResult(i,j+1,ipStress[3]);
+				calfem::RowVec Es_avg = Es.colwise().sum() / 4.0;
 
-				//
-				// Average stresses from integration points. Is this correct?? CHECK!
-				//
-
-				RowVector Es_avg = Es.sum_columns() / 4.0;
-				
-				//
-				// Calculate principal stresses
-				//
-
-				sigx=Es_avg(1);
-				sigy=Es_avg(2);
-				tau=Es_avg(3);
+				sigx = Es_avg(0);
+				sigy = Es_avg(1);
+				tau  = Es_avg(2);
 
 				double ds = (sigx-sigy)/2.0;
-				double R = sqrt(pow(ds,2)+pow(tau,2));						
+				double R = sqrt(pow(ds,2)+pow(tau,2));
 
-				double sig1 = (sigx+sigy)/2.0+R; 
-				double sig2 = (sigx+sigy)/2.0-R; 
+				double sig1 = (sigx+sigy)/2.0+R;
+				double sig2 = (sigx+sigy)/2.0-R;
 				double alfa = atan2(tau,ds)/2.0;
 
-				double misesStress = sqrt(	pow(sig1,2) - sig1*sig2 + pow(sig2,2) );
+				double misesStress = sqrt( pow(sig1,2) - sig1*sig2 + pow(sig2,2) );
 
 				m_femGrid->setResult(i, j, 0, sig1);
 				m_femGrid->setResult(i, j, 1, sig2);
 				m_femGrid->setResult(i, j, 2, alfa);
 				m_femGrid->setResult(i, j, 3, misesStress);
 
-				if (misesStress>m_maxMisesStressValue)
-					m_maxMisesStressValue = misesStress;
-				
-				if (fabs(sig1)>m_maxStressValue)
-					m_maxStressValue = fabs(sig1);
-				
-				if (fabs(sig2)>m_maxStressValue)
-					m_maxStressValue = fabs(sig2);
-				
-				if (sig1<0.0)
-					if (fabs(sig1)>m_maxNegStressValue)
-						m_maxNegStressValue = fabs(sig1);
-					
-				if (sig1>0.0)
-					if (fabs(sig1)>m_maxPosStressValue)
-						m_maxPosStressValue = sig1;
-						
-				if (sig2<0.0)
-					if (fabs(sig2)>m_maxNegStressValue)
-						m_maxNegStressValue = fabs(sig2);
-							
-				if (sig2>0.0)
-					if (fabs(sig2)>m_maxPosStressValue)
-						m_maxPosStressValue = sig2;
+				if (misesStress>m_maxMisesStressValue) m_maxMisesStressValue = misesStress;
+				if (fabs(sig1)>m_maxStressValue) m_maxStressValue = fabs(sig1);
+				if (fabs(sig2)>m_maxStressValue) m_maxStressValue = fabs(sig2);
+				if (sig1<0.0 && fabs(sig1)>m_maxNegStressValue) m_maxNegStressValue = fabs(sig1);
+				if (sig1>0.0 && fabs(sig1)>m_maxPosStressValue) m_maxPosStressValue = sig1;
+				if (sig2<0.0 && fabs(sig2)>m_maxNegStressValue) m_maxNegStressValue = fabs(sig2);
+				if (sig2>0.0 && fabs(sig2)>m_maxPosStressValue) m_maxPosStressValue = sig2;
 			}
 		}
 	}
@@ -1613,44 +613,39 @@ void CFemGridSolver2::computeElementForces()
 	cout << "Max misses stress = " << m_maxMisesStressValue << endl;
 }
 
-void CFemGridSolver2::computeElementForcesOpt(Matrix& X, double penalty)
+void CFemGridSolver2::computeElementForcesOpt(calfem::Matrix& X, double penalty)
 {
-	//so_print("CFemGridSolver2","Calculating results.");
-
 	int i, j, l;
 	int rows, cols;
 	double elementValue;
 	double ex[4];
 	double ey[4];
 	int topo[8];
-	int ptype = m_ptype;    // Plane stress
-	int ir = 2; // Integration rule
+	int ptype = m_ptype;
+	int ir = 2;
 
 	double E = m_elasticModulus;
 	double v = m_youngsModulus;
 	double t = m_thickness;
 
-	RowVector Ep(3);
-	RowVector Ex(4);
-	RowVector Ey(4);
-	RowVector DofTopo(8);
+	calfem::RowVec Ep(3);
+	calfem::RowVec Ex(4);
+	calfem::RowVec Ey(4);
+	calfem::IntRowVec DofTopo(8);
+	calfem::RowVec Ed(8);
+	calfem::Matrix Es;
+	calfem::Matrix Et;
+	calfem::Matrix D;
 
-	Ep << ptype << t << ir;
+	Ep << ptype, t, ir;
 
 	m_femGrid->getGridSize(rows, cols);
 
-	RowVector Ed(8);
-	Matrix Es; 
-	Matrix Et; 
-	Matrix D;
-
-	Ed = 0.0;
+	Ed.setZero();
 	m_maxStressValue = -1.0e300;
 	m_maxMisesStressValue = -1.0e300;
 	m_maxPosStressValue = -1.0e300;
 	m_maxNegStressValue = -1.0e300;
-
-	//so_print("CFemGridSolver2:","\tCalculating element forces.");
 
 	m_femGrid->zeroNodeResults();
 
@@ -1658,138 +653,73 @@ void CFemGridSolver2::computeElementForcesOpt(Matrix& X, double penalty)
 	{
 		for (j=0; j<cols; j++)
 		{
-			double sigx;
-			double sigy;
-			double tau;
+			double sigx, sigy, tau;
 
 			if (m_femGrid->getElement(i, j, elementValue, ex, ey, topo))
 			{
-				//
-				// Get element coordinates
-				//
+				Ex << ex[0], ex[1], ex[2], ex[3];
+				Ey << ey[0], ey[1], ey[2], ey[3];
 
-				Ex(1) = ex[0]; Ey(1) = ey[0];
-				Ex(2) = ex[1]; Ey(2) = ey[1];
-				Ex(3) = ex[2]; Ey(3) = ey[2];
-				Ex(4) = ex[3]; Ey(4) = ey[3];
-				
-				// 
-				// Get element properties
-				//
-				
-				calfem::hooke(ptype, E*pow(X(i+1,j+1),penalty), v, D);
+				calfem::hooke(ptype, E*pow(X(i,j),penalty), v, D);
 
-				// 
-				// Get element topology
-				//
-				
 				for (l=0; l<8; l++)
-					DofTopo(l+1) = topo[l];
+					DofTopo(l) = topo[l];
 
-				//
-				// Get element displacements
-				//
-				
-				for (l=1; l<=8; l++)
-					Ed(l) = m_a(DofTopo(l));
+				for (l=0; l<8; l++)
+					Ed(l) = m_a(DofTopo(l)-1);
 
-				// 
-				// Calculate element forces 
-				//
-				
 				calfem::plani4s(Ex, Ey, Ep, D, Ed, Es, Et);
 
-				// 
-				// Calculate mises stresses for the integration points and store in 
-				// nodes.
-				//
-
-				//cout << "Ex = " << Ex(1) << ", " << Ex(2) << ", " << Ex(3) << ", " << Ex(4) << endl;
-				//cout << "Ey = " << Ey(1) << ", " << Ey(2) << ", " << Ey(3) << ", " << Ey(4) << endl;
-
 				int ip;
-
 				double ipStress[4];
 
-				for (ip=1; ip<=4; ip++)
+				for (ip=0; ip<4; ip++)
 				{
-					sigx=Es(ip,1);
-					sigy=Es(ip,2);
-					tau=Es(ip,3);
+					sigx = Es(ip,0);
+					sigy = Es(ip,1);
+					tau  = Es(ip,2);
 
 					double ds = (sigx-sigy)/2.0;
-					double R = sqrt(pow(ds,2)+pow(tau,2));						
+					double R = sqrt(pow(ds,2)+pow(tau,2));
 
-					double sig1 = (sigx+sigy)/2.0+R; 
-					double sig2 = (sigx+sigy)/2.0-R; 
+					double sig1 = (sigx+sigy)/2.0+R;
+					double sig2 = (sigx+sigy)/2.0-R;
 
-					ipStress[ip-1] = sqrt( pow(sig1,2) - sig1*sig2 + pow(sig2,2) );
+					ipStress[ip] = sqrt( pow(sig1,2) - sig1*sig2 + pow(sig2,2) );
 				}
 
-				//     i,j+1    i+1,j+1
-				//     o-----o
-				//     |     |
-				//     |     |
-				//     o-----o
-				//     i,j    i,j+1
+				m_femGrid->addNodeResult(i,   j,   ipStress[0]);
+				m_femGrid->addNodeResult(i,   j+1, ipStress[1]);
+				m_femGrid->addNodeResult(i+1, j+1, ipStress[2]);
+				m_femGrid->addNodeResult(i,   j+1, ipStress[3]);
 
-				m_femGrid->addNodeResult(i,j,ipStress[0]);
-				m_femGrid->addNodeResult(i,j+1,ipStress[1]);
-				m_femGrid->addNodeResult(i+1,j+1,ipStress[2]);
-				m_femGrid->addNodeResult(i,j+1,ipStress[3]);
+				calfem::RowVec Es_avg = Es.colwise().sum() / 4.0;
 
-				//
-				// Average stresses from integration points. Is this correct?? CHECK!
-				//
-
-				RowVector Es_avg = Es.sum_columns() / 4.0;
-				
-				//
-				// Calculate principal stresses
-				//
-
-				sigx=Es_avg(1);
-				sigy=Es_avg(2);
-				tau=Es_avg(3);
+				sigx = Es_avg(0);
+				sigy = Es_avg(1);
+				tau  = Es_avg(2);
 
 				double ds = (sigx-sigy)/2.0;
-				double R = sqrt(pow(ds,2)+pow(tau,2));						
+				double R = sqrt(pow(ds,2)+pow(tau,2));
 
-				double sig1 = (sigx+sigy)/2.0+R; 
-				double sig2 = (sigx+sigy)/2.0-R; 
+				double sig1 = (sigx+sigy)/2.0+R;
+				double sig2 = (sigx+sigy)/2.0-R;
 				double alfa = atan2(tau,ds)/2.0;
 
-				double misesStress = sqrt(	pow(sig1,2) - sig1*sig2 + pow(sig2,2) );
+				double misesStress = sqrt( pow(sig1,2) - sig1*sig2 + pow(sig2,2) );
 
 				m_femGrid->setResult(i, j, 0, sig1);
 				m_femGrid->setResult(i, j, 1, sig2);
 				m_femGrid->setResult(i, j, 2, alfa);
 				m_femGrid->setResult(i, j, 3, misesStress);
 
-				if (misesStress>m_maxMisesStressValue)
-					m_maxMisesStressValue = misesStress;
-				
-				if (fabs(sig1)>m_maxStressValue)
-					m_maxStressValue = fabs(sig1);
-				
-				if (fabs(sig2)>m_maxStressValue)
-					m_maxStressValue = fabs(sig2);
-				
-				if (sig1<0.0)
-					if (fabs(sig1)>m_maxNegStressValue)
-						m_maxNegStressValue = fabs(sig1);
-					
-				if (sig1>0.0)
-					if (fabs(sig1)>m_maxPosStressValue)
-						m_maxPosStressValue = sig1;
-						
-				if (sig2<0.0)
-					if (fabs(sig2)>m_maxNegStressValue)
-						m_maxNegStressValue = fabs(sig2);
-							
-				if (sig2>0.0)
-					if (fabs(sig2)>m_maxPosStressValue)
-						m_maxPosStressValue = sig2;
+				if (misesStress>m_maxMisesStressValue) m_maxMisesStressValue = misesStress;
+				if (fabs(sig1)>m_maxStressValue) m_maxStressValue = fabs(sig1);
+				if (fabs(sig2)>m_maxStressValue) m_maxStressValue = fabs(sig2);
+				if (sig1<0.0 && fabs(sig1)>m_maxNegStressValue) m_maxNegStressValue = fabs(sig1);
+				if (sig1>0.0 && fabs(sig1)>m_maxPosStressValue) m_maxPosStressValue = sig1;
+				if (sig2<0.0 && fabs(sig2)>m_maxNegStressValue) m_maxNegStressValue = fabs(sig2);
+				if (sig2>0.0 && fabs(sig2)>m_maxPosStressValue) m_maxPosStressValue = sig2;
 			}
 		}
 	}
@@ -1803,18 +733,17 @@ void CFemGridSolver2::computeReactionForces(std::vector<CConstraint*>& vectorCon
 {
 	double x1, y1, x2, y2, ex, ey, es;
 	int dofs[2];
-	RowVector BarEx(2);
-	RowVector BarEy(2);
-	RowVector BarEp(2);
-	RowVector BarEd(4);
+	calfem::RowVec BarEx(2);
+	calfem::RowVec BarEy(2);
+	calfem::RowVec BarEp(2);
+	calfem::RowVec BarEd(4);
 
 	double maxReactionForce = -1e300;
 	double E = m_elasticModulus;
-	vector<CConstraint*>::iterator vci;
 
-	BarEp << E << m_constraintStiffnessScale;
+	BarEp << E, m_constraintStiffnessScale;
 
-	for (vci=vectorConstraints.begin(); vci!=vectorConstraints.end(); vci++)
+	for (auto vci=vectorConstraints.begin(); vci!=vectorConstraints.end(); vci++)
 	{
 		CConstraint* constraint = *vci;
 		constraint->getPosition(x2, y2);
@@ -1825,9 +754,9 @@ void CFemGridSolver2::computeReactionForces(std::vector<CConstraint*>& vectorCon
 		x1 = x2 - ex;
 		y1 = y2 - ey;
 
-		BarEx << x1 << x2;
-		BarEy << y1 << y2;
-		BarEd << 0.0 << 0.0 << m_a(dofs[0]) << m_a(dofs[1]) ;
+		BarEx << x1, x2;
+		BarEy << y1, y2;
+		BarEd << 0.0, 0.0, m_a(dofs[0]-1), m_a(dofs[1]-1);
 
 		calfem::bar2s(BarEx, BarEy, BarEp, BarEd, es);
 
@@ -1837,7 +766,7 @@ void CFemGridSolver2::computeReactionForces(std::vector<CConstraint*>& vectorCon
 		constraint->getReactionForce()->setValue(es);
 	}
 
-	for (vci=vectorConstraints.begin(); vci!=vectorConstraints.end(); vci++)
+	for (auto vci=vectorConstraints.begin(); vci!=vectorConstraints.end(); vci++)
 	{
 		CConstraint* constraint = *vci;
 
@@ -1846,50 +775,40 @@ void CFemGridSolver2::computeReactionForces(std::vector<CConstraint*>& vectorCon
 	}
 }
 
-void CFemGridSolver2::objectiveFunctionAndSensitivity(Matrix& X, Matrix& dC, Matrix& L, double penalty, double& c)
+void CFemGridSolver2::objectiveFunctionAndSensitivity(calfem::Matrix& X, calfem::Matrix& dC, calfem::Matrix& L, double penalty, double& c)
 {
-	//so_print("CFemGridSolver2","Calculating results.");
-
 	int i, j, l;
 	int rows, cols;
 	double elementValue;
 	double ex[4];
 	double ey[4];
 	int topo[8];
-	int ptype = m_ptype;    // Plane stress
-	int ir = 2; // Integration rule
+	int ptype = m_ptype;
+	int ir = 2;
 
 	double E = m_elasticModulus;
 	double v = m_youngsModulus;
 	double t = m_thickness;
 
-	RowVector Ep(3);
-	RowVector Ex(4);
-	RowVector Ey(4);
-	RowVector DofTopo(8);
+	calfem::RowVec Ep(3);
+	calfem::RowVec Ex(4);
+	calfem::RowVec Ey(4);
+	calfem::IntRowVec DofTopo(8);
+	calfem::RowVec Ed(8);
+	calfem::Matrix Es;
+	calfem::Matrix Et;
+	calfem::Matrix D;
+	calfem::ColVec fe(8);
+	calfem::Matrix Ke(8,8);
 
-	Ep << ptype << t << ir;
+	Ep << ptype, t, ir;
 
 	m_femGrid->getGridSize(rows, cols);
 
-	RowVector Ed(8);
-	Matrix Es; 
-	Matrix Et; 
-	Matrix D;
-
-	ColumnVector fe(8);
-	Matrix Ke(8,8);
-
-	Ed = 0.0;
-	m_maxStressValue = -1.0e300;
-	m_maxMisesStressValue = -1.0e300;
-	m_maxPosStressValue = -1.0e300;
-	m_maxNegStressValue = -1.0e300;
-
-	//so_print("CFemGridSolver2:","\tCalculating element forces.");
+	Ed.setZero();
 
 	c = 0.0;
-	dC = 0.0;
+	dC.setZero();
 
 	for (i=0; i<rows; i++)
 	{
@@ -1897,273 +816,175 @@ void CFemGridSolver2::objectiveFunctionAndSensitivity(Matrix& X, Matrix& dC, Mat
 		{
 			if (m_femGrid->getElement(i, j, elementValue, ex, ey, topo))
 			{
-				//
-				// Get element coordinates
-				//
+				Ex << ex[0], ex[1], ex[2], ex[3];
+				Ey << ey[0], ey[1], ey[2], ey[3];
 
-				Ex(1) = ex[0]; Ey(1) = ey[0];
-				Ex(2) = ex[1]; Ey(2) = ey[1];
-				Ex(3) = ex[2]; Ey(3) = ey[2];
-				Ex(4) = ex[3]; Ey(4) = ey[3];
-				
-				// 
-				// Get element properties
-				//
-				
 				calfem::hooke(ptype, E, v, D);
 
-				// 
-				// Get element topology
-				//
-				
 				for (l=0; l<8; l++)
-					DofTopo(l+1) = topo[l];
+					DofTopo(l) = topo[l];
 
-				//
-				// Get element displacements
-				//
-				
-				for (l=1; l<=8; l++)
-					Ed(l) = m_a(DofTopo(l));
+				for (l=0; l<8; l++)
+					Ed(l) = m_a(DofTopo(l)-1);
 
-				// 
-				// Calculate strain energy 
-				//
-
-				Ke = 0.0;
+				Ke.setZero();
 				calfem::plani4e(Ex, Ey, Ep, D, m_Eq, Ke, fe);
-				Ke = Ke * pow(X(i+1,j+1),penalty);
+				Ke = Ke * pow(X(i,j), penalty);
 
-				// [1x8][8x8][8x1] = [1x1]
-
-				if (L(i+1,j+1)<0.2)
+				if (L(i,j)<0.2)
 				{
-					double W = (Ed * Ke * Ed.t()).as_scalar();
-					c += pow(X(i+1,j+1),penalty)*W;
-					dC(i+1,j+1) = -penalty*pow(X(i+1,j+1),penalty-1)*W;
+					double W = (Ed * Ke * Ed.transpose()).value();
+					c += pow(X(i,j), penalty)*W;
+					dC(i,j) = -penalty*pow(X(i,j), penalty-1)*W;
 				}
 				else
 				{
-					// Is this correct ?
-					//double W = (Ed * Ke * Ed.t()).as_scalar();
-					//c += pow(X(i+1,j+1),penalty)*W;
-					dC(i+1,j+1) = -1e50;
+					dC(i,j) = -1e50;
 				}
-				//cout << "W = " << W << ", pow(X(i+1,j+1),penalty) = " << pow(X(i+1,j+1),penalty) << endl;
 			}
 		}
 	}
 }
 
-ReturnMatrix CFemGridSolver2::optimalityCriteriaUpdate(Matrix& X, Matrix& dC, Matrix& L, double volfrac, int nElements)
+calfem::Matrix CFemGridSolver2::optimalityCriteriaUpdate(calfem::Matrix& X, calfem::Matrix& dC, calfem::Matrix& L, double volfrac, int nElements)
 {
-	using namespace calfem;
-
-	//%%%%%%%%%% OPTIMALITY CRITERIA UPDATE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	//function [xnew]=OC(nelx,nely,x,volfrac,dc)  
-	//l1 = 0; l2 = 100000; move = 0.2;
-	//while (l2-l1 > 1e-4)
-	//  lmid = 0.5*(l2+l1);
-	//  xnew = max( 0.001, max( x-move, min( 1., min( x+move, x.*sqrt(-dc./lmid));
-	//  if sum(sum(xnew)) - volfrac*nelx*nely > 0;                                
-	//    l1 = lmid;
-	//  else
-	//    l2 = lmid;
-	//  end
-	//end
-
 	double lmid;
 	double l1 = 0.0;
 	double l2 = 100000;
 	double move = 0.2;
 
-	Matrix Xnew;
-
-	//int rigidElements = (int)L.Sum();
-	//cout << "rigidElements = " << rigidElements << endl;
+	calfem::Matrix Xnew;
 
 	while (l2-l1 > 1e-4)
 	{
 		lmid = 0.5*(l2+l1);
-		Matrix X1 = X - move;
-		Matrix X2 = X + move;
-		Matrix X3 = -dC/lmid;
-		Matrix X4 = elementMultiply(X,matrixSqrt(X3));
-		Xnew = matrixMax2(0.001, matrixMax1(X1, matrixMin2( 1.0, matrixMin1(X2, X4))));
+		calfem::Matrix X1 = (X.array() - move).matrix();
+		calfem::Matrix X2 = (X.array() + move).matrix();
+		calfem::Matrix X3 = (-dC.array() / lmid).matrix();
+		calfem::Matrix X4 = X.cwiseProduct(X3.array().sqrt().matrix());
+		Xnew = (X1.cwiseMax(X2.cwiseMin(X4).cwiseMin(1.0))).cwiseMax(0.001);
 		m_femGrid->assignNonElements(Xnew, 0.0);
-		//if (Xnew.Sum() - volfrac * (nElements-rigidElements) > 0.0)
-		if (Xnew.Sum() - volfrac * (nElements) > 0.0)
+		if (Xnew.sum() - volfrac * nElements > 0.0)
 			l1 = lmid;
 		else
 			l2 = lmid;
 	}
-	//assignWhereGreaterThan(Xnew, L, X, 0.0);
-	Xnew.release(); return Xnew;
+
+	return Xnew;
 }
 
 int CFemGridSolver2::scaleToAbsoluteSize(int r)
 {
 	auto grid_stride = m_femGrid->getStride();
-	r = r * 6 / grid_stride; // 6 is default grid size, this should scale the filter radius to be constant wrt. canvas size
+	r = r * 6 / grid_stride;
 	return r;
 }
 
-ReturnMatrix CFemGridSolver2::sensitivityFilter1(Matrix& X, Matrix& dC, double rmin)
+calfem::Matrix CFemGridSolver2::sensitivityFilter1(calfem::Matrix& X, calfem::Matrix& dC, double rmin)
 {
-	//function [dcn]=Ole_Sigmund(nelx,nely,rmin,x,dc)                                   % ved rmin<1 deaktiveres filtreringen
-	//dcn=zeros(nely,nelx);
-	//for i = 1:nelx
-	//  for j = 1:nely
-	//    sum=0.0; 
-	//    for k = max(i-floor(rmin),1):min(i+floor(rmin),nelx)
-	//      for l = max(j-floor(rmin),1):min(j+floor(rmin),nely)
-	//        fac = rmin-sqrt((i-k)^2+(j-l)^2);
-	//        sum = sum+max(0,fac);
-	//        dcn(j,i) = dcn(j,i) + max(0,fac)*x(l,k)*dc(l,k);
-	//      end
-	//    end
-	//    dcn(j,i) = dcn(j,i)/(x(j,i)*sum);
-	//  end
-	//end	
 	int i, j, k, l;
-	int rows = X.nrows();
-	int cols = X.ncols();
+	int rows = (int)X.rows();
+	int cols = (int)X.cols();
 	double sum, fac;
-	Matrix dCnew;
 
-	dCnew = Matrix(rows, cols);
-	dCnew = 0.0;
+	calfem::Matrix dCnew = calfem::Matrix::Zero(rows, cols);
 
 	if (m_rminInPixels)
 		rmin = rmin / (double)m_femGrid->getStride();
-  	//	rmin = scaleToAbsoluteSize(rmin);
 
-	for (i=1; i<=cols; i++)
+	for (i=0; i<cols; i++)
 	{
-		for (j=1; j<=rows; j++)
+		for (j=0; j<rows; j++)
 		{
 			sum = 0.0;
 
-			for (k=max(i-floor(rmin),1.0); k<=min(i+floor(rmin),(double)cols); k++)
-				for (l=max(j-floor(rmin),1.0); l<=min(j+floor(rmin),(double)rows); l++)
+			int kmin = std::max(0, (int)(i - std::floor(rmin)));
+			int kmax = std::min(cols-1, (int)(i + std::floor(rmin)));
+			int lmin = std::max(0, (int)(j - std::floor(rmin)));
+			int lmax = std::min(rows-1, (int)(j + std::floor(rmin)));
+
+			for (k=kmin; k<=kmax; k++)
+				for (l=lmin; l<=lmax; l++)
 				{
 					fac = rmin - sqrt(pow((double)(i-k),2.0)+pow((double)(j-l),2.0));
-					sum += max(0.0,fac);
-					dCnew(j,i) += max(0.0,fac)*X(l,k)*dC(l,k);
+					sum += std::max(0.0,fac);
+					dCnew(j,i) += std::max(0.0,fac)*X(l,k)*dC(l,k);
 				}
 			dCnew(j,i) = dCnew(j,i)/(X(j,i)*sum);
 		}
 	}
-	dCnew.release(); return dCnew;
+
+	return dCnew;
 }
 
-ReturnMatrix CFemGridSolver2::sensitivityFilter2(Matrix& dC, double rmin)
+calfem::Matrix CFemGridSolver2::sensitivityFilter2(calfem::Matrix& dC, double rmin)
 {
-	//function [dcn]=Back_Pedersen(nelx,nely,rmin,dc)         
-	//A(1:nely, 1:nelx)=1;  % Volumen for each element
-	//dcn=zeros(nely,nelx);
-	//for i = 1:nelx
-	//  for j = 1:nely
-	//    sum=0.0; 
-	//    for k = max(i-floor(rmin),1):min(i+floor(rmin),nelx);
-	//      for l = max(j-floor(rmin),1):min(j+floor(rmin),nely);
-	//        fac = rmin-sqrt((i-k)^2+(j-l)^2);
-	//        sum = sum+max(0,fac)*A(l,k);
-	//        dcn(j,i) = dcn(j,i) + max(0,fac)*dc(l,k);
-	//      end
-	//    end
-	//    dcn(j,i) = dcn(j,i)/sum;% FE-ANALYSIS
-	//
-	//  end
-	//end
 	int i, j, k, l;
-	int rows = dC.nrows();
-	int cols = dC.ncols();
+	int rows = (int)dC.rows();
+	int cols = (int)dC.cols();
 	double sum, fac;
-	Matrix dCnew;
 
-	dCnew = Matrix(rows, cols);
-	dCnew = 0.0;
+	calfem::Matrix dCnew = calfem::Matrix::Zero(rows, cols);
 
 	if (m_rminInPixels)
 		rmin = rmin / (double)m_femGrid->getStride();
 
-	for (i=1; i<=cols; i++)
+	for (i=0; i<cols; i++)
 	{
-		for (j=1; j<=rows; j++)
+		for (j=0; j<rows; j++)
 		{
 			sum = 0.0;
 
-			for (k=max(i-floor(rmin),1.0); k<=min(i+floor(rmin),(double)cols); k++)
-				for (l=max(j-floor(rmin),1.0); l<=min(j+floor(rmin),(double)rows); l++)
+			int kmin = std::max(0, (int)(i - std::floor(rmin)));
+			int kmax = std::min(cols-1, (int)(i + std::floor(rmin)));
+			int lmin = std::max(0, (int)(j - std::floor(rmin)));
+			int lmax = std::min(rows-1, (int)(j + std::floor(rmin)));
+
+			for (k=kmin; k<=kmax; k++)
+				for (l=lmin; l<=lmax; l++)
 				{
 					fac = rmin - sqrt(pow((double)(i-k),2.0)+pow((double)(j-l),2.0));
-					sum += max(0.0,fac);
-					dCnew(j,i) += max(0.0,fac)*dC(l,k);
+					sum += std::max(0.0,fac);
+					dCnew(j,i) += std::max(0.0,fac)*dC(l,k);
 				}
 			dCnew(j,i) = dCnew(j,i)/sum;
 		}
 	}
-	dCnew.release(); return dCnew;
+
+	return dCnew;
 }
 
 void CFemGridSolver2::executeOptimizer()
 {
-	int i;
-	int maxBandwidth;
 	int rows, cols;
 	bool loadsDefined, bcsDefined, vectorBcsDefined;
-	set<int> uniqueDofs;
-	set<int> uniqueVectorDofs;
-	vector<CConstraint*> vectorConstraints;
-	RowVector prescribedValues;
+	std::set<int> uniqueDofs;
+	std::set<int> uniqueVectorDofs;
+	std::vector<CConstraint*> vectorConstraints;
+	std::vector<double> prescribedValues;
 
 #ifdef WIN32
 	DWORD startTime = timeGetTime();
 #endif
 
-
-	ColumnVector fsys;
-	ColumnVector gdof;
-	ColumnVector ldof;
-	ColumnVector GlobalA;
-
 	int nElements;
-
-	//
-	// Reset error status
-	//
 
 	m_errorStatus = CFemGridSolver2::ET_NO_ERROR;
 
-	///////////////////////////////////////////////////////////////////////////
-	// Apply hinge constraints directly to stiffness grid
-	//
-
 	setupHinges();
 
-	///////////////////////////////////////////////////////////////////////////
-	// Calculate optimum bandwidth
-	//
+	calculateOptimalBandwidth();
 
-	maxBandwidth = this->calculateOptimalBandwidth();
-	
 	if (m_nDof==0)
 	{
 		m_errorStatus = ET_NO_ELEMENTS;
 		return;
 	}
 
-	SymmetricBandMatrix K(m_nDof,maxBandwidth);
-
-	///////////////////////////////////////////////////////////////////////////
-	// Init optimisation
-	//
-
-	Matrix X;
-	Matrix Xold;
-	Matrix dC;
-	Matrix L;
+	calfem::Matrix X;
+	calfem::Matrix Xold;
+	calfem::Matrix dC;
+	calfem::Matrix L;
 
 	double change = 1.0;
 	double penalty = m_optPenalty;
@@ -2172,53 +993,32 @@ void CFemGridSolver2::executeOptimizer()
 	int loop = 0;
 
 	m_femGrid->getGridSize(rows, cols);
-	X.ReSize(rows, cols);
-	Xold.ReSize(rows, cols);
-	dC.ReSize(rows, cols);
-	L.ReSize(rows, cols);
+	X  = calfem::Matrix::Zero(rows, cols);
+	Xold = calfem::Matrix::Zero(rows, cols);
+	dC = calfem::Matrix::Zero(rows, cols);
+	L  = calfem::Matrix::Ones(rows, cols);
 
-	L = 1.0;
+	cout << "Sum L = " << L.sum() << endl;
 
-	cout << "Sum L = " << L.Sum() << endl;
-
-	m_femGrid->copyGrid(X, volfrac); // Copy grid values to X multiplied with volfrac
+	m_femGrid->copyGrid(X, volfrac);
 	m_femGrid->assignFieldFromImage(1, 1);
 	m_femGrid->copyField(1, L);
 
-	calfem::assignWhereGreaterThan(L, L, 1.0, 0.0);
-	//calfem::assignWhereGreaterThan(X, L, 1.0, 0.0);
-
-	///////////////////////////////////////////////////////////////////////////
-	// Start optimisation loop
-	//
+	L = (L.array() > 0.0).select(1.0, L);
 
 	while ((change>m_optMinChange)&&(loop<m_optMaxLoops)&&(this->continueCalc()))
 	{
 		loop++;
 		Xold = X;
 
-
-		///////////////////////////////////////////////////////////////////////////
-		// Setup system matrices
-		//
-
 		this->progressMessage("Assembling system matrix.", 20);
 
-		K = 0.0;
+		calfem::TripletList Ktriplets;
 
-		///////////////////////////////////////////////////////////////////////////
-		// Assemble system
-		//
-
-        clock_t t0 = clock();
-		nElements = this->assembleSystemOpt(K, X, L, penalty);
-        clock_t t1 = clock();
-        std::cout << "Assemble system = " << t1-t0 << std::endl;
-
-		//
-		// If no elements where assembled something was wrong return 
-		// with error.
-		//
+		clock_t t0 = clock();
+		nElements = this->assembleSystemOpt(Ktriplets, X, L, penalty);
+		clock_t t1 = clock();
+		std::cout << "Assemble system = " << t1-t0 << std::endl;
 
 		if (nElements==0)
 		{
@@ -2226,11 +1026,7 @@ void CFemGridSolver2::executeOptimizer()
 			return;
 		}
 
-		///////////////////////////////////////////////////////////////////////////
-		// Setup forces and constraints
-		//
-
-		if ((m_femGrid->getPointLoadSize()==0)&&(m_Eq(1)==0.0)&&(m_Eq(2)==0.0))
+		if ((m_femGrid->getPointLoadSize()==0)&&(m_Eq(0)==0.0)&&(m_Eq(1)==0.0))
 		{
 			m_errorStatus = ET_NO_LOADS;
 			return;
@@ -2257,63 +1053,47 @@ void CFemGridSolver2::executeOptimizer()
 			return;
 		}
 
-		///////////////////////////////////////////////////////////////////////////
-		// Assemble Vector Constraints
-		//
-
 		if (vectorBcsDefined)
-			this->assembleVectorConstraints(K, vectorConstraints);
+			this->assembleVectorConstraints(Ktriplets, vectorConstraints);
 
-		Matrix Bc(uniqueDofs.size(),2);
-		this->removeDoubleDofs(uniqueDofs, prescribedValues, Bc);
+		calfem::IntColVec bcDofs;
+		calfem::ColVec bcVals;
+		this->removeDoubleDofs(uniqueDofs, prescribedValues, bcDofs, bcVals);
 
-		///////////////////////////////////////////////////////////////////////////
-		// Solve system
-		//
+		m_K_sparse.resize(m_nDof, m_nDof);
+		m_K_sparse.setFromTriplets(Ktriplets.begin(), Ktriplets.end());
 
-		m_a.ReSize(m_nDof,1);
-		m_a = 0.0;
+		m_a = calfem::ColVec::Zero(m_nDof);
 
 		progressMessage("Solving system.", 50);
 
-        t0 = clock();
-		Try 
-		{
-			m_X = K; // LU decomposition
-			m_a = m_X.i() * m_f;
-		}
-		CatchAll 
+		t0 = clock();
+		calfem::ColVec Q;
+		if (!calfem::spsolveq(m_K_sparse, m_f, bcDofs, bcVals, m_a, Q))
 		{
 			m_errorStatus = ET_INVALID_MODEL;
 			return;
 		}
-        t1 = clock();
-        cout << "Equation system = " << t1-t0 << endl;
+		t1 = clock();
+		cout << "Equation system = " << t1-t0 << endl;
 
-		// Objective functions
-
-        t0 = clock();
-
+		t0 = clock();
 		c = 0.0;
-		dC = 0.0;
+		dC.setZero();
 
 		cout << "objectiveFunctionAndSensitivity()" << endl;
 		this->progressMessage("Objective function and sensitivity.", 60);
 		this->objectiveFunctionAndSensitivity(X, dC, L, m_optPenalty, c);
-        t1 = clock();
-        cout << "Objective function = " << t1-t0 << endl;
-
-		// Filter sensitivities
+		t1 = clock();
+		cout << "Objective function = " << t1-t0 << endl;
 
 		if (!this->continueCalc())
-		{
 			break;
-		}
 
 		cout << "sensitivityFilter1()" << endl;
 		this->progressMessage("Applying sensitivity filter.", 70);
 
-		Matrix dCnew;
+		calfem::Matrix dCnew;
 
 		switch (m_filterType) {
 			case FT_NO_FILTER:
@@ -2328,79 +1108,26 @@ void CFemGridSolver2::executeOptimizer()
 				break;
 		}
 
-		// Design update by the optimality criteria method
-
 		cout << "optimalityCriteriaUpdate()" << endl;
 		this->progressMessage("Design update.", 100);
-		Matrix Xnew = this->optimalityCriteriaUpdate(X, dC, L, volfrac, nElements);
-		Matrix Diff = Xnew-Xold;
-		change = Diff.maximum_absolute_value();
+		calfem::Matrix Xnew = this->optimalityCriteriaUpdate(X, dC, L, volfrac, nElements);
+		calfem::Matrix Diff = Xnew - Xold;
+		change = Diff.array().abs().maxCoeff();
 		X = Xnew;
-
-		// Assign current X to field 0 for visualisation purposes
 
 		m_femGrid->assignField(0, X);
 
 		cout << "loop = " << loop << ", change = " << change << ", c = " << c << endl;
-
 	}
-
-	// Copy optimised shape to original grid
 
 	m_femGrid->assignGrid(X);
 
 	this->execute();
 
-	return;
-
-	///////////////////////////////////////////////////////////////////////////
-	// Create global displacement vector
-	//
-
-	progressMessage("Storing results.", 80);
-
-	m_maxNodeValue = -1.0e300;
-
-	m_femGrid->setDisplacementSize(m_nDof);
-
-	for (i=1; i<=K.Nrows(); i++)
-	{
-		m_femGrid->setDisplacement(i, m_a(i));
-		if (fabs(m_a(i))>m_maxNodeValue)
-			m_maxNodeValue = fabs(m_a(i));
-	}
-
-	///////////////////////////////////////////////////////////////////////////
-	// Store element forces in elements
-	//
-
-	this->computeElementForcesOpt(X, m_optPenalty);
-	
-	///////////////////////////////////////////////////////////////////////////
-	// Calculate reaction forces from vector constraints
-	//
-
-	if (vectorBcsDefined)
-		this->computeReactionForces(vectorConstraints);
-
-	///////////////////////////////////////////////////////////////////////////
-	// Store max stress in FEM model
-	//
-
-	m_femGrid->setMaxStressValue(m_maxStressValue);
-	m_femGrid->setMaxPosStressValue(m_maxPosStressValue);
-	m_femGrid->setMaxNegStressValue(m_maxNegStressValue);
-	m_femGrid->setMaxNodeValue(m_maxNodeValue);
-	m_femGrid->setMaxMisesStressValue(m_maxMisesStressValue);
-
 #ifdef WIN32
 	DWORD endTime = timeGetTime();
 	cout << "Total execution time (ms) = " << endTime - startTime << endl;
 #endif
-
-	progressMessage("Finished.", 99);
-	progressMessage("Finished.", 0);
-
 }
 
 
@@ -2416,23 +1143,18 @@ void CFemGridSolver2::executeUpdate()
 	double E = m_elasticModulus;
 	double v = m_youngsModulus;
 	double t = m_thickness;
-	int ptype = m_ptype;    // Plane stress
+	int ptype = m_ptype;
 	int ir = 2;
 
-	RowVector Ex(4);
-	RowVector Ey(4);
-	RowVector DofTopo(8);
-	RowVector Ep(3);
+	calfem::RowVec Ex(4);
+	calfem::RowVec Ey(4);
+	calfem::IntRowVec DofTopo(8);
+	calfem::RowVec Ep(3);
+	calfem::Matrix D;
 
-	Matrix D;
-
-	Ep << ptype << t << ir;
+	Ep << ptype, t, ir;
 
 	m_femGrid->getGridSize(rows, cols);
-
-	//
-	// Define constraints
-	//
 
 	if (m_femGrid->getPointConstraintsSize()==0)
 	{
@@ -2440,21 +1162,18 @@ void CFemGridSolver2::executeUpdate()
 		return;
 	}
 
-	CConstraint* pointConstraint = m_femGrid->getFirstPointConstraint();
-
-	set<int> uniqueDofs;
-	set<int> uniqueVectorDofs;
-	set<int>::iterator si;
-
-	vector<CConstraint*> vectorConstraints;
-	vector<CConstraint*>::iterator vci;
-
-	double* prescribedValues = new double[m_nDof+1];
-	bool vectorBcsDefined = false;
+	// Re-build the BC set to get the same bcDofs/bcVals as execute()
+	std::set<int> uniqueDofs;
+	std::set<int> uniqueVectorDofs;
+	std::vector<CConstraint*> vectorConstraints;
+	std::vector<double> prescribedValues;
 	double x, y, value;
 	int dofs[2];
-	
-	while (pointConstraint!=NULL) 
+	bool vectorBcsDefined = false;
+
+	CConstraint* pointConstraint = m_femGrid->getFirstPointConstraint();
+
+	while (pointConstraint!=NULL)
 	{
 		pointConstraint->getPosition(x, y);
 		m_femGrid->getNearestDofs((int)x, (int)y, dofs);
@@ -2465,60 +1184,49 @@ void CFemGridSolver2::executeUpdate()
 			case CConstraint::CT_XY:
 				uniqueDofs.insert(dofs[0]);
 				uniqueDofs.insert(dofs[1]);
-				prescribedValues[dofs[0]] = 0.0;
-				prescribedValues[dofs[1]] = 0.0;
 				break;
 			case CConstraint::CT_X:
 				uniqueDofs.insert(dofs[0]);
-				prescribedValues[dofs[0]] = 0.0;
 				break;
 			case CConstraint::CT_Y:
 				uniqueDofs.insert(dofs[1]);
-				prescribedValues[dofs[1]] = 0.0;
 				break;
 			case CConstraint::CT_VECTOR:
 				uniqueVectorDofs.insert(dofs[0]);
 				uniqueVectorDofs.insert(dofs[1]);
-				si = uniqueVectorDofs.find(dofs[0]);
-				if (si != uniqueVectorDofs.end())
-					vectorConstraints.push_back(pointConstraint);
+				{
+					auto si = uniqueVectorDofs.find(dofs[0]);
+					if (si != uniqueVectorDofs.end())
+						vectorConstraints.push_back(pointConstraint);
+				}
 				vectorBcsDefined = true;
 				break;
 			default:
 				break;
 			}
 		}
-			
+
 		pointConstraint = m_femGrid->getNextPointConstraint();
 	}
 
-	//
-	// Scale load vector for body weight
-	//
-
-	m_f = 0.0;
+	// Rebuild load vector with current loads
+	m_f.setZero();
 
 	if (m_useWeight)
 	{
 		double Fsum = 0.0;
-		
-		for (i=2; i<=m_nDof; i+=2)
-			Fsum+=m_f(i);
-		
-		for (i=2; i<=m_nDof; i+=2)
+		for (i=1; i<m_nDof; i+=2)
+			Fsum += m_f(i);
+		for (i=1; i<m_nDof; i+=2)
 			m_f(i) = -m_weight*m_f(i)/Fsum;
 	}
-
-	//
-	// Setup load vector
-	//
 
 	bool loadsDefined = false;
 	double vx, vy;
 
 	m_femGrid->clearPoints();
 
-	if ((m_femGrid->getPointLoadSize()==0)&&(m_Eq(1)==0.0)&&(m_Eq(2)==0.0))
+	if ((m_femGrid->getPointLoadSize()==0)&&(m_Eq(0)==0.0)&&(m_Eq(1)==0.0))
 	{
 		m_errorStatus = ET_NO_LOADS;
 		return;
@@ -2526,7 +1234,7 @@ void CFemGridSolver2::executeUpdate()
 
 	CForce* pointLoad = m_femGrid->getFirstPointLoad();
 
-	while (pointLoad!=NULL) 
+	while (pointLoad!=NULL)
 	{
 		pointLoad->getPosition(x, y);
 		value = pointLoad->getValue();
@@ -2535,16 +1243,15 @@ void CFemGridSolver2::executeUpdate()
 
 		if (dofs[0]>0)
 		{
-			m_f(dofs[0]) += vx*value*m_forceMagnitude;
-			m_f(dofs[1]) += vy*value*m_forceMagnitude;
-
+			m_f(dofs[0]-1) += vx*value*m_forceMagnitude;
+			m_f(dofs[1]-1) += vy*value*m_forceMagnitude;
 			loadsDefined = true;
 		}
-		
+
 		pointLoad = m_femGrid->getNextPointLoad();
 	}
 
-	if ((m_Eq(1)!=0.0)||(m_Eq(2)!=0.0))
+	if ((m_Eq(0)!=0.0)||(m_Eq(1)!=0.0))
 		loadsDefined = true;
 
 	if (!loadsDefined)
@@ -2553,245 +1260,159 @@ void CFemGridSolver2::executeUpdate()
 		return;
 	}
 
-	//
-	// Update solution vector 
-	//
+	// Re-solve with updated load vector using stored K
+	prescribedValues.assign(m_nDof, 0.0);
+	calfem::IntColVec bcDofs;
+	calfem::ColVec bcVals;
+	this->removeDoubleDofs(uniqueDofs, prescribedValues, bcDofs, bcVals);
 
-	m_a.ReSize(m_nDof,1);
-	m_a = 0.0;
+	m_a = calfem::ColVec::Zero(m_nDof);
 
-	Try 
-	{
-		//m_X = K; // LU decomposition
-		m_a = m_X.i() * m_f;
-	}
-	CatchAll 
+	calfem::ColVec Q;
+	if (!calfem::spsolveq(m_K_sparse, m_f, bcDofs, bcVals, m_a, Q))
 	{
 		m_errorStatus = ET_INVALID_MODEL;
 		return;
 	}
 
-	//
-	// Create global displacement vector
-	//
-
 	m_maxNodeValue = -1.0e300;
 
 	m_femGrid->setDisplacementSize(m_nDof);
 
-	for (i=1; i<=m_nDof; i++)
+	for (i=0; i<m_nDof; i++)
 	{
-		m_femGrid->setDisplacement(i, m_a(i));
+		m_femGrid->setDisplacement(i+1, m_a(i));
 		if (fabs(m_a(i))>m_maxNodeValue)
 			m_maxNodeValue = fabs(m_a(i));
 	}
 
-	//
-	// Store element forces in elements
-	//
-	
-	RowVector Ed(8);
-	Matrix Es; 
-	Matrix Et; 
-	Ed = 0.0;
-	m_maxStressValue = -1.0e300;
-	m_maxMisesStressValue = -1.0e300;
-	m_maxPosStressValue = -1.0e300;
-	m_maxNegStressValue = -1.0e300;
-
-	m_femGrid->zeroNodeResults();
-
-	for (i=0; i<rows; i++)
-	{
-		for (j=0; j<cols; j++)
-		{
-			double sigx;
-			double sigy;
-			double tau;
-
-			if (m_femGrid->getElement(i, j, elementValue, ex, ey, topo))
-			{
-				//
-				// Get element coordinates
-				//
-
-				Ex(1) = ex[0]; Ey(1) = ey[0];
-				Ex(2) = ex[1]; Ey(2) = ey[1];
-				Ex(3) = ex[2]; Ey(3) = ey[2];
-				Ex(4) = ex[3]; Ey(4) = ey[3];
-				
-				// 
-				// Get element properties
-				//
-				
-				calfem::hooke(ptype, E*(double)elementValue*m_stiffnessScalefactor, v, D);
-
-				// 
-				// Get element topology
-				//
-				
-				for (l=0; l<8; l++)
-					DofTopo(l+1) = topo[l];
-
-				//
-				// Get element displacements
-				//
-				
-				for (l=1; l<=8; l++)
-					Ed(l) = m_a(DofTopo(l));
-
-				// 
-				// Calculate element forces 
-				//
-				
-				calfem::plani4s(Ex, Ey, Ep, D, Ed, Es, Et);
-
-				int ip;
-
-				double ipStress[4];
-
-				for (ip=1; ip<=4; ip++)
-				{
-					sigx=Es(ip,1);
-					sigy=Es(ip,2);
-					tau=Es(ip,3);
-
-					double ds = (sigx-sigy)/2.0;
-					double R = sqrt(pow(ds,2)+pow(tau,2));						
-
-					double sig1 = (sigx+sigy)/2.0+R; 
-					double sig2 = (sigx+sigy)/2.0-R; 
-
-					ipStress[ip-1] = sqrt( pow(sig1,2) - sig1*sig2 + pow(sig2,2) );
-				}
-
-				//     i,j+1    i+1,j+1
-				//     o-----o
-				//     |     |
-				//     |     |
-				//     o-----o
-				//     i,j    i,j+1
-
-				m_femGrid->addNodeResult(i,j,ipStress[0]);
-				m_femGrid->addNodeResult(i,j+1,ipStress[1]);
-				m_femGrid->addNodeResult(i+1,j+1,ipStress[2]);
-				m_femGrid->addNodeResult(i,j+1,ipStress[3]);
-
-				//
-				// Average stresses from integration points. Is this correct?? CHECK!
-				//
-
-				RowVector Es_avg = Es.sum_columns() / 4.0;
-				
-				//
-				// Calculate principal stresses
-				//
-
-				sigx=Es_avg(1);
-				sigy=Es_avg(2);
-				tau=Es_avg(3);
-
-				double ds = (sigx-sigy)/2.0;
-				double R = sqrt(pow(ds,2)+pow(tau,2));						
-
-				double sig1 = (sigx+sigy)/2.0+R; 
-				double sig2 = (sigx+sigy)/2.0-R; 
-				double alfa = atan2(tau,ds)/2.0;
-
-				double misesStress = sqrt(	pow(sig1,2) - sig1*sig2 + pow(sig2,2) );
-
-				m_femGrid->setResult(i, j, 0, sig1);
-				m_femGrid->setResult(i, j, 1, sig2);
-				m_femGrid->setResult(i, j, 2, alfa);
-				m_femGrid->setResult(i, j, 3, misesStress);
-
-				if (misesStress>m_maxMisesStressValue)
-					m_maxMisesStressValue = misesStress;
-				
-				if (fabs(sig1)>m_maxStressValue)
-					m_maxStressValue = fabs(sig1);
-				
-				if (fabs(sig2)>m_maxStressValue)
-					m_maxStressValue = fabs(sig2);
-				
-				if (sig1<0.0)
-					if (fabs(sig1)>m_maxNegStressValue)
-						m_maxNegStressValue = fabs(sig1);
-					
-				if (sig1>0.0)
-					if (fabs(sig1)>m_maxPosStressValue)
-						m_maxPosStressValue = sig1;
-						
-				if (sig2<0.0)
-					if (fabs(sig2)>m_maxNegStressValue)
-						m_maxNegStressValue = fabs(sig2);
-							
-				if (sig2>0.0)
-					if (fabs(sig2)>m_maxPosStressValue)
-						m_maxPosStressValue = sig2;
-			}
-		}
-	}
-
-	m_femGrid->averageNodeResults();
-
-	//
-	// Calculate reaction forces from vector constraints
-	//
+	this->computeElementForces();
 
 	if (vectorBcsDefined)
-	{
-		double x1, y1, x2, y2, ex, ey, es;
-		RowVector BarEx(2);
-		RowVector BarEy(2);
-		RowVector BarEp(2);
-		RowVector BarEd(4);
-
-		double maxReactionForce = -1e300;
-
-		BarEp << E << m_constraintStiffnessScale;
-
-		for (vci=vectorConstraints.begin(); vci!=vectorConstraints.end(); vci++)
-		{
-			CConstraint* constraint = *vci;
-			constraint->getPosition(x2, y2);
-			m_femGrid->getNearestDofs((int)x2, (int)y2, dofs);
-
-			constraint->getDirection(ex, ey);
-
-			x1 = x2 - ex;
-			y1 = y2 - ey;
-
-			BarEx << x1 << x2;
-			BarEy << y1 << y2;
-			BarEd << 0.0 << 0.0 << m_a(dofs[0]) << m_a(dofs[1]) ;
-
-			calfem::bar2s(BarEx, BarEy, BarEp, BarEd, es);
-
-			if (fabs(es)>maxReactionForce)
-				maxReactionForce = fabs(es);
-
-			constraint->getReactionForce()->setValue(es);
-		}
-
-		for (vci=vectorConstraints.begin(); vci!=vectorConstraints.end(); vci++)
-		{
-			CConstraint* constraint = *vci;
-
-			double force = 100.0 * constraint->getReactionForce()->getValue()/maxReactionForce;
-			constraint->getReactionForce()->setLength(-force);
-		}
-	}
-
-	//
-	// Store max stress in FEM model
-	//
+		this->computeReactionForces(vectorConstraints);
 
 	m_femGrid->setMaxStressValue(m_maxStressValue);
 	m_femGrid->setMaxPosStressValue(m_maxPosStressValue);
 	m_femGrid->setMaxNegStressValue(m_maxNegStressValue);
 	m_femGrid->setMaxNodeValue(m_maxNodeValue);
 	m_femGrid->setMaxMisesStressValue(m_maxMisesStressValue);
+}
+
+void CFemGridSolver2::execute()
+{
+	int i;
+	bool loadsDefined, bcsDefined, vectorBcsDefined;
+	std::set<int> uniqueDofs;
+	std::set<int> uniqueVectorDofs;
+	std::vector<CConstraint*> vectorConstraints;
+	std::vector<double> prescribedValues;
+
+#ifdef WIN32
+	DWORD startTime = timeGetTime();
+#endif
+
+	m_errorStatus = CFemGridSolver2::ET_NO_ERROR;
+
+	setupHinges();
+
+	calculateOptimalBandwidth();
+
+	if (m_nDof==0)
+	{
+		m_errorStatus = ET_NO_ELEMENTS;
+		return;
+	}
+
+	this->progressMessage("Assembling system matrix.", 20);
+
+	int nElements;
+
+	calfem::TripletList Ktriplets;
+
+	nElements = this->assembleSystem(Ktriplets);
+
+	if (nElements==0)
+	{
+		m_errorStatus = ET_NO_ELEMENTS;
+		return;
+	}
+
+	if ((m_femGrid->getPointLoadSize()==0)&&(m_Eq(0)==0.0)&&(m_Eq(1)==0.0))
+	{
+		m_errorStatus = ET_NO_LOADS;
+		return;
+	}
+
+	if (m_femGrid->getPointConstraintsSize()==0)
+	{
+		m_errorStatus = ET_NO_BCS;
+		return;
+	}
+
+	setupForcesAndConstraints(loadsDefined, bcsDefined, vectorBcsDefined, uniqueDofs, uniqueVectorDofs, vectorConstraints, prescribedValues);
+
+	if ((!bcsDefined)&&(!vectorBcsDefined))
+	{
+		m_errorStatus = ET_BC_OUTSIDE_AE;
+		return;
+	}
+
+	if (!loadsDefined)
+	{
+		m_errorStatus = ET_LOAD_OUTSIDE_AE;
+		return;
+	}
+
+	if (vectorBcsDefined)
+		this->assembleVectorConstraints(Ktriplets, vectorConstraints);
+
+	this->removeDoubleDofs(uniqueDofs, prescribedValues, m_bcDofs, m_bcVals);
+
+	m_K_sparse.resize(m_nDof, m_nDof);
+	m_K_sparse.setFromTriplets(Ktriplets.begin(), Ktriplets.end());
+
+	m_a = calfem::ColVec::Zero(m_nDof);
+
+	progressMessage("Solving.", 60);
+
+	calfem::ColVec Q;
+	if (!calfem::spsolveq(m_K_sparse, m_f, m_bcDofs, m_bcVals, m_a, Q))
+	{
+		m_errorStatus = ET_INVALID_MODEL;
+		return;
+	}
+
+	progressMessage("Storing results.", 80);
+
+	m_maxNodeValue = -1.0e300;
+
+	m_femGrid->setDisplacementSize(m_nDof);
+
+	for (i=0; i<m_nDof; i++)
+	{
+		m_femGrid->setDisplacement(i+1, m_a(i));
+		if (fabs(m_a(i))>m_maxNodeValue)
+			m_maxNodeValue = fabs(m_a(i));
+	}
+
+	this->computeElementForces();
+
+	if (vectorBcsDefined)
+		this->computeReactionForces(vectorConstraints);
+
+	m_femGrid->setMaxStressValue(m_maxStressValue);
+	m_femGrid->setMaxPosStressValue(m_maxPosStressValue);
+	m_femGrid->setMaxNegStressValue(m_maxNegStressValue);
+	m_femGrid->setMaxNodeValue(m_maxNodeValue);
+	m_femGrid->setMaxMisesStressValue(m_maxMisesStressValue);
+
+#ifdef WIN32
+	DWORD endTime = timeGetTime();
+	cout << "Total execution time (ms) = " << endTime - startTime << endl;
+#endif
+
+	progressMessage("Finished.", 99);
+	progressMessage("Finished.", 0);
 }
 
 void CFemGridSolver2::setElementTreshold(double treshold)
@@ -2937,191 +1558,4 @@ void CFemGridSolver2::setOptFilterType(TFilterType filterType)
 CFemGridSolver2::TFilterType CFemGridSolver2::getOptFilterType()
 {
 	return m_filterType;
-}
-
-void CFemGridSolver2::execute()
-{
-	int i;
-	int maxBandwidth;
-	bool loadsDefined, bcsDefined, vectorBcsDefined;
-	set<int> uniqueDofs;
-	set<int> uniqueVectorDofs;
-	vector<CConstraint*> vectorConstraints;
-	RowVector prescribedValues;
-
-#ifdef WIN32
-	DWORD startTime = timeGetTime();
-#endif
-
-	//
-	// Reset error status
-	//
-
-	m_errorStatus = CFemGridSolver2::ET_NO_ERROR;
-
-	///////////////////////////////////////////////////////////////////////////
-	// Apply hinge constraints directly to stiffness grid
-	//
-
-	setupHinges();
-
-	///////////////////////////////////////////////////////////////////////////
-	// Calculate optimum bandwidth
-	//
-
-	maxBandwidth = this->calculateOptimalBandwidth();
-	
-	if (m_nDof==0)
-	{
-		m_errorStatus = ET_NO_ELEMENTS;
-		return;
-	}
-
-	///////////////////////////////////////////////////////////////////////////
-	// Setup system matrices
-	//
-
-	this->progressMessage("Assembling system matrix.", 20);
-
-	ColumnVector fsys;
-	ColumnVector gdof;
-	ColumnVector ldof;
-	ColumnVector GlobalA;
-
-	int nElements;
-
-	SymmetricBandMatrix K(m_nDof,maxBandwidth);
-	K = 0.0;
-
-	///////////////////////////////////////////////////////////////////////////
-	// Assemble system
-	//
-
-	nElements = this->assembleSystem(K);
-
-	//
-	// If no elements where assembled something was wrong return 
-	// with error.
-	//
-
-	if (nElements==0)
-	{
-		m_errorStatus = ET_NO_ELEMENTS;
-		return;
-	}
-
-	//so_print("CFemGridSolver2",so_format("%d elements assembled.",nElements));
-
-	///////////////////////////////////////////////////////////////////////////
-	// Setup forces and constraints
-	//
-
-	if ((m_femGrid->getPointLoadSize()==0)&&(m_Eq(1)==0.0)&&(m_Eq(2)==0.0))
-	{
-		m_errorStatus = ET_NO_LOADS;
-		return;
-	}
-
-	if (m_femGrid->getPointConstraintsSize()==0)
-	{
-		m_errorStatus = ET_NO_BCS;
-		return;
-	}
-
-	setupForcesAndConstraints(loadsDefined, bcsDefined, vectorBcsDefined, uniqueDofs, uniqueVectorDofs, vectorConstraints, prescribedValues);
-
-	if ((!bcsDefined)&&(!vectorBcsDefined))
-	{
-		m_errorStatus = ET_BC_OUTSIDE_AE;
-		return;
-	}
-
-	if (!loadsDefined)
-	{
-		m_errorStatus = ET_LOAD_OUTSIDE_AE;
-		return;
-	}
-
-	///////////////////////////////////////////////////////////////////////////
-	// Assemble Vector Constraints
-	//
-
-	if (vectorBcsDefined)
-		this->assembleVectorConstraints(K, vectorConstraints);
-
-	Matrix Bc(uniqueDofs.size(),2);
-	this->removeDoubleDofs(uniqueDofs, prescribedValues, Bc);
-
-	///////////////////////////////////////////////////////////////////////////
-	// Solve system
-	//
-
-	m_a.ReSize(m_nDof,1);
-	m_a = 0.0;
-
-	//so_print("CFemGridSolver2","Solving system.");
-	progressMessage("Solving.", 60);
-
-	Try 
-	{
-		m_X = K; // LU decomposition
-		m_a = m_X.i() * m_f;
-	}
-	CatchAll 
-	{
-		m_errorStatus = ET_INVALID_MODEL;
-		return;
-	}
-
-	//so_print("CFemGridSolver2","Done.");
-
-	///////////////////////////////////////////////////////////////////////////
-	// Create global displacement vector
-	//
-
-	//so_print("CFemGridSolver2","\tCreating global displacement vector.");
-
-	progressMessage("Storing results.", 80);
-
-	m_maxNodeValue = -1.0e300;
-
-	m_femGrid->setDisplacementSize(m_nDof);
-
-	for (i=1; i<=K.Nrows(); i++)
-	{
-		m_femGrid->setDisplacement(i, m_a(i));
-		if (fabs(m_a(i))>m_maxNodeValue)
-			m_maxNodeValue = fabs(m_a(i));
-	}
-
-	///////////////////////////////////////////////////////////////////////////
-	// Store element forces in elements
-	//
-
-	this->computeElementForces();
-	
-	///////////////////////////////////////////////////////////////////////////
-	// Calculate reaction forces from vector constraints
-	//
-
-	if (vectorBcsDefined)
-		this->computeReactionForces(vectorConstraints);
-
-	///////////////////////////////////////////////////////////////////////////
-	// Store max stress in FEM model
-	//
-
-	m_femGrid->setMaxStressValue(m_maxStressValue);
-	m_femGrid->setMaxPosStressValue(m_maxPosStressValue);
-	m_femGrid->setMaxNegStressValue(m_maxNegStressValue);
-	m_femGrid->setMaxNodeValue(m_maxNodeValue);
-	m_femGrid->setMaxMisesStressValue(m_maxMisesStressValue);
-
-#ifdef WIN32
-	DWORD endTime = timeGetTime();
-	cout << "Total execution time (ms) = " << endTime - startTime << endl;
-#endif
-
-	progressMessage("Finished.", 99);
-	progressMessage("Finished.", 0);
 }

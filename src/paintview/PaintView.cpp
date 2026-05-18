@@ -51,15 +51,7 @@
 #include <sstream>
 #include <algorithm>
 
-#include <newmat.h>
-#include <newmatio.h>
-#include <newmatap.h>
-
 #include "UiSettings.h"
-
-#ifdef use_namespace
-using namespace NEWMAT;
-#endif
 
 /////////////////////////////////////////////////////////////
 // Structures used for copy and paste in Windows
@@ -1710,16 +1702,12 @@ bool CPaintView::execute()
 	// Check for long computational times >10000 dofs. (today...)
 	//
 	
-	if (m_warnOnLargeModels)
-		if (m_femGrid->enumerateDofs(ED_BOTTOM_TOP)>10000)
-	        if (!doAskYesNo("Model contains >10000 degrees of freedom.\nCalculation can take a long time.\nContinue?"))
-				return false;
 	//
 	// Initiate solver
 	//
-	
+
 	so_print("CPaintView","\tInitiating solver.");
-	
+
 	m_solver = new CFemGridSolver2();
 	m_solver->setStatusMessageEvent(m_statusMessageEvent);
 	m_solver->setLogMessageEvent(m_logMessageEvent);
@@ -1819,17 +1807,12 @@ bool CPaintView::executeOpt()
 	// Check for long computational times >10000 dofs. (today...)
 	//
 	
-	if (m_warnOnLargeModels)
-		if (m_femGrid->enumerateDofs(ED_BOTTOM_TOP)>10000)
-			if (!doAskYesNo("Model contains >10000 degrees of freedom.\nCalculation can take a long time.\nContinue?"))
-				return false;
-		
 	//
 	// Initiate solver
 	//
-	
+
 	so_print("CPaintView","\tInitiating solver.");
-	
+
 	m_solver = new CFemGridSolver2();
 	m_solver->setStatusMessageEvent(m_statusMessageEvent);
 	m_solver->setLogMessageEvent(m_logMessageEvent);

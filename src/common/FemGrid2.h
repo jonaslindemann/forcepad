@@ -297,7 +297,7 @@ public:
 	void setGridSpacing(int spacing);
 	int getGridSpacing();
 
-	void assignNonElements(Matrix& M, double value);
+	void assignNonElements(Eigen::MatrixXd& M, double value);
 
 	void setShowDensity(bool flag);
 	bool getShowDensity();

@@ -58,6 +58,20 @@ typedef Eigen::Matrix<double, 4, 12> Matrix4x12;
 typedef Eigen::Matrix<double, 4, 1> Vector4;
 typedef Eigen::Matrix<double, 1, 3> RowVec3;
 
+void hooke(int ptype, double E, double v, Matrix &D);
+
+void bar2e(const RowVec &ex, const RowVec &ey, const RowVec &ep, Matrix &Ke);
+
+void bar2s(const RowVec &ex, const RowVec &ey, const RowVec &ep, const RowVec &ed, double &es);
+
+void plani4e(const RowVec &ex, const RowVec &ey, const RowVec &ep, const Matrix &D,
+             const RowVec &eq, Matrix &Ke, ColVec &fe);
+
+void plani4s(const RowVec &ex, const RowVec &ey, const RowVec &ep, const Matrix &D,
+             const RowVec &ed, Matrix &es, Matrix &et);
+
+void writeMatrix(const std::string &name, Matrix &m, std::ostream &out);
+
 void bar3e(const RowVec &ex, const RowVec &ey, const RowVec &ez, const RowVec &ep, double eq, Matrix &Ke, ColVec &fe);
 
 void bar3s(const RowVec &ex, const RowVec &ey, const RowVec &ez, const RowVec &ep, const RowVec &ed, double eq, int n,

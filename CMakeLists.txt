@@ -54,6 +54,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 message(STATUS "Qt6 version: ${Qt6_VERSION}")
 
+find_package(Eigen3 REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(PNG REQUIRED)
@@ -69,9 +70,9 @@ add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
 
 if(WIN32)
-	include_directories(${FLTK_BUILD_DIR} ${FLTK_INCLUDE_DIR} src/calfemcxx src/newmat src/defs ${JPEG_INCLUDE_DIR} ${PNG_INCLUDE_DIR} ${ZLIB_INCLUDE_DIR})
+	include_directories(${FLTK_BUILD_DIR} ${FLTK_INCLUDE_DIR} src/calfem src/defs ${JPEG_INCLUDE_DIR} ${PNG_INCLUDE_DIR} ${ZLIB_INCLUDE_DIR})
 else(WIN32)
-	include_directories(/opt/local/include ${FLTK_INCLUDE_DIR} src/calfemcxx src/newmat src/defs)
+	include_directories(/opt/local/include ${FLTK_INCLUDE_DIR} src/calfem src/defs)
 endif(WIN32)
 
 if (APPLE)

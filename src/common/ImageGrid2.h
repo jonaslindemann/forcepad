@@ -28,10 +28,7 @@
 #include "Image.h"
 #include "Shape.h"
 
-#include <include.h>
-#include <newmat.h>
-#include <newmatio.h>
-#include <newmatap.h>
+#include <Eigen/Dense>
 
 IvfSmartPointer(CImageGrid2);
 
@@ -75,9 +72,9 @@ public:
 	void setGridValue(int row, int col, double value);
 	double getGridValue(int row, int col);
 
-	void copyGrid(Matrix& toMatrix);
-	void copyGrid(Matrix& toMatrix, double scaleFactor);
-	void assignGrid(Matrix& toMatrix);
+	void copyGrid(Eigen::MatrixXd& toMatrix);
+	void copyGrid(Eigen::MatrixXd& toMatrix, double scaleFactor);
+	void assignGrid(Eigen::MatrixXd& toMatrix);
 
 	void setFieldValue(int layer, int row, int col, double value);
 	double getFieldValue(int layer, int row, int col);
@@ -85,8 +82,8 @@ public:
 	void copyField(int fromLayer, int toLayer);
 	void copyFromGrid(int toLayer, double factor);
 	void assignField(int layer, double value);
-	void assignField(int layer, Matrix& toMatrix);
-	void copyField(int fromLayer, Matrix& toMatrix);
+	void assignField(int layer, Eigen::MatrixXd& toMatrix);
+	void copyField(int fromLayer, Eigen::MatrixXd& toMatrix);
 	void assignFieldFromImage(int imageLayer, int toLayer);
 
 	double maxAbsDiff(int l1, int l2);

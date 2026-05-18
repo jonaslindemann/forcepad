@@ -4,7 +4,11 @@
       "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\Jonas\\\\Development\\\\forcepad\" -Recurse -Directory)",
       "Bash(Select-Object -First 20)",
       "Bash(Format-Table FullName)",
-      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\Jonas\\\\Development\\\\forcepad\\\\src\\\\calfem\\\\\" -Recurse | Select-Object FullName, Length | Format-Table -AutoSize)"
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\Jonas\\\\Development\\\\forcepad\\\\src\\\\calfem\\\\\" -Recurse | Select-Object FullName, Length | Format-Table -AutoSize)",
+      "Bash(cd /d c:/Users/Jonas/Development/forcepad)",
+      "Bash(cmake -B build-debug -DBUILD_QT_APP=ON)",
+      "Bash(cmake -B build-debug -DBUILD_QT_APP=ON -S c:/Users/Jonas/Development/forcepad)",
+      "Bash(cmake --build c:/Users/Jonas/Development/forcepad/build-debug --config Debug --target qtforcepad)"
     ]
   }
 }
