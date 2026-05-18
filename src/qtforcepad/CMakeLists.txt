@@ -1,4 +1,4 @@
-include_directories(../forcepad ../common ../ivf2d ../calfemcxx ../newmat ../defs)
+include_directories(../paintview ../forcepad ../common ../ivf2d ../calfemcxx ../newmat ../defs)
 
 add_definitions(-DQT_NO_KEYWORDS -DUSE_QT)
 
@@ -9,7 +9,7 @@ set(SOURCES
     CalcSettingsDialog.cpp
     GeneralSettingsDialog.cpp
     AboutDialog.cpp
-    ../forcepad/PaintView.cpp
+    ../paintview/PaintView.cpp
     ../common/FemGridSolver2.cpp
 )
 

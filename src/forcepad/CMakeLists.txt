@@ -1,7 +1,9 @@
-include_directories(../common ../ivf2d)
+include_directories(../common ../ivf2d ../paintview)
 file(GLOB SOURCE_FILES CONFIGURE_DEPENDS *.cpp)
 file(GLOB INCLUDE_FILES CONFIGURE_DEPENDS *.h)
 list(APPEND SOURCE_FILES ../common/FemGridSolver2.cpp)
+list(APPEND SOURCE_FILES ../paintview/PaintView.cpp)
+list(APPEND INCLUDE_FILES ../paintview/PaintView.h)
 
 file(GLOB to_remove_cpp "MainFrame2_kiosk.cpp")
 file(GLOB to_remove_h "MainFrame2_kiosk.h")

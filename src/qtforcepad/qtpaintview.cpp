@@ -83,8 +83,9 @@ void QtPaintView::reinitGL()
 
 void QtPaintView::mousePressEvent(QMouseEvent *event)
 {
-    int x = event->pos().x();
-    int y = event->pos().y();
+    const qreal dpr = devicePixelRatio();
+    int x = qRound(event->pos().x() * dpr);
+    int y = qRound(event->pos().y() * dpr);
 
     if (event->modifiers() & Qt::ShiftModifier)
     {
@@ -112,8 +113,9 @@ void QtPaintView::mousePressEvent(QMouseEvent *event)
 
 void QtPaintView::mouseMoveEvent(QMouseEvent *event)
 {
-    int x = event->pos().x();
-    int y = event->pos().y();
+    const qreal dpr = devicePixelRatio();
+    int x = qRound(event->pos().x() * dpr);
+    int y = qRound(event->pos().y() * dpr);
 
     if (event->modifiers() & Qt::ShiftModifier)
     {
@@ -140,8 +142,9 @@ void QtPaintView::mouseMoveEvent(QMouseEvent *event)
 
 void QtPaintView::mouseReleaseEvent(QMouseEvent *event)
 {
-    int x = event->pos().x();
-    int y = event->pos().y();
+    const qreal dpr = devicePixelRatio();
+    int x = qRound(event->pos().x() * dpr);
+    int y = qRound(event->pos().y() * dpr);
 
     if (event->button() == Qt::LeftButton)
     {
@@ -186,12 +189,12 @@ void QtPaintView::keyPressEvent(QKeyEvent *event)
 
 int QtPaintView::height()
 {
-    return QOpenGLWidget::height();
+    return qRound(QOpenGLWidget::height() * devicePixelRatio());
 }
 
 int QtPaintView::width()
 {
-    return QOpenGLWidget::width();
+    return qRound(QOpenGLWidget::width() * devicePixelRatio());
 }
 
 void QtPaintView::doRedraw()
