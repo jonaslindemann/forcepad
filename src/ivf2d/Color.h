@@ -45,6 +45,8 @@ public:
 	/** Color class destructor. */
 	virtual ~CColor();
 
+	static CColorPtr create() { return std::make_shared<CColor>(); }
+
 	IvfClassInfo("CColor",CDrawableBase);
 
 	// Get/set methods
@@ -74,7 +76,7 @@ public:
 	 * DrawbleBase method render(), which in turn calls this 
 	 * method for setting the current color.
 	 */
-	virtual void doMaterial();
+	virtual void doMaterial() override;
 };
 
 #endif 

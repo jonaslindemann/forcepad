@@ -58,8 +58,7 @@ void CElementGrid::initGrid()
 	{
 		for (j=0; j<=m_cols; j++)
 		{
-			CNodePtr node = new CNode();
-			m_nodes[i].push_back(node);
+			m_nodes[i].push_back(CNode::create());
 		}
 	}
 }

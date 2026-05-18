@@ -29,19 +29,19 @@
 
 CSgiImage::CSgiImage()
 {
-	m_fileName = NULL;
+	m_fileName = nullptr;
 	m_alphaChannel = false;
 }
 
 CSgiImage::~CSgiImage()
 {
-	if (m_fileName!=NULL)
+	if (m_fileName!=nullptr)
 		delete [] m_fileName;
 }
 
 void CSgiImage::setFileName(const char *name)
 {
-	if (m_fileName!=NULL)
+	if (m_fileName!=nullptr)
 		delete [] m_fileName;
 
 	m_fileName = new char[strlen(name)+1];
@@ -105,7 +105,7 @@ bool CSgiImage::read()
 	// Open file
 	//
 
-	if (this->getFileName()==NULL)
+	if (this->getFileName()==nullptr)
 		return false;
 
 	inf = fopen(this->getFileName(), "rb");

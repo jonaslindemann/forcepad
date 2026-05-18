@@ -57,6 +57,8 @@ public:
 	CClipboard();
 	virtual ~CClipboard();
 
+	static CClipboardPtr create() { return std::make_shared<CClipboard>(); }
+
 	IvfClassInfo("CClipboard",CBase);
 
 	virtual void copy(int x1, int y1, int x2, int y2);
@@ -66,7 +68,7 @@ public:
     void copyImage(int width, int height, unsigned char* imageMap);
 
 	void setPasteMode(TPasteMode mode);
-	void setImage(CImage* image);
+	void setImage(CImagePtr image);
 	CImage* getClipboardImage();
 	void setCopyImageMode(TCopyImageMode mode);
 	void getSelection(int &x1, int &y1, int &x2, int &y2);

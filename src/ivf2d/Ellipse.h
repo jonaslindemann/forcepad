@@ -37,6 +37,8 @@ public:
 	CEllipse();
 	virtual ~CEllipse();
 
+	static CEllipsePtr create() { return std::make_shared<CEllipse>(); }
+
 	IvfClassInfo("CEllipse",CShape);
 
 	virtual void doGeometry();

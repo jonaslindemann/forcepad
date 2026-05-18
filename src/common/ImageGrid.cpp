@@ -34,10 +34,10 @@
 
 CImageGrid::CImageGrid()
 {
-	m_image = NULL;
+	m_image = nullptr;
 	m_stride = 8;
-	m_grid = NULL;
-	m_specialElement = NULL;
+	m_grid = nullptr;
+	m_specialElement = nullptr;
 	m_rows = -1;
 	m_cols = -1;
 	m_maxIntensity = 1.0;
@@ -51,7 +51,7 @@ CImageGrid::~CImageGrid()
 
 	// Delete old grid, if any.
 
-	if (m_grid!=NULL)
+	if (m_grid!=nullptr)
 	{
 		for (i=0; i<m_rows; i++)
 		{
@@ -70,7 +70,7 @@ CImageGrid::~CImageGrid()
 	}
 }
 
-void CImageGrid::setImage(CImage *image)
+void CImageGrid::setImage(CImagePtr image)
 {
 	m_image = image;
 
@@ -82,7 +82,7 @@ void CImageGrid::doGeometry()
 {
 	int i, j;
 
-	if (m_grid!=NULL)
+	if (m_grid!=nullptr)
 	{
 		/*
 		glBegin(GL_LINES);
@@ -153,7 +153,7 @@ void CImageGrid::initGrid()
 
 	// Delete old grid, if any.
 
-	if (m_grid!=NULL)
+	if (m_grid!=nullptr)
 	{
 		for (i=0; i<m_rows; i++)
 		{
@@ -363,7 +363,7 @@ void CImageGrid::getGridSize(int &rows, int &cols)
 
 CImage* CImageGrid::getImage()
 {
-	return m_image;
+	return m_image.get();
 }
 
 int CImageGrid::getStride()
@@ -373,7 +373,7 @@ int CImageGrid::getStride()
 
 double CImageGrid::getGridValue(int row, int col, int element)
 {
-	if (m_grid!=NULL)
+	if (m_grid!=nullptr)
 	{
 		if ((row>=0)&&(row<m_rows)&&(col>=0)&&(col<m_cols)&&(element>=0)&&(element<2))
 			return m_grid[row][col][element];
@@ -386,7 +386,7 @@ double CImageGrid::getGridValue(int row, int col, int element)
 
 bool CImageGrid::isSpecialElement(int row, int col, int element)
 {
-	if (m_specialElement!=NULL)
+	if (m_specialElement!=nullptr)
 	{
 		if ((row>=0)&&(row<m_rows)&&(col>=0)&&(col<m_cols)&&(element>=0)&&(element<2))
 			return m_specialElement[row][col][element];
@@ -418,7 +418,7 @@ void CImageGrid::snapToGrid(int& x, int& y)
 
 void CImageGrid::getElementCoords(int row, int col, int element, double *ex, double *ey)
 {
-	if (m_grid!=NULL)
+	if (m_grid!=nullptr)
 	{
 		switch (getGridElementType(row, col)) {
 		case ET_RIGHT_DIAGONAL:
@@ -512,7 +512,7 @@ void CImageGrid::getElementTopo(int row, int col, int element, int *dx, int *dy)
 	//     e=1: dx = [1, 1, 0]
 	//          dy = [0, 1, 1]
 	//
-	if (m_grid!=NULL)
+	if (m_grid!=nullptr)
 	{
 		switch (getGridElementType(row, col)) {
 		case ET_RIGHT_DIAGONAL:
@@ -584,7 +584,7 @@ void CImageGrid::setUseImage(bool flag)
 
 void CImageGrid::setGridValue(int row, int col, int element, double value)
 {
-	if (m_grid!=NULL)
+	if (m_grid!=nullptr)
 	{
 		if ((row>=0)&&(row<m_rows)&&(col>=0)&&(col<m_cols)&&(element>=0)&&(element<2))
 			m_grid[row][col][element] = value;
@@ -593,7 +593,7 @@ void CImageGrid::setGridValue(int row, int col, int element, double value)
 
 void CImageGrid::setSpecialElement(int row, int col, int element, bool special)
 {
-	if (m_specialElement!=NULL)
+	if (m_specialElement!=nullptr)
 	{
 		if ((row>=0)&&(row<m_rows)&&(col>=0)&&(col<m_cols)&&(element>=0)&&(element<2))
 			m_specialElement[row][col][element] = special;

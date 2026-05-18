@@ -47,6 +47,8 @@ public:
 	/** CIvfJpegImage destructor */
 	virtual ~CJpegImage();
 
+	static CJpegImagePtr create() { return std::make_shared<CJpegImage>(); }
+
 	IvfClassInfo("CJpegImage",CImage);
 
 	/** Reads jpeg image */

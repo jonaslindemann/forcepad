@@ -52,6 +52,8 @@ public:
 	/** Rectangle class destructor. */
     virtual ~CArch();
 
+	static CArchPtr create() { return std::make_shared<CArch>(); }
+
     IvfClassInfo("CArch",CShape);
 
 	/** Set size of rectangle in world coordinates. */
@@ -63,7 +65,7 @@ public:
 	/** Draw rectangle in OpenGL. */
 	virtual void doGeometry();
 
-	void setLineColor(CColor* color);
+	void setLineColor(CColorPtr color);
 	void setLineWidth(double width);
     double getLineWidth();
 };

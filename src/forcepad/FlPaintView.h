@@ -60,28 +60,28 @@ public:
      */
 
     /** FLTK draw() method virtual override. */
-    void draw();
+    void draw() override;
 
     /** FLTK handle() method virtual override. */
-    int handle(int event);
+    int handle(int event) override;
 
 protected:
-    virtual int height();
-    virtual int width();
-    virtual void doRedraw();
-    virtual void doFlush();
-    virtual void doInvalidate();
-    virtual void doMakeCurrent();
-    virtual const std::string doSaveDialog(const string title, const string filter, const string defaultFilename);
-    virtual bool doNewModel(int &width, int &height, int& initialStiffness);
-    virtual void doInfoMessage(const string message);
-    virtual bool doAskYesNo(const string question);
-    virtual const std::string doOpenDialog(const string title, const string filter);
-    virtual void doCreateCursors();
-    virtual void doUpdateCursor(TEditMode mode);
-    virtual void doDeleteCursors();
-    virtual void doShowAbout();
-    virtual void doShowHelp();
+    virtual int height() override;
+    virtual int width() override;
+    virtual void doRedraw() override;
+    virtual void doFlush() override;
+    virtual void doInvalidate() override;
+    virtual void doMakeCurrent() override;
+    virtual const std::string doSaveDialog(const string title, const string filter, const string defaultFilename) override;
+    virtual bool doNewModel(int &width, int &height, int& initialStiffness) override;
+    virtual void doInfoMessage(const string message) override;
+    virtual bool doAskYesNo(const string question) override;
+    virtual const std::string doOpenDialog(const string title, const string filter) override;
+    virtual void doCreateCursors() override;
+    virtual void doUpdateCursor(TEditMode mode) override;
+    virtual void doDeleteCursors() override;
+    virtual void doShowAbout() override;
+    virtual void doShowHelp() override;
 };
 
 #endif

@@ -71,7 +71,7 @@ namespace std {
 		// leave place for single char + 0 terminator
 		setp( psz, psz + BUF_SIZE - 2 );
 		//::InitializeCriticalSection( &m_csLock );
-		m_Log = NULL;
+		m_Log = nullptr;
 	}
 
 	template <class E, class T, int BUF_SIZE >
@@ -114,7 +114,7 @@ namespace std {
 				#pragma warning (pop)
 				
 				// Sync if string contains LF
-				bool bSync = traits_type::find( pch, nMax, traits_type::to_char_type( '\n' ) ) != NULL;
+				bool bSync = traits_type::find( pch, nMax, traits_type::to_char_type( '\n' ) ) != nullptr;
 				pch += nMax, nPut += nMax, n -= nMax, pbump(nMax);
 				if( bSync )
 					sync();
@@ -144,7 +144,7 @@ namespace std {
 		*plast = char_type();
 
 		// Pass text to the edit control
-		if (m_Log!=NULL)
+		if (m_Log!=nullptr)
 		{
 			m_Log->insert(pbase());
 			m_Log->show_insert_position();

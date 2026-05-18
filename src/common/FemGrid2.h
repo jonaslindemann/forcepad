@@ -78,7 +78,7 @@ private:
 
 	CColorMapPtr m_colorMap;
 
-	int*** m_dofs;
+	std::vector<int> m_dofs;
 
 	int m_dofRows;
 	int m_dofCols;
@@ -126,9 +126,9 @@ private:
 
 	int m_stressStep;
 
-	double*** m_results;
-	double** m_nodeResults;
-	int** m_nodeUsage;
+	std::vector<double> m_results;
+	EigenGridMatrix m_nodeResults;
+	std::vector<int> m_nodeUsage;
 
 	double m_arrowSize;
 
@@ -157,6 +157,8 @@ private:
 public:
 	CFemGrid2();
 	virtual ~CFemGrid2();
+
+	static CFemGrid2Ptr create() { return std::make_shared<CFemGrid2>(); }
 
 	int getElementCount();
 	void updatePixelArea();
@@ -213,8 +215,8 @@ public:
 	void addPoint(int x, int y);
 	void clearPoints();
 
-	void addForce(CForce* force);
-	void addConstraint(CConstraint* constraint);
+	void addForce(CForcePtr force);
+	void addConstraint(CConstraintPtr constraint);
 
 	void setShowGrid(bool flag);
 	bool getShowGrid();
@@ -284,7 +286,7 @@ public:
 
 	void setMaxIntensity(double intensity);
 
-	void setColorMap(CColorMap* colorMap);
+	void setColorMap(CColorMapPtr colorMap);
 	CColorMap* getColorMap();
 
 	void setStressType(TStressType stressType);
@@ -307,9 +309,9 @@ public:
 
 	void updateColorMapTexture();
 
-	virtual void setImage(CImage* image);
-	virtual void initGrid();
-	virtual void doGeometry();
+	virtual void setImage(CImagePtr image) override;
+	virtual void initGrid() override;
+	virtual void doGeometry() override;
 };
 
 #endif 

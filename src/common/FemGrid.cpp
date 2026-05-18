@@ -38,20 +38,20 @@ CFemGrid::CFemGrid()
 {
 	m_showGrid = false;
 
-	m_forceColor = new CColor();
+	m_forceColor = CColor::create();
 	m_forceColor->setColor(1.0f, 0.0f, 0.0f, 1.0f);
 
-	m_constraintColor = new CColor();
+	m_constraintColor = CColor::create();
 	m_constraintColor->setColor(0.0f, 0.3f, 1.0f, 1.0f);
 
-	m_colorMap = new CColorMap();
+	m_colorMap = CColorMap::create();
 	m_invertColorMap = false;
 
-	m_dofs = NULL;
+	m_dofs = nullptr;
 	m_bandwidth = 0;
 	m_displacementScale = 1.0;
-	m_displacements = NULL;
-	m_results = NULL;
+	m_displacements = nullptr;
+	m_results = nullptr;
 
 	m_elementTreshold = 0.02;
 
@@ -88,11 +88,11 @@ CFemGrid::~CFemGrid()
 	clearResults();
 	clearDofs();
 
-	if (m_displacements!=NULL)
+	if (m_displacements!=nullptr)
 		delete [] m_displacements;
 }
 
-void CFemGrid::addForce(CForce* force)
+void CFemGrid::addForce(CForcePtr force)
 {
 	double x, y;
 	int iy;
@@ -104,8 +104,7 @@ void CFemGrid::addForce(CForce* force)
 
 	if ((iy>=0)&&(iy<this->getImage()->getHeight()))
 	{
-		m_pointForces[iy].push_back(CForcePtr(force));
-		//force->addReference();
+		m_pointForces[iy].push_back(force);
 	}
 }
 
@@ -173,7 +172,7 @@ bool CFemGrid::getShowGrid()
 	return m_showGrid;
 }
 
-void CFemGrid::setImage(CImage *image)
+void CFemGrid::setImage(CImagePtr image)
 {
 	CImageGrid::setImage(image);
 
@@ -187,11 +186,11 @@ void CFemGrid::clearForces()
 {
 	m_pointForces.clear();
 
-	if (this->getImage()!=NULL)
+	if (this->getImage()!=nullptr)
 		m_pointForces.resize(this->getImage()->getHeight());
 }
 
-void CFemGrid::addConstraint(CConstraint *constraint)
+void CFemGrid::addConstraint(CConstraintPtr constraint)
 {
 	double x, y;
 	int iy;
@@ -200,14 +199,14 @@ void CFemGrid::addConstraint(CConstraint *constraint)
 	constraint->setColor(m_constraintColor);
 
 	iy = (int) y;
-	m_pointConstraints[iy].push_back(CConstraintPtr(constraint));
+	m_pointConstraints[iy].push_back(constraint);
 }
 
 void CFemGrid::clearConstraints()
 {
 	m_pointConstraints.clear();
 
-	if (this->getImage()!=NULL)
+	if (this->getImage()!=nullptr)
 		m_pointConstraints.resize(this->getImage()->getHeight());
 }
 
@@ -258,7 +257,7 @@ void CFemGrid::clearDofs()
 
 	// Delete old grid, if any.
 
-	if (m_dofs!=NULL)
+	if (m_dofs!=nullptr)
 	{
 		for (i=0; i<m_dofRows; i++)
 		{
@@ -270,7 +269,7 @@ void CFemGrid::clearDofs()
 
 		delete [] m_dofs;
 	}
-	m_dofs = NULL;
+	m_dofs = nullptr;
 }
 
 
@@ -335,7 +334,7 @@ int CFemGrid::enumerateDofs(int direction)
 
 	m_bandwidth = 0;
 	this->getGridSize(rows, cols);
-	if (m_dofs!=NULL)
+	if (m_dofs!=nullptr)
 	{
 		switch (direction) {
 		case ED_LEFT_RIGHT:
@@ -435,7 +434,7 @@ void CFemGrid::resetDofs()
 
 	rows++;
 	cols++;
-	if (m_dofs!=NULL)
+	if (m_dofs!=nullptr)
 	{
 		for (j=0; j<cols; j++)
 			for (i=0; i<rows; i++)
@@ -518,10 +517,10 @@ CForce* CFemGrid::getFirstPointLoad()
 
 	for (i=0; (i<height)&&(m_pointForces[i].empty()); i++);
 
-	// If no forces where found return NULL
+	// If no forces where found return nullptr
 
 	if (i==height)
-		return NULL;
+		return nullptr;
 
 	// Update search variables
 
@@ -530,7 +529,7 @@ CForce* CFemGrid::getFirstPointLoad()
 
 	// Return found force
 
-	return (*m_currentPointForceIter);
+	return (*m_currentPointForceIter).get();
 }
 
 CForce* CFemGrid::getNextPointLoad()
@@ -545,7 +544,7 @@ CForce* CFemGrid::getNextPointLoad()
 	// Return found force 
 
 	if (m_currentPointForceIter!=m_pointForces[m_currentPointForceRow].end())
-		return (*m_currentPointForceIter);
+		return (*m_currentPointForceIter).get();
 
 	// Go to next row
 
@@ -555,10 +554,10 @@ CForce* CFemGrid::getNextPointLoad()
 
 	for (i=m_currentPointForceRow; (i<height)&&(m_pointForces[i].empty()); i++);
 
-	// Return NULL if no forces where found
+	// Return nullptr if no forces where found
 
 	if (i==height)
-		return NULL;
+		return nullptr;
 
 	// Update search variables
 
@@ -567,7 +566,7 @@ CForce* CFemGrid::getNextPointLoad()
 
 	// Return found force
 
-	return (*m_currentPointForceIter);
+	return (*m_currentPointForceIter).get();
 }
 
 
@@ -626,7 +625,7 @@ void CFemGrid::erasePointLoad(int x, int y, int brushSize)
 		{
 			for (fi=m_pointForces[i].begin(); fi!=m_pointForces[i].end(); fi++)
 			{
-				CForce* force = (*fi);
+				CForce* force = (*fi).get();
 				force->getPosition(fx, fy);
 
 				fxs = (int)fx;
@@ -658,10 +657,10 @@ CConstraint* CFemGrid::getFirstPointConstraint()
 
 	for (i=0; (m_pointConstraints[i].empty())&&(i<height); i++);
 
-	// If no constraints where found return NULL
+	// If no constraints where found return nullptr
 
 	if (i==height)
-		return NULL;
+		return nullptr;
 
 	// Update search variables
 
@@ -670,7 +669,7 @@ CConstraint* CFemGrid::getFirstPointConstraint()
 
 	// Return found constraint
 
-	return (*m_currentPointConstraintIter);
+	return (*m_currentPointConstraintIter).get();
 }
 
 CConstraint* CFemGrid::getNextPointConstraint()
@@ -685,7 +684,7 @@ CConstraint* CFemGrid::getNextPointConstraint()
 	// Return found constraint 
 
 	if (m_currentPointConstraintIter!=m_pointConstraints[m_currentPointConstraintRow].end())
-		return (*m_currentPointConstraintIter);
+		return (*m_currentPointConstraintIter).get();
 
 	// Go to next row
 
@@ -695,10 +694,10 @@ CConstraint* CFemGrid::getNextPointConstraint()
 
 	for (i=m_currentPointConstraintRow; (i<height)&&(m_pointConstraints[i].empty()); i++);
 
-	// Return NULL if no constraints where found
+	// Return nullptr if no constraints where found
 
 	if (i==height)
-		return NULL;
+		return nullptr;
 
 	// Update search variables
 
@@ -707,7 +706,7 @@ CConstraint* CFemGrid::getNextPointConstraint()
 
 	// Return found constraint
 
-	return (*m_currentPointConstraintIter);
+	return (*m_currentPointConstraintIter).get();
 }
 
 void CFemGrid::erasePointConstraint(int x, int y, int brushSize)
@@ -725,7 +724,7 @@ void CFemGrid::erasePointConstraint(int x, int y, int brushSize)
 		{
 			for (ci=m_pointConstraints[i].begin(); ci!=m_pointConstraints[i].end(); ci++)
 			{
-				CConstraint* constraint = (*ci);
+				CConstraint* constraint = (*ci).get();
 				constraint->getPosition(cx, cy);
 
 				cxs = (int)cx;
@@ -776,7 +775,7 @@ void CFemGrid::drawGrid2()
 	double ey[3];
 	double value;
 
-	if (m_displacements!=NULL)
+	if (m_displacements!=nullptr)
 	{
 		for (i=0; i<m_rows; i++)
 		{
@@ -814,7 +813,7 @@ void CFemGrid::drawGrid()
 	double k = m_displacementScale/m_maxNodeValue;
 	double alpha = 0.7;
 
-	if (m_displacements!=NULL)
+	if (m_displacements!=nullptr)
 	{
 		for (i=0; i<m_rows; i++)
 		{
@@ -963,7 +962,7 @@ void CFemGrid::drawUndeformedGrid()
 	double k = 0.0;
 	double alpha = 0.3;
 
-	if (m_displacements!=NULL)
+	if (m_displacements!=nullptr)
 	{
 		for (i=0; i<m_rows; i++)
 		{
@@ -1117,7 +1116,7 @@ void CFemGrid::setDisplacement(int dof, double value)
 
 void CFemGrid::setDisplacementSize(int size)
 {
-	if (m_displacements!=NULL)
+	if (m_displacements!=nullptr)
 		delete [] m_displacements;
 
 	m_displacements = new double[size+1];
@@ -1142,7 +1141,7 @@ void CFemGrid::deactivateDofs()
 {
 	int i, j, k;
 
-	if (m_dofs!=NULL)
+	if (m_dofs!=nullptr)
 	{
 		for (i=0; i<m_dofRows; i++)
 			for (j=0; j<m_dofCols; j++)
@@ -1181,7 +1180,7 @@ void CFemGrid::clearResults()
 
 	// Delete old results grid, if any.
 
-	if (m_results!=NULL)
+	if (m_results!=nullptr)
 	{
 		for (i=0; i<m_rows; i++)
 		{
@@ -1193,12 +1192,12 @@ void CFemGrid::clearResults()
 		delete [] m_results;
 	}
 
-	m_results = NULL;
+	m_results = nullptr;
 }
 
 void CFemGrid::setResult(int i, int j, int element, const double *values)
 {
-	if (m_results!=NULL)
+	if (m_results!=nullptr)
 	{
 		int k;
 
@@ -1209,7 +1208,7 @@ void CFemGrid::setResult(int i, int j, int element, const double *values)
 
 void CFemGrid::setResult(int i, int j, int element, int index, double value)
 {
-	if (m_results!=NULL)
+	if (m_results!=nullptr)
 	{
 		m_results[i][j][element*4+index] = value;
 	}
@@ -1224,7 +1223,7 @@ void CFemGrid::drawMisesStress()
 	double sigm;
 	float r, g, b;
 
-	if ((m_displacements!=NULL)&&(m_results!=NULL))
+	if ((m_displacements!=nullptr)&&(m_results!=nullptr))
 	{
 		for (i=0; i<m_rows; i++)
 		{
@@ -1387,7 +1386,7 @@ void CFemGrid::drawStress()
 	double values[3];
 
 
-	if (m_results!=NULL)
+	if (m_results!=nullptr)
 	{
 		glPushAttrib(GL_COLOR_BUFFER_BIT);
 		glEnable(GL_BLEND);
@@ -1700,7 +1699,7 @@ double CFemGrid::getDisplacement(int dof)
 
 void CFemGrid::getResult(int i, int j, int element, double *values)
 {
-	if (m_results!=NULL)
+	if (m_results!=nullptr)
 	{
 		int k;
 
@@ -1730,7 +1729,7 @@ void CFemGrid::saveToStream(ostream &out)
 	int valueCount = 0;
 	double x, y;
 
-	if (image!=NULL)
+	if (image!=nullptr)
 	{
 		//
 		// Write image map RLE (only black & white)
@@ -1787,7 +1786,7 @@ void CFemGrid::saveToStream(ostream &out)
 		{
 			for (fi=m_pointForces[i].begin(); fi!=m_pointForces[i].end(); fi++)
 			{
-				CForce* force = (*fi);
+				CForce* force = (*fi).get();
 				force->getPosition(x, y);
 				out << x << " " << y << endl;
 				force->saveToStream(out);
@@ -1806,7 +1805,7 @@ void CFemGrid::saveToStream(ostream &out)
 		{
 			for (ci=m_pointConstraints[i].begin(); ci!=m_pointConstraints[i].end(); ci++)
 			{
-				CConstraint* constraint = (*ci);
+				CConstraint* constraint = (*ci).get();
 				constraint->getPosition(x, y);
 				out << x << " " << y << endl;
 				constraint->saveToStream(out);
@@ -1819,7 +1818,7 @@ void CFemGrid::saveToStream(ostream &out)
 
 void CFemGrid::readFromStream(istream &in)
 {
-	CImagePtr image = this->getImage();
+	CImage* image = this->getImage();
 	int width, height;
 	int i;
 	int value;
@@ -1830,7 +1829,7 @@ void CFemGrid::readFromStream(istream &in)
 	int nConstraints;
 	double x, y;
 
-	if (image!=NULL)
+	if (image!=nullptr)
 	{
 
 		//
@@ -1894,7 +1893,7 @@ void CFemGrid::readFromStream(istream &in)
 
 		for (i=0; i<nForces; i++)
 		{
-			CForce* force = new CForce();
+			auto force = CForce::create();
 			in >> x >> y;
 			force->setPosition(x, y);
 			force->readFromStream(in);
@@ -1909,31 +1908,31 @@ void CFemGrid::readFromStream(istream &in)
 
 		for (i=0; i<nConstraints; i++)
 		{
-			CConstraint* constraint = new CConstraint();
+			auto constraint = CConstraint::create();
 			in >> x >> y;
 			constraint->setPosition(x, y);
 			constraint->readFromStream(in);
 
 			// Convert from old constraint types
 
-			if (constraint->getConstraintType()==CConstraint::CT_X) 
+			if (constraint->getConstraintType()==CConstraint::CT_X)
 			{
 				constraint->setConstraintType(CConstraint::CT_VECTOR);
 				constraint->setDirection(1.0, 0.0);
 			}
 
-			if (constraint->getConstraintType()==CConstraint::CT_Y) 
+			if (constraint->getConstraintType()==CConstraint::CT_Y)
 			{
 				constraint->setConstraintType(CConstraint::CT_VECTOR);
 				constraint->setDirection(0.0, 1.0);
 			}
 
-			if (constraint->getConstraintType()==CConstraint::CT_XY) 
+			if (constraint->getConstraintType()==CConstraint::CT_XY)
 			{
 				constraint->setConstraintType(CConstraint::CT_VECTOR);
 				constraint->setDirection(1.0, 0.0);
 
-				CConstraint* extraConstraint = new CConstraint();
+				auto extraConstraint = CConstraint::create();
 				extraConstraint->setPosition(x, y);
 				extraConstraint->setDirection(0.0, 1.0);
 				extraConstraint->setConstraintType(CConstraint::CT_VECTOR);
@@ -1985,7 +1984,7 @@ void CFemGrid::calcCenterOfGravity(int &x, int &y)
 	sumFy = 0.0;
 	sumF = 0.0;
 
-	if (image!=NULL)
+	if (image!=nullptr)
 	{
 		width = image->getWidth();
 		height = image->getHeight();
@@ -2132,21 +2131,21 @@ CForce* CFemGrid::getNearestForce(int x, int y)
 	// n  - Pixel search distance (n=2 above)
 	//
 
-	CForceSelectionPtr selection = new CForceSelection();
-	this->getForces(x-20, y-20, x+20, y+20, selection);
+	auto selection = CForceSelection::create();
+	this->getForces(x-20, y-20, x+20, y+20, selection.get());
 
 	if (selection->getSize()==0)
-		return NULL;
+		return nullptr;
 
 	int i;
 	double dist;
 	double minDist = 1e300;
 	double xf, yf;
-	CForcePtr nearestForce = NULL;
+	CForce* nearestForce = nullptr;
 
 	for (i=0; i<selection->getSize(); i++)
 	{
-		CForcePtr force = selection->getForce(i);
+		CForce* force = selection->getForce(i);
 		force->getPosition(xf, yf);
 		dist = sqrt(pow(xf - (double)x, 2) + pow(yf - (double)y, 2));
 		if (dist<minDist)
@@ -2172,7 +2171,7 @@ void CFemGrid::getForces(int x1, int y1, int x2, int y2, CForceSelection *select
 	{
 		for (fi=m_pointForces[i].begin(); (!m_pointForces[i].empty())&&(fi!=m_pointForces[i].end()); fi++)
 		{
-			CForce* force = (*fi);
+			auto& force = *fi;
 			force->getPosition(fx, fy);
 
 			fxs = (int)fx;
@@ -2196,7 +2195,7 @@ void CFemGrid::getConstraints(int x1, int y1, int x2, int y2, CConstraintSelecti
 	{
 		for (fi=m_pointConstraints[i].begin(); (!m_pointConstraints[i].empty())&&(fi!=m_pointConstraints[i].end()); fi++)
 		{
-			CConstraint* constraint = (*fi);
+			auto& constraint = *fi;
 			constraint->getPosition(fx, fy);
 
 			fxs = (int)fx;
@@ -2221,9 +2220,7 @@ void CFemGrid::removePointForce(CForce *force)
 
 	for (fi=m_pointForces[fys].begin(); (!m_pointForces[fys].empty())&&(fi!=m_pointForces[fys].end()); fi++)
 	{
-		CForce* aForce = (*fi);
-
-		if (force == aForce)
+		if ((*fi).get() == force)
 		{
 			if (fi!=m_pointForces[fys].begin())
 				prevfi = fi-1;
@@ -2252,25 +2249,32 @@ void CFemGrid::moveForce(CForce* force, int x, int y)
 	fys = (int)fy;
 
 
+	CForcePtr holdForce;
+	CForceQueIter eraseIt = m_pointForces[fys].end();
 	for (fi=m_pointForces[fys].begin(); (!m_pointForces[fys].empty())&&(fi!=m_pointForces[fys].end()); fi++)
 	{
-		CForce* aForce = (*fi);
-		if (force == aForce)
-			eraseForce = fi;
+		if ((*fi).get() == force)
+		{
+			holdForce = *fi;
+			eraseIt = fi;
+			break;
+		}
 	}
 
-	m_pointForces[fys].erase(eraseForce);
+	if (!holdForce || eraseIt == m_pointForces[fys].end())
+		return;
 
+	m_pointForces[fys].erase(eraseIt);
 
 	if ((int)y>=(int)m_pointForces.size())
 	{
-		force->setPosition((double)x, (double)m_pointForces.size()-1);
-		m_pointForces[m_pointForces.size()-1].push_back(force);
+		holdForce->setPosition((double)x, (double)m_pointForces.size()-1);
+		m_pointForces.back().push_back(holdForce);
 	}
 	else
 	{
-		force->setPosition((double)x, (double)y);
-		m_pointForces[(int)y].push_back(force);
+		holdForce->setPosition((double)x, (double)y);
+		m_pointForces[(int)y].push_back(holdForce);
 	}
 
 }
@@ -2289,7 +2293,7 @@ void CFemGrid::removePointConstraint(CConstraint *constraint)
 
 	for (fi=m_pointConstraints[fys].begin(); (!m_pointConstraints[fys].empty())&&(fi!=m_pointConstraints[fys].end()); fi++)
 	{
-		CConstraint* aConstraint = (*fi);
+		CConstraint* aConstraint = (*fi).get();
 
 		if (constraint == aConstraint)
 		{
@@ -2321,7 +2325,7 @@ void CFemGrid::calcCenterOfStiffness(int &cgx, int &cgy)
 	sumFy = 0.0;
 	sumF = 0.0;
 
-	if (image!=NULL)
+	if (image!=nullptr)
 	{
 		width = image->getWidth();
 		height = image->getHeight();
@@ -2364,17 +2368,15 @@ CConstraintSelectionPtr CFemGrid::getConstraints()
 {
 	int i;
 
-	CConstraintSelectionPtr selection = new CConstraintSelection();
+	auto selection = CConstraintSelection::create();
 
 	CConstraintQueIter fi;
-	CConstraintQueIter prevfi;
 
 	for (i=0; i<this->getImage()->getHeight(); i++)
 	{
 		for (fi=m_pointConstraints[i].begin(); (!m_pointConstraints[i].empty())&&(fi!=m_pointConstraints[i].end()); fi++)
 		{
-			CConstraint* constraint = (*fi);
-			selection->add(constraint);
+			selection->add(*fi);
 		}
 	}
 
@@ -2385,17 +2387,15 @@ CForceSelectionPtr CFemGrid::getForces()
 {
 	int i;
 
-	CForceSelectionPtr selection = new CForceSelection();
+	auto selection = CForceSelection::create();
 
 	CForceQueIter fi;
-	CForceQueIter prevfi;
 
 	for (i=0; i<this->getImage()->getHeight(); i++)
 	{
 		for (fi=m_pointForces[i].begin(); (!m_pointForces[i].empty())&&(fi!=m_pointForces[i].end()); fi++)
 		{
-			CForce* force = (*fi);
-			selection->add(force);
+			selection->add(*fi);
 		}
 	}
 
@@ -2463,17 +2463,13 @@ void CFemGrid::setShowReactionForces(bool flag)
 {
 	int i;
 
-	CConstraintSelectionPtr selection = new CConstraintSelection();
-
 	CConstraintQueIter fi;
-	CConstraintQueIter prevfi;
 
 	for (i=0; i<this->getImage()->getHeight(); i++)
 	{
 		for (fi=m_pointConstraints[i].begin(); (!m_pointConstraints[i].empty())&&(fi!=m_pointConstraints[i].end()); fi++)
 		{
-			CConstraint* constraint = (*fi);
-			constraint->setShowReactionForce(flag);
+			(*fi)->setShowReactionForce(flag);
 		}
 	}
 }
@@ -2510,7 +2506,7 @@ void CFemGrid::updatePixelArea()
 
 	sumF = 0.0;
 
-	if (image!=NULL)
+	if (image!=nullptr)
 	{
 		width = image->getWidth();
 		height = image->getHeight();
@@ -2582,14 +2578,14 @@ bool CFemGrid::getDrawDisplacements()
 	return m_drawDisplacements;
 }
 
-void CFemGrid::setColorMap(CColorMap* colorMap)
+void CFemGrid::setColorMap(CColorMapPtr colorMap)
 {
 	m_colorMap = colorMap;
 }
 
 CColorMap* CFemGrid::getColorMap()
 {
-	return m_colorMap;
+	return m_colorMap.get();
 }
 
 void CFemGrid::setElementTreshold(double value)

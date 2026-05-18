@@ -57,6 +57,8 @@ public:
 	/** Texture class destructor. */
 	virtual ~CTexture();
 
+	static CTexturePtr create() { return std::make_shared<CTexture>(); }
+
 	IvfClassInfo("CTexture",CBase);
 
 	/** Applies a bound texture. */
@@ -79,7 +81,7 @@ public:
 	 * Replaces existing image. If existing image 
 	 * is unreferenced it will be deleted.
 	 */
-	void setImage(CImage* image);
+	void setImage(CImagePtr image);
 };
 
 #endif 

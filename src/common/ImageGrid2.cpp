@@ -35,11 +35,8 @@
 CImageGrid2::CImageGrid2()
 {
 	m_fieldLayers = 2;
-	m_image = NULL;
+	m_image = nullptr;
 	m_stride = 8;
-	m_grid = NULL;
-	m_fields = NULL;
-	m_specialElement = NULL;
 	m_rows = -1;
 	m_cols = -1;
 	m_maxIntensity = 1.0;
@@ -55,36 +52,12 @@ CImageGrid2::~CImageGrid2()
 
 void CImageGrid2::clearGrid()
 {
-	int i, j;
-
-	// Delete old grid, if any.
-
-	if (m_grid!=NULL)
-	{
-		for (i=0; i<m_rows; i++)
-		{
-			delete [] m_grid[i];
-			delete [] m_specialElement[i];
-		}
-
-		delete [] m_grid;
-		delete [] m_specialElement;
-	}
-
-	if (m_fields!=NULL)
-	{
-		for (i=0; i<m_fieldLayers; i++)
-		{
-			for (j=0; j<m_rows; j++)
-				delete [] m_fields[i][j];
-
-			delete [] m_fields[i];
-		}
-		delete [] m_fields;
-	}
+	m_grid.resize(0, 0);
+	m_fields.clear();
+	m_specialElement.clear();
 }
 
-void CImageGrid2::setImage(CImage *image)
+void CImageGrid2::setImage(CImagePtr image)
 {
 	m_image = image;
 
@@ -96,7 +69,7 @@ void CImageGrid2::doGeometry()
 {
 	int i, j;
 
-	if (m_grid!=NULL)
+	if (m_grid.size() > 0)
 	{
 		/*
 		glBegin(GL_LINES);
@@ -109,17 +82,17 @@ void CImageGrid2::doGeometry()
 		{
 			for (j=0; j<m_cols; j++)
 			{
-				if (m_grid[i][j]>0.0)
+				if (m_grid(i,j)>0.0)
 				{
 					glBegin(GL_TRIANGLES);
-					glColor3f((1.0-m_grid[i][j])*m_maxIntensity, (1.0-m_grid[i][j])*m_maxIntensity, (1.0-m_grid[i][j])*m_maxIntensity);
+					glColor3f((1.0-m_grid(i,j))*m_maxIntensity, (1.0-m_grid(i,j))*m_maxIntensity, (1.0-m_grid(i,j))*m_maxIntensity);
 					glVertex2i(j*m_stride, i*m_stride);
 					glVertex2i((j+1)*m_stride, i*m_stride);
 					glVertex2i((j+1)*m_stride, (i+1)*m_stride);
 					glEnd();
 
 					glBegin(GL_TRIANGLES);
-					glColor3f((1.0-m_grid[i][j])*m_maxIntensity, (1.0-m_grid[i][j])*m_maxIntensity, (1.0-m_grid[i][j])*m_maxIntensity);
+					glColor3f((1.0-m_grid(i,j))*m_maxIntensity, (1.0-m_grid(i,j))*m_maxIntensity, (1.0-m_grid(i,j))*m_maxIntensity);
 					glVertex2i(j*m_stride, i*m_stride);
 					glVertex2i((j+1)*m_stride, (i+1)*m_stride);
 					glVertex2i(j*m_stride, (i+1)*m_stride);
@@ -155,35 +128,9 @@ void CImageGrid2::initGrid()
 		m_cols = m_width/m_stride;
 	}
 
-	m_grid = new double* [m_rows];
-	m_specialElement = new bool* [m_rows];
-
-	for (i=0; i<m_rows; i++)
-	{
-		m_grid[i] = new double [m_cols];
-		m_specialElement[i] = new bool [m_cols];
-		for (j=0; j<m_cols; j++)
-		{
-			m_grid[i][j] = 0.0;
-			m_specialElement[i][j] = false;
-		}
-	}
-
-	// Create field layers
-
-	m_fields = new double**[m_fieldLayers];
-	
-	for (i=0; i<m_fieldLayers; i++)
-	{
-		m_fields[i] = new double*[m_rows];
-		for (j=0; j<m_rows; j++)
-		{
-			m_fields[i][j] = new double [m_cols];
-
-			for (k=0; k<m_cols; k++)
-				m_fields[i][j][k] = 0.0;
-		}
-	}
+	m_grid = EigenGridMatrix::Zero(m_rows, m_cols);
+	m_specialElement.assign(m_rows * m_cols, 0);
+	m_fields.assign(m_fieldLayers, EigenGridMatrix::Zero(m_rows, m_cols));
 
 	// Fill grid
 
@@ -213,9 +160,9 @@ void CImageGrid2::initGrid()
 					}
 				}
 
-				m_grid[i][j] = 1.0 - gridSum1/(double)nGridValues1/255.0f;
+				m_grid(i,j) = 1.0 - gridSum1/(double)nGridValues1/255.0f;
 
-				if (m_grid[i][j]>0.0)
+				if (m_grid(i,j)>0.0)
 					nNonZeroValues++;
 			}
 		}
@@ -230,7 +177,7 @@ void CImageGrid2::getGridSize(int &rows, int &cols)
 
 CImage* CImageGrid2::getImage()
 {
-	return m_image;
+	return m_image.get();
 }
 
 int CImageGrid2::getStride()
@@ -240,10 +187,10 @@ int CImageGrid2::getStride()
 
 double CImageGrid2::getGridValue(int row, int col)
 {
-	if (m_grid!=NULL)
+	if (m_grid.size() > 0)
 	{
 		if ((row>=0)&&(row<m_rows)&&(col>=0)&&(col<m_cols))
-			return m_grid[row][col];
+			return m_grid(row, col);
 		else
 			return 0.0;
 	}
@@ -253,17 +200,17 @@ double CImageGrid2::getGridValue(int row, int col)
 
 void CImageGrid2::setFieldValue(int layer, int row, int col, double value)
 {
-	if (m_fields!=NULL)
+	if (!m_fields.empty())
 		if ((row>=0)&&(row<m_rows)&&(col>=0)&&(col<m_cols)&&(layer>=0)&&(layer<m_fieldLayers))
-			m_fields[layer][row][col] = value;
+			m_fields[layer](row, col) = value;
 }
 
 double CImageGrid2::getFieldValue(int layer, int row, int col)
 {
-	if (m_fields!=NULL)
+	if (!m_fields.empty())
 	{
 		if ((row>=0)&&(row<m_rows)&&(col>=0)&&(col<m_cols)&&(layer>=0)&&(layer<m_fieldLayers))
-			return m_fields[layer][row][col];
+			return m_fields[layer](row, col);
 		else
 			return 0.0;
 	}
@@ -273,144 +220,62 @@ double CImageGrid2::getFieldValue(int layer, int row, int col)
 
 void CImageGrid2::copyField(int fromLayer, int toLayer)
 {
-	int i, j;
-
-	if (m_fields!=NULL)
-	{
+	if (!m_fields.empty())
 		if ((fromLayer>=0)&&(fromLayer<m_fieldLayers)&&(toLayer>=0)&&(toLayer<m_fieldLayers))
-		{
-			for (i=0; i<m_rows; i++)
-				for (j=0; j<m_cols; j++)
-					m_fields[toLayer][i][j] = m_fields[fromLayer][i][j];
-		}
-	}
+			m_fields[toLayer] = m_fields[fromLayer];
 }
 
 void CImageGrid2::copyField(int fromLayer, Eigen::MatrixXd& toMatrix)
 {
-	int i, j;
-
-	if (m_fields!=NULL)
-	{
+	if (!m_fields.empty())
 		if ((fromLayer>=0)&&(fromLayer<m_fieldLayers))
-		{
-			toMatrix.resize(m_rows, m_cols);
-			for (i=0; i<m_rows; i++)
-				for (j=0; j<m_cols; j++)
-					toMatrix(i,j) = m_fields[fromLayer][i][j];
-		}
-	}
+			toMatrix = m_fields[fromLayer];
 }
 
 void CImageGrid2::copyFromGrid(int toLayer, double factor)
 {
-	int i, j;
-
-	if ((m_fields!=NULL)&&(m_grid!=NULL))
-	{
+	if (!m_fields.empty() && m_grid.size() > 0)
 		if ((toLayer>=0)&&(toLayer<m_fieldLayers))
-		{
-			for (i=0; i<m_rows; i++)
-				for (j=0; j<m_cols; j++)
-					m_fields[toLayer][i][j] = m_grid[i][j]*factor;
-		}
-	}
+			m_fields[toLayer] = m_grid * factor;
 }
 
 double CImageGrid2::maxAbsDiff(int l1, int l2)
 {
-	int i, j;
-
-	double maxValue = -1e300;
-	double diff;
-
-	if (m_fields!=NULL)
-	{
+	if (!m_fields.empty())
 		if ((l1>=0)&&(l1<m_fieldLayers)&&(l2>=0)&&(l2<m_fieldLayers))
-		{
-			for (i=0; i<m_rows; i++)
-				for (j=0; j<m_cols; j++)
-				{
-					diff = abs(m_fields[l1][i][j]-m_fields[l2][i][j]);
-					if (diff>maxValue)
-						maxValue = diff;
-				}
-		}
-		return maxValue;
-	}
+			return (m_fields[l1] - m_fields[l2]).cwiseAbs().maxCoeff();
 	return 0.0;
 }
 
 void CImageGrid2::assignField(int layer, double value)
 {
-	int i, j;
-
-	if ((m_fields!=NULL)&&(layer>=0)&&(layer<m_fieldLayers))
-	{
-		for (i=0; i<m_rows; i++)
-			for (j=0; j<m_cols; j++)
-				m_fields[layer][i][j] = value;
-	}
+	if (!m_fields.empty() && (layer>=0) && (layer<m_fieldLayers))
+		m_fields[layer].fill(value);
 }
 
 void CImageGrid2::assignField(int layer, Eigen::MatrixXd& toMatrix)
 {
-	int i, j;
-
-	if (m_fields!=NULL)
-	{
+	if (!m_fields.empty())
 		if ((layer>=0)&&(layer<m_fieldLayers)&&(toMatrix.rows()==m_rows)&&(toMatrix.cols()==m_cols))
-		{
-			for (i=0; i<m_rows; i++)
-				for (j=0; j<m_cols; j++)
-					m_fields[layer][i][j] = toMatrix(i,j);
-		}
-	}
+			m_fields[layer] = toMatrix;
 }
 
 void CImageGrid2::copyGrid(Eigen::MatrixXd& toMatrix)
 {
-	int i, j;
-
-	if (this->m_grid!=NULL)
-	{
-		if ((toMatrix.rows()==m_rows)&&(toMatrix.cols()==m_cols))
-		{
-			for (i=0; i<m_rows; i++)
-				for (j=0; j<m_cols; j++)
-					toMatrix(i,j) = m_grid[i][j];
-		}
-	}
+	if (m_grid.size() > 0)
+		toMatrix = m_grid;
 }
 
 void CImageGrid2::copyGrid(Eigen::MatrixXd& toMatrix, double scaleFactor)
 {
-	int i, j;
-
-	if (this->m_grid!=NULL)
-	{
-		if ((toMatrix.rows()==m_rows)&&(toMatrix.cols()==m_cols))
-		{
-			for (i=0; i<m_rows; i++)
-				for (j=0; j<m_cols; j++)
-					toMatrix(i,j) = m_grid[i][j] * scaleFactor;
-		}
-	}
+	if (m_grid.size() > 0)
+		toMatrix = m_grid * scaleFactor;
 }
 
 void CImageGrid2::assignGrid(Eigen::MatrixXd& toMatrix)
 {
-	int i, j;
-
-	if (m_grid!=NULL)
-	{
-		if ((toMatrix.rows()==m_rows)&&(toMatrix.cols()==m_cols))
-		{
-			for (i=0; i<m_rows; i++)
-				for (j=0; j<m_cols; j++)
-					m_grid[i][j] = toMatrix(i,j);
-		}
-	}
+	if (m_grid.size() > 0 && toMatrix.rows()==m_rows && toMatrix.cols()==m_cols)
+		m_grid = toMatrix;
 }
 
 void CImageGrid2::assignFieldFromImage(int imageLayer, int toFieldLayer)
@@ -458,9 +323,9 @@ void CImageGrid2::assignFieldFromImage(int imageLayer, int toFieldLayer)
 					}
 				}
 
-				m_fields[toFieldLayer][i][j] = 1.0 - gridSum1/(double)nGridValues1/255.0f/3.0f;
+				m_fields[toFieldLayer](i, j) = 1.0 - gridSum1/(double)nGridValues1/255.0f/3.0f;
 
-				if (m_fields[toFieldLayer][i][j]>0.0)
+				if (m_fields[toFieldLayer](i, j)>0.0)
 					nNonZeroValues++;
 			}
 		}
@@ -471,10 +336,10 @@ void CImageGrid2::assignFieldFromImage(int imageLayer, int toFieldLayer)
 
 bool CImageGrid2::isSpecialElement(int row, int col)
 {
-	if (m_specialElement!=NULL)
+	if (!m_specialElement.empty())
 	{
 		if ((row>=0)&&(row<m_rows)&&(col>=0)&&(col<m_cols))
-			return m_specialElement[row][col];
+			return m_specialElement[row * m_cols + col] != 0;
 		else
 			return false;
 	}
@@ -505,7 +370,7 @@ void CImageGrid2::getElementCoords(int row, int col, double *ex, double *ey)
 	//     o----------o
 	//
 
-	if (m_grid!=NULL)
+	if (m_grid.size() > 0)
 	{
 		ex[0] = (double)col*m_stride*m_elementScaleFactor;
 		ex[1] = (double)(col+1)*m_stride*m_elementScaleFactor;
@@ -535,7 +400,7 @@ void CImageGrid2::getElementTopo(int row, int col, int *dx, int *dy)
 	//     dy = [0, 0, 1, 1]
 	//
 
-	if (m_grid!=NULL)
+	if (m_grid.size() > 0)
 	{
 		dx[0] = 0;
 		dx[1] = 1;
@@ -567,20 +432,16 @@ void CImageGrid2::setUseImage(bool flag)
 
 void CImageGrid2::setGridValue(int row, int col, double value)
 {
-	if (m_grid!=NULL)
-	{
+	if (m_grid.size() > 0)
 		if ((row>=0)&&(row<m_rows)&&(col>=0)&&(col<m_cols))
-			m_grid[row][col] = value;
-	}
+			m_grid(row, col) = value;
 }
 
 void CImageGrid2::setSpecialElement(int row, int col, bool special)
 {
-	if (m_specialElement!=NULL)
-	{
+	if (!m_specialElement.empty())
 		if ((row>=0)&&(row<m_rows)&&(col>=0)&&(col<m_cols))
-			m_specialElement[row][col] = special;
-	}
+			m_specialElement[row * m_cols + col] = special ? 1 : 0;
 }
 
 void CImageGrid2::setImageSize(int width, int height)

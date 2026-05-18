@@ -62,6 +62,9 @@ public:
 	CImage(int nLayers);
 	virtual ~CImage();
 
+	static CImagePtr create() { return std::make_shared<CImage>(); }
+	static CImagePtr create(int nLayers) { return std::make_shared<CImage>(nLayers); }
+
 	IvfClassInfo("CImage",CBase);
 
 	// Methods

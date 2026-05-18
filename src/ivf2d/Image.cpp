@@ -34,8 +34,8 @@
 
 CImage::CImage()
 {
-	m_imageMap = NULL;
-	m_imageMaps = NULL;
+	m_imageMap = nullptr;
+	m_imageMaps = nullptr;
 	m_layers = 1;
 	m_currentLayer = 0;
 	m_size[0] = -1;
@@ -53,8 +53,8 @@ CImage::CImage()
 
 CImage::CImage(int nLayers)
 {
-	m_imageMap = NULL;
-	m_imageMaps = NULL;
+	m_imageMap = nullptr;
+	m_imageMaps = nullptr;
 	m_layers = nLayers;
 	m_currentLayer = 0;
 	m_size[0] = -1;
@@ -82,11 +82,11 @@ void CImage::clearLayers()
 {
 	int i;
 
-	if (m_imageMaps==NULL)
+	if (m_imageMaps==nullptr)
 		return;
 
 	for (i=0; i<m_layers; i++)
-		if (m_imageMaps[i]!=NULL)
+		if (m_imageMaps[i]!=nullptr)
 			delete [] m_imageMaps[i];
 }
 
@@ -97,7 +97,7 @@ void CImage::initLayers()
     m_imageMaps = new unsigned char*[m_layers];
 
 	for (i=0; i<m_layers; i++)
-		m_imageMaps[i] = NULL;
+		m_imageMaps[i] = nullptr;
 
 	m_imageMap = m_imageMaps[m_currentLayer];
 }
@@ -686,7 +686,7 @@ void CImage::setImageMap(int width, int height, unsigned char* data, bool ownDat
 {
 	if (m_ownData)
 	{
-		if (m_imageMap!=NULL)
+		if (m_imageMap!=nullptr)
 			delete [] m_imageMap;
 	}
 

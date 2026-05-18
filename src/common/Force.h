@@ -58,6 +58,8 @@ public:
 	/** Force class destructor. */
 	virtual ~CForce ();
 
+	static CForcePtr create() { return std::make_shared<CForce>(); }
+
 	IvfClassInfo("CForce",CShape);
 
 	// Methods
@@ -112,12 +114,12 @@ public:
 	// Virtual overrides
 
 	/** Draw force in OpenGL */
-	virtual void doGeometry();
+	virtual void doGeometry() override;
 
 	/** Read force from text stream. */
-	virtual void readFromStream(istream &in);
+	virtual void readFromStream(istream &in) override;
 
 	/** Store force to text stream. */
-	virtual void saveToStream(ostream &out);
+	virtual void saveToStream(ostream &out) override;
 };
 #endif

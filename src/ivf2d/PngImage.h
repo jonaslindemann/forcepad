@@ -47,6 +47,8 @@ public:
 	/** CIvfPngImage destructor */
 	virtual ~CPngImage();
 
+	static CPngImagePtr create() { return std::make_shared<CPngImage>(); }
+
 	IvfClassInfo("CPngImage",CImage);
 
 	/** Reads PNG image */

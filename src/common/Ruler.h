@@ -48,6 +48,8 @@ public:
 	/** Ruler class destructor. */
 	virtual ~CRuler();
 
+	static CRulerPtr create() { return std::make_shared<CRuler>(); }
+
 	IvfClassInfo("CRuler",CShape);
 
 	void doGeometry();

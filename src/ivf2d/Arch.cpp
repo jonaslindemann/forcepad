@@ -40,9 +40,9 @@ CArch::CArch()
     m_size[1] = 1.0;
 
     m_lineWidth = 1.0;
-    m_lineColor = new CColor();
+    m_lineColor = CColor::create();
     m_lineColor->setColor(0.0f, 0.0f, 0.0f, 1.0f);
-    m_ellipse = new CEllipse();
+    m_ellipse = CEllipse::create();
 }
 
 CArch::~CArch()
@@ -143,7 +143,7 @@ double CArch::getLineWidth()
 }
 
 
-void CArch::setLineColor(CColor *color)
+void CArch::setLineColor(CColorPtr color)
 {
     m_lineColor = color;
 }

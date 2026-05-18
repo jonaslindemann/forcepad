@@ -67,6 +67,8 @@ public:
 	/** Rectangle class destructor. */
 	virtual ~CRectangle();
 
+	static CRectanglePtr create() { return std::make_shared<CRectangle>(); }
+
 	IvfClassInfo("CRectangle",CShape);
 
 	/** Set size of rectangle in world coordinates. */
@@ -76,15 +78,15 @@ public:
 	void getSize(double &width, double &height);
 
 	/** Set texture override. */
-	void setTexture(CTexture* texture); // Override
+	void setTexture(CTexturePtr texture); // Override
 
 	/** Draw rectangle in OpenGL. */
-	virtual void doGeometry();
+	virtual void doGeometry() override;
 
 	/** Set type of rectangle */
 	void setRectangleType(TRectangleType type);
 
-	void setLineColor(CColor* color);
+	void setLineColor(CColorPtr color);
 	void setLineWidth(double width);
 	void setLineType(TLineType type);
 };

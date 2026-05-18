@@ -35,7 +35,7 @@
 CTexture::CTexture()
 {
 	m_bound = false;
-	m_image = NULL;
+	m_image = nullptr;
 	m_wrapT = GL_REPEAT;
 	m_wrapS = GL_REPEAT;
 	m_textureMode = GL_DECAL;
@@ -76,7 +76,7 @@ void CTexture::bind()
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, m_textureMode);
 	glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, m_textureEnvColor);
 
-	if (m_image!=NULL)
+	if (m_image!=nullptr)
 	{
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, (GLsizei)m_image->getWidth(), (GLsizei)m_image->getHeight(),
 			0, GL_RGBA, GL_UNSIGNED_BYTE, m_image->getImageMap());
@@ -102,12 +102,12 @@ void CTexture::apply()
 	glMatrixMode (GL_MODELVIEW);
 }
 
-void CTexture::setImage(CImage *image)
+void CTexture::setImage(CImagePtr image)
 {
 	m_image = image;
 }
 
 CImage* CTexture::getImage()
 {
-	return m_image;
+	return m_image.get();
 }

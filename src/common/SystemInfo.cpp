@@ -29,7 +29,7 @@ SystemInfo::~SystemInfo()
 
 bool SystemInfo::DetectWindowsVersion()
 {
-	PGetNativeSystemInfo pGNSI = NULL;
+	PGetNativeSystemInfo pGNSI = nullptr;
 
 	m_bOsVersionInfoEx = FALSE;
 	m_nWinVersion = Win_Unknown;
@@ -48,7 +48,7 @@ bool SystemInfo::DetectWindowsVersion()
 	}
 
 	pGNSI = (PGetNativeSystemInfo) GetProcAddress(GetModuleHandle(_T("kernel32.dll")), "GetNativeSystemInfo");
-	if(NULL != pGNSI) pGNSI(&m_SysInfo);
+	if(nullptr != pGNSI) pGNSI(&m_SysInfo);
 	else GetSystemInfo(&m_SysInfo);
 
 	switch (m_osvi.dwPlatformId)
@@ -189,7 +189,7 @@ bool SystemInfo::DetectWindowsVersion()
 			if( lRet != ERROR_SUCCESS )
 				return false;
 
-			lRet = RegQueryValueEx( hKey, "ProductType", NULL, NULL,
+			lRet = RegQueryValueEx( hKey, "ProductType", nullptr, nullptr,
 				(LPBYTE) szProductType, &dwBufLen);
 			if( (lRet != ERROR_SUCCESS) || (dwBufLen > BUFSIZE) )
 				return false;
@@ -297,7 +297,7 @@ void SystemInfo::DetectProductInfo()
 	{
 		PGetProductInfo lpProducInfo = (PGetProductInfo)GetProcAddress(
 			GetModuleHandle(_T("kernel32.dll")), "GetProductInfo");
-		if(NULL != lpProducInfo)
+		if(nullptr != lpProducInfo)
 		{
 			DWORD prodType = 0;
 			if(lpProducInfo(m_osvi.dwMajorVersion, 
@@ -411,10 +411,10 @@ DWORD SystemInfo::GetPlatformID() const
 	return m_osvi.dwPlatformId;	
 }
 
-// PARAMETER szServicePack must not be NULL
+// PARAMETER szServicePack must not be nullptr
 void SystemInfo::GetServicePackInfo(TCHAR* szServicePack) const
 {
-	if(szServicePack == NULL) return;
+	if(szServicePack == nullptr) return;
 	
 	_tcscpy(szServicePack, m_szServicePack);
 }

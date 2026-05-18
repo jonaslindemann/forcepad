@@ -39,6 +39,8 @@ public:
 	/** Color class destructor. */
 	virtual ~CNode();
 
+	static CNodePtr create() { return std::make_shared<CNode>(); }
+
 	IvfClassInfo("CNode",CBase);
 	int enumerate(int start);
 	void setDof(int idx, int value);

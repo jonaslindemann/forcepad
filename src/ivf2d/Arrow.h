@@ -40,6 +40,8 @@ public:
 	CArrow();
 	virtual ~CArrow();
 
+	static CArrowPtr create() { return std::make_shared<CArrow>(); }
+
 	IvfClassInfo("CArrow",CShape);
 };
 

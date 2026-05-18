@@ -25,6 +25,8 @@
 #ifndef _Ivf2dDef_h_
 #define _Ivf2dDef_h_
 
+#include <memory>
+
 #pragma warning( disable : 4786 )  // Disable template generation warning
 
 #ifndef M_PI
@@ -103,7 +105,7 @@ typedef unsigned short wchar_t;
 
 #define IvfSmartPointer(classname) \
 	class classname; \
-	typedef CIvfPointer<classname> classname##Ptr; \
+	typedef std::shared_ptr<classname> classname##Ptr; \
 	typedef classname* classname##StdPtr;
 
 #if defined(__APPLE__) || !defined(WINDOWS)

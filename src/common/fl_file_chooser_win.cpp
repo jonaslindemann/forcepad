@@ -71,11 +71,11 @@ char *fl_file_chooser_image(const char *message,const char *fname)
 	ofn.nMaxFile = sizeof(g_szFile);
 	ofn.lpstrFilter = szFilter;
 	ofn.nFilterIndex = 0;
-	ofn.lpstrFileTitle = NULL;
+	ofn.lpstrFileTitle = nullptr;
 	ofn.nMaxFileTitle = 0;
 	ofn.lpstrTitle = szTitle;
-	ofn.lpstrInitialDir = NULL;
-	ofn.lpstrDefExt = NULL;
+	ofn.lpstrInitialDir = nullptr;
+	ofn.lpstrDefExt = nullptr;
 	ofn.Flags = OFN_PATHMUSTEXIST|OFN_OVERWRITEPROMPT;
 	
 	// Display the Open/save dialog box. 
@@ -88,7 +88,7 @@ char *fl_file_chooser_image(const char *message,const char *fname)
 		}
 		else
 		{
-			return NULL;
+			return nullptr;
 		}
 	}
 	else
@@ -99,12 +99,12 @@ char *fl_file_chooser_image(const char *message,const char *fname)
 		}
 		else
 		{
-			return NULL;
+			return nullptr;
 		}
 	}
-	return NULL;
+	return nullptr;
 #else
-	return NULL;
+	return nullptr;
 #endif
 }
 
@@ -137,10 +137,10 @@ char *fl_file_chooser(const char *message,const char *pat,const char *fname)
 	ofn.nMaxFile = sizeof(g_szFile);
 	ofn.lpstrFilter = szFilter;
 	ofn.nFilterIndex = 0;
-	ofn.lpstrFileTitle = NULL;
+	ofn.lpstrFileTitle = nullptr;
 	ofn.nMaxFileTitle = 0;
 	ofn.lpstrTitle = szTitle;
-	ofn.lpstrInitialDir = NULL;
+	ofn.lpstrInitialDir = nullptr;
 	ofn.lpstrDefExt = szDefExt;
 	ofn.Flags = OFN_PATHMUSTEXIST|OFN_OVERWRITEPROMPT;
 	
@@ -154,7 +154,7 @@ char *fl_file_chooser(const char *message,const char *pat,const char *fname)
 		}
 		else
 		{
-			return NULL;
+			return nullptr;
 		}
 	}
 	else
@@ -165,11 +165,11 @@ char *fl_file_chooser(const char *message,const char *pat,const char *fname)
 		}
 		else
 		{
-			return NULL;
+			return nullptr;
 		}
 	}
-	return NULL;
+	return nullptr;
 #else
-	return NULL;
+	return nullptr;
 #endif
 }

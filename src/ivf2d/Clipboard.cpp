@@ -26,8 +26,8 @@
 
 CClipboard::CClipboard()
 {
-	m_baseImage = NULL;
-	m_clipboard = new CImage();
+	m_baseImage = nullptr;
+	m_clipboard = CImage::create();
 
 	m_pasteMode = PM_NON_WHITE;
 	m_copyImageMode = IM_RGB;
@@ -44,7 +44,7 @@ CClipboard::~CClipboard()
 
 void CClipboard::copy(int x1, int y1, int x2, int y2)
 {
-	if (m_baseImage!=NULL)
+	if (m_baseImage!=nullptr)
 	{
 		int w = x2 - x1 + 1;
 		int h = y2 - y1 + 1;
@@ -74,7 +74,7 @@ void CClipboard::copy(int x1, int y1, int x2, int y2)
 
 void CClipboard::cut(int x1, int y1, int x2, int y2)
 {
-	if (m_baseImage!=NULL)
+	if (m_baseImage!=nullptr)
 	{
 		int w = x2 - x1 + 1;
 		int h = y2 - y1 + 1;
@@ -105,7 +105,7 @@ void CClipboard::cut(int x1, int y1, int x2, int y2)
 
 void CClipboard::paste(int x, int y)
 {
-	if (m_baseImage!=NULL)
+	if (m_baseImage!=nullptr)
 	{
 		int w = m_clipboard->getWidth();
 		int h = m_clipboard->getHeight();
@@ -137,10 +137,10 @@ void CClipboard::paste(int x, int y)
 
 CImage* CClipboard::getClipboard()
 {
-	return m_clipboard;
+	return m_clipboard.get();
 }
 
-void CClipboard::setImage(CImage *image)
+void CClipboard::setImage(CImagePtr image)
 {
 	m_baseImage = image;
 }
@@ -153,7 +153,7 @@ void CClipboard::setPasteMode(TPasteMode mode)
 
 void CClipboard::copyImage(int width, int height, unsigned char *imageMap)
 {
-	CImage* image = new CImage();
+	auto image = CImage::create();
 	image->setImageMap(width, height, imageMap, false);
 	
 	//int w = x2 - x1 + 1;
@@ -209,7 +209,6 @@ void CClipboard::copyImage(int width, int height, unsigned char *imageMap)
 			}
 	}
 
-	delete image;
 }
 
 void CClipboard::setCopyImageMode(TCopyImageMode mode)
@@ -227,6 +226,6 @@ void CClipboard::getSelection(int &x1, int &y1, int &x2, int &y2)
 
 CImage* CClipboard::getClipboardImage()
 {
-	return m_clipboard;
+	return m_clipboard.get();
 }
 

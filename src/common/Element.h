@@ -40,6 +40,8 @@ public:
 	/** Color class destructor. */
 	virtual ~CElement();
 
+	static CElementPtr create() { return std::make_shared<CElement>(); }
+
 	IvfClassInfo("CElement",CBase);
 
 	void setNodes(int number);

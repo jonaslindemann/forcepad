@@ -147,6 +147,8 @@ public:
 	CFemGrid();
 	virtual ~CFemGrid();
 
+	static CFemGridPtr create() { return std::make_shared<CFemGrid>(); }
+
 	int getElementCount();
 	void updatePixelArea();
 	int getStressStep();
@@ -199,8 +201,8 @@ public:
 	void addPoint(int x, int y);
 	void clearPoints();
 
-	void addForce(CForce* force);
-	void addConstraint(CConstraint* constraint);
+	void addForce(CForcePtr force);
+	void addConstraint(CConstraintPtr constraint);
 
 	void setShowGrid(bool flag);
 	bool getShowGrid();
@@ -263,7 +265,7 @@ public:
 
 	void setMaxIntensity(double intensity);
 
-	void setColorMap(CColorMap* colorMap);
+	void setColorMap(CColorMapPtr colorMap);
 	CColorMap* getColorMap();
 
 	void setStressType(TStressType stressType);
@@ -276,7 +278,7 @@ public:
 	void setGridSpacing(int spacing);
 	int getGridSpacing();
 
-	virtual void setImage(CImage* image);
+	virtual void setImage(CImagePtr image);
 	virtual void initGrid();
 	virtual void doGeometry();
 };

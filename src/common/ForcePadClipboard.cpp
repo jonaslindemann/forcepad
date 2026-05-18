@@ -26,10 +26,10 @@
 
 CForcePadClipboard::CForcePadClipboard()
 {
-	m_grid = NULL;
+	m_grid = nullptr;
 
-	m_forceSelection = new CForceSelection();
-	m_constraintSelection = new CConstraintSelection();
+	m_forceSelection = std::make_unique<CForceSelection>();
+	m_constraintSelection = std::make_unique<CConstraintSelection>();
 
 	m_drawingOffsetX = 0;
 	m_drawingOffsetY = 0;
@@ -37,68 +37,19 @@ CForcePadClipboard::CForcePadClipboard()
 
 CForcePadClipboard::~CForcePadClipboard()
 {
-	delete m_forceSelection;
-	delete m_constraintSelection;
 }
 
 void CForcePadClipboard::copy(int x1, int y1, int x2, int y2)
 {
 	CClipboard::copy(x1, y1, x2, y2);
 
-	if (m_grid!=NULL)
+	if (m_grid!=nullptr)
 	{
-		int i; 
-
-		// Clear forces on clipboard
-
-		for (i=0; i<m_forceSelection->getSize(); i++)
-		{
-			CForce* force = m_forceSelection->getForce(i);
-			force->delReference();
-			
-			if (!force->isReferenced())
-				delete force;
-		}
-
 		m_forceSelection->clear();
-
-		// Clear constraints on clipboard
-
-		for (i=0; i<m_constraintSelection->getSize(); i++)
-		{
-			CConstraint* constraint = m_constraintSelection->getConstraint(i);
-			constraint->delReference();
-
-			if (!constraint->isReferenced())
-				delete constraint;
-		}
-
 		m_constraintSelection->clear();
 
-		// Find existing forces in selection area
-		
-		m_grid->getForces(x1, y1, x2, y2, m_forceSelection);
-		m_grid->getConstraints(x1, y1, x2, y2, m_constraintSelection);
-
-		// Move forces to clipboard
-
-		for (i=0; i<m_forceSelection->getSize(); i++)
-		{
-			// Add force to selection
-
-			CForce* force = m_forceSelection->getForce(i);
-			force->addReference();
-		}
-
-		// Move constraints to clipboard
-
-		for (i=0; i<m_constraintSelection->getSize(); i++)
-		{
-			// Add constraint to selection
-
-			CConstraint* constraint = m_constraintSelection->getConstraint(i);
-			constraint->addReference();
-		}
+		m_grid->getForces(x1, y1, x2, y2, m_forceSelection.get());
+		m_grid->getConstraints(x1, y1, x2, y2, m_constraintSelection.get());
 	}
 }
 
@@ -106,66 +57,19 @@ void CForcePadClipboard::cut(int x1, int y1, int x2, int y2)
 {
 	CClipboard::cut(x1, y1, x2, y2);
 
-	if (m_grid!=NULL)
+	if (m_grid!=nullptr)
 	{
-		int i; 
-
-		// Clear forces on clipboard
-
-		for (i=0; i<m_forceSelection->getSize(); i++)
-		{
-			CForce* force = m_forceSelection->getForce(i);
-			force->delReference();
-			
-			if (!force->isReferenced())
-				delete force;
-		}
-
 		m_forceSelection->clear();
+		m_constraintSelection->clear();
 
-		// Clear constraints on clipboard
+		m_grid->getForces(x1, y1, x2, y2, m_forceSelection.get());
+		m_grid->getConstraints(x1, y1, x2, y2, m_constraintSelection.get());
 
-		for (i=0; i<m_constraintSelection->getSize(); i++)
-		{
-			CConstraint* constraint = m_constraintSelection->getConstraint(i);
-			constraint->delReference();
+		for (int i=0; i<m_forceSelection->getSize(); i++)
+			m_grid->removePointForce(m_forceSelection->getForce(i));
 
-			if (!constraint->isReferenced())
-				delete constraint;
-		}
-
-		// Find existing forces in selection area
-		
-		m_grid->getForces(x1, y1, x2, y2, m_forceSelection);
-		m_grid->getConstraints(x1, y1, x2, y2, m_constraintSelection);
-
-		// Move forces to clipboard
-
-		for (i=0; i<m_forceSelection->getSize(); i++)
-		{
-			// Add force to selection
-
-			CForce* force = m_forceSelection->getForce(i);
-			force->addReference();
-
-			// Remove force from grid
-
-			m_grid->removePointForce(force);
-		}
-
-		// Move constraints to clipboard
-
-		for (i=0; i<m_constraintSelection->getSize(); i++)
-		{
-			// Add constraint to selection
-
-			CConstraint* constraint = m_constraintSelection->getConstraint(i);
-			constraint->addReference();
-
-			// Remove constraint from grid
-		
-			m_grid->removePointConstraint(constraint);
-		}
+		for (int i=0; i<m_constraintSelection->getSize(); i++)
+			m_grid->removePointConstraint(m_constraintSelection->getConstraint(i));
 	}
 }
 
@@ -173,53 +77,36 @@ void CForcePadClipboard::paste(int x, int y)
 {
 	CClipboard::paste(x, y);
 
-	if (m_grid!=NULL)
+	if (m_grid!=nullptr)
 	{
-		int i;
+		int x1, y1, x2, y2;
+		this->getSelection(x1, y1, x2, y2);
 
-		for (i=0; i<m_forceSelection->getSize(); i++)
+		for (int i=0; i<m_forceSelection->getSize(); i++)
 		{
-			// Add force to to grid
-
 			double dx, dy;
-			int x1, y1, x2, y2;
-
 			CForce* force = m_forceSelection->getForce(i);
 			force->getPosition(dx, dy);
-
-			this->getSelection(x1, y1, x2, y2);
-
 			dx = dx - (double)x1;
 			dy = dy - (double)y1;
 
-			CForce* newForce = new CForce();
+			auto newForce = CForce::create();
 			newForce->assignFrom(force);
 			newForce->setPosition(dx + (double)x, dy + (double)y);
-
 			m_grid->addForce(newForce);
 		}
 
-		// Move constraints to clipboard
-
-		for (i=0; i<m_constraintSelection->getSize(); i++)
+		for (int i=0; i<m_constraintSelection->getSize(); i++)
 		{
-			// Add constraint to to grid
-
 			double dx, dy;
-			int x1, y1, x2, y2;
-
 			CConstraint* constraint = m_constraintSelection->getConstraint(i);
 			constraint->getPosition(dx, dy);
-
-			this->getSelection(x1, y1, x2, y2);
-
 			dx = dx - (double)x1;
 			dy = dy - (double)y1;
 
-			CConstraint* newConstraint = new CConstraint();
+			auto newConstraint = CConstraint::create();
 			newConstraint->assignFrom(constraint);
 			newConstraint->setPosition(dx + (double)x, dy + (double)y);
-
 			m_grid->addConstraint(newConstraint);
 		}
 	}
@@ -238,47 +125,33 @@ void CForcePadClipboard::setDrawingOffset(int x, int y)
 
 void CForcePadClipboard::render(int x, int y)
 {
-	int i;
+	int x1, y1, x2, y2;
+	this->getSelection(x1, y1, x2, y2);
 
-	CForce* newForce = new CForce();
-	CConstraint* newConstraint = new CConstraint();
+	auto newForce = CForce::create();
+	auto newConstraint = CConstraint::create();
 
-	for (i=0; i<m_forceSelection->getSize(); i++)
+	for (int i=0; i<m_forceSelection->getSize(); i++)
 	{
-			double dx, dy;
-			int x1, y1, x2, y2;
-			CForce* force = m_forceSelection->getForce(i);
-			force->getPosition(dx, dy);
-
-			newForce->assignFrom(force);
-			this->getSelection(x1, y1, x2, y2);
-			dx = dx - (double)x1;
-			dy = dy - (double)y1;
-
-			newForce->setPosition(dx + (double)x, dy + (double)y);
-			newForce->render();
+		double dx, dy;
+		CForce* force = m_forceSelection->getForce(i);
+		force->getPosition(dx, dy);
+		newForce->assignFrom(force);
+		dx = dx - (double)x1;
+		dy = dy - (double)y1;
+		newForce->setPosition(dx + (double)x, dy + (double)y);
+		newForce->render();
 	}
 
-	for (i=0; i<m_constraintSelection->getSize(); i++)
+	for (int i=0; i<m_constraintSelection->getSize(); i++)
 	{
-			double dx, dy;
-			int x1, y1, x2, y2;
-			CConstraint* constraint = m_constraintSelection->getConstraint(i);
-			constraint->getPosition(dx, dy);
-
-			newConstraint->assignFrom(constraint);
-			this->getSelection(x1, y1, x2, y2);
-			dx = dx - (double)x1;
-			dy = dy - (double)y1;
-
-			newConstraint->setPosition(dx + (double)x, dy + (double)y);
-			newConstraint->render();
+		double dx, dy;
+		CConstraint* constraint = m_constraintSelection->getConstraint(i);
+		constraint->getPosition(dx, dy);
+		newConstraint->assignFrom(constraint);
+		dx = dx - (double)x1;
+		dy = dy - (double)y1;
+		newConstraint->setPosition(dx + (double)x, dy + (double)y);
+		newConstraint->render();
 	}
-
-	delete newForce;
-	delete newConstraint;
-
-
-
-
 }

@@ -37,6 +37,8 @@ public:
 	CColorMap();
 	virtual ~CColorMap();
 
+	static CColorMapPtr create() { return std::make_shared<CColorMap>(); }
+
 	void open(const char* fname);
 	void clear();
 

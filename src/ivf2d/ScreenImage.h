@@ -48,6 +48,8 @@ public:
 	CScreenImage();
 	virtual ~CScreenImage();
 
+	static CScreenImagePtr create() { return std::make_shared<CScreenImage>(); }
+
 	IvfClassInfo("CScreenImage",CShape);
 
 	void reset();
@@ -62,7 +64,7 @@ public:
 	TRenderMode getRenderMode();
 	void setRenderMode(TRenderMode mode);
 
-	void setImage(CImage* image);
+	void setImage(CImagePtr image);
 	void getSubImageSize(int &width, int &height);
 	void setSubImageSize(int width, int height);
 

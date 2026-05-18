@@ -149,6 +149,8 @@ public:
 	/** FeminternalSolver class destructor. */
 	virtual ~CFemGridSolver2();
 
+	static CFemGridSolver2Ptr create() { return std::make_shared<CFemGridSolver2>(); }
+
 	/* ---- Methods ----- */
 
 	/** Finite element solver for solving active/inactive elements. */

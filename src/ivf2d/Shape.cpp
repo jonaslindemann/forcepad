@@ -37,8 +37,8 @@ CShape::CShape()
 	m_pos[0] = 0.0;
 	m_pos[1] = 0.0;
 	m_rotation = 0.0;
-	m_color = NULL;
-	m_texture = NULL;
+	m_color = nullptr;
+	m_texture = nullptr;
 	m_useRasterPos = false;
 }
 
@@ -85,7 +85,7 @@ void CShape::doBeginTransform()
 	// Apply texture, if any.
 	//
 
-	if (m_texture!=NULL)
+	if (m_texture!=nullptr)
 	{
 		glEnable(GL_TEXTURE_2D);
 		if (!m_texture->isBound())
@@ -100,7 +100,7 @@ void CShape::doEndTransform()
 	if (!m_useRasterPos)
 		glPopMatrix();
 
-	if (m_texture!=NULL)
+	if (m_texture!=nullptr)
 	{
 		glDisable(GL_TEXTURE_2D);
 	}
@@ -109,28 +109,28 @@ void CShape::doEndTransform()
 
 void CShape::doMaterial()
 {
-	if (m_color!=NULL)
+	if (m_color!=nullptr)
 		m_color->render();
 }
 
-void CShape::setColor(CColor *color)
+void CShape::setColor(CColorPtr color)
 {
 	m_color = color;
 }
 
-CColor* CShape::getColor()
+CColorPtr CShape::getColor()
 {
 	return m_color;
 }
 
-void CShape::setTexture(CTexture *texture)
+void CShape::setTexture(CTexturePtr texture)
 {
 	m_texture = texture;
 }
 
 CTexture* CShape::getTexture()
 {
-	return m_texture;
+	return m_texture.get();
 }
 
 void CShape::setUseRasterPosition(bool flag)

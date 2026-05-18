@@ -42,13 +42,13 @@ void CElement::setNodes(int number)
 void CElement::setNode(int idx, CNode* node)
 {
 	if ((idx>=1)&&(idx<=(int)m_nodes.size()))
-		m_nodes[idx+1] = node;
+		m_nodes[idx+1] = std::shared_ptr<CNode>(node, [](CNode*){});
 }
 
 CNode* CElement::getNode(int idx)
 {
 	if ((idx>=1)&&(idx<=(int)m_nodes.size()))
-		return m_nodes[idx+1];
+		return m_nodes[idx+1].get();
 	else
-		return NULL;
+		return nullptr;
 }

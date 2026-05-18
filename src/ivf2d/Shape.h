@@ -54,6 +54,8 @@ public:
 	/** Shape class destructor. */
 	virtual ~CShape();
 
+	static CShapePtr create() { return std::make_shared<CShape>(); }
+
 	IvfClassInfo("CShape",CDrawableBase);
 
 	// Get/set methods 
@@ -71,13 +73,13 @@ public:
 	double getRotation();
 
 	/** Set shape color. */
-	void setColor(CColor* color);
+	void setColor(CColorPtr color);
 
 	/** Return shape color. */
-	CColor* getColor();
+	CColorPtr getColor();
 
 	/** Set shape texture. */
-	void setTexture(CTexture* texture);
+	void setTexture(CTexturePtr texture);
 
 	/** Get shape texture. */
 	CTexture* getTexture();
@@ -85,13 +87,13 @@ public:
 	// Implemented virtual methods
 
 	/** Defined shape material. */
-	virtual void doMaterial();
+	virtual void doMaterial() override;
 
 	/** Transforms shape in OpenGL. */
-	virtual void doBeginTransform();
+	virtual void doBeginTransform() override;
 
 	/** Ends transform in OpenGL. */
-	virtual void doEndTransform();
+	virtual void doEndTransform() override;
 };
 
 #endif 

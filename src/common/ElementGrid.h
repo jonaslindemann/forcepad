@@ -45,6 +45,8 @@ public:
 	CElementGrid();
 	virtual ~CElementGrid();
 
+	static CElementGridPtr create() { return std::make_shared<CElementGrid>(); }
+
 	void setSize(int rows, int cols);
 	void setWidth(double width);
 

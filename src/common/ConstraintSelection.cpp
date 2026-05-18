@@ -34,7 +34,7 @@ CConstraintSelection::~CConstraintSelection()
 
 }
 
-void CConstraintSelection::add(CConstraint *constraint)
+void CConstraintSelection::add(CConstraintPtr constraint)
 {
 	m_constraints.push_back(constraint);
 }
@@ -48,10 +48,10 @@ CConstraint* CConstraintSelection::getConstraint(int idx)
 {
 	if ((idx>=0)&&(idx<(int)m_constraints.size()))
 	{
-		return m_constraints[idx];
+		return m_constraints[idx].get();
 	}
 	else
-		return NULL;
+		return nullptr;
 }
 
 int CConstraintSelection::getSize()

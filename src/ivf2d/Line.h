@@ -44,6 +44,8 @@ public:
 	CLine();
 	virtual ~CLine();
 
+	static CLinePtr create() { return std::make_shared<CLine>(); }
+
 	IvfClassInfo("CLine",CShape);
 
 	void doGeometry();

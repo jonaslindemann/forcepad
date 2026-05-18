@@ -29,6 +29,9 @@
 #include "Shape.h"
 
 #include <Eigen/Dense>
+#include <vector>
+
+using EigenGridMatrix = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
 
 IvfSmartPointer(CImageGrid2);
 
@@ -39,9 +42,9 @@ private:
 	bool m_useImage;
 	bool m_averageOverGridSquare;
 protected:
-	double** m_grid;
-	double*** m_fields;
-	bool** m_specialElement;
+	EigenGridMatrix m_grid;
+	std::vector<EigenGridMatrix> m_fields;
+	std::vector<uint8_t> m_specialElement;
 	int m_width;
 	int m_height;
 	int m_rows;
@@ -53,13 +56,15 @@ public:
 	CImageGrid2();
 	virtual ~CImageGrid2();
 
+	static CImageGrid2Ptr create() { return std::make_shared<CImageGrid2>(); }
+
 	void clearGrid();
 
 	IvfClassInfo("CImageGrid",CShape);
 
 	virtual void initGrid();
 
-	virtual void setImage(CImage* image);
+	virtual void setImage(CImagePtr image);
 	CImage* getImage();
 
 	void setImageSize(int width, int height);

@@ -171,48 +171,48 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 		
 	// Create drawing tools
 	
-	CColorPtr selectionColor = new CColor();
+	CColorPtr selectionColor = CColor::create();
 	selectionColor->setColor(1.0f, 0.0f, 0.0f, 1.0f);
-	
-	m_selectionBox = new CRectangle();
+
+	m_selectionBox = CRectangle::create();
 	m_selectionBox->setRectangleType(CRectangle::RT_OUTLINE);
 	m_selectionBox->setLineColor(selectionColor);
 	m_selectionBox->setLineWidth(1.0);
 	m_selectionBox->setLineType(CRectangle::LT_DASHED);
 	m_selectionBox->setSize(200.0,100.0);
 	m_selectionBox->setPosition(50.0, 50.0);
-	
-	CColorPtr color = new CColor();
+
+	CColorPtr color = CColor::create();
 #ifdef USE_QT
 	color->setColor(0.0f, 0.0f, 0.0f, 1.0f);
 #else
 	color->setColor(0.0f, 0.0f, 0.0f, 0.5f);
 #endif
 	
-	m_rectangle = new CRectangle();
+	m_rectangle = CRectangle::create();
 	m_rectangle->setColor(color);
-	
-	m_ellipse = new CEllipse();
+
+	m_ellipse = CEllipse::create();
 	m_ellipse->setColor(color);
 	m_ellipse->setSectors(36);
-	
-	m_line = new CLine();
+
+	m_line = CLine::create();
 	m_line->setColor(color);
 	m_line->setWidth(4);
 
-    m_arch = new CArch();
+    m_arch = CArch::create();
     m_arch->setColor(color);
     m_arch->setLineWidth(4);
-	
-	color = new CColor();
+
+	color = CColor::create();
 	color->setColor(0.5f, 0.0f, 0.0f, 1.0f);
 
-	color = new CColor();
+	color = CColor::create();
 	color->setColor(0.0f, 0.5f, 0.0f, 1.0f);
 
 	// Rigid body variables
-	
-	m_cgIndicator = new CCGIndicator();
+
+	m_cgIndicator = CCGIndicator::create();
 	m_cgIndicator->setColor(color);
 	m_relativeForceSize = 0.05;
 	
@@ -225,7 +225,7 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 	
 	// Create drawing area
 	
-	m_drawing = new CImage(2);
+	m_drawing = CImage::create(2);
 	m_drawing->setChannels(4);
 	m_drawing->setSize(640,480);
 	m_drawing->fillColor(255,255,255);
@@ -236,7 +236,7 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 	m_drawing->setAlpha(128);
 	m_drawing->setLayer(0);
 
-	m_ruler = new CRuler();
+	m_ruler = CRuler::create();
 	m_ruler->setStartPos(0,0);
     m_ruler->setEndPos(m_drawing->getWidth(), 0);
 	m_ruler->setActualLength(1.0);
@@ -244,36 +244,39 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 
 	// Create a buffer for reading pixels back
 	
-	m_buffer = new CImage();
+	m_buffer = CImage::create();
 	m_buffer->setChannels(4);
 	m_buffer->setSize(64,64);
-	
+
 	// Create image grid
-	
-	m_femGrid = new CFemGrid2();
+
+	m_femGrid = CFemGrid2::create();
 	m_femGrid->setImage(m_drawing);
 	m_femGrid->setStride(6);
 	m_femGrid->setAverageStress(true);
 	
 	// Create clipboard
 		
-	m_clipboard = new CForcePadClipboard();
+	m_clipboard = CForcePadClipboard::create();
 	m_clipboard->setImage(m_drawing);
-	m_clipboard->setFemGrid(m_femGrid);
-	
+	m_clipboard->setFemGrid(m_femGrid.get());
+
 	// Create clipboard used in undo operations
-	
-	m_undoClipboard = new CClipboard();
+
+	m_undoClipboard = CClipboard::create();
 	m_undoClipboard->setImage(m_drawing);
 	m_undoClipboard->setPasteMode(CClipboard::PM_REPLACE);
-	
-	m_screenImage = new CScreenImage();
+
+	m_screenImage = CScreenImage::create();
 	m_screenImage->setImage(m_drawing);
 	
 	resetUndoArea();
 	
 	// Create dialogs
 	
+	m_selectedForce = nullptr;
+	m_newConstraint = nullptr;
+
 	m_modeChangeEvent = NULL;
 	m_viewModeChangeEvent = NULL;
 	m_viewModeErrorEvent = NULL;
@@ -445,7 +448,7 @@ void CPaintView::onPush(int x, int y)
 		
 		// Create a constraint and add it to the grid
 		
-		constraint = new CConstraint();
+		constraint = CConstraint::create();
         constraint->setPosition(x-m_drawingOffsetX, height()-y-m_drawingOffsetY);
 		constraint->setConstraintType(m_constraintType);
 		m_femGrid->addConstraint(constraint);
@@ -456,7 +459,7 @@ void CPaintView::onPush(int x, int y)
 		// Create a new force. The position is set here.
 		// Direction is is done in the onDrag() method.
 		
-		m_newForce = new CForce();
+		m_newForce = CForce::create();
         m_newForce->setPosition(x-m_drawingOffsetX, height()-y-m_drawingOffsetY);
 		m_femGrid->addForce(m_newForce);
 		break;
@@ -464,7 +467,7 @@ void CPaintView::onPush(int x, int y)
 		
 		// Create a directional constraint (ForcePAD/Rigid)
 		
-		m_newConstraint = new CConstraint();
+		m_newConstraint = CConstraint::create();
 		m_newConstraint->setConstraintType(CConstraint::CT_VECTOR);
         m_newConstraint->setPosition(x-m_drawingOffsetX, height()-y-m_drawingOffsetY);
 		m_newConstraint->setDirection(0.0, 1.0);
@@ -472,10 +475,10 @@ void CPaintView::onPush(int x, int y)
 
 		break;
 	case EM_CONSTRAINT_HINGE:
-		
+
 		// Create a directional constraint (ForcePAD/Rigid)
-		
-		m_newConstraint = new CConstraint();
+
+		m_newConstraint = CConstraint::create();
 		m_newConstraint->setConstraintType(CConstraint::CT_HINGE);
         m_newConstraint->setPosition(x-m_drawingOffsetX, height()-y-m_drawingOffsetY);
 		m_newConstraint->setDirection(0.0, 1.0);
@@ -615,37 +618,37 @@ void CPaintView::onDrag(int x, int y)
 			{
 				if (m_editMode == EM_DIRECT_ERASE)
 					m_drawing->drawImageLine(
-						m_currentBrush, 
+						m_currentBrush.get(),
                         prevPos[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2,
                         height()-prevPos[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2,
                         m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2,
                         height()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2,
 						eraseColor
-					);		
+					);
 				else
 					m_drawing->drawImageLine(
-						m_currentBrush, 
+						m_currentBrush.get(),
                         prevPos[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2,
                         height()-prevPos[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2,
                         m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2,
                         height()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2,
 						m_optConstraintColor
-					);		
+					);
 			}
 			else
 			{
 				if (m_editMode == EM_DIRECT_ERASE)
 					m_drawing->drawImageLine(
-						m_currentBrush, 
+						m_currentBrush.get(),
                         prevPos[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2,
                         height()-prevPos[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2,
                         m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2,
                         height()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2,
 						eraseColor
-					);		
+					);
 				else
 					m_drawing->drawImageLine(
-						m_currentBrush, 
+						m_currentBrush.get(),
                         prevPos[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2,
                         height()-prevPos[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2,
                         m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2,
@@ -658,14 +661,14 @@ void CPaintView::onDrag(int x, int y)
 		{
 			if (m_optLayerActive)
 				if (m_editMode == EM_DIRECT_ERASE)
-                    m_drawing->copyFrom(m_currentBrush, m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, height()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, eraseColor);
-				else 
-                    m_drawing->copyFrom(m_currentBrush, m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, height()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, m_optConstraintColor);
+                    m_drawing->copyFrom(m_currentBrush.get(), m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, height()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, eraseColor);
+				else
+                    m_drawing->copyFrom(m_currentBrush.get(), m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, height()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, m_optConstraintColor);
 			else
 				if (m_editMode == EM_DIRECT_ERASE)
-                    m_drawing->copyFrom(m_currentBrush, m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, height()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, eraseColor);
+                    m_drawing->copyFrom(m_currentBrush.get(), m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, height()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, eraseColor);
 				else
-                    m_drawing->copyFrom(m_currentBrush, m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, height()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, m_brushColor);
+                    m_drawing->copyFrom(m_currentBrush.get(), m_current[0]-m_drawingOffsetX-m_currentBrush->getWidth()/2, height()-m_current[1]-m_drawingOffsetY-m_currentBrush->getHeight()/2, m_brushColor);
 
 		}
         this->doRedraw();
@@ -816,7 +819,7 @@ void CPaintView::onDrag(int x, int y)
             height() - m_current[1] - m_drawingOffsetY
 			);
 		if (m_rulerChangedEvent!=NULL)
-			m_rulerChangedEvent->onRulerChanged(m_ruler);
+			m_rulerChangedEvent->onRulerChanged(m_ruler.get());
         this->doRedraw();
 		break;
 	case EM_FORCE:
@@ -902,7 +905,7 @@ void CPaintView::onRelease(int x, int y)
 
 	m_leftMouseDown = false;
 	//m_zoomResults = false;
-	m_selectedForce = 0;
+	m_selectedForce = nullptr;
 	
 	updateCursor();
 	
@@ -918,10 +921,10 @@ void CPaintView::onRelease(int x, int y)
 	case EM_CONSTRAINT:
 		break;
 	case EM_CONSTRAINT_VECTOR:
-		m_newConstraint = NULL;
+		m_newConstraint = nullptr;
 		break;
 	case EM_CONSTRAINT_HINGE:
-		m_newConstraint = NULL;
+		m_newConstraint = nullptr;
 		break;
 		
 		// For the following modes the image has to be read
@@ -1392,14 +1395,14 @@ void CPaintView::loadBrushes()
 
 	std::cout << "Loading brush: " << brushName << std::endl;
 	
-	brush = new CSgiImage();
+	brush = CSgiImage::create();
 	brush->setFileName(brushName.c_str());
 	brush->setAlphaChannel(true);
 	brush->read();
 	brush->createAlphaMask(0,m_blendFactor);
 	m_brushes.push_back(CSgiImagePtr(brush));
 	
-	invertedBrush = new CSgiImage();
+	invertedBrush = CSgiImage::create();
 	invertedBrush->setFileName(brushName.c_str());
 	invertedBrush->read();
 	invertedBrush->invert();
@@ -1407,14 +1410,14 @@ void CPaintView::loadBrushes()
 	
 	brushName = brushPath+"rbrush8.rgb";	
 	
-	brush = new CSgiImage();
+	brush = CSgiImage::create();
 	brush->setFileName(brushName.c_str());
 	brush->setAlphaChannel(true);
 	brush->read();
 	brush->createAlphaMask(0,m_blendFactor);
 	m_brushes.push_back(CSgiImagePtr(brush));
 	
-	invertedBrush = new CSgiImage();
+	invertedBrush = CSgiImage::create();
 	invertedBrush->setFileName(brushName.c_str());
 	invertedBrush->read();
 	invertedBrush->invert();
@@ -1422,14 +1425,14 @@ void CPaintView::loadBrushes()
 	
 	brushName = brushPath+"rbrush16.rgb";	
 	
-	brush = new CSgiImage();
+	brush = CSgiImage::create();
 	brush->setFileName(brushName.c_str());
 	brush->setAlphaChannel(true);
 	brush->read();
 	brush->createAlphaMask(0,m_blendFactor);
 	m_brushes.push_back(CSgiImagePtr(brush));
 	
-	invertedBrush = new CSgiImage();
+	invertedBrush = CSgiImage::create();
 	invertedBrush->setFileName(brushName.c_str());
 	invertedBrush->read();
 	invertedBrush->invert();
@@ -1437,14 +1440,14 @@ void CPaintView::loadBrushes()
 	
 	brushName = brushPath+"rbrush32.rgb";
 	
-	brush = new CSgiImage();
+	brush = CSgiImage::create();
 	brush->setFileName(brushName.c_str());
 	brush->setAlphaChannel(true);
 	brush->read();
 	brush->createAlphaMask(0,m_blendFactor);
 	m_brushes.push_back(CSgiImagePtr(brush));
 	
-	invertedBrush = new CSgiImage();
+	invertedBrush = CSgiImage::create();
 	invertedBrush->setFileName(brushName.c_str());
 	invertedBrush->read();
 	invertedBrush->invert();
@@ -1452,14 +1455,14 @@ void CPaintView::loadBrushes()
 	
 	brushName = brushPath+"rbrush64.rgb";	
 	
-	brush = new CSgiImage();
+	brush = CSgiImage::create();
 	brush->setFileName(brushName.c_str());
 	brush->setAlphaChannel(true);
 	brush->read();
 	brush->createAlphaMask(0,m_blendFactor);
 	m_brushes.push_back(CSgiImagePtr(brush));
 	
-	invertedBrush = new CSgiImage();
+	invertedBrush = CSgiImage::create();
 	invertedBrush->setFileName(brushName.c_str());
 	invertedBrush->read();
 	invertedBrush->invert();
@@ -1467,14 +1470,14 @@ void CPaintView::loadBrushes()
 	
 	brushName = brushPath+"sbrush4.rgb";	
 	
-	brush = new CSgiImage();
+	brush = CSgiImage::create();
 	brush->setFileName(brushName.c_str());
 	brush->setAlphaChannel(true);
 	brush->read();
 	brush->createAlphaMask(0,m_blendFactor);
 	m_brushes.push_back(CSgiImagePtr(brush));
 	
-	invertedBrush = new CSgiImage();
+	invertedBrush = CSgiImage::create();
 	invertedBrush->setFileName(brushName.c_str());
 	invertedBrush->read();
 	invertedBrush->invert();
@@ -1482,14 +1485,14 @@ void CPaintView::loadBrushes()
 	
 	brushName = brushPath+"sbrush8.rgb";	
 	
-	brush = new CSgiImage();
+	brush = CSgiImage::create();
 	brush->setFileName(brushName.c_str());
 	brush->setAlphaChannel(true);
 	brush->read();
 	brush->createAlphaMask(0,m_blendFactor);
 	m_brushes.push_back(CSgiImagePtr(brush));
 	
-	invertedBrush = new CSgiImage();
+	invertedBrush = CSgiImage::create();
 	invertedBrush->setFileName(brushName.c_str());
 	invertedBrush->read();
 	invertedBrush->invert();
@@ -1497,14 +1500,14 @@ void CPaintView::loadBrushes()
 	
 	brushName = brushPath+"sbrush16.rgb";	
 	
-	brush = new CSgiImage();
+	brush = CSgiImage::create();
 	brush->setFileName(brushName.c_str());
 	brush->setAlphaChannel(true);
 	brush->read();
 	brush->createAlphaMask(0,m_blendFactor);
 	m_brushes.push_back(CSgiImagePtr(brush));
 	
-	invertedBrush = new CSgiImage();
+	invertedBrush = CSgiImage::create();
 	invertedBrush->setFileName(brushName.c_str());
 	invertedBrush->read();
 	invertedBrush->invert();
@@ -1512,14 +1515,14 @@ void CPaintView::loadBrushes()
 	
 	brushName = brushPath+"sbrush32.rgb";	
 	
-	brush = new CSgiImage();
+	brush = CSgiImage::create();
 	brush->setFileName(brushName.c_str());
 	brush->setAlphaChannel(true);
 	brush->read();
 	brush->createAlphaMask(0,m_blendFactor);
 	m_brushes.push_back(CSgiImagePtr(brush));
 	
-	invertedBrush = new CSgiImage();
+	invertedBrush = CSgiImage::create();
 	invertedBrush->setFileName(brushName.c_str());
 	invertedBrush->read();
 	invertedBrush->invert();
@@ -1527,14 +1530,14 @@ void CPaintView::loadBrushes()
 	
 	brushName = brushPath+"sbrush64.rgb";	
 	
-	brush = new CSgiImage();
+	brush = CSgiImage::create();
 	brush->setFileName(brushName.c_str());
 	brush->setAlphaChannel(true);
 	brush->read();
 	brush->createAlphaMask(0,m_blendFactor);
 	m_brushes.push_back(CSgiImagePtr(brush));
 	
-	invertedBrush = new CSgiImage();
+	invertedBrush = CSgiImage::create();
 	invertedBrush->setFileName(brushName.c_str());
 	invertedBrush->read();
 	invertedBrush->invert();
@@ -1551,8 +1554,8 @@ void CPaintView::deleteBrushes()
 	m_brushes.clear();
 	m_invertedBrushes.clear();
 	
-	m_currentBrush = NULL;
-	m_currentInvertedBrush = NULL;
+	m_currentBrush = nullptr;
+	m_currentInvertedBrush = nullptr;
 }
 
 void CPaintView::clearMesh()
@@ -1708,7 +1711,7 @@ bool CPaintView::execute()
 
 	so_print("CPaintView","\tInitiating solver.");
 
-	m_solver = new CFemGridSolver2();
+	m_solver = CFemGridSolver2::create();
 	m_solver->setStatusMessageEvent(m_statusMessageEvent);
 	m_solver->setLogMessageEvent(m_logMessageEvent);
 	m_solver->setUseWeight(m_useWeight);
@@ -1722,7 +1725,7 @@ bool CPaintView::execute()
 	if (m_useWeight)
 		m_solver->setWeight(m_weight);
 
-	m_solver->setFemGrid(m_femGrid);
+	m_solver->setFemGrid(m_femGrid.get());
 	
 	//
 	// Execute calculation
@@ -1813,7 +1816,7 @@ bool CPaintView::executeOpt()
 
 	so_print("CPaintView","\tInitiating solver.");
 
-	m_solver = new CFemGridSolver2();
+	m_solver = CFemGridSolver2::create();
 	m_solver->setStatusMessageEvent(m_statusMessageEvent);
 	m_solver->setLogMessageEvent(m_logMessageEvent);
 	m_solver->setContinueCalcEvent(m_continueCalcEvent);
@@ -1834,7 +1837,7 @@ bool CPaintView::executeOpt()
 	if (m_useWeight)
 		m_solver->setWeight(m_weight);
 
-	m_solver->setFemGrid(m_femGrid);
+	m_solver->setFemGrid(m_femGrid.get());
 	m_femGrid->setShowDensity(true);
 	
 	//
@@ -1941,7 +1944,7 @@ void CPaintView::newModel()
 			}
 		}
 
-		m_drawing = new CImage(2);
+		m_drawing = CImage::create(2);
 		m_drawing->setChannels(4);
 		m_drawing->setSize(width, height);
 		m_drawing->fillColor(255-initialStiffness,255-initialStiffness,255-initialStiffness);
@@ -2023,7 +2026,7 @@ void CPaintView::openImage()
 		
 		if (jpegFile)
 		{
-			jpegImage = new CJpegImage();
+			jpegImage = CJpegImage::create();
             jpegImage->setFileName(fname.c_str());
 			jpegImage->read();
 			image = jpegImage;
@@ -2031,7 +2034,7 @@ void CPaintView::openImage()
 		
 		if (pngFile)
 		{
-			pngImage = new CPngImage();
+			pngImage = CPngImage::create();
             pngImage->setFileName(fname.c_str());
 			pngImage->read();
 			image = pngImage;
@@ -2039,7 +2042,7 @@ void CPaintView::openImage()
 		
 		if (rgbFile)
 		{
-			rgbImage = new CSgiImage();
+			rgbImage = CSgiImage::create();
             rgbImage->setFileName(fname.c_str());
 			rgbImage->read();
 			image = rgbImage;
@@ -2157,7 +2160,7 @@ void CPaintView::expandImage()
     width = (int)dWidth;
     height = (int)dHeight;
 
-    m_drawing = new CImage(2);
+    m_drawing = CImage::create(2);
     m_drawing->setChannels(4);
 
     for (i=width; i>0; i--)
@@ -2218,7 +2221,7 @@ void CPaintView::expandImageToWindow()
 {
 	disableDrawing();
 
-	m_drawing = new CImage(2);
+	m_drawing = CImage::create(2);
 	m_drawing->setChannels(4);
 
 	int i, width, height;
@@ -2286,7 +2289,7 @@ void CPaintView::openModel(const std::string filename)
 	
 	setModelName(filename);
 		
-	m_drawing = new CImage(2);
+	m_drawing = CImage::create(2);
 	m_drawing->setSize(640,480);
 	m_drawing->setChannels(4);
 	m_femGrid->setImage(m_drawing);
@@ -2337,7 +2340,7 @@ void CPaintView::openModel()
 	{
 		setModelName(fname);
 		
-		m_drawing = new CImage(2);
+		m_drawing = CImage::create(2);
 		m_drawing->setSize(640,480);
 		m_drawing->setChannels(4);
 		m_femGrid->setImage(m_drawing);

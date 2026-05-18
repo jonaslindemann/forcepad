@@ -43,7 +43,7 @@ CConstraint::CConstraint ()
 	m_value = 0.0;
 	m_vectorSize = 30.0;
 	m_vectorRadius = 5.0;
-	m_reactionForce = new CReactionForce();
+	m_reactionForce = CReactionForce::create();
 	m_visibleReaction = false;
 }
 
@@ -376,6 +376,6 @@ bool CConstraint::getShowReactionForce()
 // ------------------------------------------------------------
 CReactionForce* CConstraint::getReactionForce()
 {
-	return m_reactionForce;
+	return m_reactionForce.get();
 }
 

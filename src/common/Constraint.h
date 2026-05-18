@@ -65,6 +65,8 @@ public:
 	/** Constraint class destructor. */
 	virtual ~CConstraint ();
 
+	static CConstraintPtr create() { return std::make_shared<CConstraint>(); }
+
 	IvfClassInfo("CConstraint",CShape);
 
 	// Methods
@@ -105,12 +107,12 @@ public:
 	// Virtual overrides
 
 	/** Renders constraint in OpenGL (2D). */
-	virtual void doGeometry();
+	virtual void doGeometry() override;
 
 	/** Reads constraint from a text stream. */
-	virtual void readFromStream(istream &in);
+	virtual void readFromStream(istream &in) override;
 
 	/** Stores constraint to a text stream */
-	virtual void saveToStream(ostream &out);
+	virtual void saveToStream(ostream &out) override;
 };
 #endif

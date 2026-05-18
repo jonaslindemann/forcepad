@@ -34,18 +34,18 @@ extern "C" {
 
 CJpegImage::CJpegImage()
 {
-	m_fileName = NULL;
+	m_fileName = nullptr;
 }
 
 CJpegImage::~CJpegImage()
 {
-	if (m_fileName!=NULL)
+	if (m_fileName!=nullptr)
 		delete [] m_fileName;	
 }
 
 void CJpegImage::setFileName(const char *name)
 {
-	if (m_fileName!=NULL)
+	if (m_fileName!=nullptr)
 		delete [] m_fileName;
 
 	m_fileName = new char[strlen(name)+1];
@@ -65,7 +65,7 @@ bool CJpegImage::read()
 	int row_stride;		
 	struct jpeg_error_mgr pub;
 	
-	if ((infile = fopen(getFileName(), "rb")) == NULL) {
+	if ((infile = fopen(getFileName(), "rb")) == nullptr) {
 		fprintf(stderr, "can't open %s\n", getFileName());
 		return 0;
 	}

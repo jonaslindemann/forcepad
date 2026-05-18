@@ -26,7 +26,6 @@
 #define _CBase_H_
 
 #include "CommonDefs.h"
-#include "IvfPointer.h"
 
 #ifdef WIN32
 #pragma comment( lib, "opengl32" )
@@ -57,7 +56,6 @@ IvfSmartPointer(CBase);
  */
 class CBase {
 private:
-	int m_ref;
 	CBase* m_parent;
 public:
 	/** Base class constructor.*/
@@ -65,23 +63,9 @@ public:
 	/** Base class destructor.*/
 	virtual ~CBase ();
 
+	static CBasePtr create() { return std::make_shared<CBase>(); }
+
 	IvfClassInfoTop("CBase");
-
-	/** Increase reference count by 1.*/
-	void addReference();
-
-	/**
-	 * Decrease reference count.
-	 *
-	 * Count is decreased only if > 0.
-	 */
-	void delReference();
-
-	/** Returns true if reference count > 0.*/
-	bool isReferenced();
-
-	/** Returns reference count.*/
-	int getReferenceCount();
 
 	/** Sets parent object. */
 	void setParent(CBase* parent);

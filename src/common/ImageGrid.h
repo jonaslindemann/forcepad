@@ -51,11 +51,13 @@ public:
 	CImageGrid();
 	virtual ~CImageGrid();
 
+	static CImageGridPtr create() { return std::make_shared<CImageGrid>(); }
+
 	IvfClassInfo("CImageGrid",CShape);
 
 	virtual void initGrid();
 
-	virtual void setImage(CImage* image);
+	virtual void setImage(CImagePtr image);
 	CImage* getImage();
 
 	void setStride(int stride);

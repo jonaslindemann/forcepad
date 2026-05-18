@@ -32,16 +32,18 @@ IvfSmartPointer(CForceSelection);
 
 class CForceSelection : public CBase {
 private:
-	vector<CForce*> m_forces;
+	vector<CForcePtr> m_forces;
 public:
 	CForce* getForce(int idx);
 	int getSize();
 	CForceSelection();
 	virtual ~CForceSelection();
 
+	static CForceSelectionPtr create() { return std::make_shared<CForceSelection>(); }
+
 	IvfClassInfo("CForceSelection",CBase);
 
-	void add(CForce* force);
+	void add(CForcePtr force);
 	void clear();
 };
 

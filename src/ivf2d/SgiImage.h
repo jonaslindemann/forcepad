@@ -45,6 +45,8 @@ public:
 	CSgiImage();
 	virtual ~CSgiImage();
 
+	static CSgiImagePtr create() { return std::make_shared<CSgiImage>(); }
+
 	IvfClassInfo("CSgiImage",CImage);
 
 	bool read();

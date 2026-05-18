@@ -34,7 +34,7 @@ CForceSelection::~CForceSelection()
 
 }
 
-void CForceSelection::add(CForce *force)
+void CForceSelection::add(CForcePtr force)
 {
 	m_forces.push_back(force);
 }
@@ -53,8 +53,8 @@ CForce* CForceSelection::getForce(int idx)
 {
 	if ((idx>=0)&&(idx<(int)m_forces.size()))
 	{
-		return m_forces[idx];
+		return m_forces[idx].get();
 	}
 	else
-		return NULL;
+		return nullptr;
 }

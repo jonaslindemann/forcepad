@@ -82,9 +82,9 @@ CFemGridSolver2::CFemGridSolver2()
 
 	// Events
 
-	m_statusMessageEvent = NULL;
-	m_logMessageEvent = NULL;
-	m_continueCalcEvent = NULL;
+	m_statusMessageEvent = nullptr;
+	m_logMessageEvent = nullptr;
+	m_continueCalcEvent = nullptr;
 }
 
 CFemGridSolver2::~CFemGridSolver2()
@@ -100,7 +100,7 @@ bool CFemGridSolver2::continueCalc()
 #else
 	QCoreApplication::processEvents();
 #endif
-	if (m_continueCalcEvent!=NULL)
+	if (m_continueCalcEvent!=nullptr)
 		return m_continueCalcEvent->onContinueCalc();
 	else
 		return true;
@@ -108,13 +108,13 @@ bool CFemGridSolver2::continueCalc()
 
 void CFemGridSolver2::progressMessage(const std::string message, const int progress)
 {
-	if (m_statusMessageEvent!=NULL)
+	if (m_statusMessageEvent!=nullptr)
 		m_statusMessageEvent->onStatusMessage(message, progress);
 }
 
 void CFemGridSolver2::logMessage(const std::string context, const std::string message)
 {
-	if (m_logMessageEvent!=NULL)
+	if (m_logMessageEvent!=nullptr)
 	{
 		m_logMessageEvent->onLogMessage(context, message);
 	}
@@ -154,7 +154,7 @@ void CFemGridSolver2::setupHinges()
 {
 	CConstraint* pointConstraint = m_femGrid->getFirstPointConstraint();
 
-	while (pointConstraint!=NULL)
+	while (pointConstraint!=nullptr)
 	{
 		switch (pointConstraint->getConstraintType()) {
 		case CConstraint::CT_HINGE:
@@ -372,7 +372,7 @@ void CFemGridSolver2::setupForcesAndConstraints(bool& loadsDefined, bool& bcsDef
 
 	CForce* pointLoad = m_femGrid->getFirstPointLoad();
 
-	while (pointLoad!=NULL)
+	while (pointLoad!=nullptr)
 	{
 		pointLoad->getPosition(x, y);
 		value = pointLoad->getValue();
@@ -401,7 +401,7 @@ void CFemGridSolver2::setupForcesAndConstraints(bool& loadsDefined, bool& bcsDef
 	bcsDefined = false;
 	vectorBcsDefined = false;
 
-	while (pointConstraint!=NULL)
+	while (pointConstraint!=nullptr)
 	{
 		pointConstraint->getPosition(x, y);
 		m_femGrid->getNearestDofs((int)x, (int)y, dofs);
@@ -1173,7 +1173,7 @@ void CFemGridSolver2::executeUpdate()
 
 	CConstraint* pointConstraint = m_femGrid->getFirstPointConstraint();
 
-	while (pointConstraint!=NULL)
+	while (pointConstraint!=nullptr)
 	{
 		pointConstraint->getPosition(x, y);
 		m_femGrid->getNearestDofs((int)x, (int)y, dofs);
@@ -1234,7 +1234,7 @@ void CFemGridSolver2::executeUpdate()
 
 	CForce* pointLoad = m_femGrid->getFirstPointLoad();
 
-	while (pointLoad!=NULL)
+	while (pointLoad!=nullptr)
 	{
 		pointLoad->getPosition(x, y);
 		value = pointLoad->getValue();

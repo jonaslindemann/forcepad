@@ -37,6 +37,8 @@ public:
 	CElementGridCell();
 	virtual ~CElementGridCell();
 
+	static CElementGridCellPtr create() { return std::make_shared<CElementGridCell>(); }
+
 	IvfClassInfo("CElementGridCell",CBase);
 };
 

@@ -228,7 +228,7 @@ protected:
      *    Dynamic force update variables
      */
 
-    CForcePtr m_selectedForce;
+    CForce* m_selectedForce;
 
     /*
      *    Rigid body tools

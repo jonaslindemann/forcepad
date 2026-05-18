@@ -65,7 +65,7 @@ void CColorMap::open(const char *fname)
 	for (i=0; i<nColors; i++)
 	{
 		f >> r >> g >> b;
-		color = new CColor();
+		color = CColor::create();
 		color->setColor(r, g, b, 1.0f);
 		m_colors.push_back(color);
 	}
@@ -96,7 +96,7 @@ void CColorMap::getColor(double value, float &r, float &g, float &b)
 		// Clamp value
 
 		clampedValue = value;
-		
+
 		if (value>1)
 			clampedValue = 1.0;
 
@@ -108,7 +108,7 @@ void CColorMap::getColor(double value, float &r, float &g, float &b)
 		else
 			colorIndex = (int)( (double)(m_colors.size()-1)*clampedValue );
 
-		color = m_colors[colorIndex];
+		color = m_colors[colorIndex].get();
 
 		float alfa;
 		color->getColor(r, g, b, alfa);

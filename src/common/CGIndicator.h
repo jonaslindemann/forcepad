@@ -47,6 +47,8 @@ public:
 	CCGIndicator();
 	virtual ~CCGIndicator();
 
+	static CCGIndicatorPtr create() { return std::make_shared<CCGIndicator>(); }
+
 	IvfClassInfo("CCGIndicator",CShape);
 
 	void setArrowLength(double length);

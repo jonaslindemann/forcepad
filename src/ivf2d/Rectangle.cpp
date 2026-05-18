@@ -45,7 +45,7 @@ CRectangle::CRectangle()
 	m_lineType = LT_SOLID;
 	m_rectType = RT_SOLID;
 	m_lineWidth = 1.0;
-	m_lineColor = new CColor();
+	m_lineColor = CColor::create();
 	m_lineColor->setColor(0.0f, 0.0f, 0.0f, 1.0f);
 }
 
@@ -172,13 +172,13 @@ void CRectangle::doGeometry()
 	*/
 }
 
-void CRectangle::setTexture(CTexture *texture)
+void CRectangle::setTexture(CTexturePtr texture)
 {
 	//
 	// Let's snatch us some image info from the texture
 	//
 
-	if (texture->getImage()!=NULL)
+	if (texture->getImage()!=nullptr)
 	{
 		CImage* image = texture->getImage();
 		m_imageRatio = image->getRatio();				
@@ -201,7 +201,7 @@ void CRectangle::setLineWidth(double width)
 	m_lineWidth = width;
 }
 
-void CRectangle::setLineColor(CColor *color)
+void CRectangle::setLineColor(CColorPtr color)
 {
 	m_lineColor = color;
 }

@@ -53,7 +53,7 @@ CScreenImage::~CScreenImage()
 
 void CScreenImage::doGeometry()
 {
-	if (m_image!=NULL)
+	if (m_image!=nullptr)
 	{
 		int i, j;
 
@@ -93,7 +93,7 @@ void CScreenImage::doGeometry()
 	}
 }
 
-void CScreenImage::setImage(CImage *image)
+void CScreenImage::setImage(CImagePtr image)
 {
 	m_image = image;
 	m_subImageSize[0] = m_image->getWidth();
@@ -116,7 +116,7 @@ void CScreenImage::getSubImageSize(int &width, int &height)
 
 void CScreenImage::reset()
 {
-	if (m_image!=NULL)
+	if (m_image!=nullptr)
 	{
 		m_subImagePos[0] = 0;
 		m_subImagePos[1] = 1;
@@ -141,7 +141,7 @@ void CScreenImage::setTiles(int rows, int cols)
 	m_rows = rows;
 	m_cols = cols;
 
-	if (m_image!=NULL)
+	if (m_image!=nullptr)
 	{
 		m_tileSpacing[0] = m_image->getWidth() / m_cols;
 		m_tileSpacing[1] = m_image->getHeight() / m_rows;
@@ -166,7 +166,7 @@ int CScreenImage::getCols()
 
 void CScreenImage::update(int x1, int y1, int x2, int y2)
 {
-	if (m_image!=NULL)
+	if (m_image!=nullptr)
 	{
 		int xmin, ymin, xmax, ymax;
 

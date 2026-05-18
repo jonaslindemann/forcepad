@@ -49,6 +49,8 @@ public:
 	/** Force class destructor. */
 	virtual ~CReactionForce ();
 
+	static CReactionForcePtr create() { return std::make_shared<CReactionForce>(); }
+
 	IvfClassInfo("CReactionForce",CShape);
 
 	// Get/set methods
