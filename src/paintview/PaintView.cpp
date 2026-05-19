@@ -52,6 +52,7 @@ using namespace std;
 #include <string>
 #include <sstream>
 #include <algorithm>
+#include <cmath>
 
 #include "UiSettings.h"
 
@@ -996,7 +997,7 @@ void PaintView::onInitContext()
 
 	// Initialize OpenGL context
 
-    m_screenImage->setDevicePixelRatio((int)doDevicePixelRatio());
+    m_screenImage->setDevicePixelRatio(doDevicePixelRatio());
     m_drawingOffsetX = (width()-m_drawing->getWidth())/2;
     m_drawingOffsetY = (height()-m_drawing->getHeight())/2;
 
@@ -2541,13 +2542,13 @@ void PaintView::transferViewToImage()
 {
     int w = m_drawing->getWidth();
     int h = m_drawing->getHeight();
-    int dpr = (int)doDevicePixelRatio();
+    double dpr = doDevicePixelRatio();
 
     this->doMakeCurrent();
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
     glPixelStorei(GL_PACK_ROW_LENGTH, 0);
 
-    if (dpr == 1)
+    if (std::abs(dpr - 1.0) < 0.001)
     {
         int storageWidth = w * 3;
         GLubyte *pPixelData = new GLubyte[storageWidth * h];
@@ -2560,18 +2561,18 @@ void PaintView::transferViewToImage()
     else
     {
         // Read at physical resolution then nearest-neighbour decimate to canvas pixels.
-        int physX = (int)(m_drawingOffsetX * dpr);
-        int physY = (int)(m_drawingOffsetY * dpr);
-        int physW = w * dpr;
-        int physH = h * dpr;
+        int physX = (int)std::lround(m_drawingOffsetX * dpr);
+        int physY = (int)std::lround(m_drawingOffsetY * dpr);
+        int physW = (std::max)(1, (int)std::lround(w * dpr));
+        int physH = (std::max)(1, (int)std::lround(h * dpr));
         int physRowStride = physW * 3;
         GLubyte *pPixelData = new GLubyte[physRowStride * physH];
         glReadPixels(physX, physY, physW, physH, GL_RGB, GL_UNSIGNED_BYTE, pPixelData);
         for (int i = 0; i < h; i++)
             for (int j = 0; j < w; j++)
             {
-                int pi = i * dpr;
-                int pj = j * dpr;
+                int pi = (std::min)(physH - 1, (std::max)(0, (int)std::floor((i + 0.5) * dpr)));
+                int pj = (std::min)(physW - 1, (std::max)(0, (int)std::floor((j + 0.5) * dpr)));
                 int srcIdx = pi * physRowStride + pj * 3;
                 m_drawing->setPixel(j, i, pPixelData[srcIdx], pPixelData[srcIdx+1], pPixelData[srcIdx+2]);
             }

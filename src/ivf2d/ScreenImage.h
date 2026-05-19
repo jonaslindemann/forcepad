@@ -46,7 +46,7 @@ private:
 	int m_rows;
 	int m_cols;
 	int m_tileSpacing[2];
-	int m_devicePixelRatio;
+	double m_devicePixelRatio;
 public:
 	ScreenImage();
 	virtual ~ScreenImage();
@@ -71,7 +71,7 @@ public:
 	void getSubImageSize(int &width, int &height);
 	void setSubImageSize(int width, int height);
 
-	void setDevicePixelRatio(int dpr);
+	void setDevicePixelRatio(double dpr);
 
 	virtual void doGeometry();
 

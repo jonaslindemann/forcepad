@@ -24,6 +24,8 @@
 
 #include "ScreenImage.h"
 
+#include <algorithm>
+#include <cmath>
 #include <vector>
 
 #ifdef __APPLE__
@@ -48,12 +50,12 @@ ScreenImage::ScreenImage()
 	m_tileSpacing[0] = -1;
 	m_tileSpacing[1] = -1;
 	m_renderMode = RM_NORMAL;
-	m_devicePixelRatio = 1;
+	m_devicePixelRatio = 1.0;
 }
 
-void ScreenImage::setDevicePixelRatio(int dpr)
+void ScreenImage::setDevicePixelRatio(double dpr)
 {
-    m_devicePixelRatio = dpr > 0 ? dpr : 1;
+    m_devicePixelRatio = dpr > 0.0 ? dpr : 1.0;
 }
 
 ScreenImage::~ScreenImage()
@@ -217,7 +219,7 @@ void ScreenImage::update(int x1, int y1, int x2, int y2)
 		int logW = xmax - xmin;
 		int logH = ymax - ymin;
 
-		if (m_devicePixelRatio == 1)
+		if (std::abs(m_devicePixelRatio - 1.0) < 0.001)
 		{
 			glPixelStorei(GL_PACK_ROW_LENGTH, m_image->getWidth());
 			glPixelStorei(GL_PACK_SKIP_PIXELS, xmin);
@@ -230,11 +232,11 @@ void ScreenImage::update(int x1, int y1, int x2, int y2)
 		else
 		{
 			// Read at physical resolution then nearest-neighbour decimate to logical canvas pixels.
-			int dpr = m_devicePixelRatio;
-			int physX = (int)((x + xmin) * dpr);
-			int physY = (int)((y + ymin) * dpr);
-			int physW = logW * dpr;
-			int physH = logH * dpr;
+			double dpr = m_devicePixelRatio;
+			int physX = (int)std::lround((x + xmin) * dpr);
+			int physY = (int)std::lround((y + ymin) * dpr);
+			int physW = (std::max)(1, (int)std::lround(logW * dpr));
+			int physH = (std::max)(1, (int)std::lround(logH * dpr));
 
 			std::vector<unsigned char> temp(physW * physH * 4);
 			glPixelStorei(GL_PACK_ALIGNMENT, 1);
@@ -247,7 +249,9 @@ void ScreenImage::update(int x1, int y1, int x2, int y2)
 			{
 				for (int col = 0; col < logW; col++)
 				{
-					int srcIdx = (row * dpr * physW + col * dpr) * 4;
+					int srcRow = (std::min)(physH - 1, (std::max)(0, (int)std::floor((row + 0.5) * dpr)));
+					int srcCol = (std::min)(physW - 1, (std::max)(0, (int)std::floor((col + 0.5) * dpr)));
+					int srcIdx = (srcRow * physW + srcCol) * 4;
 					int cx = xmin + col;
 					int cy = ymin + row;
 					m_image->setPixel(cx, cy, temp[srcIdx], temp[srcIdx+1], temp[srcIdx+2]);

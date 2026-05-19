@@ -10,6 +10,7 @@
 #include <QUrl>
 #include <QDesktopServices>
 #include <QApplication>
+#include <QOpenGLContext>
 #include <QOpenGLFunctions>
 
 #include "UiSettings.h"
@@ -50,12 +51,14 @@ QSize QtPaintView::sizeHint() const
 
 void QtPaintView::initializeGL()
 {
-    fp::UiSettings::getInstance()->setDevicePixelRatio(devicePixelRatio());
+    fp::UiSettings::getInstance()->setDevicePixelRatio(doDevicePixelRatio());
     onInitContext();
 }
 
 void QtPaintView::paintGL()
 {
+    fp::UiSettings::getInstance()->setDevicePixelRatio(doDevicePixelRatio());
+
     onClear();
 
     // m_drawing layer 0 stores alpha as a layer marker (0 = background,
@@ -75,12 +78,14 @@ void QtPaintView::paintGL()
 
 void QtPaintView::resizeGL(int w, int h)
 {
+    fp::UiSettings::getInstance()->setDevicePixelRatio(doDevicePixelRatio());
     onInitContext();  // Recalculates drawing offset and scissor for the actual widget size
 }
 
 void QtPaintView::reinitGL()
 {
     makeCurrent();
+    fp::UiSettings::getInstance()->setDevicePixelRatio(doDevicePixelRatio());
     onInitContext();
     update();
 }
@@ -214,17 +219,17 @@ int QtPaintView::width()
 
 int QtPaintView::physicalWidth()
 {
-    return qRound(QOpenGLWidget::width() * devicePixelRatio());
+    return qRound(QOpenGLWidget::width() * devicePixelRatioF());
 }
 
 int QtPaintView::physicalHeight()
 {
-    return qRound(QOpenGLWidget::height() * devicePixelRatio());
+    return qRound(QOpenGLWidget::height() * devicePixelRatioF());
 }
 
 float QtPaintView::doDevicePixelRatio()
 {
-    return (float)devicePixelRatio();
+    return (float)devicePixelRatioF();
 }
 
 void QtPaintView::doRedraw()
