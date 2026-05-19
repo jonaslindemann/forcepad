@@ -34,6 +34,8 @@
 
 #include "UiSettings.h"
 
+using namespace std;
+
 // ------------------------------------------------------------
 CConstraint::CConstraint ()
 		:CShape()
@@ -58,10 +60,13 @@ void CConstraint::doGeometry()
     double oldVectorRadius = m_vectorRadius;
     double oldVectorSize = this->getVectorSize();
 
-	if (CUiSettings::getInstance()->getLineThickness()>0.0)
-		glLineWidth(CUiSettings::getInstance()->getLineThickness());
-	else
-		glLineWidth(2.0);
+	{
+        float dpr = (float)CUiSettings::getInstance()->getDevicePixelRatio();
+        if (CUiSettings::getInstance()->getLineThickness()>0.0)
+            glLineWidth((GLfloat)(CUiSettings::getInstance()->getLineThickness() * dpr));
+        else
+            glLineWidth(2.0f * dpr);
+	}
 
 	if (CUiSettings::getInstance()->getSymbolLength()>0.0)
 	{

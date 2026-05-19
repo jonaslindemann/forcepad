@@ -38,6 +38,9 @@ protected:
     // CPaintView virtual UI bridge
     int height() override;
     int width() override;
+    int physicalWidth() override;
+    int physicalHeight() override;
+    float doDevicePixelRatio() override;
     void doRedraw() override;
     void doFlush() override;
     void doInvalidate() override;

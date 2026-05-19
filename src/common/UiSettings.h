@@ -13,6 +13,7 @@ private:
 
 	double m_symbolLength;
 	double m_lineThickness;
+	double m_devicePixelRatio;
 public:
 	/** Returns the PlatformInfo singleton */
 	static CUiSettings* getInstance();
@@ -23,7 +24,10 @@ public:
 	double getSymbolLength();
 
 	void setLineThickness(double thickness);
-	double getLineThickness(); 
+	double getLineThickness();
+
+	void setDevicePixelRatio(double dpr);
+	double getDevicePixelRatio();
 
 protected:
 	/** Protected constructor (do not use) */

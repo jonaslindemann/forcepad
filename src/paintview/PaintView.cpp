@@ -37,6 +37,8 @@
 #include "JpegImage.h"
 #include "PngImage.h"
 
+using namespace std;
+
 #ifdef __APPLE__
 #include <OpenGL/glu.h>
 #else
@@ -314,6 +316,21 @@ int CPaintView::height()
 int CPaintView::width()
 {
     return -1;
+}
+
+int CPaintView::physicalWidth()
+{
+    return width();
+}
+
+int CPaintView::physicalHeight()
+{
+    return height();
+}
+
+float CPaintView::doDevicePixelRatio()
+{
+    return 1.0f;
 }
 
 void CPaintView::doRedraw()
@@ -976,7 +993,8 @@ void CPaintView::onInitContext()
 	}
 
 	// Initialize OpenGL context
-	
+
+    m_screenImage->setDevicePixelRatio((int)doDevicePixelRatio());
     m_drawingOffsetX = (width()-m_drawing->getWidth())/2;
     m_drawingOffsetY = (height()-m_drawing->getHeight())/2;
 
@@ -1013,18 +1031,22 @@ void CPaintView::onInitContext()
 	glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 	
-	// Setup projection (ortho)
-	
+	// Setup projection: viewport in physical pixels, ortho in logical pixels.
+
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-    glViewport(0,0,width(),height());
-    gluOrtho2D(0,width(),0,height());
+    glViewport(0, 0, physicalWidth(), physicalHeight());
+    gluOrtho2D(0, width(), 0, height());
 	glMatrixMode(GL_MODELVIEW);
-	
-	
-	// Define drawing area using the scissor function
-	
-    glScissor(m_drawingOffsetX, m_drawingOffsetY, m_drawing->getWidth(), m_drawing->getHeight());
+
+
+	// Define drawing area using the scissor function (physical pixels).
+
+	{
+        float dpr = doDevicePixelRatio();
+        glScissor((int)(m_drawingOffsetX * dpr), (int)(m_drawingOffsetY * dpr),
+                  (int)(m_drawing->getWidth() * dpr), (int)(m_drawing->getHeight() * dpr));
+	}
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 	// Implement a resize method
@@ -1051,8 +1073,8 @@ void CPaintView::onDraw()
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-    glViewport(0,0,width(),height());
-    gluOrtho2D(0,width(),0,height());
+    glViewport(0, 0, physicalWidth(), physicalHeight());
+    gluOrtho2D(0, width(), 0, height());
 	glMatrixMode(GL_MODELVIEW);
 
 	// Background properties
@@ -1127,10 +1149,14 @@ void CPaintView::onDraw()
 
 	glEnable(GL_SCISSOR_TEST);
 
-	if (m_zoomResults)
-        glScissor(15, 15, width()-30, height()-30);
-	else
-        glScissor(m_drawingOffsetX, m_drawingOffsetY, m_drawing->getWidth(), m_drawing->getHeight());
+	{
+        float dpr = doDevicePixelRatio();
+        if (m_zoomResults)
+            glScissor((int)(15 * dpr), (int)(15 * dpr), (int)((width() - 30) * dpr), (int)((height() - 30) * dpr));
+        else
+            glScissor((int)(m_drawingOffsetX * dpr), (int)(m_drawingOffsetY * dpr),
+                      (int)(m_drawing->getWidth() * dpr), (int)(m_drawing->getHeight() * dpr));
+	}
 
 	
 	if (m_lockDrawing)
@@ -1141,35 +1167,44 @@ void CPaintView::onDraw()
 	if (!m_femGrid->getShowGrid())
 	{
 		m_screenImage->setPosition((double)m_drawingOffsetX, (double)m_drawingOffsetY);
-		if (m_optLayerActive)
 		{
-			m_drawing->setLayer(0);
-			m_screenImage->render();
-			m_drawing->setLayer(1);
-			glEnable(GL_BLEND);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			m_screenImage->render();
-			glDisable(GL_BLEND);
-		}
-		else
-		{
-			m_drawing->setLayer(0);
-			m_screenImage->render();
+            float dpr = doDevicePixelRatio();
+            glPixelZoom(dpr, dpr);
+            if (m_optLayerActive)
+            {
+                m_drawing->setLayer(0);
+                m_screenImage->render();
+                m_drawing->setLayer(1);
+                glEnable(GL_BLEND);
+                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                m_screenImage->render();
+                glDisable(GL_BLEND);
+            }
+            else
+            {
+                m_drawing->setLayer(0);
+                m_screenImage->render();
+            }
+            glPixelZoom(1.0f, 1.0f);
 		}
 		
 		switch (m_editMode) {
 		case EM_PASTE:
-			
+
 			// Xor clipboard
-			
-			glEnable(GL_COLOR_LOGIC_OP);
-			glPixelZoom(m_brushScale, m_brushScale);
-			glLogicOp(GL_AND);
-            glRasterPos2i(m_current[0]-m_clipboard->getClipboard()->getWidth()*m_brushScale/2, height()-m_current[1]-m_clipboard->getClipboard()->getHeight()*m_brushScale/2);
-            glDrawPixels(m_clipboard->getClipboard()->getWidth(), m_clipboard->getClipboard()->getHeight(), GL_RGB, GL_UNSIGNED_BYTE, m_clipboard->getClipboard()->getImageMap());
-			glDisable(GL_COLOR_LOGIC_OP);
-            m_clipboard->render(m_current[0]-m_clipboard->getClipboard()->getWidth()*m_brushScale/2, height()-m_current[1]-m_clipboard->getClipboard()->getHeight()*m_brushScale/2);
-			glPixelZoom(1.0, 1.0);
+
+			{
+                float dpr = doDevicePixelRatio();
+                float pasteScale = m_brushScale * dpr;
+                glEnable(GL_COLOR_LOGIC_OP);
+                glPixelZoom(pasteScale, pasteScale);
+                glLogicOp(GL_AND);
+                glRasterPos2i(m_current[0]-m_clipboard->getClipboard()->getWidth()*m_brushScale/2, height()-m_current[1]-m_clipboard->getClipboard()->getHeight()*m_brushScale/2);
+                glDrawPixels(m_clipboard->getClipboard()->getWidth(), m_clipboard->getClipboard()->getHeight(), GL_RGB, GL_UNSIGNED_BYTE, m_clipboard->getClipboard()->getImageMap());
+                glDisable(GL_COLOR_LOGIC_OP);
+                m_clipboard->render(m_current[0]-m_clipboard->getClipboard()->getWidth()*m_brushScale/2, height()-m_current[1]-m_clipboard->getClipboard()->getHeight()*m_brushScale/2);
+                glPixelZoom(1.0f, 1.0f);
+			}
 			break;
 		case EM_RECTANGLE:
 			if (m_leftMouseDown)
@@ -1200,12 +1235,16 @@ void CPaintView::onDraw()
 		case EM_CONSTRAINT:
 		case EM_CONSTRAINT_VECTOR:
 		case EM_ERASE_CONSTRAINTS_FORCES:
-			glEnable(GL_BLEND);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			glPixelZoom(1.0, 1.0);
-			glRasterPos2i(m_drawingOffsetX, m_drawingOffsetY);
-            glDrawPixels(m_drawing->getWidth(), m_drawing->getHeight(), GL_RGBA, GL_UNSIGNED_BYTE, m_drawing->getImageMap());
-			glDisable(GL_BLEND);
+			{
+                float dpr = doDevicePixelRatio();
+                glEnable(GL_BLEND);
+                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                glPixelZoom(dpr, dpr);
+                glRasterPos2i(m_drawingOffsetX, m_drawingOffsetY);
+                glDrawPixels(m_drawing->getWidth(), m_drawing->getHeight(), GL_RGBA, GL_UNSIGNED_BYTE, m_drawing->getImageMap());
+                glPixelZoom(1.0f, 1.0f);
+                glDisable(GL_BLEND);
+			}
 			break;
 		default:
 			
@@ -1241,7 +1280,7 @@ void CPaintView::onDraw()
 
 				glMatrixMode(GL_PROJECTION);
 				glLoadIdentity();
-                glViewport(0,0,width(),height());
+                glViewport(0,0,physicalWidth(),physicalHeight());
                 gluOrtho2D(m_zoomPos[0]-width()*m_zoomFactor,m_zoomPos[0]+width()*m_zoomFactor,(height()-m_zoomPos[1])-height()*m_zoomFactor,(height()-m_zoomPos[1])+height()*m_zoomFactor);
 				glMatrixMode(GL_MODELVIEW);
 			}
@@ -1249,7 +1288,7 @@ void CPaintView::onDraw()
 			{
 				glMatrixMode(GL_PROJECTION);
 				glLoadIdentity();
-                glViewport(0,0,width(),height());
+                glViewport(0,0,physicalWidth(),physicalHeight());
                 gluOrtho2D(0,width(),0,height());
 				glMatrixMode(GL_MODELVIEW);
 			}
@@ -1264,7 +1303,7 @@ void CPaintView::onDraw()
 
 		if (m_calcCG)
 			m_cgIndicator->render();
-		
+
 		if (m_zoomResults)
 		{
 			//m_femGrid->setPosition(m_drawingOffsetX+m_current[0]-m_drawingOffsetX, m_drawingOffsetY-m_current[1]+m_drawingOffsetY);
@@ -1273,7 +1312,7 @@ void CPaintView::onDraw()
 
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
-            glViewport(0,0,width(),height());
+            glViewport(0,0,physicalWidth(),physicalHeight());
             gluOrtho2D(m_zoomPos[0]-width()*m_zoomFactor,m_zoomPos[0]+width()*m_zoomFactor,(height()-m_zoomPos[1])-height()*m_zoomFactor,(height()-m_zoomPos[1])+height()*m_zoomFactor);
 			glMatrixMode(GL_MODELVIEW);
 		}
@@ -1281,7 +1320,7 @@ void CPaintView::onDraw()
 		{
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
-            glViewport(0,0,width(),height());
+            glViewport(0,0,physicalWidth(),physicalHeight());
             gluOrtho2D(0,width(),0,height());
 			glMatrixMode(GL_MODELVIEW);
 		}
@@ -2499,38 +2538,43 @@ void CPaintView::undoToDrawing()
 void CPaintView::transferViewToImage()
 {
     int w = m_drawing->getWidth();
-	int h = m_drawing->getHeight();
-	int storageWidth = w*3;
-	GLubyte *pPixelData = new GLubyte[storageWidth*h];
-	
-	// Make OpenGL context current
-	
+    int h = m_drawing->getHeight();
+    int dpr = (int)doDevicePixelRatio();
+
     this->doMakeCurrent();
-	
-	// Read pixels from screen
-	
-	glPixelStorei(GL_PACK_ALIGNMENT, 1);
-	
-	glReadPixels(
-		m_drawingOffsetX,
-		m_drawingOffsetY,
-		w,
-		h,
-		GL_RGB,GL_UNSIGNED_BYTE,
-		pPixelData
-		);
+    glPixelStorei(GL_PACK_ALIGNMENT, 1);
+    glPixelStorei(GL_PACK_ROW_LENGTH, 0);
 
-	// Write pixels back into drawing.
-
-	int i, j;
-
-	for (i=0; i<h; i++)
-		for (j=0; j<w; j++)
-			m_drawing->setPixel(j, i, pPixelData[storageWidth*i + j*3], pPixelData[storageWidth*i + j*3 + 1], pPixelData[storageWidth*i + j*3 + 2]);
-
-	// Clean up
-
-	delete [] pPixelData;
+    if (dpr == 1)
+    {
+        int storageWidth = w * 3;
+        GLubyte *pPixelData = new GLubyte[storageWidth * h];
+        glReadPixels(m_drawingOffsetX, m_drawingOffsetY, w, h, GL_RGB, GL_UNSIGNED_BYTE, pPixelData);
+        for (int i = 0; i < h; i++)
+            for (int j = 0; j < w; j++)
+                m_drawing->setPixel(j, i, pPixelData[storageWidth*i + j*3], pPixelData[storageWidth*i + j*3+1], pPixelData[storageWidth*i + j*3+2]);
+        delete [] pPixelData;
+    }
+    else
+    {
+        // Read at physical resolution then nearest-neighbour decimate to canvas pixels.
+        int physX = (int)(m_drawingOffsetX * dpr);
+        int physY = (int)(m_drawingOffsetY * dpr);
+        int physW = w * dpr;
+        int physH = h * dpr;
+        int physRowStride = physW * 3;
+        GLubyte *pPixelData = new GLubyte[physRowStride * physH];
+        glReadPixels(physX, physY, physW, physH, GL_RGB, GL_UNSIGNED_BYTE, pPixelData);
+        for (int i = 0; i < h; i++)
+            for (int j = 0; j < w; j++)
+            {
+                int pi = i * dpr;
+                int pj = j * dpr;
+                int srcIdx = pi * physRowStride + pj * 3;
+                m_drawing->setPixel(j, i, pPixelData[srcIdx], pPixelData[srcIdx+1], pPixelData[srcIdx+2]);
+            }
+        delete [] pPixelData;
+    }
 }
 
 void CPaintView::copyToWindows()

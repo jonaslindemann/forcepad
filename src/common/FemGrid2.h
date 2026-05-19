@@ -33,14 +33,14 @@
 #include "ConstraintSelection.h"
 #include "ColorMap.h"
 
-typedef deque<CForcePtr> CForceQue;
-typedef deque<CForcePtr>::iterator CForceQueIter;
+typedef std::deque<CForcePtr> CForceQue;
+typedef std::deque<CForcePtr>::iterator CForceQueIter;
 
-typedef deque<CConstraintPtr> CConstraintQue;
-typedef deque<CConstraintPtr>::iterator CConstraintQueIter;
+typedef std::deque<CConstraintPtr> CConstraintQue;
+typedef std::deque<CConstraintPtr>::iterator CConstraintQueIter;
 
-typedef vector< vector<int> > CElementList;
-typedef vector< vector<int> >::iterator CElementListIter;
+typedef std::vector< std::vector<int> > CElementList;
+typedef std::vector< std::vector<int> >::iterator CElementListIter;
 
 #define ED_LEFT_RIGHT 0
 #define ED_BOTTOM_TOP 1
@@ -60,8 +60,8 @@ public:
 		ST_MISES_SMOOTH
 	};
 private:
-	vector<CForceQue> m_pointForces;
-	vector<CConstraintQue> m_pointConstraints;
+	std::vector<CForceQue> m_pointForces;
+	std::vector<CConstraintQue> m_pointConstraints;
 
 	bool m_showGrid;
 	bool m_stressDrawn;
@@ -132,8 +132,8 @@ private:
 
 	double m_arrowSize;
 
-	vector<int> m_xpoints;
-	vector<int> m_ypoints;
+	std::vector<int> m_xpoints;
+	std::vector<int> m_ypoints;
 
 	double m_pixelArea;
 
@@ -183,8 +183,8 @@ public:
 	double getMaxNegStressValue();
 	double getMaxPosStressValue();
 	void setStressMode(TStressMode mode);
-	void readFromStream(istream &in);
-	void saveToStream(ostream &out);
+	void readFromStream(std::istream &in);
+	void saveToStream(std::ostream &out);
 	void setDrawStressOnce(bool flag);
 	void resetStressDrawing();
 	void getElements(int x1, int y1, int x2, int y2, CElementList& list);

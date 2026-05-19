@@ -39,7 +39,7 @@ IvfSmartPointer(CPngImage);
  */
 class CPngImage : public CImage {
 private:
-	char* m_fileName;
+	std::string m_fileName;
 public:
 	/** CIvfPngImage constructor */
 	CPngImage();
@@ -54,8 +54,8 @@ public:
 	/** Reads PNG image */
 	virtual bool read();
 
-	void setFileName(const char* name);
-	const char* getFileName();
+	void setFileName(const std::string& name);
+	const std::string& getFileName();
 };
 
 #endif 

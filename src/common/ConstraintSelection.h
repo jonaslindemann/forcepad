@@ -32,7 +32,7 @@ IvfSmartPointer(CConstraintSelection);
 
 class CConstraintSelection : public CBase {
 private:
-	vector<CConstraintPtr> m_constraints;
+	std::vector<CConstraintPtr> m_constraints;
 public:
 	CConstraintSelection();
 	virtual ~CConstraintSelection();

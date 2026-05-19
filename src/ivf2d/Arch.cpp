@@ -64,7 +64,7 @@ void CArch::getSize(double &width, double &height)
 
 double CArch::f1(double x)
 {
-    return m_size[1]-(4*m_size[1])*pow(x,2.0)/pow(m_size[0],2.0);
+    return m_size[1]-(4*m_size[1])*x*x/(m_size[0]*m_size[0]);
 }
 
 void CArch::doGeometry()
@@ -104,10 +104,10 @@ void CArch::doGeometry()
         forward.getComponents(dx, dy, dz);
         right.setComponents(-dy, dx, 0.0);
 
-        qp1 = p1 + (double)m_lineWidth*0.5*right;
-        qp2 = p1 - (double)m_lineWidth*0.5*right;
-        qp3 = p2 - (double)m_lineWidth*0.5*right;
-        qp4 = p2 + (double)m_lineWidth*0.5*right;
+        qp1 = p1 + static_cast<double>(m_lineWidth)*0.5*right;
+        qp2 = p1 - static_cast<double>(m_lineWidth)*0.5*right;
+        qp3 = p2 - static_cast<double>(m_lineWidth)*0.5*right;
+        qp4 = p2 + static_cast<double>(m_lineWidth)*0.5*right;
 
         glBegin(GL_QUADS);
         glVertex2d(qp1.getX(), qp1.getY());

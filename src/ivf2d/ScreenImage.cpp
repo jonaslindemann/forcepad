@@ -24,6 +24,8 @@
 
 #include "ScreenImage.h"
 
+#include <vector>
+
 #ifdef __APPLE__
 #include <OpenGL/glu.h>
 #include <OpenGL/gl.h>
@@ -44,6 +46,12 @@ CScreenImage::CScreenImage()
 	m_tileSpacing[0] = -1;
 	m_tileSpacing[1] = -1;
 	m_renderMode = RM_NORMAL;
+	m_devicePixelRatio = 1;
+}
+
+void CScreenImage::setDevicePixelRatio(int dpr)
+{
+    m_devicePixelRatio = dpr > 0 ? dpr : 1;
 }
 
 CScreenImage::~CScreenImage()
@@ -203,14 +211,48 @@ void CScreenImage::update(int x1, int y1, int x2, int y2)
 			ymin = 0;
 		if (xmin<0)
 			xmin = 0;
-	
-		glPixelStorei(GL_PACK_ROW_LENGTH, m_image->getWidth());
-		glPixelStorei(GL_PACK_SKIP_PIXELS, xmin);
-		glPixelStorei(GL_PACK_SKIP_ROWS, ymin);
-		glReadPixels((int)x + xmin, (int)y + ymin, xmax-xmin, ymax-ymin, GL_RGBA, GL_UNSIGNED_BYTE, m_image->getImageMap());
-		glPixelStorei(GL_PACK_ROW_LENGTH, 0);
-		glPixelStorei(GL_PACK_SKIP_PIXELS, 0);
-		glPixelStorei(GL_PACK_SKIP_ROWS, 0);
+
+		int logW = xmax - xmin;
+		int logH = ymax - ymin;
+
+		if (m_devicePixelRatio == 1)
+		{
+			glPixelStorei(GL_PACK_ROW_LENGTH, m_image->getWidth());
+			glPixelStorei(GL_PACK_SKIP_PIXELS, xmin);
+			glPixelStorei(GL_PACK_SKIP_ROWS, ymin);
+			glReadPixels((int)x + xmin, (int)y + ymin, logW, logH, GL_RGBA, GL_UNSIGNED_BYTE, m_image->getImageMap());
+			glPixelStorei(GL_PACK_ROW_LENGTH, 0);
+			glPixelStorei(GL_PACK_SKIP_PIXELS, 0);
+			glPixelStorei(GL_PACK_SKIP_ROWS, 0);
+		}
+		else
+		{
+			// Read at physical resolution then nearest-neighbour decimate to logical canvas pixels.
+			int dpr = m_devicePixelRatio;
+			int physX = (int)((x + xmin) * dpr);
+			int physY = (int)((y + ymin) * dpr);
+			int physW = logW * dpr;
+			int physH = logH * dpr;
+
+			std::vector<unsigned char> temp(physW * physH * 4);
+			glPixelStorei(GL_PACK_ALIGNMENT, 1);
+			glPixelStorei(GL_PACK_ROW_LENGTH, 0);
+			glPixelStorei(GL_PACK_SKIP_PIXELS, 0);
+			glPixelStorei(GL_PACK_SKIP_ROWS, 0);
+			glReadPixels(physX, physY, physW, physH, GL_RGBA, GL_UNSIGNED_BYTE, temp.data());
+
+			for (int row = 0; row < logH; row++)
+			{
+				for (int col = 0; col < logW; col++)
+				{
+					int srcIdx = (row * dpr * physW + col * dpr) * 4;
+					int cx = xmin + col;
+					int cy = ymin + row;
+					m_image->setPixel(cx, cy, temp[srcIdx], temp[srcIdx+1], temp[srcIdx+2]);
+					m_image->setPixelAlpha(cx, cy, temp[srcIdx+3]);
+				}
+			}
+		}
 
 		m_image->fillRectAlpha(x1, y1, x2, y2, 128);
 	}

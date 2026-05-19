@@ -194,7 +194,7 @@ void CClipboard::copyImage(int width, int height, unsigned char *imageMap)
 					image->getPixel(i, j, red, green, blue);
 
 					median = ((double)red + (double)green + (double)blue) / 3.0;
-                    byteMedian = (unsigned char) median;
+                    byteMedian = static_cast<unsigned char>(median);
 
 					red = byteMedian;
 					green = byteMedian;

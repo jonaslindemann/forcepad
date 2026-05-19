@@ -23,6 +23,7 @@
 //
 
 #include "FemGrid2.h"
+#include "UiSettings.h"
 
 #ifdef __APPLE__
 #include <OpenGL/glu.h>
@@ -33,6 +34,8 @@
 #endif
 
 #include "Vec3d.h"
+
+using namespace std;
 
 #ifdef WIN32
 #define GL_CLAMP_TO_EDGE 0x812F
@@ -1184,7 +1187,7 @@ void CFemGrid2::drawStressArrow(double x, double y, const double *values)
 	if ( (maxSig>m_lowerStressTreshold)&&(maxSig<m_upperStressTreshold) )
 	{
 
-		glLineWidth(m_stressWidth);
+		glLineWidth((GLfloat)(m_stressWidth * CUiSettings::getInstance()->getDevicePixelRatio()));
 		glBegin(GL_LINES);
 
 		if  (((m_stressMode==CFemGrid2::SM_POSITIVE)&&(sig1>0.0))||
@@ -1296,11 +1299,12 @@ void CFemGrid2::drawConstraints()
 void CFemGrid2::drawDebugPoints()
 {
 	unsigned int i;
+	float dpr = (float)CUiSettings::getInstance()->getDevicePixelRatio();
 
 	// Draw test points
 
+	glLineWidth(2.0f * dpr);
 	glBegin(GL_LINES);
-	glLineWidth(2.0);
 	glColor3f(1.0f, 0.0f, 1.0f);
 	for (i=0; i<m_xpoints.size(); i++)
 	{
@@ -1325,7 +1329,7 @@ void CFemGrid2::drawGridPoints()
 			this->getElementCoords(i, j, ex, ey);
 
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			glLineWidth(1.0f);
+			glLineWidth(1.0f * (float)CUiSettings::getInstance()->getDevicePixelRatio());
 			glBegin(GL_QUADS);
 			glColor4f(0.2f, 0.2f, 0.2f, 0.5f);
 			for (l=0; l<4; l++)
@@ -2160,7 +2164,7 @@ void CFemGrid2::getElements(int x1, int y1, int x2, int y2, CElementList& list)
 	oldR = (int)(x / m_stride);
 	oldC = (int)(y / m_stride);
 
-	vector<int> elementPos;
+	std::vector<int> elementPos;
 	elementPos.push_back(oldR);
 	elementPos.push_back(oldC);
 	list.push_back(elementPos);

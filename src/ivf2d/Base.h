@@ -43,8 +43,6 @@
 #include <deque>
 #include <set>
 
-using namespace std;
-
 IvfSmartPointer(CBase);
 
 /**
@@ -74,9 +72,9 @@ public:
 	virtual CBase* getParent();
 
 	/** Virtual method for retrieving object from a stream. */
-	virtual void readFromStream(istream &in);
+	virtual void readFromStream(std::istream &in);
 
 	/** Virtual method for storing object to a stream. */
-	virtual void saveToStream(ostream &out);
+	virtual void saveToStream(std::ostream &out);
 };
 #endif

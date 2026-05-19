@@ -11,6 +11,8 @@
 #include <QDesktopServices>
 #include <QApplication>
 
+#include "UiSettings.h"
+
 #ifdef __APPLE__
 #include <OpenGL/glu.h>
 #else
@@ -47,6 +49,7 @@ QSize QtPaintView::sizeHint() const
 
 void QtPaintView::initializeGL()
 {
+    CUiSettings::getInstance()->setDevicePixelRatio(devicePixelRatio());
     onInitContext();
 }
 
@@ -83,9 +86,8 @@ void QtPaintView::reinitGL()
 
 void QtPaintView::mousePressEvent(QMouseEvent *event)
 {
-    const qreal dpr = devicePixelRatio();
-    int x = qRound(event->pos().x() * dpr);
-    int y = qRound(event->pos().y() * dpr);
+    int x = event->pos().x();
+    int y = event->pos().y();
 
     if (event->modifiers() & Qt::ShiftModifier)
     {
@@ -113,9 +115,8 @@ void QtPaintView::mousePressEvent(QMouseEvent *event)
 
 void QtPaintView::mouseMoveEvent(QMouseEvent *event)
 {
-    const qreal dpr = devicePixelRatio();
-    int x = qRound(event->pos().x() * dpr);
-    int y = qRound(event->pos().y() * dpr);
+    int x = event->pos().x();
+    int y = event->pos().y();
 
     if (event->modifiers() & Qt::ShiftModifier)
     {
@@ -142,9 +143,8 @@ void QtPaintView::mouseMoveEvent(QMouseEvent *event)
 
 void QtPaintView::mouseReleaseEvent(QMouseEvent *event)
 {
-    const qreal dpr = devicePixelRatio();
-    int x = qRound(event->pos().x() * dpr);
-    int y = qRound(event->pos().y() * dpr);
+    int x = event->pos().x();
+    int y = event->pos().y();
 
     if (event->button() == Qt::LeftButton)
     {
@@ -189,12 +189,27 @@ void QtPaintView::keyPressEvent(QKeyEvent *event)
 
 int QtPaintView::height()
 {
-    return qRound(QOpenGLWidget::height() * devicePixelRatio());
+    return QOpenGLWidget::height();
 }
 
 int QtPaintView::width()
 {
+    return QOpenGLWidget::width();
+}
+
+int QtPaintView::physicalWidth()
+{
     return qRound(QOpenGLWidget::width() * devicePixelRatio());
+}
+
+int QtPaintView::physicalHeight()
+{
+    return qRound(QOpenGLWidget::height() * devicePixelRatio());
+}
+
+float QtPaintView::doDevicePixelRatio()
+{
+    return (float)devicePixelRatio();
 }
 
 void QtPaintView::doRedraw()

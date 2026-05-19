@@ -331,6 +331,9 @@ protected:
 
     virtual int height();
     virtual int width();
+    virtual int physicalWidth();
+    virtual int physicalHeight();
+    virtual float doDevicePixelRatio();
     virtual void doRedraw();
     virtual void doFlush();
     virtual void doInvalidate();

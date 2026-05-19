@@ -70,14 +70,14 @@ void CVec3d::setComponents(const double *v)
 
 void CVec3d::setComponents(int x, int y)
 {
-	m_vector[0] = (double)x;
-	m_vector[1] = (double)y;
+	m_vector[0] = static_cast<double>(x);
+	m_vector[1] = static_cast<double>(y);
 }
 
 void CVec3d::setComponents(const int* pos)
 {
-	m_vector[0] = (double)pos[0];
-	m_vector[1] = (double)pos[1];
+	m_vector[0] = static_cast<double>(pos[0]);
+	m_vector[1] = static_cast<double>(pos[1]);
 }
 
 void CVec3d::getComponents(double &vx, double &vy, double &vz)
@@ -167,9 +167,9 @@ void CVec3d::getComponents(double *v)
 	v[2] = m_vector[2];
 }
 
-double CVec3d::length()
+double CVec3d::length() const
 {
-	return sqrt(pow(m_vector[0],2) + pow(m_vector[1],2) + pow(m_vector[2],2));
+	return sqrt(m_vector[0]*m_vector[0] + m_vector[1]*m_vector[1] + m_vector[2]*m_vector[2]);
 }
 
 void CVec3d::normalize()
@@ -189,20 +189,20 @@ void CVec3d::rotate(CVec3d &axis, double angle)
 
 	double rv[3];
 
-	rv[0] = 
-		(cost + (1.0-cost)*pow(axis[0],2))        * m_vector[0] + 
-		((1.0-cost)*axis[0]*axis[1]-axis[2]*sint) * m_vector[1] + 
+	rv[0] =
+		(cost + (1.0-cost)*axis[0]*axis[0])        * m_vector[0] +
+		((1.0-cost)*axis[0]*axis[1]-axis[2]*sint) * m_vector[1] +
 		((1.0-cost)*axis[0]*axis[2]+axis[1]*sint) * m_vector[2];
 
-	rv[1] = 
+	rv[1] =
 		((1.0-cost)*axis[0]*axis[1]+axis[2]*sint) * m_vector[0] +
-		(cost + (1.0-cost)*pow(axis[1],2))        * m_vector[1] + 
+		(cost + (1.0-cost)*axis[1]*axis[1])        * m_vector[1] +
 		((1.0-cost)*axis[1]*axis[2]-axis[0]*sint) * m_vector[2];
 
-	rv[2] = 
-		((1.0-cost)*axis[0]*axis[2]-axis[1]*sint) * m_vector[0] + 
+	rv[2] =
+		((1.0-cost)*axis[0]*axis[2]-axis[1]*sint) * m_vector[0] +
 		((1.0-cost)*axis[1]*axis[2]+axis[0]*sint) * m_vector[1] +
-		(cost+(1.0-cost)*pow(axis[2],2))          * m_vector[2];
+		(cost+(1.0-cost)*axis[2]*axis[2])          * m_vector[2];
 
 	m_vector[0] = rv[0];
 	m_vector[1] = rv[1];
@@ -212,7 +212,7 @@ void CVec3d::rotate(CVec3d &axis, double angle)
 void CVec3d::getEulerAngles(double &pitch, double &heading)
 {
 	heading = atan2(m_vector[0], m_vector[2])*180.0/M_PI;
-	double t = sqrt(pow(m_vector[0],2)+pow(m_vector[2],2));
+	double t = sqrt(m_vector[0]*m_vector[0]+m_vector[2]*m_vector[2]);
 	pitch = atan2(m_vector[1], t)*180.0/M_PI;
 }
 
@@ -258,17 +258,17 @@ double* CVec3d::getComponents()
 	return &m_vector[0];
 }
 
-double CVec3d::getX()
+double CVec3d::getX() const
 {
 	return m_vector[0];
 }
 
-double CVec3d::getY()
+double CVec3d::getY() const
 {
 	return m_vector[1];
 }
 
-double CVec3d::getZ()
+double CVec3d::getZ() const
 {
 	return m_vector[2];
 }

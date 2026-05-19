@@ -23,6 +23,7 @@
 //
 
 #include "CGIndicator.h"
+#include "UiSettings.h"
 
 #ifdef __APPLE__
 #include <OpenGL/glu.h>
@@ -54,7 +55,8 @@ CCGIndicator::~CCGIndicator()
 
 void CCGIndicator::doGeometry()
 {
-	glLineWidth(2.0);
+	float dpr = (float)CUiSettings::getInstance()->getDevicePixelRatio();
+	glLineWidth(2.0f * dpr);
 	glBegin(GL_LINES);
 	glVertex2d(0.0 - m_indicatorSize/2.0, 0.0);
 	glVertex2d(0.0 + m_indicatorSize/2.0, 0.0);
@@ -67,16 +69,16 @@ void CCGIndicator::doGeometry()
 		glPushMatrix();
 		glTranslated(m_direction[0]*(m_indicatorSize+m_arrowLength), m_direction[1]*(m_indicatorSize+m_arrowLength), 0.0);
 
+		glLineWidth(2.0f * dpr);
 		glBegin(GL_LINES);
-		glLineWidth(2.0);
 		glVertex2d(0, 0);
 		glVertex2d(0 - m_direction[0]*m_arrowLength, 0 - m_direction[1]*m_arrowLength);
 		glVertex2d(0, 0);
 		glVertex2d(0 - m_leftPos[0], 0 - m_leftPos[1]);
 		glVertex2d(0, 0);
 		glVertex2d(0 - m_rightPos[0], 0 - m_rightPos[1]);
-		glLineWidth(1.0);
 		glEnd();
+		glLineWidth(1.0f * dpr);
 
 		glPopMatrix();
 	}

@@ -48,10 +48,10 @@ private:
     unsigned char m_currentAlpha;
     unsigned char m_startColor[3];
     unsigned char m_fillColor[3];
-	deque<int> m_nextListX;
-	deque<int> m_nextListY;
-	deque<int> m_processListX;
-	deque<int> m_processListY;
+	std::deque<int> m_nextListX;
+	std::deque<int> m_nextListY;
+	std::deque<int> m_processListX;
+	std::deque<int> m_processListY;
 	bool m_ownData;
 
 	void initLayers();

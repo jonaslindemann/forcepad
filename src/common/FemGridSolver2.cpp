@@ -48,6 +48,8 @@
 #include <climits>
 #include <ctime>
 
+using namespace std;
+
 CFemGridSolver2::CFemGridSolver2()
 {
 	so_print("CFemGridSolver2","Constructed.");
@@ -459,9 +461,8 @@ void CFemGridSolver2::assembleVectorConstraints(calfem::TripletList& Ktriplets, 
 
 	BarEp << E, m_constraintStiffnessScale;
 
-	for (auto vci=vectorConstraints.begin(); vci!=vectorConstraints.end(); vci++)
+	for (auto* constraint : vectorConstraints)
 	{
-		CConstraint* constraint = *vci;
 		constraint->getPosition(x2, y2);
 		m_femGrid->getNearestDofs((int)x2, (int)y2, dofs);
 
@@ -564,12 +565,12 @@ void CFemGridSolver2::computeElementForces()
 					tau  = Es(ip,2);
 
 					double ds = (sigx-sigy)/2.0;
-					double R = sqrt(pow(ds,2)+pow(tau,2));
+					double R = sqrt(ds*ds+tau*tau);
 
 					double sig1 = (sigx+sigy)/2.0+R;
 					double sig2 = (sigx+sigy)/2.0-R;
 
-					ipStress[ip] = sqrt( pow(sig1,2) - sig1*sig2 + pow(sig2,2) );
+					ipStress[ip] = sqrt( sig1*sig1 - sig1*sig2 + sig2*sig2 );
 				}
 
 				m_femGrid->addNodeResult(i,   j,   ipStress[0]);
@@ -584,13 +585,13 @@ void CFemGridSolver2::computeElementForces()
 				tau  = Es_avg(2);
 
 				double ds = (sigx-sigy)/2.0;
-				double R = sqrt(pow(ds,2)+pow(tau,2));
+				double R = sqrt(ds*ds+tau*tau);
 
 				double sig1 = (sigx+sigy)/2.0+R;
 				double sig2 = (sigx+sigy)/2.0-R;
 				double alfa = atan2(tau,ds)/2.0;
 
-				double misesStress = sqrt( pow(sig1,2) - sig1*sig2 + pow(sig2,2) );
+				double misesStress = sqrt( sig1*sig1 - sig1*sig2 + sig2*sig2 );
 
 				m_femGrid->setResult(i, j, 0, sig1);
 				m_femGrid->setResult(i, j, 1, sig2);
@@ -680,12 +681,12 @@ void CFemGridSolver2::computeElementForcesOpt(calfem::Matrix& X, double penalty)
 					tau  = Es(ip,2);
 
 					double ds = (sigx-sigy)/2.0;
-					double R = sqrt(pow(ds,2)+pow(tau,2));
+					double R = sqrt(ds*ds+tau*tau);
 
 					double sig1 = (sigx+sigy)/2.0+R;
 					double sig2 = (sigx+sigy)/2.0-R;
 
-					ipStress[ip] = sqrt( pow(sig1,2) - sig1*sig2 + pow(sig2,2) );
+					ipStress[ip] = sqrt( sig1*sig1 - sig1*sig2 + sig2*sig2 );
 				}
 
 				m_femGrid->addNodeResult(i,   j,   ipStress[0]);
@@ -700,13 +701,13 @@ void CFemGridSolver2::computeElementForcesOpt(calfem::Matrix& X, double penalty)
 				tau  = Es_avg(2);
 
 				double ds = (sigx-sigy)/2.0;
-				double R = sqrt(pow(ds,2)+pow(tau,2));
+				double R = sqrt(ds*ds+tau*tau);
 
 				double sig1 = (sigx+sigy)/2.0+R;
 				double sig2 = (sigx+sigy)/2.0-R;
 				double alfa = atan2(tau,ds)/2.0;
 
-				double misesStress = sqrt( pow(sig1,2) - sig1*sig2 + pow(sig2,2) );
+				double misesStress = sqrt( sig1*sig1 - sig1*sig2 + sig2*sig2 );
 
 				m_femGrid->setResult(i, j, 0, sig1);
 				m_femGrid->setResult(i, j, 1, sig2);
@@ -743,9 +744,8 @@ void CFemGridSolver2::computeReactionForces(std::vector<CConstraint*>& vectorCon
 
 	BarEp << E, m_constraintStiffnessScale;
 
-	for (auto vci=vectorConstraints.begin(); vci!=vectorConstraints.end(); vci++)
+	for (auto* constraint : vectorConstraints)
 	{
-		CConstraint* constraint = *vci;
 		constraint->getPosition(x2, y2);
 		m_femGrid->getNearestDofs((int)x2, (int)y2, dofs);
 
@@ -766,10 +766,8 @@ void CFemGridSolver2::computeReactionForces(std::vector<CConstraint*>& vectorCon
 		constraint->getReactionForce()->setValue(es);
 	}
 
-	for (auto vci=vectorConstraints.begin(); vci!=vectorConstraints.end(); vci++)
+	for (auto* constraint : vectorConstraints)
 	{
-		CConstraint* constraint = *vci;
-
 		double force = 100.0 * constraint->getReactionForce()->getValue()/maxReactionForce;
 		constraint->getReactionForce()->setLength(-force);
 	}
@@ -906,7 +904,7 @@ calfem::Matrix CFemGridSolver2::sensitivityFilter1(calfem::Matrix& X, calfem::Ma
 			for (k=kmin; k<=kmax; k++)
 				for (l=lmin; l<=lmax; l++)
 				{
-					fac = rmin - sqrt(pow((double)(i-k),2.0)+pow((double)(j-l),2.0));
+					fac = rmin - sqrt((double)(i-k)*(double)(i-k)+(double)(j-l)*(double)(j-l));
 					sum += std::max(0.0,fac);
 					dCnew(j,i) += std::max(0.0,fac)*X(l,k)*dC(l,k);
 				}
@@ -943,7 +941,7 @@ calfem::Matrix CFemGridSolver2::sensitivityFilter2(calfem::Matrix& dC, double rm
 			for (k=kmin; k<=kmax; k++)
 				for (l=lmin; l<=lmax; l++)
 				{
-					fac = rmin - sqrt(pow((double)(i-k),2.0)+pow((double)(j-l),2.0));
+					fac = rmin - sqrt((double)(i-k)*(double)(i-k)+(double)(j-l)*(double)(j-l));
 					sum += std::max(0.0,fac);
 					dCnew(j,i) += std::max(0.0,fac)*dC(l,k);
 				}

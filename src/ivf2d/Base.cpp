@@ -24,6 +24,8 @@
 
 #include "Base.h"
 
+using namespace std;
+
 // ------------------------------------------------------------
 CBase::CBase ()
 {

@@ -1,4 +1,5 @@
 #include "Ruler.h"
+#include "UiSettings.h"
 
 #ifdef __APPLE__
 #include <OpenGL/glu.h>
@@ -33,7 +34,7 @@ void CRuler::doGeometry()
 {
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
 
-	glLineWidth(2);
+	glLineWidth(2.0f * (float)CUiSettings::getInstance()->getDevicePixelRatio());
 
 	glBegin(GL_LINES);
 	glVertex2i(m_startPos[0], m_startPos[1]-10);

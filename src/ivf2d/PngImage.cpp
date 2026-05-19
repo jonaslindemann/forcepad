@@ -28,25 +28,18 @@
 
 CPngImage::CPngImage()
 {
-	m_fileName = nullptr;	
 }
 
 CPngImage::~CPngImage()
 {
-	if (m_fileName!=nullptr)
-		delete [] m_fileName;
 }
 
-void CPngImage::setFileName(const char *name)
+void CPngImage::setFileName(const std::string& name)
 {
-	if (m_fileName!=nullptr)
-		delete [] m_fileName;
-
-	m_fileName = new char[strlen(name)+1];
-	strcpy(m_fileName, name);
+	m_fileName = name;
 }
 
-const char* CPngImage::getFileName()
+const std::string& CPngImage::getFileName()
 {
 	return m_fileName;
 }
@@ -59,7 +52,7 @@ bool CPngImage::read()
 	int color_type;
 	FILE *fp;
 	
-	if ((fp = fopen(getFileName(), "rb")) == nullptr)
+	if ((fp = fopen(m_fileName.c_str(), "rb")) == nullptr)
 		return false;
 	
 	png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,

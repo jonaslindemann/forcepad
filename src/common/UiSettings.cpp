@@ -17,6 +17,17 @@ CUiSettings::CUiSettings()
 {
 	m_symbolLength = 50.0;
 	m_lineThickness = 3.0;
+	m_devicePixelRatio = 1.0;
+}
+
+void CUiSettings::setDevicePixelRatio(double dpr)
+{
+	m_devicePixelRatio = dpr > 0.0 ? dpr : 1.0;
+}
+
+double CUiSettings::getDevicePixelRatio()
+{
+	return m_devicePixelRatio;
 }
 
 void CUiSettings::setLineThickness(double thickness)

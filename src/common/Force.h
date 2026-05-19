@@ -117,9 +117,9 @@ public:
 	virtual void doGeometry() override;
 
 	/** Read force from text stream. */
-	virtual void readFromStream(istream &in) override;
+	virtual void readFromStream(std::istream &in) override;
 
 	/** Store force to text stream. */
-	virtual void saveToStream(ostream &out) override;
+	virtual void saveToStream(std::ostream &out) override;
 };
 #endif

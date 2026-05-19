@@ -34,6 +34,8 @@
 
 #include "Vec3d.h"
 
+using namespace std;
+
 CFemGrid::CFemGrid()
 {
 	m_showGrid = false;
@@ -2443,7 +2445,7 @@ void CFemGrid::getElements(int x1, int y1, int x2, int y2, CElementList& list)
 	oldR = (int)(x / m_stride);
 	oldC = (int)(y / m_stride);
 
-	vector<int> elementPos;
+	std::vector<int> elementPos;
 	elementPos.push_back(oldR);
 	elementPos.push_back(oldC);
 	list.push_back(elementPos);

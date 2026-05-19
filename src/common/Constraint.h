@@ -110,9 +110,9 @@ public:
 	virtual void doGeometry() override;
 
 	/** Reads constraint from a text stream. */
-	virtual void readFromStream(istream &in) override;
+	virtual void readFromStream(std::istream &in) override;
 
 	/** Stores constraint to a text stream */
-	virtual void saveToStream(ostream &out) override;
+	virtual void saveToStream(std::ostream &out) override;
 };
 #endif

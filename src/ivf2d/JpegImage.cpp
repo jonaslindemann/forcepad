@@ -34,25 +34,18 @@ extern "C" {
 
 CJpegImage::CJpegImage()
 {
-	m_fileName = nullptr;
 }
 
 CJpegImage::~CJpegImage()
 {
-	if (m_fileName!=nullptr)
-		delete [] m_fileName;	
 }
 
-void CJpegImage::setFileName(const char *name)
+void CJpegImage::setFileName(const std::string& name)
 {
-	if (m_fileName!=nullptr)
-		delete [] m_fileName;
-
-	m_fileName = new char[strlen(name)+1];
-	strcpy(m_fileName, name);
+	m_fileName = name;
 }
 
-const char* CJpegImage::getFileName()
+const std::string& CJpegImage::getFileName()
 {
 	return m_fileName;
 }
@@ -65,8 +58,8 @@ bool CJpegImage::read()
 	int row_stride;		
 	struct jpeg_error_mgr pub;
 	
-	if ((infile = fopen(getFileName(), "rb")) == nullptr) {
-		fprintf(stderr, "can't open %s\n", getFileName());
+	if ((infile = fopen(m_fileName.c_str(), "rb")) == nullptr) {
+		fprintf(stderr, "can't open %s\n", m_fileName.c_str());
 		return 0;
 	}
 
@@ -98,7 +91,7 @@ bool CJpegImage::read()
 
 		for (i=0; i<cinfo.output_width; i++)
 			for (j=0; j<(unsigned int)cinfo.output_components; j++)
-                this->setValue(i, cinfo.output_height - cinfo.output_scanline, j, (unsigned char)buffer[0][i*cinfo.output_components+j]);
+                this->setValue(i, cinfo.output_height - cinfo.output_scanline, j, static_cast<unsigned char>(buffer[0][i*cinfo.output_components+j]));
 	}
 
 	jpeg_finish_decompress(&cinfo);

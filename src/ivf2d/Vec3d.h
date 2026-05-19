@@ -37,9 +37,9 @@ class CVec3d {
 private:
 	double m_vector[3];
 public:
-	double getZ();
-	double getY();
-	double getX();
+	double getZ() const;
+	double getY() const;
+	double getX() const;
 	/** Class constructor. */
 	CVec3d();
 
@@ -64,7 +64,7 @@ public:
 	void normalize();
 
 	/** Returns the vector length. */
-	double length();
+	double length() const;
 
 	/** Negate vector. */
 	void negate();
