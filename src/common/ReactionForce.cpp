@@ -34,8 +34,10 @@
 
 #include "UiSettings.h"
 
+namespace fp {
+
 // ------------------------------------------------------------
-CReactionForce::CReactionForce ()
+ReactionForce::ReactionForce ()
 {
 	m_value = 1.0;
 	m_direction[0] = 0.0;
@@ -48,25 +50,25 @@ CReactionForce::CReactionForce ()
 }
 
 // ------------------------------------------------------------
-CReactionForce::~CReactionForce ()
+ReactionForce::~ReactionForce ()
 {
 
 }
 
 // ------------------------------------------------------------
-void CReactionForce::setValue(double value)
+void ReactionForce::setValue(double value)
 {
 	m_value = value;
 }
 
 // ------------------------------------------------------------
-double CReactionForce::getValue()
+double ReactionForce::getValue()
 {
 	return m_value;
 }
 
 // ------------------------------------------------------------
-void CReactionForce::setDirection(double vx, double vy)
+void ReactionForce::setDirection(double vx, double vy)
 {
 	double l = sqrt(pow(vx,2)+pow(vy,2));
 	m_direction[0] = vx/l;
@@ -75,7 +77,7 @@ void CReactionForce::setDirection(double vx, double vy)
 }
 
 // ------------------------------------------------------------
-void CReactionForce::getDirection(double &vx, double &vy)
+void ReactionForce::getDirection(double &vx, double &vy)
 {
 	vx = m_direction[0];
 	vy = m_direction[1];
@@ -83,20 +85,20 @@ void CReactionForce::getDirection(double &vx, double &vy)
 }
 
 // ------------------------------------------------------------
-void CReactionForce::setLength(double length)
+void ReactionForce::setLength(double length)
 {
 	m_length = length;
 	this->initAngle();
 }
 
 // ------------------------------------------------------------
-double CReactionForce::getLength()
+double ReactionForce::getLength()
 {
 	return m_length;
 }
 
 // ------------------------------------------------------------
-void CReactionForce::doGeometry()
+void ReactionForce::doGeometry()
 {
 	double x;
 	double y;
@@ -106,16 +108,16 @@ void CReactionForce::doGeometry()
 	this->getPosition(x, y);
 
 	{
-        float dpr = (float)CUiSettings::getInstance()->getDevicePixelRatio();
-        if (CUiSettings::getInstance()->getLineThickness()>0.0)
-            glLineWidth((GLfloat)(CUiSettings::getInstance()->getLineThickness() * dpr));
+        float dpr = (float)UiSettings::getInstance()->getDevicePixelRatio();
+        if (UiSettings::getInstance()->getLineThickness()>0.0)
+            glLineWidth((GLfloat)(UiSettings::getInstance()->getLineThickness() * dpr));
         else
             glLineWidth(2.0f * dpr);
 	}
 
-	if (CUiSettings::getInstance()->getSymbolLength()>0.0)
+	if (UiSettings::getInstance()->getSymbolLength()>0.0)
 	{
-		this->setArrowSize(CUiSettings::getInstance()->getSymbolLength() * 0.25);
+		this->setArrowSize(UiSettings::getInstance()->getSymbolLength() * 0.25);
 	}
 	
 	glColor3f(1.0f, 0.5f, 0.0f);
@@ -155,25 +157,25 @@ void CReactionForce::doGeometry()
 		glPopMatrix();
 	}
 
-	if (CUiSettings::getInstance()->getSymbolLength()>0.0)
+	if (UiSettings::getInstance()->getSymbolLength()>0.0)
 		this->setArrowSize(oldArrowSize);
 }
 
 // ------------------------------------------------------------
-void CReactionForce::setArrowAngle(double angle)
+void ReactionForce::setArrowAngle(double angle)
 {
 	m_arrowAngle = angle*2.0*M_PI/360.0;
 	this->initAngle();
 }
 
 // ------------------------------------------------------------
-double CReactionForce::getArrowAngle()
+double ReactionForce::getArrowAngle()
 {
 	return m_arrowAngle*360.0/M_PI/2.0;
 }
 
 // ------------------------------------------------------------
-void CReactionForce::initAngle()
+void ReactionForce::initAngle()
 {
 	m_angle = atan2(m_direction[1], m_direction[0]);	
 
@@ -184,26 +186,28 @@ void CReactionForce::initAngle()
 }
 
 // ------------------------------------------------------------
-void CReactionForce::setArrowSize(double size)
+void ReactionForce::setArrowSize(double size)
 {
 	m_arrowSize = size;
 	this->initAngle();
 }
 
 // ------------------------------------------------------------
-double CReactionForce::getArrowSize()
+double ReactionForce::getArrowSize()
 {
 	return m_arrowSize;
 }
 
 // ------------------------------------------------------------
-double CReactionForce::getValueX()
+double ReactionForce::getValueX()
 {
 	return m_direction[0]*m_value;
 }
 
 // ------------------------------------------------------------
-double CReactionForce::getValueY()
+double ReactionForce::getValueY()
 {
 	return m_direction[1]*m_value;
 }
+
+} // namespace fp

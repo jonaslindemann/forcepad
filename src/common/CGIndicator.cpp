@@ -33,7 +33,9 @@
 #include <GL/gl.h>
 #endif
 
-CCGIndicator::CCGIndicator()
+namespace fp {
+
+CGIndicator::CGIndicator()
 {
 	m_gravityArrow = false;
 	m_indicatorSize = 6.0;
@@ -48,14 +50,14 @@ CCGIndicator::CCGIndicator()
 	this->initAngle();
 }
 
-CCGIndicator::~CCGIndicator()
+CGIndicator::~CGIndicator()
 {
 
 }
 
-void CCGIndicator::doGeometry()
+void CGIndicator::doGeometry()
 {
-	float dpr = (float)CUiSettings::getInstance()->getDevicePixelRatio();
+	float dpr = (float)UiSettings::getInstance()->getDevicePixelRatio();
 	glLineWidth(2.0f * dpr);
 	glBegin(GL_LINES);
 	glVertex2d(0.0 - m_indicatorSize/2.0, 0.0);
@@ -84,37 +86,37 @@ void CCGIndicator::doGeometry()
 	}
 }
 
-void CCGIndicator::setArrowLength(double length)
+void CGIndicator::setArrowLength(double length)
 {
 	m_arrowLength = length;
 }
 
-double CCGIndicator::getArrowLength()
+double CGIndicator::getArrowLength()
 {
 	return m_arrowLength;
 }
 
-void CCGIndicator::setShowGravityArrow(bool flag)
+void CGIndicator::setShowGravityArrow(bool flag)
 {
 	m_gravityArrow = flag;
 }
 
-bool CCGIndicator::getShowGravityArrow()
+bool CGIndicator::getShowGravityArrow()
 {
 	return m_gravityArrow; 
 }
 
-void CCGIndicator::setIndicatorSize(double size)
+void CGIndicator::setIndicatorSize(double size)
 {
 	m_indicatorSize = size;
 }
 
-double CCGIndicator::getIndicatorSize()
+double CGIndicator::getIndicatorSize()
 {
 	return m_indicatorSize;
 }
 
-void CCGIndicator::initAngle()
+void CGIndicator::initAngle()
 {
 	m_angle = atan2(m_direction[1], m_direction[0]);	
 
@@ -124,12 +126,14 @@ void CCGIndicator::initAngle()
 	m_rightPos[1] = m_arrowSize*sin(m_angle-m_arrowAngle);
 }
 
-void CCGIndicator::setArrowSize(double size)
+void CGIndicator::setArrowSize(double size)
 {
 	m_arrowSize = size;
 }
 
-double CCGIndicator::getArrowSize()
+double CGIndicator::getArrowSize()
 {
 	return m_arrowSize;
 }
+
+} // namespace fp

@@ -943,7 +943,7 @@ static Fl_Image *image_stress_mises_black() {
 
 void CVizMixerToolbar::cb_btnTensionCompression_i(Fl_HoverButton*, void*) {
   CFlPaintView* paintView = (CFlPaintView*)m_paintView;
-paintView->setStressMode(CFemGrid2::SM_ALL);
+paintView->setStressMode(fp::FemGrid2::SM_ALL);
 }
 void CVizMixerToolbar::cb_btnTensionCompression(Fl_HoverButton* o, void* v) {
   ((CVizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_btnTensionCompression_i(o,v);
@@ -1251,7 +1251,7 @@ static Fl_Image *image_tension_compression_black() {
 
 void CVizMixerToolbar::cb_btnTension_i(Fl_HoverButton*, void*) {
   CFlPaintView* paintView = (CFlPaintView*)m_paintView;
-paintView->setStressMode(CFemGrid2::SM_POSITIVE);
+paintView->setStressMode(fp::FemGrid2::SM_POSITIVE);
 }
 void CVizMixerToolbar::cb_btnTension(Fl_HoverButton* o, void* v) {
   ((CVizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_btnTension_i(o,v);
@@ -1559,7 +1559,7 @@ static Fl_Image *image_tension_black() {
 
 void CVizMixerToolbar::cb_btnCompression_i(Fl_HoverButton*, void*) {
   CFlPaintView* paintView = (CFlPaintView*)m_paintView;
-paintView->setStressMode(CFemGrid2::SM_NEGATIVE);
+paintView->setStressMode(fp::FemGrid2::SM_NEGATIVE);
 }
 void CVizMixerToolbar::cb_btnCompression(Fl_HoverButton* o, void* v) {
   ((CVizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_btnCompression_i(o,v);

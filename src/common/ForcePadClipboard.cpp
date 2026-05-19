@@ -24,22 +24,24 @@
 
 #include "ForcePadClipboard.h"
 
-CForcePadClipboard::CForcePadClipboard()
+namespace fp {
+
+ForcePadClipboard::ForcePadClipboard()
 {
 	m_grid = nullptr;
 
-	m_forceSelection = std::make_unique<CForceSelection>();
-	m_constraintSelection = std::make_unique<CConstraintSelection>();
+	m_forceSelection = std::make_unique<ForceSelection>();
+	m_constraintSelection = std::make_unique<ConstraintSelection>();
 
 	m_drawingOffsetX = 0;
 	m_drawingOffsetY = 0;
 }
 
-CForcePadClipboard::~CForcePadClipboard()
+ForcePadClipboard::~ForcePadClipboard()
 {
 }
 
-void CForcePadClipboard::copy(int x1, int y1, int x2, int y2)
+void ForcePadClipboard::copy(int x1, int y1, int x2, int y2)
 {
 	ivf2d::Clipboard::copy(x1, y1, x2, y2);
 
@@ -53,7 +55,7 @@ void CForcePadClipboard::copy(int x1, int y1, int x2, int y2)
 	}
 }
 
-void CForcePadClipboard::cut(int x1, int y1, int x2, int y2)
+void ForcePadClipboard::cut(int x1, int y1, int x2, int y2)
 {
 	ivf2d::Clipboard::cut(x1, y1, x2, y2);
 
@@ -73,7 +75,7 @@ void CForcePadClipboard::cut(int x1, int y1, int x2, int y2)
 	}
 }
 
-void CForcePadClipboard::paste(int x, int y)
+void ForcePadClipboard::paste(int x, int y)
 {
 	ivf2d::Clipboard::paste(x, y);
 
@@ -85,12 +87,12 @@ void CForcePadClipboard::paste(int x, int y)
 		for (int i=0; i<m_forceSelection->getSize(); i++)
 		{
 			double dx, dy;
-			CForce* force = m_forceSelection->getForce(i);
+			Force* force = m_forceSelection->getForce(i);
 			force->getPosition(dx, dy);
 			dx = dx - (double)x1;
 			dy = dy - (double)y1;
 
-			auto newForce = CForce::create();
+			auto newForce = Force::create();
 			newForce->assignFrom(force);
 			newForce->setPosition(dx + (double)x, dy + (double)y);
 			m_grid->addForce(newForce);
@@ -99,12 +101,12 @@ void CForcePadClipboard::paste(int x, int y)
 		for (int i=0; i<m_constraintSelection->getSize(); i++)
 		{
 			double dx, dy;
-			CConstraint* constraint = m_constraintSelection->getConstraint(i);
+			Constraint* constraint = m_constraintSelection->getConstraint(i);
 			constraint->getPosition(dx, dy);
 			dx = dx - (double)x1;
 			dy = dy - (double)y1;
 
-			auto newConstraint = CConstraint::create();
+			auto newConstraint = Constraint::create();
 			newConstraint->assignFrom(constraint);
 			newConstraint->setPosition(dx + (double)x, dy + (double)y);
 			m_grid->addConstraint(newConstraint);
@@ -112,29 +114,29 @@ void CForcePadClipboard::paste(int x, int y)
 	}
 }
 
-void CForcePadClipboard::setFemGrid(CFemGrid2 *grid)
+void ForcePadClipboard::setFemGrid(FemGrid2 *grid)
 {
 	m_grid = grid;
 }
 
-void CForcePadClipboard::setDrawingOffset(int x, int y)
+void ForcePadClipboard::setDrawingOffset(int x, int y)
 {
 	m_drawingOffsetX = x;
 	m_drawingOffsetY = y;
 }
 
-void CForcePadClipboard::render(int x, int y)
+void ForcePadClipboard::render(int x, int y)
 {
 	int x1, y1, x2, y2;
 	this->getSelection(x1, y1, x2, y2);
 
-	auto newForce = CForce::create();
-	auto newConstraint = CConstraint::create();
+	auto newForce = Force::create();
+	auto newConstraint = Constraint::create();
 
 	for (int i=0; i<m_forceSelection->getSize(); i++)
 	{
 		double dx, dy;
-		CForce* force = m_forceSelection->getForce(i);
+		Force* force = m_forceSelection->getForce(i);
 		force->getPosition(dx, dy);
 		newForce->assignFrom(force);
 		dx = dx - (double)x1;
@@ -146,7 +148,7 @@ void CForcePadClipboard::render(int x, int y)
 	for (int i=0; i<m_constraintSelection->getSize(); i++)
 	{
 		double dx, dy;
-		CConstraint* constraint = m_constraintSelection->getConstraint(i);
+		Constraint* constraint = m_constraintSelection->getConstraint(i);
 		constraint->getPosition(dx, dy);
 		newConstraint->assignFrom(constraint);
 		dx = dx - (double)x1;
@@ -155,3 +157,5 @@ void CForcePadClipboard::render(int x, int y)
 		newConstraint->render();
 	}
 }
+
+} // namespace fp

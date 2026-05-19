@@ -22,15 +22,17 @@
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
 
-#ifndef _CImageGrid_h_
-#define _CImageGrid_h_
+#ifndef _ImageGrid_h_
+#define _ImageGrid_h_
 
 #include "Image.h"
 #include "Shape.h"
 
-IvfSmartPointer(CImageGrid);
+namespace fp {
 
-class CImageGrid : public ivf2d::Shape {
+IvfSmartPointer(ImageGrid);
+
+class ImageGrid : public ivf2d::Shape {
 private:
 	ivf2d::ImagePtr m_image;
 	double m_maxIntensity;
@@ -48,12 +50,12 @@ public:
 	enum TElementType { ET_RIGHT_DIAGONAL, ET_LEFT_DIAGONAL };
 public:
 	void setImageSize(int width, int height);
-	CImageGrid();
-	virtual ~CImageGrid();
+	ImageGrid();
+	virtual ~ImageGrid();
 
-	static CImageGridPtr create() { return std::make_shared<CImageGrid>(); }
+	static ImageGridPtr create() { return std::make_shared<ImageGrid>(); }
 
-	IvfClassInfo("CImageGrid",ivf2d::Shape);
+	IvfClassInfo("ImageGrid",ivf2d::Shape);
 
 	virtual void initGrid();
 
@@ -85,5 +87,8 @@ public:
 
 	virtual void doGeometry();
 };
+
+
+} // namespace fp
 
 #endif 

@@ -22,8 +22,8 @@
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
 
-#ifndef _CImageGrid_h_
-#define _CImageGrid_h_
+#ifndef _ImageGrid_h_
+#define _ImageGrid_h_
 
 #include "Image.h"
 #include "Shape.h"
@@ -31,11 +31,13 @@
 #include <Eigen/Dense>
 #include <vector>
 
+namespace fp {
+
 using EigenGridMatrix = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
 
-IvfSmartPointer(CImageGrid2);
+IvfSmartPointer(ImageGrid2);
 
-class CImageGrid2 : public ivf2d::Shape {
+class ImageGrid2 : public ivf2d::Shape {
 private:
 	ivf2d::ImagePtr m_image;
 	double m_maxIntensity;
@@ -53,14 +55,14 @@ protected:
 	double m_elementScaleFactor;
 	int m_fieldLayers;
 public:
-	CImageGrid2();
-	virtual ~CImageGrid2();
+	ImageGrid2();
+	virtual ~ImageGrid2();
 
-	static CImageGrid2Ptr create() { return std::make_shared<CImageGrid2>(); }
+	static ImageGrid2Ptr create() { return std::make_shared<ImageGrid2>(); }
 
 	void clearGrid();
 
-	IvfClassInfo("CImageGrid",ivf2d::Shape);
+	IvfClassInfo("ImageGrid",ivf2d::Shape);
 
 	virtual void initGrid();
 
@@ -109,5 +111,8 @@ public:
 
 	virtual void doGeometry();
 };
+
+
+} // namespace fp
 
 #endif 

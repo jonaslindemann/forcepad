@@ -49,7 +49,7 @@ QSize QtPaintView::sizeHint() const
 
 void QtPaintView::initializeGL()
 {
-    CUiSettings::getInstance()->setDevicePixelRatio(devicePixelRatio());
+    fp::UiSettings::getInstance()->setDevicePixelRatio(devicePixelRatio());
     onInitContext();
 }
 

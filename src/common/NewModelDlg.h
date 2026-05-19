@@ -10,10 +10,10 @@
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Value_Slider.H>
 
-class CNewModelDlg {
+class NewModelDlg {
   int m_modalResult; 
 public:
-  CNewModelDlg();
+  NewModelDlg();
   Fl_Double_Window *wndNewModel;
   Fl_Button *btnOk;
 private:
@@ -29,7 +29,7 @@ public:
   Fl_Value_Slider *sldImageWidth;
   Fl_Value_Slider *sldImageHeight;
   Fl_Value_Slider *sldInitialStiffness;
-  ~CNewModelDlg();
+  ~NewModelDlg();
   void show();
   int getModalResult();
   void setSize(int width, int height);

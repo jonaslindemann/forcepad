@@ -86,12 +86,12 @@ CFemGridSolver::TErrorType CFemGridSolver::getLastError()
 	return m_errorStatus;
 }
 
-void CFemGridSolver::setFemGrid(CFemGrid *femGrid)
+void CFemGridSolver::setFemGrid(fp::FemGrid *femGrid)
 {
 	m_femGrid = femGrid;
 }
 
-CFemGrid* CFemGridSolver::getFemGrid()
+fp::FemGrid* CFemGridSolver::getFemGrid()
 {
 	return m_femGrid;
 }
@@ -133,12 +133,12 @@ void CFemGridSolver::execute()
 	// Apply hinge constraints directly to stiffness grid
 	//
 
-	CConstraint* pointConstraint = m_femGrid->getFirstPointConstraint();
+	fp::Constraint* pointConstraint = m_femGrid->getFirstPointConstraint();
 
 	while (pointConstraint!=NULL) 
 	{
 		switch (pointConstraint->getConstraintType()) {
-		case CConstraint::CT_HINGE:
+		case fp::Constraint::CT_HINGE:
 			double x, y;
 			double x1, y1, x2, y2;
 			double oldValue;
@@ -383,7 +383,7 @@ void CFemGridSolver::execute()
 		return;
 	}
 
-	CForce* pointLoad = m_femGrid->getFirstPointLoad();
+	fp::Force* pointLoad = m_femGrid->getFirstPointLoad();
 
 	while (pointLoad!=NULL) 
 	{
@@ -433,8 +433,8 @@ void CFemGridSolver::execute()
 	set<int> uniqueVectorDofs;
 	set<int>::iterator si;
 
-	vector<CConstraint*> vectorConstraints;
-	vector<CConstraint*>::iterator vci;
+	vector<fp::Constraint*> vectorConstraints;
+	vector<fp::Constraint*>::iterator vci;
 
 	double* prescribedValues = new double[m_nDof+1];
 	bool bcsDefined = false;
@@ -451,24 +451,24 @@ void CFemGridSolver::execute()
             //so_print("CFemGridSolver",so_format("\tConstraint found at [ %g, %g ], dofs = [ %d, %d ]",x, y, dofs[0], dofs[1]));
 
 			switch (pointConstraint->getConstraintType()) {
-			case CConstraint::CT_XY:
+			case fp::Constraint::CT_XY:
 				uniqueDofs.insert(dofs[0]);
 				uniqueDofs.insert(dofs[1]);
 				prescribedValues[dofs[0]] = 0.0;
 				prescribedValues[dofs[1]] = 0.0;
 				bcsDefined = true;
 				break;
-			case CConstraint::CT_X:
+			case fp::Constraint::CT_X:
 				uniqueDofs.insert(dofs[0]);
 				prescribedValues[dofs[0]] = 0.0;
 				bcsDefined = true;
 				break;
-			case CConstraint::CT_Y:
+			case fp::Constraint::CT_Y:
 				uniqueDofs.insert(dofs[1]);
 				prescribedValues[dofs[1]] = 0.0;
 				bcsDefined = true;
 				break;
-			case CConstraint::CT_VECTOR:
+			case fp::Constraint::CT_VECTOR:
 				uniqueVectorDofs.insert(dofs[0]);
 				uniqueVectorDofs.insert(dofs[1]);
 				si = uniqueVectorDofs.find(dofs[0]);
@@ -507,7 +507,7 @@ void CFemGridSolver::execute()
 
 		for (vci=vectorConstraints.begin(); vci!=vectorConstraints.end(); vci++)
 		{
-			CConstraint* constraint = *vci;
+			fp::Constraint* constraint = *vci;
 			constraint->getPosition(x2, y2);
 			m_femGrid->getNearestDofs((int)x2, (int)y2, dofs);
 
@@ -917,7 +917,7 @@ void CFemGridSolver::execute()
 
 		for (vci=vectorConstraints.begin(); vci!=vectorConstraints.end(); vci++)
 		{
-			CConstraint* constraint = *vci;
+			fp::Constraint* constraint = *vci;
 			constraint->getPosition(x2, y2);
 			m_femGrid->getNearestDofs((int)x2, (int)y2, dofs);
 
@@ -940,7 +940,7 @@ void CFemGridSolver::execute()
 
 		for (vci=vectorConstraints.begin(); vci!=vectorConstraints.end(); vci++)
 		{
-			CConstraint* constraint = *vci;
+			fp::Constraint* constraint = *vci;
 
 			double force = 100.0 * constraint->getReactionForce()->getValue()/maxReactionForce;
 			constraint->getReactionForce()->setLength(-force);
@@ -1002,14 +1002,14 @@ void CFemGridSolver::executeUpdate()
 		return;
 	}
 
-	CConstraint* pointConstraint = m_femGrid->getFirstPointConstraint();
+	fp::Constraint* pointConstraint = m_femGrid->getFirstPointConstraint();
 
 	set<int> uniqueDofs;
 	set<int> uniqueVectorDofs;
 	set<int>::iterator si;
 
-	vector<CConstraint*> vectorConstraints;
-	vector<CConstraint*>::iterator vci;
+	vector<fp::Constraint*> vectorConstraints;
+	vector<fp::Constraint*>::iterator vci;
 
 	double* prescribedValues = new double[m_nDof+1];
 	bool bcsDefined = false;
@@ -1026,24 +1026,24 @@ void CFemGridSolver::executeUpdate()
 		if (dofs[0]>0)
 		{
 			switch (pointConstraint->getConstraintType()) {
-			case CConstraint::CT_XY:
+			case fp::Constraint::CT_XY:
 				uniqueDofs.insert(dofs[0]);
 				uniqueDofs.insert(dofs[1]);
 				prescribedValues[dofs[0]] = 0.0;
 				prescribedValues[dofs[1]] = 0.0;
 				bcsDefined = true;
 				break;
-			case CConstraint::CT_X:
+			case fp::Constraint::CT_X:
 				uniqueDofs.insert(dofs[0]);
 				prescribedValues[dofs[0]] = 0.0;
 				bcsDefined = true;
 				break;
-			case CConstraint::CT_Y:
+			case fp::Constraint::CT_Y:
 				uniqueDofs.insert(dofs[1]);
 				prescribedValues[dofs[1]] = 0.0;
 				bcsDefined = true;
 				break;
-			case CConstraint::CT_VECTOR:
+			case fp::Constraint::CT_VECTOR:
 				uniqueVectorDofs.insert(dofs[0]);
 				uniqueVectorDofs.insert(dofs[1]);
 				si = uniqueVectorDofs.find(dofs[0]);
@@ -1091,7 +1091,7 @@ void CFemGridSolver::executeUpdate()
 		return;
 	}
 
-	CForce* pointLoad = m_femGrid->getFirstPointLoad();
+	fp::Force* pointLoad = m_femGrid->getFirstPointLoad();
 
 	while (pointLoad!=NULL) 
 	{
@@ -1361,7 +1361,7 @@ void CFemGridSolver::executeUpdate()
 
 		for (vci=vectorConstraints.begin(); vci!=vectorConstraints.end(); vci++)
 		{
-			CConstraint* constraint = *vci;
+			fp::Constraint* constraint = *vci;
 			constraint->getPosition(x2, y2);
 			m_femGrid->getNearestDofs((int)x2, (int)y2, dofs);
 
@@ -1384,7 +1384,7 @@ void CFemGridSolver::executeUpdate()
 
 		for (vci=vectorConstraints.begin(); vci!=vectorConstraints.end(); vci++)
 		{
-			CConstraint* constraint = *vci;
+			fp::Constraint* constraint = *vci;
 
 			double force = 100.0 * constraint->getReactionForce()->getValue()/maxReactionForce;
 			constraint->getReactionForce()->setLength(-force);

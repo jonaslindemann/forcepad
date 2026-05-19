@@ -22,29 +22,34 @@
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
 
-#ifndef _CForceSelection_h_
-#define _CForceSelection_h_
+#ifndef _ForceSelection_h_
+#define _ForceSelection_h_
 
 #include "Base.h"
 #include "Force.h"
 
-IvfSmartPointer(CForceSelection);
+namespace fp {
 
-class CForceSelection : public ivf2d::Base {
+IvfSmartPointer(ForceSelection);
+
+class ForceSelection : public ivf2d::Base {
 private:
-	std::vector<CForcePtr> m_forces;
+	std::vector<ForcePtr> m_forces;
 public:
-	CForce* getForce(int idx);
+	Force* getForce(int idx);
 	int getSize();
-	CForceSelection();
-	virtual ~CForceSelection();
+	ForceSelection();
+	virtual ~ForceSelection();
 
-	static CForceSelectionPtr create() { return std::make_shared<CForceSelection>(); }
+	static ForceSelectionPtr create() { return std::make_shared<ForceSelection>(); }
 
-	IvfClassInfo("CForceSelection",ivf2d::Base);
+	IvfClassInfo("ForceSelection",ivf2d::Base);
 
-	void add(CForcePtr force);
+	void add(ForcePtr force);
 	void clear();
 };
+
+
+} // namespace fp
 
 #endif 

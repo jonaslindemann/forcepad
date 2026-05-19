@@ -4,21 +4,21 @@
 #include <iostream>
 #include <string>
 
-CLogWindow* CLogWindow::m_instance = 0; 
+LogWindow* LogWindow::m_instance = 0; 
 
-CLogWindow::CLogWindow() {
+LogWindow::LogWindow() {
 }
 
-void CLogWindow::hide() {
+void LogWindow::hide() {
 }
 
-void CLogWindow::show() {
+void LogWindow::show() {
 }
 
-CLogWindow* CLogWindow::getInstance() {
+LogWindow* LogWindow::getInstance() {
   if(m_instance==0)
 {
-	m_instance = new CLogWindow();
+	m_instance = new LogWindow();
         return m_instance;
 }
 else
@@ -27,12 +27,12 @@ else
 }
 }
 
-void CLogWindow::print(const std::string& txt) {
+void LogWindow::print(const std::string& txt) {
   using namespace std;
 cout << txt << endl;
 }
 
-void CLogWindow::print(const std::string &context, const std::string &txt) {
+void LogWindow::print(const std::string &context, const std::string &txt) {
   using namespace std;
 cout << context << ": " << txt << endl;
 }

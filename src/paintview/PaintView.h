@@ -195,9 +195,9 @@ protected:
     double m_optRmin;
     double m_optMinChange;
     int m_optMaxLoops;
-    CFemGridSolver2::TFilterType m_optFilterType;
+    fp::FemGridSolver2::TFilterType m_optFilterType;
 
-    CFemGridSolver2Ptr m_solver;
+    fp::FemGridSolver2Ptr m_solver;
 
     /*
      *    Drawing tools
@@ -207,12 +207,12 @@ protected:
     ivf2d::EllipsePtr m_ellipse;
     ivf2d::LinePtr m_line;
     ivf2d::ArchPtr m_arch;
-    CForcePtr m_newForce;
-    CConstraintPtr m_newConstraint;
-    CConstraint::TConstraintType m_constraintType;
+    fp::ForcePtr m_newForce;
+    fp::ConstraintPtr m_newConstraint;
+    fp::Constraint::TConstraintType m_constraintType;
 
     ivf2d::RectanglePtr m_selectionBox;
-    CForcePadClipboardPtr m_clipboard;
+    fp::ForcePadClipboardPtr m_clipboard;
     ivf2d::ClipboardPtr m_undoClipboard;
 
     ivf2d::ImagePtr m_drawing;
@@ -220,21 +220,21 @@ protected:
     ivf2d::ImagePtr m_buffer;
     ivf2d::ScreenImagePtr m_screenImage;
 
-    CFemGrid2Ptr m_femGrid;
+    fp::FemGrid2Ptr m_femGrid;
 
-    CRulerPtr m_ruler;
+    fp::RulerPtr m_ruler;
 
     /*
      *    Dynamic force update variables
      */
 
-    CForce* m_selectedForce;
+    fp::Force* m_selectedForce;
 
     /*
      *    Rigid body tools
      */
 
-    CCGIndicatorPtr m_cgIndicator;
+    fp::CGIndicatorPtr m_cgIndicator;
     bool m_calcCG;
     double m_relativeForceSize;
     bool m_checkOpenGL;
@@ -440,7 +440,7 @@ public:
     void setBackgroundColor(float red, float green, float blue);
     void setForegroundColor(float red, float green, float blue);
     void setBrushMagnification(int factor);
-    void setConstraintType(CConstraint::TConstraintType constraintType);
+    void setConstraintType(fp::Constraint::TConstraintType constraintType);
     void setRelativeForceSize(double size);
     void setCalcCG(bool flag);
     bool getCalcCG();
@@ -451,7 +451,7 @@ public:
 
     // Visualisation settings
 
-    void setStressMode(CFemGrid2::TStressMode mode);
+    void setStressMode(fp::FemGrid2::TStressMode mode);
     void setStressStep(int step);
     int getStressStep();
     void setMaxIntensity(float intensity);
@@ -476,7 +476,7 @@ public:
     void setDrawForcesAndConstraints(bool flag);
     void setDimmedConstraints(bool flag);
 
-    void setStressType(CFemGrid2::TStressType stressType);
+    void setStressType(fp::FemGrid2::TStressType stressType);
     void setColorMap(int index);
     void setInvertColorMap(bool flag);
 
@@ -537,8 +537,8 @@ public:
     void setOptMaxLoops(int loops);
     int getOptMaxLoops();
 
-    void setOptFilterType(CFemGridSolver2::TFilterType filterType);
-    CFemGridSolver2::TFilterType getOptFilterType();
+    void setOptFilterType(fp::FemGridSolver2::TFilterType filterType);
+    fp::FemGridSolver2::TFilterType getOptFilterType();
 
     // User interface properties
 
@@ -590,7 +590,7 @@ public:
 class CPVRulerChangedEvent {
 public:
     virtual ~CPVRulerChangedEvent(){};
-    virtual void onRulerChanged(CRuler *ruler) = 0;
+    virtual void onRulerChanged(fp::Ruler *ruler) = 0;
 };
 
 class CPVVisualisationModeChangedEvent {

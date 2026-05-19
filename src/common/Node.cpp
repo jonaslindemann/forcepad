@@ -24,34 +24,38 @@
 
 #include "Node.h"
 
-CNode::CNode()
+namespace fp {
+
+Node::Node()
 {
 	m_dofs[0] = -1;
 	m_dofs[1] = -1;
 }
 
-CNode::~CNode()
+Node::~Node()
 {
 
 }
 
-int CNode::enumerate(int start)
+int Node::enumerate(int start)
 {
 	m_dofs[0] = start;
 	m_dofs[1] = start + 1;
 	return m_dofs[1] + 1;
 }
 
-void CNode::setDof(int idx, int value)
+void Node::setDof(int idx, int value)
 {
 	if ((idx==1)||(idx==2))
 		m_dofs[idx-1] = value;
 }
 
-int CNode::getDof(int idx)
+int Node::getDof(int idx)
 {
 	if ((idx==1)||(idx==2))
 		return m_dofs[idx-1];
 	else
 		return -1;
 }
+
+} // namespace fp

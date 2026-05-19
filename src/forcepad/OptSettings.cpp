@@ -145,11 +145,11 @@ void COptSettings::setData() {
   	minChange->value(view->getOptMinChange());
   	maxLoops->value(view->getOptMaxLoops());
   	
-  	if (view->getOptFilterType()==CFemGridSolver2::FT_NO_FILTER)
+  	if (view->getOptFilterType()==fp::FemGridSolver2::FT_NO_FILTER)
   		noFilter->value(1);
-  	if (view->getOptFilterType()==CFemGridSolver2::FT_OLE_SIGMUND)
+  	if (view->getOptFilterType()==fp::FemGridSolver2::FT_OLE_SIGMUND)
   		sigmundFilter->value(1);
-  	if (view->getOptFilterType()==CFemGridSolver2::FT_SHARP_CONTOURING)
+  	if (view->getOptFilterType()==fp::FemGridSolver2::FT_SHARP_CONTOURING)
   		backPedersenFilter->value(1);
   
   }
@@ -166,11 +166,11 @@ void COptSettings::getData() {
   	view->setOptMaxLoops(maxLoops->value());
   	
   	if (noFilter->value()==1)
-  		view->setOptFilterType(CFemGridSolver2::FT_NO_FILTER);
+  		view->setOptFilterType(fp::FemGridSolver2::FT_NO_FILTER);
   	if (sigmundFilter->value()==1)
-  		view->setOptFilterType(CFemGridSolver2::FT_OLE_SIGMUND);
+  		view->setOptFilterType(fp::FemGridSolver2::FT_OLE_SIGMUND);
   	if (backPedersenFilter->value()==1)
-  		view->setOptFilterType(CFemGridSolver2::FT_SHARP_CONTOURING);
+  		view->setOptFilterType(fp::FemGridSolver2::FT_SHARP_CONTOURING);
   	
   }
 }

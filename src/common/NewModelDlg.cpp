@@ -2,23 +2,23 @@
 
 #include "NewModelDlg.h"
 
-void CNewModelDlg::cb_btnOk_i(Fl_Button*, void*) {
+void NewModelDlg::cb_btnOk_i(Fl_Button*, void*) {
   m_modalResult = MR_OK;
 wndNewModel->hide();
 }
-void CNewModelDlg::cb_btnOk(Fl_Button* o, void* v) {
-  ((CNewModelDlg*)(o->parent()->user_data()))->cb_btnOk_i(o,v);
+void NewModelDlg::cb_btnOk(Fl_Button* o, void* v) {
+  ((NewModelDlg*)(o->parent()->user_data()))->cb_btnOk_i(o,v);
 }
 
-void CNewModelDlg::cb_btnCancel_i(Fl_Button*, void*) {
+void NewModelDlg::cb_btnCancel_i(Fl_Button*, void*) {
   m_modalResult = MR_CANCEL;
 wndNewModel->hide();
 }
-void CNewModelDlg::cb_btnCancel(Fl_Button* o, void* v) {
-  ((CNewModelDlg*)(o->parent()->user_data()))->cb_btnCancel_i(o,v);
+void NewModelDlg::cb_btnCancel(Fl_Button* o, void* v) {
+  ((NewModelDlg*)(o->parent()->user_data()))->cb_btnCancel_i(o,v);
 }
 
-CNewModelDlg::CNewModelDlg() {
+NewModelDlg::NewModelDlg() {
   { wndNewModel = new Fl_Double_Window(309, 142, "New model");
     wndNewModel->user_data((void*)(this));
     { btnOk = new Fl_Button(236, 6, 67, 25, "OK");
@@ -65,34 +65,34 @@ CNewModelDlg::CNewModelDlg() {
   } // Fl_Double_Window* wndNewModel
 }
 
-CNewModelDlg::~CNewModelDlg() {
+NewModelDlg::~NewModelDlg() {
   wndNewModel->hide();
 delete wndNewModel;
 }
 
-void CNewModelDlg::show() {
+void NewModelDlg::show() {
   wndNewModel->show();
 while (wndNewModel->visible()) Fl::wait();
 }
 
-int CNewModelDlg::getModalResult() {
+int NewModelDlg::getModalResult() {
   return m_modalResult;
 }
 
-void CNewModelDlg::setSize(int width, int height) {
+void NewModelDlg::setSize(int width, int height) {
   sldImageWidth->value(width);
 sldImageHeight->value(height);
 }
 
-void CNewModelDlg::getSize(int &width, int &height) {
+void NewModelDlg::getSize(int &width, int &height) {
   width = sldImageWidth->value();
 height = sldImageHeight->value();
 }
 
-int CNewModelDlg::getInitialStiffness() {
+int NewModelDlg::getInitialStiffness() {
   return sldInitialStiffness->value();
 }
 
-void CNewModelDlg::centerWindow(Fl_Window* window) {
+void NewModelDlg::centerWindow(Fl_Window* window) {
   wndNewModel->position(window->x()+window->w()/2-wndNewModel->w()/2, window->y()+window->h()/2-wndNewModel->h()/2);
 }

@@ -22,19 +22,21 @@
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
 
-#ifndef _CForce_H_
-#define _CForce_H_
+#ifndef _Force_h_
+#define _Force_h_
 
 #include "Shape.h"
 
-IvfSmartPointer(CForce);
+namespace fp {
+
+IvfSmartPointer(Force);
 
 /**
  * Force class
  *
  * Implements a node force.
  */
-class CForce : public ivf2d::Shape {
+class Force : public ivf2d::Shape {
 public:
 	enum TForceType {
 		FT_VECTOR,
@@ -53,18 +55,18 @@ private:
 	TForceType m_forceType;
 public:
 	/** Force class constructor. */
-	CForce ();
+	Force ();
 
 	/** Force class destructor. */
-	virtual ~CForce ();
+	virtual ~Force ();
 
-	static CForcePtr create() { return std::make_shared<CForce>(); }
+	static ForcePtr create() { return std::make_shared<Force>(); }
 
-	IvfClassInfo("CForce",ivf2d::Shape);
+	IvfClassInfo("Force",ivf2d::Shape);
 
 	// Methods
 
-	void assignFrom(CForce* force);
+	void assignFrom(Force* force);
 
 	// Get/set methods
 
@@ -122,4 +124,7 @@ public:
 	/** Store force to text stream. */
 	virtual void saveToStream(std::ostream &out) override;
 };
+
+} // namespace fp
+
 #endif

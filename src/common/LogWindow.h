@@ -7,29 +7,29 @@
 #include "editlog_stream.h"
 #endif
 #include "so_format.h"
-#define so_show() CLogWindow::getInstance()->show();
-#define so_print(a,b) CLogWindow::getInstance()->print(a,b);
-#define so_println() CLogWindow::getInstance()->print("");
-#define so_hide() CLogWindow::getInstance()->hide();
+#define so_show() LogWindow::getInstance()->show();
+#define so_print(a,b) LogWindow::getInstance()->print(a,b);
+#define so_println() LogWindow::getInstance()->print("");
+#define so_hide() LogWindow::getInstance()->hide();
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Text_Display.H>
 
 #include <iostream>
 #include <string>
 
-class CLogWindow {
+class LogWindow {
 #ifdef WIN32
   std::basic_streambuf<char>* m_oldBuf; 
   std::basic_editstreambuf<char> m_editStrBuf; 
 #endif
-  static CLogWindow* m_instance; 
-  CLogWindow();
+  static LogWindow* m_instance; 
+  LogWindow();
 public:
   Fl_Double_Window *mainWindow;
   Fl_Text_Display *textDisplay;
   void hide();
   void show();
-  static CLogWindow* getInstance();
+  static LogWindow* getInstance();
   void print(const std::string& txt);
   void print(const std::string& context, const std::string& txt);
 };

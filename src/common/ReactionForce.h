@@ -22,14 +22,16 @@
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
 
-#ifndef _CReactionForce_h_
-#define _CReactionForce_h_
+#ifndef _ReactionForce_h_
+#define _ReactionForce_h_
 
 #include "Shape.h"
 
-IvfSmartPointer(CReactionForce);
+namespace fp {
 
-class CReactionForce : public ivf2d::Shape {
+IvfSmartPointer(ReactionForce);
+
+class ReactionForce : public ivf2d::Shape {
 private:
 	void initAngle();
 
@@ -44,14 +46,14 @@ private:
 	double m_offset;
 public:
 	/** Force class constructor. */
-	CReactionForce ();
+	ReactionForce ();
 
 	/** Force class destructor. */
-	virtual ~CReactionForce ();
+	virtual ~ReactionForce ();
 
-	static CReactionForcePtr create() { return std::make_shared<CReactionForce>(); }
+	static ReactionForcePtr create() { return std::make_shared<ReactionForce>(); }
 
-	IvfClassInfo("CReactionForce",ivf2d::Shape);
+	IvfClassInfo("ReactionForce",ivf2d::Shape);
 
 	// Get/set methods
 
@@ -103,4 +105,7 @@ public:
 	/** Draw force in OpenGL */
 	virtual void doGeometry();
 };
+
+} // namespace fp
+
 #endif

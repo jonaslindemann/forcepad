@@ -22,39 +22,44 @@
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
 
-#ifndef _CForcePadClipboard_h_
-#define _CForcePadClipboard_h_
+#ifndef _ForcePadClipboard_h_
+#define _ForcePadClipboard_h_
 
 #include "Clipboard.h"
 #include "ForceSelection.h"
 #include "ConstraintSelection.h"
 #include "FemGrid2.h"
 
-IvfSmartPointer(CForcePadClipboard);
+namespace fp {
 
-class CForcePadClipboard : public ivf2d::Clipboard {
+IvfSmartPointer(ForcePadClipboard);
+
+class ForcePadClipboard : public ivf2d::Clipboard {
 private:
-	std::unique_ptr<CForceSelection> m_forceSelection;
-	std::unique_ptr<CConstraintSelection> m_constraintSelection;
-	CFemGrid2* m_grid;
+	std::unique_ptr<ForceSelection> m_forceSelection;
+	std::unique_ptr<ConstraintSelection> m_constraintSelection;
+	FemGrid2* m_grid;
 	int m_drawingOffsetX;
 	int m_drawingOffsetY;
 public:
-	CForcePadClipboard();
-	virtual ~CForcePadClipboard();
+	ForcePadClipboard();
+	virtual ~ForcePadClipboard();
 
-	static CForcePadClipboardPtr create() { return std::make_shared<CForcePadClipboard>(); }
+	static ForcePadClipboardPtr create() { return std::make_shared<ForcePadClipboard>(); }
 
-	IvfClassInfo("CForcePadClipboard",ivf2d::Clipboard);
+	IvfClassInfo("ForcePadClipboard",ivf2d::Clipboard);
 
 	void render(int x, int y);
 
-	void setFemGrid(CFemGrid2* grid);
+	void setFemGrid(FemGrid2* grid);
 	void setDrawingOffset(int x, int y);
 
 	virtual void copy(int x1, int y1, int x2, int y2);
 	virtual void cut(int x1, int y1, int x2, int y2);
 	virtual void paste(int x, int y);
 };
+
+
+} // namespace fp
 
 #endif 

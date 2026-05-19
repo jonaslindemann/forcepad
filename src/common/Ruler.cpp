@@ -11,7 +11,9 @@
 
 #include "Vec3d.h"
 
-CRuler::CRuler ()
+namespace fp {
+
+Ruler::Ruler ()
 		:ivf2d::Shape()
 {
 	m_startPos[0] = 0;
@@ -21,20 +23,20 @@ CRuler::CRuler ()
 	m_actualLength = 1.0;
 }
 
-CRuler::~CRuler ()
+Ruler::~Ruler ()
 {
 
 }
 
-void CRuler::initRuler()
+void Ruler::initRuler()
 {
 }
 
-void CRuler::doGeometry()
+void Ruler::doGeometry()
 {
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
 
-	glLineWidth(2.0f * (float)CUiSettings::getInstance()->getDevicePixelRatio());
+	glLineWidth(2.0f * (float)UiSettings::getInstance()->getDevicePixelRatio());
 
 	glBegin(GL_LINES);
 	glVertex2i(m_startPos[0], m_startPos[1]-10);
@@ -56,29 +58,29 @@ void CRuler::doGeometry()
 	glPopAttrib();
 }
 
-void CRuler::setEndPos(int x, int y)
+void Ruler::setEndPos(int x, int y)
 {
 	m_endPos[0] = x;
 	m_endPos[1] = y;
 }
 
-void CRuler::setStartPos(int x, int y)
+void Ruler::setStartPos(int x, int y)
 {
 	m_startPos[0] = x;
 	m_startPos[1] = y;
 }
 
-void CRuler::setActualLength(double length)
+void Ruler::setActualLength(double length)
 {
 	m_actualLength = length;
 }
 
-double CRuler::getActualLength()
+double Ruler::getActualLength()
 {
 	return m_actualLength;
 }
 
-double CRuler::getPixelLength()
+double Ruler::getPixelLength()
 {
 	ivf2d::Vec3d p1;
 	ivf2d::Vec3d p2;
@@ -91,3 +93,4 @@ double CRuler::getPixelLength()
 	return v.length();
 }
 
+} // namespace fp

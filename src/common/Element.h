@@ -22,31 +22,36 @@
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
 
-#ifndef _CElement_h_
-#define _CElement_h_
+#ifndef _Element_h_
+#define _Element_h_
 
 #include "Base.h"
 #include "Node.h"
 
-IvfSmartPointer(CElement);
+namespace fp {
 
-class CElement : public ivf2d::Base {
+IvfSmartPointer(Element);
+
+class Element : public ivf2d::Base {
 private:
-	std::vector<CNodePtr> m_nodes;
+	std::vector<NodePtr> m_nodes;
 public:
 	/** Color class constructor. */
-	CElement();
+	Element();
 
 	/** Color class destructor. */
-	virtual ~CElement();
+	virtual ~Element();
 
-	static CElementPtr create() { return std::make_shared<CElement>(); }
+	static ElementPtr create() { return std::make_shared<Element>(); }
 
-	IvfClassInfo("CElement",ivf2d::Base);
+	IvfClassInfo("Element",ivf2d::Base);
 
 	void setNodes(int number);
-	void setNode(int idx, CNode* node);
-	CNode* getNode(int idx);
+	void setNode(int idx, Node* node);
+	Node* getNode(int idx);
 };
+
+
+} // namespace fp
 
 #endif 

@@ -21,23 +21,25 @@
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
 
-#ifndef _CColorMap_h_
-#define _CColorMap_h_
+#ifndef _ColorMap_h_
+#define _ColorMap_h_
 
 #include "Base.h"
 #include "Color.h"
 
-IvfSmartPointer(CColorMap);
+namespace fp {
 
-class CColorMap : public ivf2d::Base {
+IvfSmartPointer(ColorMap);
+
+class ColorMap : public ivf2d::Base {
 private:
 	std::vector<ivf2d::ColorPtr> m_colors;
 	bool m_invert;
 public:
-	CColorMap();
-	virtual ~CColorMap();
+	ColorMap();
+	virtual ~ColorMap();
 
-	static CColorMapPtr create() { return std::make_shared<CColorMap>(); }
+	static ColorMapPtr create() { return std::make_shared<ColorMap>(); }
 
 	void open(const char* fname);
 	void clear();
@@ -49,5 +51,8 @@ public:
 
 	void setInvert(bool flag);
 };
+
+
+} // namespace fp
 
 #endif 

@@ -22,29 +22,34 @@
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
 
-#ifndef _CConstraintSelection_h_
-#define _CConstraintSelection_h_
+#ifndef _ConstraintSelection_h_
+#define _ConstraintSelection_h_
 
 #include "Base.h"
 #include "Constraint.h"
 
-IvfSmartPointer(CConstraintSelection);
+namespace fp {
 
-class CConstraintSelection : public ivf2d::Base {
+IvfSmartPointer(ConstraintSelection);
+
+class ConstraintSelection : public ivf2d::Base {
 private:
-	std::vector<CConstraintPtr> m_constraints;
+	std::vector<ConstraintPtr> m_constraints;
 public:
-	CConstraintSelection();
-	virtual ~CConstraintSelection();
+	ConstraintSelection();
+	virtual ~ConstraintSelection();
 
-	static CConstraintSelectionPtr create() { return std::make_shared<CConstraintSelection>(); }
+	static ConstraintSelectionPtr create() { return std::make_shared<ConstraintSelection>(); }
 
-	IvfClassInfo("CConstraintSelection",ivf2d::Base);
+	IvfClassInfo("ConstraintSelection",ivf2d::Base);
 
-	void add(CConstraintPtr constraint);
+	void add(ConstraintPtr constraint);
 	void clear();
-	CConstraint* getConstraint(int idx);
+	Constraint* getConstraint(int idx);
 	int getSize();
 };
+
+
+} // namespace fp
 
 #endif 

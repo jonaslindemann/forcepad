@@ -433,3 +433,7 @@ bool SystemInfo::Is64bitPlatform() const
 }
 
 #endif
+
+namespace fp {
+
+} // namespace fp

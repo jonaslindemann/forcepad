@@ -36,8 +36,10 @@
 
 using namespace std;
 
+namespace fp {
+
 // ------------------------------------------------------------
-CForce::CForce ()
+Force::Force ()
 {
 	m_value = 1.0;
 	m_direction[0] = 0.0;
@@ -50,25 +52,25 @@ CForce::CForce ()
 }
 
 // ------------------------------------------------------------
-CForce::~CForce ()
+Force::~Force ()
 {
 
 }
 
 // ------------------------------------------------------------
-void CForce::setValue(double value)
+void Force::setValue(double value)
 {
 	m_value = value;
 }
 
 // ------------------------------------------------------------
-double CForce::getValue()
+double Force::getValue()
 {
 	return m_value;
 }
 
 // ------------------------------------------------------------
-void CForce::setDirection(double vx, double vy)
+void Force::setDirection(double vx, double vy)
 {
 	double l = sqrt(pow(vx,2)+pow(vy,2));
 	m_direction[0] = vx/l;
@@ -77,7 +79,7 @@ void CForce::setDirection(double vx, double vy)
 }
 
 // ------------------------------------------------------------
-void CForce::getDirection(double &vx, double &vy)
+void Force::getDirection(double &vx, double &vy)
 {
 	vx = m_direction[0];
 	vy = m_direction[1];
@@ -85,19 +87,19 @@ void CForce::getDirection(double &vx, double &vy)
 }
 
 // ------------------------------------------------------------
-void CForce::setLength(double length)
+void Force::setLength(double length)
 {
 	m_length = length;
 }
 
 // ------------------------------------------------------------
-double CForce::getLength()
+double Force::getLength()
 {
 	return m_length;
 }
 
 // ------------------------------------------------------------
-void CForce::doGeometry()
+void Force::doGeometry()
 {
 	double x;
 	double y;
@@ -112,16 +114,16 @@ void CForce::doGeometry()
 	switch (m_forceType) {
 	case FT_VECTOR:
 		{
-            float dpr = (float)CUiSettings::getInstance()->getDevicePixelRatio();
-            if (CUiSettings::getInstance()->getLineThickness()>0.0)
-                glLineWidth((GLfloat)(CUiSettings::getInstance()->getLineThickness() * dpr));
+            float dpr = (float)UiSettings::getInstance()->getDevicePixelRatio();
+            if (UiSettings::getInstance()->getLineThickness()>0.0)
+                glLineWidth((GLfloat)(UiSettings::getInstance()->getLineThickness() * dpr));
             else
                 glLineWidth(2.0f * dpr);
 		}
 
-		if (CUiSettings::getInstance()->getSymbolLength()>0.0)
+		if (UiSettings::getInstance()->getSymbolLength()>0.0)
 		{
-			length = CUiSettings::getInstance()->getSymbolLength();
+			length = UiSettings::getInstance()->getSymbolLength();
 			arrowLength = 0.25*length;
 
 
@@ -139,7 +141,7 @@ void CForce::doGeometry()
 		glVertex2d(0 - m_rightPos[0], 0 - m_rightPos[1]);
 		glEnd();
 
-		if (CUiSettings::getInstance()->getSymbolLength()>0.0)
+		if (UiSettings::getInstance()->getSymbolLength()>0.0)
 		{
 			this->setLength(oldLength);
 			this->setArrowSize(oldArrowLength);
@@ -155,20 +157,20 @@ void CForce::doGeometry()
 }
 
 // ------------------------------------------------------------
-void CForce::setArrowAngle(double angle)
+void Force::setArrowAngle(double angle)
 {
 	m_arrowAngle = angle*2.0*M_PI/360.0;
 	this->initAngle();
 }
 
 // ------------------------------------------------------------
-double CForce::getArrowAngle()
+double Force::getArrowAngle()
 {
 	return m_arrowAngle*360.0/M_PI/2.0;
 }
 
 // ------------------------------------------------------------
-void CForce::initAngle()
+void Force::initAngle()
 {
 	m_angle = atan2(m_direction[1], m_direction[0]);	
 
@@ -179,20 +181,20 @@ void CForce::initAngle()
 }
 
 // ------------------------------------------------------------
-void CForce::setArrowSize(double size)
+void Force::setArrowSize(double size)
 {
 	m_arrowSize = size;
 	this->initAngle();
 }
 
 // ------------------------------------------------------------
-double CForce::getArrowSize()
+double Force::getArrowSize()
 {
 	return m_arrowSize;
 }
 
 // ------------------------------------------------------------
-void CForce::saveToStream(ostream &out)
+void Force::saveToStream(ostream &out)
 {
 	out << m_value << " ";
 	out << m_direction[0] << " ";
@@ -203,7 +205,7 @@ void CForce::saveToStream(ostream &out)
 }
 
 // ------------------------------------------------------------
-void CForce::readFromStream(istream &in)
+void Force::readFromStream(istream &in)
 {
 	in >> m_value;
 	in >> m_direction[0];
@@ -215,7 +217,7 @@ void CForce::readFromStream(istream &in)
 }
 
 // ------------------------------------------------------------
-void CForce::assignFrom(CForce *force)
+void Force::assignFrom(Force *force)
 {
 	double vx, vy;
 
@@ -230,13 +232,15 @@ void CForce::assignFrom(CForce *force)
 }
 
 // ------------------------------------------------------------
-double CForce::getValueX()
+double Force::getValueX()
 {
 	return m_direction[0]*m_value;
 }
 
 // ------------------------------------------------------------
-double CForce::getValueY()
+double Force::getValueY()
 {
 	return m_direction[1]*m_value;
 }
+
+} // namespace fp

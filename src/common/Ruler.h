@@ -22,19 +22,21 @@
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
 
-#ifndef _CRuler_H_
-#define _CRuler_H_
+#ifndef _Ruler_h_
+#define _Ruler_h_
 
 #include "Shape.h"
 
-IvfSmartPointer(CRuler);
+namespace fp {
+
+IvfSmartPointer(Ruler);
 
 /**
  * Ruler class
  *
  * Implements a visual ruler for setting the size of the model.
  */
-class CRuler : public ivf2d::Shape {
+class Ruler : public ivf2d::Shape {
 private:
 	int m_startPos[2];
 	int m_endPos[2];
@@ -43,14 +45,14 @@ private:
 	void initRuler();
 public:
 	/** Ruler class constructor. */
-	CRuler();
+	Ruler();
 
 	/** Ruler class destructor. */
-	virtual ~CRuler();
+	virtual ~Ruler();
 
-	static CRulerPtr create() { return std::make_shared<CRuler>(); }
+	static RulerPtr create() { return std::make_shared<Ruler>(); }
 
-	IvfClassInfo("CRuler",ivf2d::Shape);
+	IvfClassInfo("Ruler",ivf2d::Shape);
 
 	void doGeometry();
 
@@ -60,6 +62,9 @@ public:
 	double getActualLength();
 	double getPixelLength();
 };
+
+
+} // namespace fp
 
 #endif
 

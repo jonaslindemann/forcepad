@@ -24,19 +24,21 @@
 
 #include "ElementGrid.h"
 
-CElementGrid::CElementGrid()
+namespace fp {
+
+ElementGrid::ElementGrid()
 {
 	m_rows = -1;
 	m_cols = -1;
 	m_width = 1.0;
 }
 
-CElementGrid::~CElementGrid()
+ElementGrid::~ElementGrid()
 {
 
 }
 
-void CElementGrid::initGrid()
+void ElementGrid::initGrid()
 {
 	//
 	//  o----o----o----| |----o----o----o
@@ -58,12 +60,12 @@ void CElementGrid::initGrid()
 	{
 		for (j=0; j<=m_cols; j++)
 		{
-			m_nodes[i].push_back(CNode::create());
+			m_nodes[i].push_back(Node::create());
 		}
 	}
 }
 
-void CElementGrid::setSize(int rows, int cols)
+void ElementGrid::setSize(int rows, int cols)
 {
 	m_rows = rows;
 	m_cols = cols;
@@ -71,7 +73,9 @@ void CElementGrid::setSize(int rows, int cols)
 	initGrid();
 }
 
-void CElementGrid::setWidth(double width)
+void ElementGrid::setWidth(double width)
 {
 
 }
+
+} // namespace fp

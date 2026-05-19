@@ -22,8 +22,8 @@
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
 
-#ifndef _CFemGrid_h_
-#define _CFemGrid_h_
+#ifndef _FemGrid_h_
+#define _FemGrid_h_
 
 #include "ImageGrid2.h"
 #include "Color.h"
@@ -33,11 +33,13 @@
 #include "ConstraintSelection.h"
 #include "ColorMap.h"
 
-typedef std::deque<CForcePtr> CForceQue;
-typedef std::deque<CForcePtr>::iterator CForceQueIter;
+namespace fp {
 
-typedef std::deque<CConstraintPtr> CConstraintQue;
-typedef std::deque<CConstraintPtr>::iterator CConstraintQueIter;
+typedef std::deque<ForcePtr> CForceQue;
+typedef std::deque<ForcePtr>::iterator CForceQueIter;
+
+typedef std::deque<ConstraintPtr> CConstraintQue;
+typedef std::deque<ConstraintPtr>::iterator CConstraintQueIter;
 
 typedef std::vector< std::vector<int> > CElementList;
 typedef std::vector< std::vector<int> >::iterator CElementListIter;
@@ -45,9 +47,9 @@ typedef std::vector< std::vector<int> >::iterator CElementListIter;
 #define ED_LEFT_RIGHT 0
 #define ED_BOTTOM_TOP 1
 
-IvfSmartPointer(CFemGrid2);
+IvfSmartPointer(FemGrid2);
 
-class CFemGrid2 : public CImageGrid2 {
+class FemGrid2 : public ImageGrid2 {
 public:
 	enum TStressMode {
 		SM_ALL,
@@ -76,7 +78,7 @@ private:
 	ivf2d::ColorPtr m_forceColor;
 	ivf2d::ColorPtr m_constraintColor;
 
-	CColorMapPtr m_colorMap;
+	ColorMapPtr m_colorMap;
 
 	std::vector<int> m_dofs;
 
@@ -155,10 +157,10 @@ private:
 	void drawGridPoints();
 	void drawDensity();
 public:
-	CFemGrid2();
-	virtual ~CFemGrid2();
+	FemGrid2();
+	virtual ~FemGrid2();
 
-	static CFemGrid2Ptr create() { return std::make_shared<CFemGrid2>(); }
+	static FemGrid2Ptr create() { return std::make_shared<FemGrid2>(); }
 
 	int getElementCount();
 	void updatePixelArea();
@@ -167,16 +169,16 @@ public:
 	bool getAverageStress();
 	void setAverageStress(bool flag);
 	int getConstraintsSize();
-	CForceSelectionPtr getForces();
-	CConstraintSelectionPtr getConstraints();
+	ForceSelectionPtr getForces();
+	ConstraintSelectionPtr getConstraints();
 	double getPixelArea();
 	void calcCenterOfStiffness(int &cgx, int &cgy);
-	void removePointConstraint(CConstraint* constraint);
-	void removePointForce(CForce* force);
-	void moveForce(CForce* force, int x, int y);
-	void getConstraints(int x1, int y1, int x2, int y2, CConstraintSelection* selection);
-	void getForces(int x1, int y1, int x2, int y2, CForceSelection* selection);
-	CForce* getNearestForce(int x, int y);
+	void removePointConstraint(Constraint* constraint);
+	void removePointForce(Force* force);
+	void moveForce(Force* force, int x, int y);
+	void getConstraints(int x1, int y1, int x2, int y2, ConstraintSelection* selection);
+	void getForces(int x1, int y1, int x2, int y2, ForceSelection* selection);
+	Force* getNearestForce(int x, int y);
 	void calcCenterOfGravity(int &x, int &y);
 	void setMaxNegStressValue(double value);
 	void setMaxPosStressValue(double value);
@@ -197,7 +199,7 @@ public:
 	void setStiffness(double x, double y, double value, int offsetElements, bool special);
 	void setStiffnessLine(double x1, double y1, double x2, double y2, double value, double width);
 
-	IvfClassInfo("CFemGrid2",CImageGrid2);
+	IvfClassInfo("FemGrid2",ImageGrid2);
 
 	int enumerateDofs(int direction);
 	void resetDofs();
@@ -215,8 +217,8 @@ public:
 	void addPoint(int x, int y);
 	void clearPoints();
 
-	void addForce(CForcePtr force);
-	void addConstraint(CConstraintPtr constraint);
+	void addForce(ForcePtr force);
+	void addConstraint(ConstraintPtr constraint);
 
 	void setShowGrid(bool flag);
 	bool getShowGrid();
@@ -227,12 +229,12 @@ public:
 	int getBandwidth();
 	void getNearestDofs(int x, int y, int* dofs);
 
-	CForce* getNextPointLoad();
-	CForce* getFirstPointLoad();
+	Force* getNextPointLoad();
+	Force* getFirstPointLoad();
 	void erasePointLoad(int x, int y, int brushSize);
 
-	CConstraint* getFirstPointConstraint();
-	CConstraint* getNextPointConstraint();
+	Constraint* getFirstPointConstraint();
+	Constraint* getNextPointConstraint();
 	void erasePointConstraint(int x, int y, int brushSize);
 	int getPointConstraintsSize();
 
@@ -286,8 +288,8 @@ public:
 
 	void setMaxIntensity(double intensity);
 
-	void setColorMap(CColorMapPtr colorMap);
-	CColorMap* getColorMap();
+	void setColorMap(ColorMapPtr colorMap);
+	ColorMap* getColorMap();
 
 	void setStressType(TStressType stressType);
 
@@ -313,5 +315,8 @@ public:
 	virtual void initGrid() override;
 	virtual void doGeometry() override;
 };
+
+
+} // namespace fp
 
 #endif 

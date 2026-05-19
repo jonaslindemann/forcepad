@@ -285,7 +285,7 @@ const std::string CFlPaintView::doSaveDialog(const string title, const string fi
 
 bool CFlPaintView::doNewModel(int &width, int &height, int& initialStiffness)
 {
-    CNewModelDlg* dlg = new CNewModelDlg();
+    NewModelDlg* dlg = new NewModelDlg();
     dlg->setSize(640, 480);
     dlg->centerWindow(this->window());
     dlg->show();

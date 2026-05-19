@@ -24,31 +24,35 @@
 
 #include "Element.h"
 
-CElement::CElement()
+namespace fp {
+
+Element::Element()
 {
 
 }
 
-CElement::~CElement()
+Element::~Element()
 {
 
 }
 
-void CElement::setNodes(int number)
+void Element::setNodes(int number)
 {
 	m_nodes.resize(number);
 }
 
-void CElement::setNode(int idx, CNode* node)
+void Element::setNode(int idx, Node* node)
 {
 	if ((idx>=1)&&(idx<=(int)m_nodes.size()))
-		m_nodes[idx+1] = std::shared_ptr<CNode>(node, [](CNode*){});
+		m_nodes[idx+1] = std::shared_ptr<Node>(node, [](Node*){});
 }
 
-CNode* CElement::getNode(int idx)
+Node* Element::getNode(int idx)
 {
 	if ((idx>=1)&&(idx<=(int)m_nodes.size()))
 		return m_nodes[idx+1].get();
 	else
 		return nullptr;
 }
+
+} // namespace fp

@@ -36,8 +36,10 @@
 
 using namespace std;
 
+namespace fp {
+
 // ------------------------------------------------------------
-CConstraint::CConstraint ()
+Constraint::Constraint ()
 		:ivf2d::Shape()
 {
 	m_size = 9.0;
@@ -45,33 +47,33 @@ CConstraint::CConstraint ()
 	m_value = 0.0;
 	m_vectorSize = 30.0;
 	m_vectorRadius = 5.0;
-	m_reactionForce = CReactionForce::create();
+	m_reactionForce = ReactionForce::create();
 	m_visibleReaction = false;
 }
 
 // ------------------------------------------------------------
-CConstraint::~CConstraint ()
+Constraint::~Constraint ()
 {
 }
 
 // ------------------------------------------------------------
-void CConstraint::doGeometry()
+void Constraint::doGeometry()
 {
     double oldVectorRadius = m_vectorRadius;
     double oldVectorSize = this->getVectorSize();
 
 	{
-        float dpr = (float)CUiSettings::getInstance()->getDevicePixelRatio();
-        if (CUiSettings::getInstance()->getLineThickness()>0.0)
-            glLineWidth((GLfloat)(CUiSettings::getInstance()->getLineThickness() * dpr));
+        float dpr = (float)UiSettings::getInstance()->getDevicePixelRatio();
+        if (UiSettings::getInstance()->getLineThickness()>0.0)
+            glLineWidth((GLfloat)(UiSettings::getInstance()->getLineThickness() * dpr));
         else
             glLineWidth(2.0f * dpr);
 	}
 
-	if (CUiSettings::getInstance()->getSymbolLength()>0.0)
+	if (UiSettings::getInstance()->getSymbolLength()>0.0)
 	{
-		this->setVectorSize(CUiSettings::getInstance()->getSymbolLength());
-		m_vectorRadius = 0.125*CUiSettings::getInstance()->getSymbolLength();
+		this->setVectorSize(UiSettings::getInstance()->getSymbolLength());
+		m_vectorRadius = 0.125*UiSettings::getInstance()->getSymbolLength();
 	}
 
 	if (m_constraintType==CT_HINGE)
@@ -192,14 +194,14 @@ void CConstraint::doGeometry()
 		glEnd();
 	}
 
-	if (CUiSettings::getInstance()->getSymbolLength()>0.0)
+	if (UiSettings::getInstance()->getSymbolLength()>0.0)
 	{
 		this->setVectorSize(oldVectorSize);
 		m_vectorRadius = oldVectorRadius;
 	}
 }
 
-void CConstraint::getHingeStart(double &x, double &y)
+void Constraint::getHingeStart(double &x, double &y)
 {
 	double xx, yy;
 	this->getPosition(xx, yy);
@@ -207,7 +209,7 @@ void CConstraint::getHingeStart(double &x, double &y)
 	y = yy - m_hingeLength*m_direction[1];
 }
 
-void CConstraint::getHingeEnd(double &x, double &y)
+void Constraint::getHingeEnd(double &x, double &y)
 {
 	double xx, yy;
 	this->getPosition(xx, yy);
@@ -216,31 +218,31 @@ void CConstraint::getHingeEnd(double &x, double &y)
 }
 
 // ------------------------------------------------------------
-void CConstraint::setConstraintType(TConstraintType type)
+void Constraint::setConstraintType(TConstraintType type)
 {
 	m_constraintType = type;
 }
 
 // ------------------------------------------------------------
-CConstraint::TConstraintType CConstraint::getConstraintType()
+Constraint::TConstraintType Constraint::getConstraintType()
 {
 	return m_constraintType;
 }
 
 // ------------------------------------------------------------
-void CConstraint::setSize(double size)
+void Constraint::setSize(double size)
 {
 	m_size = size;
 }
 
 // ------------------------------------------------------------
-double CConstraint::getSize()
+double Constraint::getSize()
 {
 	return m_size;
 }
 
 // ------------------------------------------------------------
-void CConstraint::saveToStream(ostream &out)
+void Constraint::saveToStream(ostream &out)
 {
 	switch (m_constraintType) {
 	case CT_X:
@@ -272,7 +274,7 @@ void CConstraint::saveToStream(ostream &out)
 }
 
 // ------------------------------------------------------------
-void CConstraint::readFromStream(istream &in)
+void Constraint::readFromStream(istream &in)
 {
 	int constraintType;
 	in >> constraintType;
@@ -311,19 +313,19 @@ void CConstraint::readFromStream(istream &in)
 }
 
 // ------------------------------------------------------------
-void CConstraint::setValue(double value)
+void Constraint::setValue(double value)
 {
 	m_value = value;
 }
 
 // ------------------------------------------------------------
-double CConstraint::getValue()
+double Constraint::getValue()
 {
 	return m_value;
 }
 
 // ------------------------------------------------------------
-void CConstraint::assignFrom(CConstraint *constraint)
+void Constraint::assignFrom(Constraint *constraint)
 {
 	m_constraintType = constraint->getConstraintType();
 	m_size = constraint->getSize();
@@ -337,7 +339,7 @@ void CConstraint::assignFrom(CConstraint *constraint)
 }
 
 // ------------------------------------------------------------
-void CConstraint::setDirection(double ex, double ey)
+void Constraint::setDirection(double ex, double ey)
 {
 	double l = sqrt(pow(ex,2)+pow(ey,2));
 	m_hingeLength = l;
@@ -348,39 +350,40 @@ void CConstraint::setDirection(double ex, double ey)
 }
 
 // ------------------------------------------------------------
-void CConstraint::getDirection(double &ex, double &ey)
+void Constraint::getDirection(double &ex, double &ey)
 {
 	ex = m_direction[0];
 	ey = m_direction[1];
 }
 
 // ------------------------------------------------------------
-void CConstraint::setVectorSize(double size)
+void Constraint::setVectorSize(double size)
 {
 	m_vectorSize = size;
 }
 
 // ------------------------------------------------------------
-double CConstraint::getVectorSize()
+double Constraint::getVectorSize()
 {
 	return m_vectorSize;
 }
 
 // ------------------------------------------------------------
-void CConstraint::setShowReactionForce(bool flag)
+void Constraint::setShowReactionForce(bool flag)
 {
 	m_visibleReaction = flag;
 }
 
 // ------------------------------------------------------------
-bool CConstraint::getShowReactionForce()
+bool Constraint::getShowReactionForce()
 {
 	return m_visibleReaction;
 }
 
 // ------------------------------------------------------------
-CReactionForce* CConstraint::getReactionForce()
+ReactionForce* Constraint::getReactionForce()
 {
 	return m_reactionForce.get();
 }
 
+} // namespace fp

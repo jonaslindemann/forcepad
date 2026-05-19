@@ -22,13 +22,15 @@
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
 
-#ifndef _CConstraint_H_
-#define _CConstraint_H_
+#ifndef _Constraint_h_
+#define _Constraint_h_
 
 #include "Shape.h"
 #include "ReactionForce.h"
 
-IvfSmartPointer(CConstraint);
+namespace fp {
+
+IvfSmartPointer(Constraint);
 
 /**
  * Constraint class
@@ -37,7 +39,7 @@ IvfSmartPointer(CConstraint);
  * is visualised with vertical and horisontal lines for x and y 
  * constraints.
  */
-class CConstraint : public ivf2d::Shape {
+class Constraint : public ivf2d::Shape {
 public:
 	/** Constraint type */
 	enum TConstraintType {
@@ -50,7 +52,7 @@ public:
 	};
 private:
 	TConstraintType m_constraintType;
-	CReactionForcePtr m_reactionForce;
+	ReactionForcePtr m_reactionForce;
 	double m_size;
 	double m_value;
 	double m_direction[2];
@@ -60,18 +62,18 @@ private:
 	bool m_visibleReaction;
 public:
 	/** Constraint class constructor. */
-	CConstraint ();
+	Constraint ();
 
 	/** Constraint class destructor. */
-	virtual ~CConstraint ();
+	virtual ~Constraint ();
 
-	static CConstraintPtr create() { return std::make_shared<CConstraint>(); }
+	static ConstraintPtr create() { return std::make_shared<Constraint>(); }
 
-	IvfClassInfo("CConstraint",ivf2d::Shape);
+	IvfClassInfo("Constraint",ivf2d::Shape);
 
 	// Methods
 
-	void assignFrom(CConstraint* constraint);
+	void assignFrom(Constraint* constraint);
 
 	// Get/set methods
 
@@ -102,7 +104,7 @@ public:
 	void setShowReactionForce(bool flag);
 	bool getShowReactionForce();
 
-	CReactionForce* getReactionForce();
+	ReactionForce* getReactionForce();
 
 	// Virtual overrides
 
@@ -115,4 +117,7 @@ public:
 	/** Stores constraint to a text stream */
 	virtual void saveToStream(std::ostream &out) override;
 };
+
+} // namespace fp
+
 #endif

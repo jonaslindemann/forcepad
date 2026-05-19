@@ -762,7 +762,7 @@ void CMainFrame::cb_btnStress_i(Fl_HoverButton*, void*) {
   //showRightToolbar(scrRightStressToolbar);
 paintView->setVisualisationMode(CPaintView::VM_PRINCIPAL_STRESS);
 //paintView->setDrawDisplacements(false);
-//paintView->setStressType(CFemGrid2::ST_PRINCIPAL);
+//paintView->setStressType(fp::FemGrid2::ST_PRINCIPAL);
 //paintView->setDrawStress(true);
 //paintView->setDrawForcesAndConstraints(true);
 }
@@ -1056,7 +1056,7 @@ void CMainFrame::cb_btnMisesStress_i(Fl_HoverButton*, void*) {
   //showRightToolbar(scrRightMisesStressToolbar);
 paintView->setVisualisationMode(CPaintView::VM_MISES_STRESS);
 //paintView->setDrawDisplacements(false);
-//paintView->setStressType(CFemGrid2::ST_MISES_SMOOTH);
+//paintView->setStressType(fp::FemGrid2::ST_MISES_SMOOTH);
 //paintView->setDrawStress(true);
 //paintView->setDrawForcesAndConstraints(true);
 }
@@ -3607,7 +3607,7 @@ static unsigned char idata_arch_black[] =
 static Fl_RGB_Image image_arch_black(idata_arch_black, 36, 36, 4, 0);
 
 void CMainFrame::cb_btnTensionCompression_i(Fl_HoverButton*, void*) {
-  paintView->setStressMode(CFemGrid2::SM_ALL);
+  paintView->setStressMode(fp::FemGrid2::SM_ALL);
 }
 void CMainFrame::cb_btnTensionCompression(Fl_HoverButton* o, void* v) {
   ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnTensionCompression_i(o,v);
@@ -3734,7 +3734,7 @@ static unsigned char idata_tension_compression_black[] =
 static Fl_RGB_Image image_tension_compression_black(idata_tension_compression_black, 36, 36, 3, 0);
 
 void CMainFrame::cb_btnTension_i(Fl_HoverButton*, void*) {
-  paintView->setStressMode(CFemGrid2::SM_POSITIVE);
+  paintView->setStressMode(fp::FemGrid2::SM_POSITIVE);
 }
 void CMainFrame::cb_btnTension(Fl_HoverButton* o, void* v) {
   ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnTension_i(o,v);
@@ -3852,7 +3852,7 @@ static unsigned char idata_tension_black[] =
 static Fl_RGB_Image image_tension_black(idata_tension_black, 36, 36, 3, 0);
 
 void CMainFrame::cb_btnCompression_i(Fl_HoverButton*, void*) {
-  paintView->setStressMode(CFemGrid2::SM_NEGATIVE);
+  paintView->setStressMode(fp::FemGrid2::SM_NEGATIVE);
 }
 void CMainFrame::cb_btnCompression(Fl_HoverButton* o, void* v) {
   ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnCompression_i(o,v);
@@ -11122,7 +11122,7 @@ void CMainFrame::onViewModeChange(CPaintView::TViewMode oldMode, CPaintView::TVi
   	if (btnStress->value()==1)
   	{
   		paintView->setDrawDisplacements(false);
-  		paintView->setStressType(CFemGrid2::ST_PRINCIPAL);
+  		paintView->setStressType(fp::FemGrid2::ST_PRINCIPAL);
   		paintView->setDrawStress(true);
   		showRightToolbar(scrRightStressToolbar);
   	}
@@ -11130,7 +11130,7 @@ void CMainFrame::onViewModeChange(CPaintView::TViewMode oldMode, CPaintView::TVi
   	if (btnMisesStress->value()==1)
   	{
   		paintView->setDrawDisplacements(false);
-  		paintView->setStressType(CFemGrid2::ST_MISES_SMOOTH);
+  		paintView->setStressType(fp::FemGrid2::ST_MISES_SMOOTH);
   		paintView->setDrawStress(true);
   		
   		if (btnColorMap1->value()==1)
@@ -11345,7 +11345,7 @@ void CMainFrame::onModelChanged(const std::string& newModelName) {
   wndMain->label(caption.c_str());
 }
 
-void CMainFrame::onRulerChanged(CRuler* ruler) {
+void CMainFrame::onRulerChanged(fp::Ruler* ruler) {
   pixelLength->precision(1);
   pixelLength->value(ruler->getPixelLength());
 }

@@ -26,21 +26,23 @@
 #include <iostream>
 #include <fstream>
 
+namespace fp {
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CColorMap::CColorMap()
+ColorMap::ColorMap()
 {
 	m_invert = false;
 }
 
-CColorMap::~CColorMap()
+ColorMap::~ColorMap()
 {
 	this->clear();
 }
 
-void CColorMap::open(const char *fname)
+void ColorMap::open(const char *fname)
 {
 	using namespace std;
 
@@ -75,17 +77,17 @@ void CColorMap::open(const char *fname)
 	f.close();
 }
 
-void CColorMap::setInvert(bool flag)
+void ColorMap::setInvert(bool flag)
 {
 	m_invert = flag;
 }
 
-void CColorMap::clear()
+void ColorMap::clear()
 {
 	m_colors.clear();
 }
 
-void CColorMap::getColor(double value, float &r, float &g, float &b)
+void ColorMap::getColor(double value, float &r, float &g, float &b)
 {
 	if (m_colors.size()>0)
 	{
@@ -117,8 +119,9 @@ void CColorMap::getColor(double value, float &r, float &g, float &b)
 		r = g = b = 1.0;
 }
 
-int CColorMap::getSize()
+int ColorMap::getSize()
 {
 	return m_colors.size();
 }
 
+} // namespace fp

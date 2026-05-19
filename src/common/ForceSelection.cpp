@@ -24,32 +24,34 @@
 
 #include "ForceSelection.h"
 
-CForceSelection::CForceSelection()
+namespace fp {
+
+ForceSelection::ForceSelection()
 {
 
 }
 
-CForceSelection::~CForceSelection()
+ForceSelection::~ForceSelection()
 {
 
 }
 
-void CForceSelection::add(CForcePtr force)
+void ForceSelection::add(ForcePtr force)
 {
 	m_forces.push_back(force);
 }
 
-void CForceSelection::clear()
+void ForceSelection::clear()
 {
 	m_forces.clear();
 }
 
-int CForceSelection::getSize()
+int ForceSelection::getSize()
 {
 	return m_forces.size();
 }
 
-CForce* CForceSelection::getForce(int idx)
+Force* ForceSelection::getForce(int idx)
 {
 	if ((idx>=0)&&(idx<(int)m_forces.size()))
 	{
@@ -58,3 +60,5 @@ CForce* CForceSelection::getForce(int idx)
 	else
 		return nullptr;
 }
+
+} // namespace fp

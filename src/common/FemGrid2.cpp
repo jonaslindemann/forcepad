@@ -41,7 +41,9 @@ using namespace std;
 #define GL_CLAMP_TO_EDGE 0x812F
 #endif
 
-CFemGrid2::CFemGrid2()
+namespace fp {
+
+FemGrid2::FemGrid2()
 {
 	m_showGrid = false;
 
@@ -51,7 +53,7 @@ CFemGrid2::CFemGrid2()
 	m_constraintColor = ivf2d::Color::create();
 	m_constraintColor->setColor(0.0f, 0.3f, 1.0f, 1.0f);
 
-	m_colorMap = CColorMap::create();
+	m_colorMap = ColorMap::create();
 	m_invertColorMap = false;
 
 	m_bandwidth = 0;
@@ -65,8 +67,8 @@ CFemGrid2::CFemGrid2()
 	m_stressWidth = 1.0;
 	m_lowerStressTreshold = 0.0;
 	m_upperStressTreshold = 1.0;
-	m_stressMode = CFemGrid2::SM_ALL;
-	m_stressType = CFemGrid2::ST_PRINCIPAL;
+	m_stressMode = FemGrid2::SM_ALL;
+	m_stressType = FemGrid2::ST_PRINCIPAL;
 	m_lockScaleFactor = false;
 	m_stressStep = 1;
 
@@ -94,7 +96,7 @@ CFemGrid2::CFemGrid2()
 	this->updateColorMapTexture();
 }
 
-CFemGrid2::~CFemGrid2()
+FemGrid2::~FemGrid2()
 {
 	clearForces();
 	clearConstraints();
@@ -105,7 +107,7 @@ CFemGrid2::~CFemGrid2()
 		delete [] m_displacements;
 }
 
-void CFemGrid2::addForce(CForcePtr force)
+void FemGrid2::addForce(ForcePtr force)
 {
 	double x, y;
 	int iy;
@@ -121,7 +123,7 @@ void CFemGrid2::addForce(CForcePtr force)
 	}
 }
 
-void CFemGrid2::doGeometry()
+void FemGrid2::doGeometry()
 {
 	// Draw grid
 
@@ -186,20 +188,20 @@ void CFemGrid2::doGeometry()
 
 }
 
-void CFemGrid2::setShowGrid(bool flag)
+void FemGrid2::setShowGrid(bool flag)
 {
 	m_showGrid = flag;
 	this->setShowReactionForces(flag);
 }
 
-bool CFemGrid2::getShowGrid()
+bool FemGrid2::getShowGrid()
 {
 	return m_showGrid;
 }
 
-void CFemGrid2::setImage(ivf2d::ImagePtr image)
+void FemGrid2::setImage(ivf2d::ImagePtr image)
 {
-	CImageGrid2::setImage(image);
+	ImageGrid2::setImage(image);
 
 	clearForces();
 	clearConstraints();
@@ -207,7 +209,7 @@ void CFemGrid2::setImage(ivf2d::ImagePtr image)
 	clearDofs();
 }
 
-void CFemGrid2::clearForces()
+void FemGrid2::clearForces()
 {
 	m_pointForces.clear();
 
@@ -215,7 +217,7 @@ void CFemGrid2::clearForces()
 		m_pointForces.resize(this->getImage()->getHeight());
 }
 
-void CFemGrid2::addConstraint(CConstraintPtr constraint)
+void FemGrid2::addConstraint(ConstraintPtr constraint)
 {
 	double x, y;
 	int iy;
@@ -227,7 +229,7 @@ void CFemGrid2::addConstraint(CConstraintPtr constraint)
 	m_pointConstraints[iy].push_back(constraint);
 }
 
-void CFemGrid2::clearConstraints()
+void FemGrid2::clearConstraints()
 {
 	m_pointConstraints.clear();
 
@@ -235,7 +237,7 @@ void CFemGrid2::clearConstraints()
 		m_pointConstraints.resize(this->getImage()->getHeight());
 }
 
-void CFemGrid2::initDofs()
+void FemGrid2::initDofs()
 {
 	int rows, cols;
 	int i, j;
@@ -257,13 +259,13 @@ void CFemGrid2::initDofs()
 	m_dofs.assign(rows * cols * 4, -1);
 }
 
-void CFemGrid2::clearDofs()
+void FemGrid2::clearDofs()
 {
 	m_dofs.clear();
 }
 
 
-int CFemGrid2::enumerateDofs(int direction)
+int FemGrid2::enumerateDofs(int direction)
 {
 	//
 	//    o----------------o---------------o o---------------o----------------o
@@ -410,7 +412,7 @@ int CFemGrid2::enumerateDofs(int direction)
 		return -1;
 }
 
-void CFemGrid2::resetDofs()
+void FemGrid2::resetDofs()
 {
 	int rows, cols;
 	int i, j;
@@ -430,16 +432,16 @@ void CFemGrid2::resetDofs()
 	}
 }
 
-void CFemGrid2::initGrid()
+void FemGrid2::initGrid()
 {
 	clearDofs();
 	clearResults();
-	CImageGrid2::initGrid();
+	ImageGrid2::initGrid();
 	initDofs();
 	initResults();
 }
 
-bool CFemGrid2::getElement(int row, int col, double &value, double *ex, double *ey, int *topo)
+bool FemGrid2::getElement(int row, int col, double &value, double *ex, double *ey, int *topo)
 {
 	int rows, cols;
 	int i;
@@ -471,7 +473,7 @@ bool CFemGrid2::getElement(int row, int col, double &value, double *ex, double *
 		return false;
 }
 
-void CFemGrid2::calcMaxMin(int *arr, int size, int &maxVal, int &minVal)
+void FemGrid2::calcMaxMin(int *arr, int size, int &maxVal, int &minVal)
 {
 	int i;
 
@@ -488,12 +490,12 @@ void CFemGrid2::calcMaxMin(int *arr, int size, int &maxVal, int &minVal)
 	}
 }
 
-int CFemGrid2::getBandwidth()
+int FemGrid2::getBandwidth()
 {
 	return m_bandwidth;
 }
 
-CForce* CFemGrid2::getFirstPointLoad()
+Force* FemGrid2::getFirstPointLoad()
 {
 	int i;
 	int height = getImage()->getHeight();
@@ -517,7 +519,7 @@ CForce* CFemGrid2::getFirstPointLoad()
 	return m_currentPointForceIter->get();
 }
 
-CForce* CFemGrid2::getNextPointLoad()
+Force* FemGrid2::getNextPointLoad()
 {
 	int i;
 	int height = getImage()->getHeight();
@@ -555,7 +557,7 @@ CForce* CFemGrid2::getNextPointLoad()
 }
 
 
-void CFemGrid2::getNearestDofs(int x, int y, int *dofs)
+void FemGrid2::getNearestDofs(int x, int y, int *dofs)
 {
 	int rows, cols;
 	this->getGridSize(rows, cols);
@@ -583,19 +585,19 @@ void CFemGrid2::getNearestDofs(int x, int y, int *dofs)
 	dofs[1] = m_dofs[(yg * m_dofCols + xg) * 4 + 1];
 }
 
-void CFemGrid2::addPoint(int x, int y)
+void FemGrid2::addPoint(int x, int y)
 {
 	m_xpoints.push_back(x);
 	m_ypoints.push_back(y);
 }
 
-void CFemGrid2::clearPoints()
+void FemGrid2::clearPoints()
 {
 	m_xpoints.clear();
 	m_ypoints.clear();
 }
 
-void CFemGrid2::erasePointLoad(int x, int y, int brushSize)
+void FemGrid2::erasePointLoad(int x, int y, int brushSize)
 {
 	unsigned int i;
 	double fx, fy;
@@ -632,7 +634,7 @@ void CFemGrid2::erasePointLoad(int x, int y, int brushSize)
 	}
 }
 
-CConstraint* CFemGrid2::getFirstPointConstraint()
+Constraint* FemGrid2::getFirstPointConstraint()
 {
 	int i;
 	int height = getImage()->getHeight();
@@ -658,7 +660,7 @@ CConstraint* CFemGrid2::getFirstPointConstraint()
 	return m_currentPointConstraintIter->get();
 }
 
-CConstraint* CFemGrid2::getNextPointConstraint()
+Constraint* FemGrid2::getNextPointConstraint()
 {
 	int i;
 	int height = getImage()->getHeight();
@@ -695,7 +697,7 @@ CConstraint* CFemGrid2::getNextPointConstraint()
 	return m_currentPointConstraintIter->get();
 }
 
-void CFemGrid2::erasePointConstraint(int x, int y, int brushSize)
+void FemGrid2::erasePointConstraint(int x, int y, int brushSize)
 {
 	unsigned int i;
 	double cx, cy;
@@ -733,7 +735,7 @@ void CFemGrid2::erasePointConstraint(int x, int y, int brushSize)
 	}
 }
 
-int CFemGrid2::getPointConstraintsSize()
+int FemGrid2::getPointConstraintsSize()
 {
 	CConstraintQueIter ci;
 	int i;
@@ -749,7 +751,7 @@ int CFemGrid2::getPointConstraintsSize()
 	return constraintCounter;
 }
 
-void CFemGrid2::drawGrid()
+void FemGrid2::drawGrid()
 {
 	int i, j, l;
 	double dx, dy;
@@ -788,7 +790,7 @@ void CFemGrid2::drawGrid()
 	}
 }
 
-void CFemGrid2::drawDensity()
+void FemGrid2::drawDensity()
 {
 	int i, j, l;
 	//double k = m_displacementScale/m_maxNodeValue;
@@ -816,7 +818,7 @@ void CFemGrid2::drawDensity()
 }
 
 
-void CFemGrid2::drawUndeformedGrid()
+void FemGrid2::drawUndeformedGrid()
 {
 	int i, j, l;
 	double alpha = 0.7;
@@ -846,7 +848,7 @@ void CFemGrid2::drawUndeformedGrid()
 	}
 }
 
-void CFemGrid2::drawStructure()
+void FemGrid2::drawStructure()
 {
 	int i, j, l;
 	double alpha = 1.0;
@@ -877,17 +879,17 @@ void CFemGrid2::drawStructure()
 }
 
 
-void CFemGrid2::drawDoubleDofs()
+void FemGrid2::drawDoubleDofs()
 {
 }
 
 
-void CFemGrid2::setDisplacement(int dof, double value)
+void FemGrid2::setDisplacement(int dof, double value)
 {
 	m_displacements[dof] = value;
 }
 
-void CFemGrid2::setDisplacementSize(int size)
+void FemGrid2::setDisplacementSize(int size)
 {
 	if (m_displacements!=nullptr)
 		delete [] m_displacements;
@@ -901,16 +903,16 @@ void CFemGrid2::setDisplacementSize(int size)
 		m_displacements[i] = 0.0;
 }
 
-void CFemGrid2::clearDisplacements()
+void FemGrid2::clearDisplacements()
 {
 }
 
-void CFemGrid2::setDisplacementScale(double scaleFactor)
+void FemGrid2::setDisplacementScale(double scaleFactor)
 {
 	m_displacementScale = scaleFactor;
 }
 
-void CFemGrid2::deactivateDofs()
+void FemGrid2::deactivateDofs()
 {
 	int i, j, k;
 
@@ -923,7 +925,7 @@ void CFemGrid2::deactivateDofs()
 	}
 }
 
-void CFemGrid2::initResults()
+void FemGrid2::initResults()
 {
 	int i, j, k;
 
@@ -941,14 +943,14 @@ void CFemGrid2::initResults()
 	m_nodeUsage.assign((m_rows + 1) * (m_cols + 1), 0);
 }
 
-void CFemGrid2::clearResults()
+void FemGrid2::clearResults()
 {
 	m_results.clear();
 	m_nodeResults.resize(0, 0);
 	m_nodeUsage.clear();
 }
 
-void CFemGrid2::averageNodeResults()
+void FemGrid2::averageNodeResults()
 {
 	if (m_nodeResults.size() > 0)
 	{
@@ -962,7 +964,7 @@ void CFemGrid2::averageNodeResults()
 	}
 }
 
-void CFemGrid2::zeroNodeResults()
+void FemGrid2::zeroNodeResults()
 {
 	if (m_nodeResults.size() > 0)
 	{
@@ -971,20 +973,20 @@ void CFemGrid2::zeroNodeResults()
 	}
 }
 
-void CFemGrid2::setResult(int i, int j, const double *values)
+void FemGrid2::setResult(int i, int j, const double *values)
 {
 	if (!m_results.empty())
 		for (int k=0; k<3; k++)
 			m_results[(i * m_cols + j) * 8 + k] = values[k];
 }
 
-void CFemGrid2::setResult(int i, int j, int index, double value)
+void FemGrid2::setResult(int i, int j, int index, double value)
 {
 	if (!m_results.empty())
 		m_results[(i * m_cols + j) * 8 + index] = value;
 }
 
-void CFemGrid2::setNodeResult(int i, int j, const double value)
+void FemGrid2::setNodeResult(int i, int j, const double value)
 {
 	if (m_nodeResults.size() > 0)
 	{
@@ -993,7 +995,7 @@ void CFemGrid2::setNodeResult(int i, int j, const double value)
 	}
 }
 
-void CFemGrid2::addNodeResult(int i, int j, const double value)
+void FemGrid2::addNodeResult(int i, int j, const double value)
 {
 	if (m_nodeResults.size() > 0)
 	{
@@ -1002,7 +1004,7 @@ void CFemGrid2::addNodeResult(int i, int j, const double value)
 	}
 }
 
-double CFemGrid2::getResult(int i, int j)
+double FemGrid2::getResult(int i, int j)
 {
 	if (m_nodeResults.size() > 0)
 		return m_nodeResults(i, j);
@@ -1010,7 +1012,7 @@ double CFemGrid2::getResult(int i, int j)
 		return 0.0;
 }
 
-void CFemGrid2::drawMisesStress()
+void FemGrid2::drawMisesStress()
 {
 	int i, j, l;
 	double dx, dy;
@@ -1054,7 +1056,7 @@ void CFemGrid2::drawMisesStress()
 	}
 }
 
-void CFemGrid2::drawMisesStressSmooth()
+void FemGrid2::drawMisesStressSmooth()
 {
 	int i, j, l;
 	double dx, dy;
@@ -1141,7 +1143,7 @@ void CFemGrid2::drawMisesStressSmooth()
 	glPopAttrib();
 }
 
-void CFemGrid2::drawStressArrow(double x, double y, const double *values)
+void FemGrid2::drawStressArrow(double x, double y, const double *values)
 {
 	double maxStress;
 	double maxPosStress;
@@ -1164,7 +1166,7 @@ void CFemGrid2::drawStressArrow(double x, double y, const double *values)
     sig1 = values[0]*m_maxStressFactor;
     sig2 = values[1]*m_maxStressFactor;
 
-	if ((m_stressMode==CFemGrid2::SM_POSITIVE)||(m_stressMode==CFemGrid2::SM_NEGATIVE))
+	if ((m_stressMode==FemGrid2::SM_POSITIVE)||(m_stressMode==FemGrid2::SM_NEGATIVE))
 	{
 		if (values[0]>0.0)
 			sig1 = values[0]*m_maxPosStressFactor;
@@ -1187,12 +1189,12 @@ void CFemGrid2::drawStressArrow(double x, double y, const double *values)
 	if ( (maxSig>m_lowerStressTreshold)&&(maxSig<m_upperStressTreshold) )
 	{
 
-		glLineWidth((GLfloat)(m_stressWidth * CUiSettings::getInstance()->getDevicePixelRatio()));
+		glLineWidth((GLfloat)(m_stressWidth * UiSettings::getInstance()->getDevicePixelRatio()));
 		glBegin(GL_LINES);
 
-		if  (((m_stressMode==CFemGrid2::SM_POSITIVE)&&(sig1>0.0))||
-			((m_stressMode==CFemGrid2::SM_NEGATIVE)&&(sig1<0.0))||
-			(m_stressMode==CFemGrid2::SM_ALL))
+		if  (((m_stressMode==FemGrid2::SM_POSITIVE)&&(sig1>0.0))||
+			((m_stressMode==FemGrid2::SM_NEGATIVE)&&(sig1<0.0))||
+			(m_stressMode==FemGrid2::SM_ALL))
 		{
 			if (sig1>0)
 				glColor4f(1.0f, 0.0f, 0.0f, (double)m_stressAlpha);
@@ -1203,9 +1205,9 @@ void CFemGrid2::drawStressArrow(double x, double y, const double *values)
 			glVertex2d(x + 0.5*sig1*m_stressSize*cos(alpha), y + 0.5*sig1*m_stressSize*sin(alpha));
 		}
 
-		if  (((m_stressMode==CFemGrid2::SM_POSITIVE)&&(sig2>0.0))||
-			((m_stressMode==CFemGrid2::SM_NEGATIVE)&&(sig2<0.0))||
-			(m_stressMode==CFemGrid2::SM_ALL))
+		if  (((m_stressMode==FemGrid2::SM_POSITIVE)&&(sig2>0.0))||
+			((m_stressMode==FemGrid2::SM_NEGATIVE)&&(sig2<0.0))||
+			(m_stressMode==FemGrid2::SM_ALL))
 		{
 			if (sig2>0)
 				glColor4f(1.0f, 0.0f, 0.0f, (double)m_stressAlpha);
@@ -1220,7 +1222,7 @@ void CFemGrid2::drawStressArrow(double x, double y, const double *values)
 	}
 }
 
-void CFemGrid2::drawStress()
+void FemGrid2::drawStress()
 {
 	int i, j;
 	double xm;
@@ -1252,7 +1254,7 @@ void CFemGrid2::drawStress()
 	}
 }
 
-void CFemGrid2::drawForces()
+void FemGrid2::drawForces()
 {
 	int i;
 	int height = getImage()->getHeight();
@@ -1273,7 +1275,7 @@ void CFemGrid2::drawForces()
 	glPopAttrib();
 }
 
-void CFemGrid2::drawConstraints()
+void FemGrid2::drawConstraints()
 {
 	// Draw constraints
 
@@ -1296,10 +1298,10 @@ void CFemGrid2::drawConstraints()
 	glPopAttrib();
 }
 
-void CFemGrid2::drawDebugPoints()
+void FemGrid2::drawDebugPoints()
 {
 	unsigned int i;
-	float dpr = (float)CUiSettings::getInstance()->getDevicePixelRatio();
+	float dpr = (float)UiSettings::getInstance()->getDevicePixelRatio();
 
 	// Draw test points
 
@@ -1316,7 +1318,7 @@ void CFemGrid2::drawDebugPoints()
 	glEnd();
 }
 
-void CFemGrid2::drawGridPoints()
+void FemGrid2::drawGridPoints()
 {
 	int i, j, l;
 	double ex[4];
@@ -1329,7 +1331,7 @@ void CFemGrid2::drawGridPoints()
 			this->getElementCoords(i, j, ex, ey);
 
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			glLineWidth(1.0f * (float)CUiSettings::getInstance()->getDevicePixelRatio());
+			glLineWidth(1.0f * (float)UiSettings::getInstance()->getDevicePixelRatio());
 			glBegin(GL_QUADS);
 			glColor4f(0.2f, 0.2f, 0.2f, 0.5f);
 			for (l=0; l<4; l++)
@@ -1340,58 +1342,58 @@ void CFemGrid2::drawGridPoints()
 	}
 }
 
-void CFemGrid2::setMaxStressValue(double value)
+void FemGrid2::setMaxStressValue(double value)
 {
 	m_maxStressValue = value;
 }
 
-double CFemGrid2::getMaxStressValue()
+double FemGrid2::getMaxStressValue()
 {
 	return m_maxStressValue;
 }
 
-void CFemGrid2::setMaxNodeValue(double value)
+void FemGrid2::setMaxNodeValue(double value)
 {
 	m_maxNodeValue = value;
 }
 
-double CFemGrid2::getMaxNodeValue()
+double FemGrid2::getMaxNodeValue()
 {
 	return m_maxNodeValue;
 }
 
-void CFemGrid2::setStressAlpha(double alpha)
+void FemGrid2::setStressAlpha(double alpha)
 {
 	m_stressAlpha = alpha;
 }
 
-void CFemGrid2::setStressSize(double size)
+void FemGrid2::setStressSize(double size)
 {
 	m_stressSize = size;
 }
 
-void CFemGrid2::setStressWidth(double width)
+void FemGrid2::setStressWidth(double width)
 {
 	m_stressWidth = width;
 }
 
-void CFemGrid2::setLockScale(bool flag)
+void FemGrid2::setLockScale(bool flag)
 {
 	m_lockScaleFactor = flag;
 }
 
-void CFemGrid2::setStressTreshold(double lower, double upper)
+void FemGrid2::setStressTreshold(double lower, double upper)
 {
 	m_lowerStressTreshold = lower;
 	m_upperStressTreshold = upper;
 }
 
-void CFemGrid2::setMaxIntensity(double intensity)
+void FemGrid2::setMaxIntensity(double intensity)
 {
 	m_maxIntensity = intensity;
 }
 
-int CFemGrid2::getPointLoadSize()
+int FemGrid2::getPointLoadSize()
 {
 	CForceQueIter fi;
 	int i;
@@ -1407,17 +1409,17 @@ int CFemGrid2::getPointLoadSize()
 	return pointForceCounter;
 }
 
-int CFemGrid2::getDisplacementSize()
+int FemGrid2::getDisplacementSize()
 {
 	return m_displacementSize;
 }
 
-double CFemGrid2::getDisplacement(int dof)
+double FemGrid2::getDisplacement(int dof)
 {
 	return m_displacements[dof];
 }
 
-void CFemGrid2::getResult(int i, int j, double *values)
+void FemGrid2::getResult(int i, int j, double *values)
 {
 	if (!m_results.empty())
 	{
@@ -1428,17 +1430,17 @@ void CFemGrid2::getResult(int i, int j, double *values)
 	}
 }
 
-void CFemGrid2::resetStressDrawing()
+void FemGrid2::resetStressDrawing()
 {
 	m_stressDrawn = false;
 }
 
-void CFemGrid2::setDrawStressOnce(bool flag)
+void FemGrid2::setDrawStressOnce(bool flag)
 {
 	m_drawStressOnce = flag;
 }
 
-void CFemGrid2::saveToStream(ostream &out)
+void FemGrid2::saveToStream(ostream &out)
 {
 	ivf2d::Image* image = this->getImage();
 	int i, j;
@@ -1537,7 +1539,7 @@ void CFemGrid2::saveToStream(ostream &out)
 	}
 }
 
-void CFemGrid2::readFromStream(istream &in)
+void FemGrid2::readFromStream(istream &in)
 {
 	ivf2d::Image* image = this->getImage();
 	int width, height;
@@ -1598,7 +1600,7 @@ void CFemGrid2::readFromStream(istream &in)
 		// the image to ourselves
 		//
 
-		//CImageGrid2::setImage(image);
+		//ImageGrid2::setImage(image);
 		this->setImageSize(image->getWidth(), image->getHeight());
 
 		clearForces();
@@ -1614,7 +1616,7 @@ void CFemGrid2::readFromStream(istream &in)
 
 		for (i=0; i<nForces; i++)
 		{
-			auto force = CForce::create();
+			auto force = Force::create();
 			in >> x >> y;
 			force->setPosition(x, y);
 			force->readFromStream(in);
@@ -1629,34 +1631,34 @@ void CFemGrid2::readFromStream(istream &in)
 
 		for (i=0; i<nConstraints; i++)
 		{
-			auto constraint = CConstraint::create();
+			auto constraint = Constraint::create();
 			in >> x >> y;
 			constraint->setPosition(x, y);
 			constraint->readFromStream(in);
 
 			// Convert from old constraint types
 
-			if (constraint->getConstraintType()==CConstraint::CT_X)
+			if (constraint->getConstraintType()==Constraint::CT_X)
 			{
-				constraint->setConstraintType(CConstraint::CT_VECTOR);
+				constraint->setConstraintType(Constraint::CT_VECTOR);
 				constraint->setDirection(1.0, 0.0);
 			}
 
-			if (constraint->getConstraintType()==CConstraint::CT_Y)
+			if (constraint->getConstraintType()==Constraint::CT_Y)
 			{
-				constraint->setConstraintType(CConstraint::CT_VECTOR);
+				constraint->setConstraintType(Constraint::CT_VECTOR);
 				constraint->setDirection(0.0, 1.0);
 			}
 
-			if (constraint->getConstraintType()==CConstraint::CT_XY)
+			if (constraint->getConstraintType()==Constraint::CT_XY)
 			{
-				constraint->setConstraintType(CConstraint::CT_VECTOR);
+				constraint->setConstraintType(Constraint::CT_VECTOR);
 				constraint->setDirection(1.0, 0.0);
 
-				auto extraConstraint = CConstraint::create();
+				auto extraConstraint = Constraint::create();
 				extraConstraint->setPosition(x, y);
 				extraConstraint->setDirection(0.0, 1.0);
-				extraConstraint->setConstraintType(CConstraint::CT_VECTOR);
+				extraConstraint->setConstraintType(Constraint::CT_VECTOR);
 
 				this->addConstraint(extraConstraint);
 			}
@@ -1677,32 +1679,32 @@ void CFemGrid2::readFromStream(istream &in)
 	}
 }
 
-void CFemGrid2::setStressMode(TStressMode mode)
+void FemGrid2::setStressMode(TStressMode mode)
 {
 	m_stressMode = mode;
 }
 
-double CFemGrid2::getMaxPosStressValue()
+double FemGrid2::getMaxPosStressValue()
 {
 	return m_maxPosStressValue;
 }
 
-double CFemGrid2::getMaxNegStressValue()
+double FemGrid2::getMaxNegStressValue()
 {
 	return m_maxNegStressValue;
 }
 
-void CFemGrid2::setMaxPosStressValue(double value)
+void FemGrid2::setMaxPosStressValue(double value)
 {
 	m_maxPosStressValue = value;
 }
 
-void CFemGrid2::setMaxNegStressValue(double value)
+void FemGrid2::setMaxNegStressValue(double value)
 {
 	m_maxNegStressValue = value;
 }
 
-void CFemGrid2::calcCenterOfGravity(int &x, int &y)
+void FemGrid2::calcCenterOfGravity(int &x, int &y)
 {
 	ivf2d::Image* image = this->getImage();
 	int i, j;
@@ -1753,13 +1755,13 @@ void CFemGrid2::calcCenterOfGravity(int &x, int &y)
 	}
 }
 
-void CFemGrid2::getElementPos(double x, double y, int& r, int& c)
+void FemGrid2::getElementPos(double x, double y, int& r, int& c)
 {
 	r = (int)((double)y / m_stride);
 	c = (int)((double)x / m_stride);	
 }
 
-double CFemGrid2::getStiffness(double x, double y)
+double FemGrid2::getStiffness(double x, double y)
 {
 	int r, c;
 
@@ -1767,14 +1769,14 @@ double CFemGrid2::getStiffness(double x, double y)
 	return this->getGridValue(r, c);
 }
 
-void CFemGrid2::setStiffness(double x, double y, double value)
+void FemGrid2::setStiffness(double x, double y, double value)
 {
 	int r, c;
 	this->getElementPos(x, y, r, c);
 	this->setGridValue(r, c, value);
 }
 
-void CFemGrid2::setStiffness(double x, double y, double value, int offsetElements, bool special)
+void FemGrid2::setStiffness(double x, double y, double value, int offsetElements, bool special)
 {
 	int r, c;
 
@@ -1792,7 +1794,7 @@ void CFemGrid2::setStiffness(double x, double y, double value, int offsetElement
 	}
 }
 
-void CFemGrid2::setStiffnessLine(double x1, double y1, double x2, double y2, double value, double width)
+void FemGrid2::setStiffnessLine(double x1, double y1, double x2, double y2, double value, double width)
 {
 	ivf2d::Vec3d v;
 	v.setComponents(x2-x1, y2-y1, 0.0);
@@ -1830,7 +1832,7 @@ void CFemGrid2::setStiffnessLine(double x1, double y1, double x2, double y2, dou
 //	}
 }
 
-CForce* CFemGrid2::getNearestForce(int x, int y)
+Force* FemGrid2::getNearestForce(int x, int y)
 {
 	//  
 	//  x-n        x        x+n
@@ -1855,7 +1857,7 @@ CForce* CFemGrid2::getNearestForce(int x, int y)
 	// n  - Pixel search distance (n=2 above)
 	//
 
-	auto selection = CForceSelection::create();
+	auto selection = ForceSelection::create();
 	this->getForces(x-20, y-20, x+20, y+20, selection.get());
 
 	if (selection->getSize()==0)
@@ -1865,11 +1867,11 @@ CForce* CFemGrid2::getNearestForce(int x, int y)
 	double dist;
 	double minDist = 1e300;
 	double xf, yf;
-	CForce* nearestForce = nullptr;
+	Force* nearestForce = nullptr;
 
 	for (i=0; i<selection->getSize(); i++)
 	{
-		CForce* force = selection->getForce(i);
+		Force* force = selection->getForce(i);
 		force->getPosition(xf, yf);
 		dist = sqrt(pow(xf - (double)x, 2) + pow(yf - (double)y, 2));
 		if (dist<minDist)
@@ -1882,7 +1884,7 @@ CForce* CFemGrid2::getNearestForce(int x, int y)
 	return nearestForce;
 }
 
-void CFemGrid2::getForces(int x1, int y1, int x2, int y2, CForceSelection *selection)
+void FemGrid2::getForces(int x1, int y1, int x2, int y2, ForceSelection *selection)
 {
 	int i;
 	double fx, fy;
@@ -1906,7 +1908,7 @@ void CFemGrid2::getForces(int x1, int y1, int x2, int y2, CForceSelection *selec
 	}
 }
 
-void CFemGrid2::getConstraints(int x1, int y1, int x2, int y2, CConstraintSelection *selection)
+void FemGrid2::getConstraints(int x1, int y1, int x2, int y2, ConstraintSelection *selection)
 {
 	int i;
 	double fx, fy;
@@ -1930,7 +1932,7 @@ void CFemGrid2::getConstraints(int x1, int y1, int x2, int y2, CConstraintSelect
 	}
 }
 
-void CFemGrid2::removePointForce(CForce *force)
+void FemGrid2::removePointForce(Force *force)
 {
 	double fx, fy;
 	int fys;
@@ -1944,7 +1946,7 @@ void CFemGrid2::removePointForce(CForce *force)
 
 	for (fi=m_pointForces[fys].begin(); (!m_pointForces[fys].empty())&&(fi!=m_pointForces[fys].end()); fi++)
 	{
-		CForce* aForce = (*fi).get();
+		Force* aForce = (*fi).get();
 
 		if (force == aForce)
 		{
@@ -1962,7 +1964,7 @@ void CFemGrid2::removePointForce(CForce *force)
 	}
 }
 
-void CFemGrid2::moveForce(CForce* force, int x, int y)
+void FemGrid2::moveForce(Force* force, int x, int y)
 {
 	double fx, fy;
 	int fys;
@@ -1970,7 +1972,7 @@ void CFemGrid2::moveForce(CForce* force, int x, int y)
 	force->getPosition(fx, fy);
 	fys = (int)fy;
 
-	CForcePtr holdForce;
+	ForcePtr holdForce;
 	CForceQueIter eraseIt = m_pointForces[fys].end();
 
 	for (auto fi = m_pointForces[fys].begin(); fi != m_pointForces[fys].end(); ++fi)
@@ -2000,7 +2002,7 @@ void CFemGrid2::moveForce(CForce* force, int x, int y)
 	}
 }
 
-void CFemGrid2::removePointConstraint(CConstraint *constraint)
+void FemGrid2::removePointConstraint(Constraint *constraint)
 {
 	double fx, fy;
 	int fys;
@@ -2014,7 +2016,7 @@ void CFemGrid2::removePointConstraint(CConstraint *constraint)
 
 	for (fi=m_pointConstraints[fys].begin(); (!m_pointConstraints[fys].empty())&&(fi!=m_pointConstraints[fys].end()); fi++)
 	{
-		CConstraint* aConstraint = (*fi).get();
+		Constraint* aConstraint = (*fi).get();
 
 		if (constraint == aConstraint)
 		{
@@ -2032,7 +2034,7 @@ void CFemGrid2::removePointConstraint(CConstraint *constraint)
 	}
 }
 
-void CFemGrid2::calcCenterOfStiffness(int &cgx, int &cgy)
+void FemGrid2::calcCenterOfStiffness(int &cgx, int &cgy)
 {
 	ivf2d::Image* image = this->getImage();
 	int i, j;
@@ -2080,16 +2082,16 @@ void CFemGrid2::calcCenterOfStiffness(int &cgx, int &cgy)
 	}
 }
 
-double CFemGrid2::getPixelArea()
+double FemGrid2::getPixelArea()
 {
 	return m_pixelArea;
 }
 
-CConstraintSelectionPtr CFemGrid2::getConstraints()
+ConstraintSelectionPtr FemGrid2::getConstraints()
 {
 	int i;
 
-	auto selection = CConstraintSelection::create();
+	auto selection = ConstraintSelection::create();
 
 	CConstraintQueIter fi;
 
@@ -2104,11 +2106,11 @@ CConstraintSelectionPtr CFemGrid2::getConstraints()
 	return selection;
 }
 
-CForceSelectionPtr CFemGrid2::getForces()
+ForceSelectionPtr FemGrid2::getForces()
 {
 	int i;
 
-	auto selection = CForceSelection::create();
+	auto selection = ForceSelection::create();
 
 	CForceQueIter fi;
 
@@ -2123,7 +2125,7 @@ CForceSelectionPtr CFemGrid2::getForces()
 	return selection;
 }
 
-int CFemGrid2::getConstraintsSize()
+int FemGrid2::getConstraintsSize()
 {
 	int i;
 
@@ -2143,7 +2145,7 @@ int CFemGrid2::getConstraintsSize()
 	return constraintCount;
 }
 
-void CFemGrid2::getElements(int x1, int y1, int x2, int y2, CElementList& list)
+void FemGrid2::getElements(int x1, int y1, int x2, int y2, CElementList& list)
 {
 	double ex = (double)(x2 - x1);
 	double ey = (double)(y2 - y1);
@@ -2180,7 +2182,7 @@ void CFemGrid2::getElements(int x1, int y1, int x2, int y2, CElementList& list)
 	}
 }
 
-void CFemGrid2::setShowReactionForces(bool flag)
+void FemGrid2::setShowReactionForces(bool flag)
 {
 	int i;
 
@@ -2195,27 +2197,27 @@ void CFemGrid2::setShowReactionForces(bool flag)
 	}
 }
 
-void CFemGrid2::setAverageStress(bool flag)
+void FemGrid2::setAverageStress(bool flag)
 {
 	m_averageStress = flag;
 }
 
-bool CFemGrid2::getAverageStress()
+bool FemGrid2::getAverageStress()
 {
 	return m_averageStress;
 }
 
-void CFemGrid2::setStressStep(int step)
+void FemGrid2::setStressStep(int step)
 {
 	m_stressStep = step;
 }
 
-int CFemGrid2::getStressStep()
+int FemGrid2::getStressStep()
 {
 	return m_stressStep;
 }
 
-void CFemGrid2::updatePixelArea()
+void FemGrid2::updatePixelArea()
 {
 	ivf2d::Image* image = this->getImage();
 	int i, j;
@@ -2253,7 +2255,7 @@ void CFemGrid2::updatePixelArea()
 	}
 }
 
-int CFemGrid2::getElementCount()
+int FemGrid2::getElementCount()
 {
 	int rows, cols;
 	int i, j;
@@ -2276,114 +2278,114 @@ int CFemGrid2::getElementCount()
 	return nElements;
 }
 
-void CFemGrid2::setDrawStress(bool flag)
+void FemGrid2::setDrawStress(bool flag)
 {
 	m_drawStress = flag;
 }
 
-bool CFemGrid2::getDrawStress()
+bool FemGrid2::getDrawStress()
 {
 	return m_drawStress;
 }
 
-void CFemGrid2::setDrawDisplacements(bool flag)
+void FemGrid2::setDrawDisplacements(bool flag)
 {
 	m_drawDisplacements = flag;
 }
 
-bool CFemGrid2::getDrawDisplacements()
+bool FemGrid2::getDrawDisplacements()
 {
 	return m_drawDisplacements;
 }
 
-void CFemGrid2::setColorMap(CColorMapPtr colorMap)
+void FemGrid2::setColorMap(ColorMapPtr colorMap)
 {
 	m_colorMap = colorMap;
 	this->updateColorMapTexture();
 }
 
-CColorMap* CFemGrid2::getColorMap()
+ColorMap* FemGrid2::getColorMap()
 {
 	return m_colorMap.get();
 }
 
-void CFemGrid2::setElementTreshold(double value)
+void FemGrid2::setElementTreshold(double value)
 {
 	m_elementTreshold = value;
 }
 
-double CFemGrid2::getElementTreshold()
+double FemGrid2::getElementTreshold()
 {
 	return m_elementTreshold;
 }
 
-void CFemGrid2::setMaxMisesStressValue(double value)
+void FemGrid2::setMaxMisesStressValue(double value)
 {
 	m_maxMisesStressValue = value;
 }
 
-void CFemGrid2::setStressType(TStressType stressType)
+void FemGrid2::setStressType(TStressType stressType)
 {
 	m_stressType = stressType;
 }
 
-void CFemGrid2::setUpperMisesTreshold(double upper)
+void FemGrid2::setUpperMisesTreshold(double upper)
 {
 	m_upperMisesTreshold = upper;
 }
 
-void CFemGrid2::setDrawForcesAndConstraints(bool flag)
+void FemGrid2::setDrawForcesAndConstraints(bool flag)
 {
 	m_drawForcesAndConstraints = flag;
 }
 
-bool CFemGrid2::getDrawForcesAndConstraints()
+bool FemGrid2::getDrawForcesAndConstraints()
 {
 	return m_drawForcesAndConstraints;
 }
 
-void CFemGrid2::setDimmedConstraints(bool flag)
+void FemGrid2::setDimmedConstraints(bool flag)
 {
 	m_dimmedConstraints = flag;
 }
 
-bool CFemGrid2::getDimmedConstraints()
+bool FemGrid2::getDimmedConstraints()
 {
 	return m_dimmedConstraints;
 }
 
-void CFemGrid2::setUndeformedGrid(bool flag)
+void FemGrid2::setUndeformedGrid(bool flag)
 {
 	m_undeformedGrid = flag;
 }
 
-bool CFemGrid2::getUndeformedGrid()
+bool FemGrid2::getUndeformedGrid()
 {
 	return m_undeformedGrid;
 }
 
-void CFemGrid2::setDrawStructure(bool flag)
+void FemGrid2::setDrawStructure(bool flag)
 {
 	m_drawStructure = flag;
 }
 
-bool CFemGrid2::getDrawStructure()
+bool FemGrid2::getDrawStructure()
 {
 	return m_drawStructure;
 }
 
-void CFemGrid2::setShowDensity(bool flag)
+void FemGrid2::setShowDensity(bool flag)
 {
 	m_drawDensity = flag;
 }
 
-bool CFemGrid2::getShowDensity()
+bool FemGrid2::getShowDensity()
 {
 	return m_drawDensity;
 }
 
 
-void CFemGrid2::assignNonElements(Eigen::MatrixXd& M, double value)
+void FemGrid2::assignNonElements(Eigen::MatrixXd& M, double value)
 {
 	int rows, cols, i, j;
 
@@ -2400,7 +2402,7 @@ void CFemGrid2::assignNonElements(Eigen::MatrixXd& M, double value)
 	}
 }
 
-void CFemGrid2::updateColorMapTexture()
+void FemGrid2::updateColorMapTexture()
 {
 	int i;
 	float r, g, b;
@@ -2414,12 +2416,14 @@ void CFemGrid2::updateColorMapTexture()
 	}
 }
 
-void CFemGrid2::setUseWeight(bool flag)
+void FemGrid2::setUseWeight(bool flag)
 {
 	m_useWeight = flag;
 }
 
-bool CFemGrid2::getUseWeight()
+bool FemGrid2::getUseWeight()
 {
 	return m_useWeight;
 }
+
+} // namespace fp

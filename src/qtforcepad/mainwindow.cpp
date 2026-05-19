@@ -503,7 +503,7 @@ void MainWindow::onAutoScale()
 
 void MainWindow::onStressModeChanged(int mode)
 {
-    m_paintView->setStressMode(static_cast<CFemGrid2::TStressMode>(mode));
+    m_paintView->setStressMode(static_cast<fp::FemGrid2::TStressMode>(mode));
     m_paintView->update();
 }
 
@@ -1127,9 +1127,9 @@ QWidget* MainWindow::createPrincipalPropsWidget()
     auto *btnTens = makePanelIconBtn("icons/tension.svg",              "Tensile only");
     auto *btnComp = makePanelIconBtn("icons/compression.svg",          "Compression only");
 
-    m_stressModeGroup->addButton(btnAll,  CFemGrid2::SM_ALL);
-    m_stressModeGroup->addButton(btnTens, CFemGrid2::SM_POSITIVE);
-    m_stressModeGroup->addButton(btnComp, CFemGrid2::SM_NEGATIVE);
+    m_stressModeGroup->addButton(btnAll,  fp::FemGrid2::SM_ALL);
+    m_stressModeGroup->addButton(btnTens, fp::FemGrid2::SM_POSITIVE);
+    m_stressModeGroup->addButton(btnComp, fp::FemGrid2::SM_NEGATIVE);
     btnAll->setChecked(true);
 
     connect(m_stressModeGroup, &QButtonGroup::idClicked, this, &MainWindow::onStressModeChanged);

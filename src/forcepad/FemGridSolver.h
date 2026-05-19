@@ -88,7 +88,7 @@ private:
 	std::string m_matlabFilename;
 
 	TErrorType m_errorStatus;
-	CFemGrid* m_femGrid;
+	fp::FemGrid* m_femGrid;
 
 	double m_elementTreshold;
 	double m_stiffnessScalefactor;
@@ -131,10 +131,10 @@ public:
 	/* ----- Get/set methods ----- */
 
 	/** Set FemModel instance containing problem description. */
-	void setFemGrid(CFemGrid* femGrid);
+	void setFemGrid(fp::FemGrid* femGrid);
 
 	/** Returns current FemModel instance */
-	CFemGrid* getFemGrid();
+	fp::FemGrid* getFemGrid();
 
 	/** Returns error status from finite element solver. */
 	TErrorType getLastError();

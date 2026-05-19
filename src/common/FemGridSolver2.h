@@ -22,8 +22,8 @@
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
 
-#ifndef _CFemGridSolver2_h_
-#define _CFemGridSolver2_h_
+#ifndef _FemGridSolver2_h_
+#define _FemGridSolver2_h_
 
 #define BS_NO_ERROR			0
 #define BS_NO_NODES			1
@@ -62,7 +62,9 @@ public:
 	virtual bool onContinueCalc() = 0;
 };
 
-IvfSmartPointer(CFemGridSolver2);
+namespace fp {
+
+IvfSmartPointer(FemGridSolver2);
 
 /**
  * Fem Internal solver class.
@@ -70,7 +72,7 @@ IvfSmartPointer(CFemGridSolver2);
  * This class is responsible for converting the FemModel class
  * into a finite element problem and then solving it.
  */
-class CFemGridSolver2 : public ivf2d::Base {
+class FemGridSolver2 : public ivf2d::Base {
 public:
 	enum TErrorType {
 		ET_NO_ERROR,
@@ -105,7 +107,7 @@ private:
 	std::string m_matlabFilename;
 
 	TErrorType m_errorStatus;
-	CFemGrid2* m_femGrid;
+	FemGrid2* m_femGrid;
 
 	double m_elementTreshold;
 	double m_stiffnessScalefactor;
@@ -144,12 +146,12 @@ private:
 	CGSContinueCalcEvent* m_continueCalcEvent;
 public:
 	/** FemInternalSolver class constructor. */
-	CFemGridSolver2();
+	FemGridSolver2();
 
 	/** FeminternalSolver class destructor. */
-	virtual ~CFemGridSolver2();
+	virtual ~FemGridSolver2();
 
-	static CFemGridSolver2Ptr create() { return std::make_shared<CFemGridSolver2>(); }
+	static FemGridSolver2Ptr create() { return std::make_shared<FemGridSolver2>(); }
 
 	/* ---- Methods ----- */
 
@@ -164,13 +166,13 @@ public:
 	int calculateOptimalBandwidth();
 	void setupForcesAndConstraints(bool& loadsDefined, bool& bcsDefined, bool& vectorBcsDefined,
 		std::set<int>& uniqueDofs, std::set<int>& uniqueVectorDofs,
-		std::vector<CConstraint*>& vectorConstraints, std::vector<double>& prescribedValues);
-	void assembleVectorConstraints(calfem::TripletList& Ktriplets, std::vector<CConstraint*>& vectorConstraints);
+		std::vector<Constraint*>& vectorConstraints, std::vector<double>& prescribedValues);
+	void assembleVectorConstraints(calfem::TripletList& Ktriplets, std::vector<Constraint*>& vectorConstraints);
 	void removeDoubleDofs(std::set<int>& uniqueDofs, std::vector<double>& prescribedValues,
 		calfem::IntColVec& bcDofs, calfem::ColVec& bcVals);
 	void computeElementForces();
 	void computeElementForcesOpt(calfem::Matrix& X, double penalty);
-	void computeReactionForces(std::vector<CConstraint*>& vectorConstraints);
+	void computeReactionForces(std::vector<Constraint*>& vectorConstraints);
 
 	void objectiveFunctionAndSensitivity(calfem::Matrix& X, calfem::Matrix& dC, calfem::Matrix& L, double penalty, double& c);
 	calfem::Matrix optimalityCriteriaUpdate(calfem::Matrix& X, calfem::Matrix& dC, calfem::Matrix& L, double volfrac, int nElements);
@@ -189,10 +191,10 @@ public:
 	/* ----- Get/set methods ----- */
 
 	/** Set FemModel instance containing problem description. */
-	void setFemGrid(CFemGrid2* femGrid);
+	void setFemGrid(FemGrid2* femGrid);
 
 	/** Returns current FemModel instance */
-	CFemGrid2* getFemGrid();
+	FemGrid2* getFemGrid();
 
 	/** Returns error status from finite element solver. */
 	TErrorType getLastError();
@@ -256,5 +258,7 @@ public:
 	void setLogMessageEvent(CGSLogMessageEvent* eventMethod);
 	void setContinueCalcEvent(CGSContinueCalcEvent* eventMethod);
 };
+
+} // namespace fp
 
 #endif

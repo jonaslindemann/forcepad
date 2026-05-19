@@ -75,7 +75,7 @@ inline void CBcTypes::cb_btnBcX_i(Fl_HoverButton*, void*) {
   if (m_view!=NULL)
 {
 	CPaintView* paintView = (CPaintView*) m_view;
-	paintView->setConstraintType(CConstraint::CT_X);
+	paintView->setConstraintType(fp::Constraint::CT_X);
 	paintView->setEditMode(CPaintView::EM_CONSTRAINT);
 }
 wnd->hide();
@@ -225,7 +225,7 @@ inline void CBcTypes::cb_btnBcY_i(Fl_HoverButton*, void*) {
   if (m_view!=NULL)
 {
 	CPaintView* paintView = (CPaintView*) m_view;
-	paintView->setConstraintType(CConstraint::CT_Y);
+	paintView->setConstraintType(fp::Constraint::CT_Y);
 	paintView->setEditMode(CPaintView::EM_CONSTRAINT);
 }
 wnd->hide();
@@ -388,7 +388,7 @@ inline void CBcTypes::cb_btnBcXY_i(Fl_HoverButton*, void*) {
   if (m_view!=NULL)
 {
 	CPaintView* paintView = (CPaintView*) m_view;
-	paintView->setConstraintType(CConstraint::CT_XY);
+	paintView->setConstraintType(fp::Constraint::CT_XY);
 	paintView->setEditMode(CPaintView::EM_CONSTRAINT);
 }
 wnd->hide();

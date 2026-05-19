@@ -1,52 +1,55 @@
 #include "UiSettings.h"
 
-CUiSettings* CUiSettings::m_instance = 0;
-ivf2d::SingletonDestroyer<CUiSettings> CUiSettings::m_destroyer;
+namespace fp {
 
-CUiSettings* CUiSettings::getInstance () 
+UiSettings* UiSettings::m_instance = 0;
+ivf2d::SingletonDestroyer<UiSettings> UiSettings::m_destroyer;
+
+UiSettings* UiSettings::getInstance () 
 {
     if (m_instance == 0)  
     {  
-		m_instance = new CUiSettings(); 
+		m_instance = new UiSettings(); 
 		m_destroyer.setSingleton(m_instance);
     }
     return m_instance; 
 }
 
-CUiSettings::CUiSettings()
+UiSettings::UiSettings()
 {
 	m_symbolLength = 50.0;
 	m_lineThickness = 3.0;
 	m_devicePixelRatio = 1.0;
 }
 
-void CUiSettings::setDevicePixelRatio(double dpr)
+void UiSettings::setDevicePixelRatio(double dpr)
 {
 	m_devicePixelRatio = dpr > 0.0 ? dpr : 1.0;
 }
 
-double CUiSettings::getDevicePixelRatio()
+double UiSettings::getDevicePixelRatio()
 {
 	return m_devicePixelRatio;
 }
 
-void CUiSettings::setLineThickness(double thickness)
+void UiSettings::setLineThickness(double thickness)
 {
 	m_lineThickness = thickness;
 }
 
-double CUiSettings::getLineThickness()
+double UiSettings::getLineThickness()
 {
 	return m_lineThickness;
 }
 
-void CUiSettings::setSymbolLength(double length)
+void UiSettings::setSymbolLength(double length)
 {
 	m_symbolLength = length;
 }
 
-double CUiSettings::getSymbolLength()
+double UiSettings::getSymbolLength()
 {
 	return m_symbolLength;
 }
 
+} // namespace fp

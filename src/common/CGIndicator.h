@@ -22,14 +22,16 @@
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
 
-#ifndef _CCGIndicator_h_
-#define _CCGIndicator_h_
+#ifndef _CGIndicator_h_
+#define _CGIndicator_h_
 
 #include "Shape.h"
 
-IvfSmartPointer(CCGIndicator);
+namespace fp {
 
-class CCGIndicator : public ivf2d::Shape {
+IvfSmartPointer(CGIndicator);
+
+class CGIndicator : public ivf2d::Shape {
 private:
 	double m_arrowLength;
 	bool m_gravityArrow;
@@ -44,12 +46,12 @@ private:
 
 	void initAngle();
 public:
-	CCGIndicator();
-	virtual ~CCGIndicator();
+	CGIndicator();
+	virtual ~CGIndicator();
 
-	static CCGIndicatorPtr create() { return std::make_shared<CCGIndicator>(); }
+	static CGIndicatorPtr create() { return std::make_shared<CGIndicator>(); }
 
-	IvfClassInfo("CCGIndicator",ivf2d::Shape);
+	IvfClassInfo("CGIndicator",ivf2d::Shape);
 
 	void setArrowLength(double length);
 	double getArrowLength();
@@ -65,5 +67,8 @@ public:
 
 	virtual void doGeometry();
 };
+
+
+} // namespace fp
 
 #endif 

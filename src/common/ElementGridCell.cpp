@@ -24,12 +24,16 @@
 
 #include "ElementGridCell.h"
 
-CElementGridCell::CElementGridCell()
+namespace fp {
+
+ElementGridCell::ElementGridCell()
 {
 
 }
 
-CElementGridCell::~CElementGridCell()
+ElementGridCell::~ElementGridCell()
 {
 
 }
+
+} // namespace fp

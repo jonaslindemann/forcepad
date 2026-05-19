@@ -22,25 +22,30 @@
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
 
-#ifndef _CElementGridCell_h_
-#define _CElementGridCell_h_
+#ifndef _ElementGridCell_h_
+#define _ElementGridCell_h_
 
 #include "Element.h"
 
-IvfSmartPointer(CElementGridCell);
+namespace fp {
 
-class CElementGridCell : public ivf2d::Point {
+IvfSmartPointer(ElementGridCell);
+
+class ElementGridCell : public ivf2d::Point {
 private:
 	double m_value;
-	std::vector<CElementPtr> m_elements;
+	std::vector<ElementPtr> m_elements;
 public:
-	CElementGridCell();
-	virtual ~CElementGridCell();
+	ElementGridCell();
+	virtual ~ElementGridCell();
 
-	static CElementGridCellPtr create() { return std::make_shared<CElementGridCell>(); }
+	static ElementGridCellPtr create() { return std::make_shared<ElementGridCell>(); }
 
-	IvfClassInfo("CElementGridCell",ivf2d::Base);
+	IvfClassInfo("ElementGridCell",ivf2d::Base);
 };
+
+
+} // namespace fp
 
 #endif 
 

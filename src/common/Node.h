@@ -22,30 +22,35 @@
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
 
-#ifndef _CNode_h_
-#define _CNode_h_
+#ifndef _Node_h_
+#define _Node_h_
 
 #include "Point.h"
 
-IvfSmartPointer(CNode);
+namespace fp {
 
-class CNode : public ivf2d::Point {
+IvfSmartPointer(Node);
+
+class Node : public ivf2d::Point {
 private:
 	int m_dofs[2];
 public:
 	/** Color class constructor. */
-	CNode();
+	Node();
 
 	/** Color class destructor. */
-	virtual ~CNode();
+	virtual ~Node();
 
-	static CNodePtr create() { return std::make_shared<CNode>(); }
+	static NodePtr create() { return std::make_shared<Node>(); }
 
-	IvfClassInfo("CNode",ivf2d::Base);
+	IvfClassInfo("Node",ivf2d::Base);
 	int enumerate(int start);
 	void setDof(int idx, int value);
 	int getDof(int idx);
 };
+
+
+} // namespace fp
 
 #endif 
 

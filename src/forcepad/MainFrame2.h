@@ -601,7 +601,7 @@ public:
   void centerWindow(Fl_Window* window);
   Fl_Window* getMainWindow();
   void onModelChanged(const std::string& newModelName);
-  void onRulerChanged(CRuler* ruler);
+  void onRulerChanged(fp::Ruler* ruler);
   void onVisualisationModeChanged(CPaintView::TVisualisationMode oldMode, CPaintView::TVisualisationMode newMode);
   void disableUserInterface();
   void enableUserInterface();

@@ -50,13 +50,15 @@
 
 using namespace std;
 
-CFemGridSolver2::CFemGridSolver2()
+namespace fp {
+
+FemGridSolver2::FemGridSolver2()
 {
-	so_print("CFemGridSolver2","Constructed.");
+	so_print("FemGridSolver2","Constructed.");
 	m_maxNodeValue = -1.0e300;
 	m_maxStressValue = -1.0e300;
 	m_maxMisesStressValue = -1.0e300;
-	m_errorStatus = CFemGridSolver2::ET_NO_ERROR;
+	m_errorStatus = FemGridSolver2::ET_NO_ERROR;
 	m_elementTreshold = 1.0e-5;
 	m_forceMagnitude = 1.0;
 	m_weight = 0.0;
@@ -89,12 +91,12 @@ CFemGridSolver2::CFemGridSolver2()
 	m_continueCalcEvent = nullptr;
 }
 
-CFemGridSolver2::~CFemGridSolver2()
+FemGridSolver2::~FemGridSolver2()
 {
-	so_print("CFemGridSolver2","Destroyed.");
+	so_print("FemGridSolver2","Destroyed.");
 }
 
-bool CFemGridSolver2::continueCalc()
+bool FemGridSolver2::continueCalc()
 {
 #ifndef USE_QT
 	Fl::check();
@@ -108,13 +110,13 @@ bool CFemGridSolver2::continueCalc()
 		return true;
 }
 
-void CFemGridSolver2::progressMessage(const std::string message, const int progress)
+void FemGridSolver2::progressMessage(const std::string message, const int progress)
 {
 	if (m_statusMessageEvent!=nullptr)
 		m_statusMessageEvent->onStatusMessage(message, progress);
 }
 
-void CFemGridSolver2::logMessage(const std::string context, const std::string message)
+void FemGridSolver2::logMessage(const std::string context, const std::string message)
 {
 	if (m_logMessageEvent!=nullptr)
 	{
@@ -122,44 +124,44 @@ void CFemGridSolver2::logMessage(const std::string context, const std::string me
 	}
 }
 
-CFemGridSolver2::TErrorType CFemGridSolver2::getLastError()
+FemGridSolver2::TErrorType FemGridSolver2::getLastError()
 {
 	return m_errorStatus;
 }
 
-void CFemGridSolver2::setFemGrid(CFemGrid2 *femGrid)
+void FemGridSolver2::setFemGrid(FemGrid2 *femGrid)
 {
 	m_femGrid = femGrid;
 }
 
-CFemGrid2* CFemGridSolver2::getFemGrid()
+FemGrid2* FemGridSolver2::getFemGrid()
 {
 	return m_femGrid;
 }
 
-double CFemGridSolver2::getMaxStressValue()
+double FemGridSolver2::getMaxStressValue()
 {
 	return m_maxStressValue;
 }
 
-double CFemGridSolver2::getMaxNodeValue()
+double FemGridSolver2::getMaxNodeValue()
 {
 	return m_maxNodeValue;
 }
 
-void CFemGridSolver2::execute_old()
+void FemGridSolver2::execute_old()
 {
 	// Deprecated: use execute() instead.
 }
 
-void CFemGridSolver2::setupHinges()
+void FemGridSolver2::setupHinges()
 {
-	CConstraint* pointConstraint = m_femGrid->getFirstPointConstraint();
+	Constraint* pointConstraint = m_femGrid->getFirstPointConstraint();
 
 	while (pointConstraint!=nullptr)
 	{
 		switch (pointConstraint->getConstraintType()) {
-		case CConstraint::CT_HINGE:
+		case Constraint::CT_HINGE:
 			double x, y;
 			double x1, y1, x2, y2;
 			double oldValue;
@@ -180,7 +182,7 @@ void CFemGridSolver2::setupHinges()
 	}
 }
 
-int CFemGridSolver2::calculateOptimalBandwidth()
+int FemGridSolver2::calculateOptimalBandwidth()
 {
 	int rows, cols;
 	int bwLeftRight, bwBottomTop;
@@ -208,7 +210,7 @@ int CFemGridSolver2::calculateOptimalBandwidth()
 	return maxBandwidth;
 }
 
-int CFemGridSolver2::assembleSystem(calfem::TripletList& Ktriplets)
+int FemGridSolver2::assembleSystem(calfem::TripletList& Ktriplets)
 {
 	int i, j, l;
 	int rows, cols;
@@ -275,7 +277,7 @@ int CFemGridSolver2::assembleSystem(calfem::TripletList& Ktriplets)
 	return nElements;
 }
 
-int CFemGridSolver2::assembleSystemOpt(calfem::TripletList& Ktriplets, calfem::Matrix& X, calfem::Matrix& L, double penalty)
+int FemGridSolver2::assembleSystemOpt(calfem::TripletList& Ktriplets, calfem::Matrix& X, calfem::Matrix& L, double penalty)
 {
 	int i, j, l;
 	int rows, cols;
@@ -347,9 +349,9 @@ int CFemGridSolver2::assembleSystemOpt(calfem::TripletList& Ktriplets, calfem::M
 	return nElements;
 }
 
-void CFemGridSolver2::setupForcesAndConstraints(bool& loadsDefined, bool& bcsDefined, bool& vectorBcsDefined,
+void FemGridSolver2::setupForcesAndConstraints(bool& loadsDefined, bool& bcsDefined, bool& vectorBcsDefined,
 	std::set<int>& uniqueDofs, std::set<int>& uniqueVectorDofs,
-	std::vector<CConstraint*>& vectorConstraints, std::vector<double>& prescribedValues)
+	std::vector<Constraint*>& vectorConstraints, std::vector<double>& prescribedValues)
 {
 	int i;
 	int dofs[2];
@@ -372,7 +374,7 @@ void CFemGridSolver2::setupForcesAndConstraints(bool& loadsDefined, bool& bcsDef
 
 	m_femGrid->clearPoints();
 
-	CForce* pointLoad = m_femGrid->getFirstPointLoad();
+	Force* pointLoad = m_femGrid->getFirstPointLoad();
 
 	while (pointLoad!=nullptr)
 	{
@@ -396,7 +398,7 @@ void CFemGridSolver2::setupForcesAndConstraints(bool& loadsDefined, bool& bcsDef
 
 	progressMessage("Setting up boundary conditions.", 40);
 
-	CConstraint* pointConstraint = m_femGrid->getFirstPointConstraint();
+	Constraint* pointConstraint = m_femGrid->getFirstPointConstraint();
 
 	prescribedValues.assign(m_nDof, 0.0);
 
@@ -411,24 +413,24 @@ void CFemGridSolver2::setupForcesAndConstraints(bool& loadsDefined, bool& bcsDef
 		if (dofs[0]>0)
 		{
 			switch (pointConstraint->getConstraintType()) {
-			case CConstraint::CT_XY:
+			case Constraint::CT_XY:
 				uniqueDofs.insert(dofs[0]);
 				uniqueDofs.insert(dofs[1]);
 				prescribedValues[dofs[0]-1] = 0.0;
 				prescribedValues[dofs[1]-1] = 0.0;
 				bcsDefined = true;
 				break;
-			case CConstraint::CT_X:
+			case Constraint::CT_X:
 				uniqueDofs.insert(dofs[0]);
 				prescribedValues[dofs[0]-1] = 0.0;
 				bcsDefined = true;
 				break;
-			case CConstraint::CT_Y:
+			case Constraint::CT_Y:
 				uniqueDofs.insert(dofs[1]);
 				prescribedValues[dofs[1]-1] = 0.0;
 				bcsDefined = true;
 				break;
-			case CConstraint::CT_VECTOR:
+			case Constraint::CT_VECTOR:
 				uniqueVectorDofs.insert(dofs[0]);
 				uniqueVectorDofs.insert(dofs[1]);
 				{
@@ -447,7 +449,7 @@ void CFemGridSolver2::setupForcesAndConstraints(bool& loadsDefined, bool& bcsDef
 	}
 }
 
-void CFemGridSolver2::assembleVectorConstraints(calfem::TripletList& Ktriplets, std::vector<CConstraint*>& vectorConstraints)
+void FemGridSolver2::assembleVectorConstraints(calfem::TripletList& Ktriplets, std::vector<Constraint*>& vectorConstraints)
 {
 	int dofs[2];
 	double x1, y1, x2, y2, ex, ey;
@@ -480,7 +482,7 @@ void CFemGridSolver2::assembleVectorConstraints(calfem::TripletList& Ktriplets, 
 	}
 }
 
-void CFemGridSolver2::removeDoubleDofs(std::set<int>& uniqueDofs, std::vector<double>& prescribedValues,
+void FemGridSolver2::removeDoubleDofs(std::set<int>& uniqueDofs, std::vector<double>& prescribedValues,
 	calfem::IntColVec& bcDofs, calfem::ColVec& bcVals)
 {
 	int n = (int)uniqueDofs.size();
@@ -498,7 +500,7 @@ void CFemGridSolver2::removeDoubleDofs(std::set<int>& uniqueDofs, std::vector<do
 	uniqueDofs.clear();
 }
 
-void CFemGridSolver2::computeElementForces()
+void FemGridSolver2::computeElementForces()
 {
 	int i, j, l;
 	int rows, cols;
@@ -614,7 +616,7 @@ void CFemGridSolver2::computeElementForces()
 	cout << "Max misses stress = " << m_maxMisesStressValue << endl;
 }
 
-void CFemGridSolver2::computeElementForcesOpt(calfem::Matrix& X, double penalty)
+void FemGridSolver2::computeElementForcesOpt(calfem::Matrix& X, double penalty)
 {
 	int i, j, l;
 	int rows, cols;
@@ -730,7 +732,7 @@ void CFemGridSolver2::computeElementForcesOpt(calfem::Matrix& X, double penalty)
 	cout << "Max misses stress = " << m_maxMisesStressValue << endl;
 }
 
-void CFemGridSolver2::computeReactionForces(std::vector<CConstraint*>& vectorConstraints)
+void FemGridSolver2::computeReactionForces(std::vector<Constraint*>& vectorConstraints)
 {
 	double x1, y1, x2, y2, ex, ey, es;
 	int dofs[2];
@@ -773,7 +775,7 @@ void CFemGridSolver2::computeReactionForces(std::vector<CConstraint*>& vectorCon
 	}
 }
 
-void CFemGridSolver2::objectiveFunctionAndSensitivity(calfem::Matrix& X, calfem::Matrix& dC, calfem::Matrix& L, double penalty, double& c)
+void FemGridSolver2::objectiveFunctionAndSensitivity(calfem::Matrix& X, calfem::Matrix& dC, calfem::Matrix& L, double penalty, double& c)
 {
 	int i, j, l;
 	int rows, cols;
@@ -844,7 +846,7 @@ void CFemGridSolver2::objectiveFunctionAndSensitivity(calfem::Matrix& X, calfem:
 	}
 }
 
-calfem::Matrix CFemGridSolver2::optimalityCriteriaUpdate(calfem::Matrix& X, calfem::Matrix& dC, calfem::Matrix& L, double volfrac, int nElements)
+calfem::Matrix FemGridSolver2::optimalityCriteriaUpdate(calfem::Matrix& X, calfem::Matrix& dC, calfem::Matrix& L, double volfrac, int nElements)
 {
 	double lmid;
 	double l1 = 0.0;
@@ -871,14 +873,14 @@ calfem::Matrix CFemGridSolver2::optimalityCriteriaUpdate(calfem::Matrix& X, calf
 	return Xnew;
 }
 
-int CFemGridSolver2::scaleToAbsoluteSize(int r)
+int FemGridSolver2::scaleToAbsoluteSize(int r)
 {
 	auto grid_stride = m_femGrid->getStride();
 	r = r * 6 / grid_stride;
 	return r;
 }
 
-calfem::Matrix CFemGridSolver2::sensitivityFilter1(calfem::Matrix& X, calfem::Matrix& dC, double rmin)
+calfem::Matrix FemGridSolver2::sensitivityFilter1(calfem::Matrix& X, calfem::Matrix& dC, double rmin)
 {
 	int i, j, k, l;
 	int rows = (int)X.rows();
@@ -915,7 +917,7 @@ calfem::Matrix CFemGridSolver2::sensitivityFilter1(calfem::Matrix& X, calfem::Ma
 	return dCnew;
 }
 
-calfem::Matrix CFemGridSolver2::sensitivityFilter2(calfem::Matrix& dC, double rmin)
+calfem::Matrix FemGridSolver2::sensitivityFilter2(calfem::Matrix& dC, double rmin)
 {
 	int i, j, k, l;
 	int rows = (int)dC.rows();
@@ -952,13 +954,13 @@ calfem::Matrix CFemGridSolver2::sensitivityFilter2(calfem::Matrix& dC, double rm
 	return dCnew;
 }
 
-void CFemGridSolver2::executeOptimizer()
+void FemGridSolver2::executeOptimizer()
 {
 	int rows, cols;
 	bool loadsDefined, bcsDefined, vectorBcsDefined;
 	std::set<int> uniqueDofs;
 	std::set<int> uniqueVectorDofs;
-	std::vector<CConstraint*> vectorConstraints;
+	std::vector<Constraint*> vectorConstraints;
 	std::vector<double> prescribedValues;
 
 #ifdef WIN32
@@ -967,7 +969,7 @@ void CFemGridSolver2::executeOptimizer()
 
 	int nElements;
 
-	m_errorStatus = CFemGridSolver2::ET_NO_ERROR;
+	m_errorStatus = FemGridSolver2::ET_NO_ERROR;
 
 	setupHinges();
 
@@ -1129,7 +1131,7 @@ void CFemGridSolver2::executeOptimizer()
 }
 
 
-void CFemGridSolver2::executeUpdate()
+void FemGridSolver2::executeUpdate()
 {
 	int i, j, l;
 	int rows, cols;
@@ -1163,13 +1165,13 @@ void CFemGridSolver2::executeUpdate()
 	// Re-build the BC set to get the same bcDofs/bcVals as execute()
 	std::set<int> uniqueDofs;
 	std::set<int> uniqueVectorDofs;
-	std::vector<CConstraint*> vectorConstraints;
+	std::vector<Constraint*> vectorConstraints;
 	std::vector<double> prescribedValues;
 	double x, y, value;
 	int dofs[2];
 	bool vectorBcsDefined = false;
 
-	CConstraint* pointConstraint = m_femGrid->getFirstPointConstraint();
+	Constraint* pointConstraint = m_femGrid->getFirstPointConstraint();
 
 	while (pointConstraint!=nullptr)
 	{
@@ -1179,17 +1181,17 @@ void CFemGridSolver2::executeUpdate()
 		if (dofs[0]>0)
 		{
 			switch (pointConstraint->getConstraintType()) {
-			case CConstraint::CT_XY:
+			case Constraint::CT_XY:
 				uniqueDofs.insert(dofs[0]);
 				uniqueDofs.insert(dofs[1]);
 				break;
-			case CConstraint::CT_X:
+			case Constraint::CT_X:
 				uniqueDofs.insert(dofs[0]);
 				break;
-			case CConstraint::CT_Y:
+			case Constraint::CT_Y:
 				uniqueDofs.insert(dofs[1]);
 				break;
-			case CConstraint::CT_VECTOR:
+			case Constraint::CT_VECTOR:
 				uniqueVectorDofs.insert(dofs[0]);
 				uniqueVectorDofs.insert(dofs[1]);
 				{
@@ -1230,7 +1232,7 @@ void CFemGridSolver2::executeUpdate()
 		return;
 	}
 
-	CForce* pointLoad = m_femGrid->getFirstPointLoad();
+	Force* pointLoad = m_femGrid->getFirstPointLoad();
 
 	while (pointLoad!=nullptr)
 	{
@@ -1296,20 +1298,20 @@ void CFemGridSolver2::executeUpdate()
 	m_femGrid->setMaxMisesStressValue(m_maxMisesStressValue);
 }
 
-void CFemGridSolver2::execute()
+void FemGridSolver2::execute()
 {
 	int i;
 	bool loadsDefined, bcsDefined, vectorBcsDefined;
 	std::set<int> uniqueDofs;
 	std::set<int> uniqueVectorDofs;
-	std::vector<CConstraint*> vectorConstraints;
+	std::vector<Constraint*> vectorConstraints;
 	std::vector<double> prescribedValues;
 
 #ifdef WIN32
 	DWORD startTime = timeGetTime();
 #endif
 
-	m_errorStatus = CFemGridSolver2::ET_NO_ERROR;
+	m_errorStatus = FemGridSolver2::ET_NO_ERROR;
 
 	setupHinges();
 
@@ -1413,147 +1415,149 @@ void CFemGridSolver2::execute()
 	progressMessage("Finished.", 0);
 }
 
-void CFemGridSolver2::setElementTreshold(double treshold)
+void FemGridSolver2::setElementTreshold(double treshold)
 {
 	m_elementTreshold = treshold;
 }
 
-double CFemGridSolver2::getMaxPosStressValue()
+double FemGridSolver2::getMaxPosStressValue()
 {
 	return m_maxPosStressValue;
 }
 
-double CFemGridSolver2::getMaxNegStressValue()
+double FemGridSolver2::getMaxNegStressValue()
 {
 	return m_maxNegStressValue;
 }
 
-int CFemGridSolver2::getDofs()
+int FemGridSolver2::getDofs()
 {
 	return m_femGrid->enumerateDofs(ED_BOTTOM_TOP);
 }
 
-void CFemGridSolver2::setWeight(double weight)
+void FemGridSolver2::setWeight(double weight)
 {
 	m_weight = weight;
 }
 
-void CFemGridSolver2::setForceMagnitude(double value)
+void FemGridSolver2::setForceMagnitude(double value)
 {
 	m_forceMagnitude = value;
 }
 
-void CFemGridSolver2::setUseWeight(bool flag)
+void FemGridSolver2::setUseWeight(bool flag)
 {
 	m_useWeight = flag;
 }
 
-void CFemGridSolver2::setOutputMatlab(bool flag)
+void FemGridSolver2::setOutputMatlab(bool flag)
 {
 	m_outputMatlab = flag;
 }
 
-void CFemGridSolver2::setMatlabFilename(const char *name)
+void FemGridSolver2::setMatlabFilename(const char *name)
 {
 	m_matlabFilename = name;
 }
 
-void CFemGridSolver2::setStiffnessScalefactor(const double scalefactor)
+void FemGridSolver2::setStiffnessScalefactor(const double scalefactor)
 {
 	m_stiffnessScalefactor = scalefactor;
 }
 
-double CFemGridSolver2::getStiffnessScalefactor()
+double FemGridSolver2::getStiffnessScalefactor()
 {
 	return m_stiffnessScalefactor;
 }
 
-void CFemGridSolver2::setElasticModulus(double elasticModulus)
+void FemGridSolver2::setElasticModulus(double elasticModulus)
 {
 	m_elasticModulus = elasticModulus;
 }
 
-void CFemGridSolver2::setThickness(double thickness)
+void FemGridSolver2::setThickness(double thickness)
 {
 	m_thickness = thickness;
 }
 
-void CFemGridSolver2::setYoungsModulus(double youngsModulus)
+void FemGridSolver2::setYoungsModulus(double youngsModulus)
 {
 	m_youngsModulus = youngsModulus;
 }
 
-void CFemGridSolver2::setConstraintStiffnessScale(double scale)
+void FemGridSolver2::setConstraintStiffnessScale(double scale)
 {
 	m_constraintStiffnessScale = scale;
 }
 
-double CFemGridSolver2::getConstraintStiffnessScale()
+double FemGridSolver2::getConstraintStiffnessScale()
 {
 	return m_constraintStiffnessScale;
 }
 
-void CFemGridSolver2::setStatusMessageEvent(CGSStatusMessageEvent* eventMethod)
+void FemGridSolver2::setStatusMessageEvent(CGSStatusMessageEvent* eventMethod)
 {
 	m_statusMessageEvent = eventMethod;
 }
 
-void CFemGridSolver2::setLogMessageEvent(CGSLogMessageEvent* eventMethod)
+void FemGridSolver2::setLogMessageEvent(CGSLogMessageEvent* eventMethod)
 {
 	m_logMessageEvent = eventMethod;
 }
 
-void CFemGridSolver2::setContinueCalcEvent(CGSContinueCalcEvent* eventMethod)
+void FemGridSolver2::setContinueCalcEvent(CGSContinueCalcEvent* eventMethod)
 {
 	m_continueCalcEvent = eventMethod;
 }
 
-void CFemGridSolver2::setOptVolumeFraction(double fraction)
+void FemGridSolver2::setOptVolumeFraction(double fraction)
 {
 	m_optVolfrac = fraction;
 }
 
-double CFemGridSolver2::getOptVolumeFraction()
+double FemGridSolver2::getOptVolumeFraction()
 {
 	return m_optVolfrac;
 }
 
-void CFemGridSolver2::setOptRmin(double rmin)
+void FemGridSolver2::setOptRmin(double rmin)
 {
 	m_optRmin = rmin;
 }
 
-double CFemGridSolver2::getOptRmin()
+double FemGridSolver2::getOptRmin()
 {
 	return m_optRmin;
 }
 
-void CFemGridSolver2::setOptMinChange(double minChange)
+void FemGridSolver2::setOptMinChange(double minChange)
 {
 	m_optMinChange = minChange;
 }
 
-double CFemGridSolver2::getOptMinChange()
+double FemGridSolver2::getOptMinChange()
 {
 	return m_optMinChange;
 }
 
-void CFemGridSolver2::setOptMaxLoops(int loops)
+void FemGridSolver2::setOptMaxLoops(int loops)
 {
 	m_optMaxLoops = loops;
 }
 
-int CFemGridSolver2::getOptMaxLoops()
+int FemGridSolver2::getOptMaxLoops()
 {
 	return m_optMaxLoops;
 }
 
-void CFemGridSolver2::setOptFilterType(TFilterType filterType)
+void FemGridSolver2::setOptFilterType(TFilterType filterType)
 {
 	m_filterType = filterType;
 }
 
-CFemGridSolver2::TFilterType CFemGridSolver2::getOptFilterType()
+FemGridSolver2::TFilterType FemGridSolver2::getOptFilterType()
 {
 	return m_filterType;
 }
+
+} // namespace fp

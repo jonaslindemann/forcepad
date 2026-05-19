@@ -113,7 +113,7 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 	m_gridSpacing = 8;
 	m_editMode = EM_DIRECT_BRUSH;
 	m_viewMode = VM_PHYSICS;
-	m_constraintType = CConstraint::CT_XY;
+	m_constraintType = fp::Constraint::CT_XY;
 	m_mainFrame = NULL;
 	
 	m_lockDrawing = false;
@@ -159,7 +159,7 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 	m_optMinChange = 0.01;
 	m_optMaxLoops = 100;
 	m_optRmin = 2.75;
-	m_optFilterType = CFemGridSolver2::FT_SHARP_CONTOURING;
+	m_optFilterType = fp::FemGridSolver2::FT_SHARP_CONTOURING;
 
 	// Test OpenGL version
 
@@ -214,7 +214,7 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 
 	// Rigid body variables
 
-	m_cgIndicator = CCGIndicator::create();
+	m_cgIndicator = fp::CGIndicator::create();
 	m_cgIndicator->setColor(color);
 	m_relativeForceSize = 0.05;
 	
@@ -238,7 +238,7 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 	m_drawing->setAlpha(128);
 	m_drawing->setLayer(0);
 
-	m_ruler = CRuler::create();
+	m_ruler = fp::Ruler::create();
 	m_ruler->setStartPos(0,0);
     m_ruler->setEndPos(m_drawing->getWidth(), 0);
 	m_ruler->setActualLength(1.0);
@@ -252,14 +252,14 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 
 	// Create image grid
 
-	m_femGrid = CFemGrid2::create();
+	m_femGrid = fp::FemGrid2::create();
 	m_femGrid->setImage(m_drawing);
 	m_femGrid->setStride(6);
 	m_femGrid->setAverageStress(true);
 	
 	// Create clipboard
 		
-	m_clipboard = CForcePadClipboard::create();
+	m_clipboard = fp::ForcePadClipboard::create();
 	m_clipboard->setImage(m_drawing);
 	m_clipboard->setFemGrid(m_femGrid.get());
 
@@ -448,7 +448,7 @@ void CPaintView::onPush(int x, int y)
 	m_start[1] = y;
 	m_oldPos[0] = -1;
 	m_leftMouseDown = true;
-	CConstraintPtr constraint;
+	fp::ConstraintPtr constraint;
 
 	updateCursor();
 	resetUndoArea();
@@ -465,7 +465,7 @@ void CPaintView::onPush(int x, int y)
 		
 		// Create a constraint and add it to the grid
 		
-		constraint = CConstraint::create();
+		constraint = fp::Constraint::create();
         constraint->setPosition(x-m_drawingOffsetX, height()-y-m_drawingOffsetY);
 		constraint->setConstraintType(m_constraintType);
 		m_femGrid->addConstraint(constraint);
@@ -476,7 +476,7 @@ void CPaintView::onPush(int x, int y)
 		// Create a new force. The position is set here.
 		// Direction is is done in the onDrag() method.
 		
-		m_newForce = CForce::create();
+		m_newForce = fp::Force::create();
         m_newForce->setPosition(x-m_drawingOffsetX, height()-y-m_drawingOffsetY);
 		m_femGrid->addForce(m_newForce);
 		break;
@@ -484,8 +484,8 @@ void CPaintView::onPush(int x, int y)
 		
 		// Create a directional constraint (ForcePAD/Rigid)
 		
-		m_newConstraint = CConstraint::create();
-		m_newConstraint->setConstraintType(CConstraint::CT_VECTOR);
+		m_newConstraint = fp::Constraint::create();
+		m_newConstraint->setConstraintType(fp::Constraint::CT_VECTOR);
         m_newConstraint->setPosition(x-m_drawingOffsetX, height()-y-m_drawingOffsetY);
 		m_newConstraint->setDirection(0.0, 1.0);
 		m_femGrid->addConstraint(m_newConstraint);
@@ -495,8 +495,8 @@ void CPaintView::onPush(int x, int y)
 
 		// Create a directional constraint (ForcePAD/Rigid)
 
-		m_newConstraint = CConstraint::create();
-		m_newConstraint->setConstraintType(CConstraint::CT_HINGE);
+		m_newConstraint = fp::Constraint::create();
+		m_newConstraint->setConstraintType(fp::Constraint::CT_HINGE);
         m_newConstraint->setPosition(x-m_drawingOffsetX, height()-y-m_drawingOffsetY);
 		m_newConstraint->setDirection(0.0, 1.0);
 		m_femGrid->addConstraint(m_newConstraint);
@@ -1750,7 +1750,7 @@ bool CPaintView::execute()
 
 	so_print("CPaintView","\tInitiating solver.");
 
-	m_solver = CFemGridSolver2::create();
+	m_solver = fp::FemGridSolver2::create();
 	m_solver->setStatusMessageEvent(m_statusMessageEvent);
 	m_solver->setLogMessageEvent(m_logMessageEvent);
 	m_solver->setUseWeight(m_useWeight);
@@ -1781,28 +1781,28 @@ bool CPaintView::execute()
 	so_print("CPaintView","\tChecking for errors.");
 	
 	switch (m_solver->getLastError()) {
-	case CFemGridSolver2::ET_NO_ERROR:
+	case fp::FemGridSolver2::ET_NO_ERROR:
 		errors = false;
 		break;
-	case CFemGridSolver2::ET_NO_ELEMENTS:
+	case fp::FemGridSolver2::ET_NO_ELEMENTS:
         doInfoMessage("No structure to solve.");
 		break;
-	case CFemGridSolver2::ET_NO_BCS:
+	case fp::FemGridSolver2::ET_NO_BCS:
         doInfoMessage("Add locks to structure.");
 		break;
-	case CFemGridSolver2::ET_NO_LOADS:
+	case fp::FemGridSolver2::ET_NO_LOADS:
         doInfoMessage("No loads defined on structure.");
 		break;
-	case CFemGridSolver2::ET_UNSTABLE:
+	case fp::FemGridSolver2::ET_UNSTABLE:
         doInfoMessage("Structure unstable. Try adding locks.");
 		break;
-	case CFemGridSolver2::ET_INVALID_MODEL:
+	case fp::FemGridSolver2::ET_INVALID_MODEL:
         doInfoMessage("Model invalid.");
 		break;
-	case CFemGridSolver2::ET_LOAD_OUTSIDE_AE:
+	case fp::FemGridSolver2::ET_LOAD_OUTSIDE_AE:
         doInfoMessage("Loads defined outside structure.");
 		break;
-	case CFemGridSolver2::ET_BC_OUTSIDE_AE:
+	case fp::FemGridSolver2::ET_BC_OUTSIDE_AE:
         doInfoMessage("Locks defined outside structure.");
 		break;
 	default:
@@ -1855,7 +1855,7 @@ bool CPaintView::executeOpt()
 
 	so_print("CPaintView","\tInitiating solver.");
 
-	m_solver = CFemGridSolver2::create();
+	m_solver = fp::FemGridSolver2::create();
 	m_solver->setStatusMessageEvent(m_statusMessageEvent);
 	m_solver->setLogMessageEvent(m_logMessageEvent);
 	m_solver->setContinueCalcEvent(m_continueCalcEvent);
@@ -1894,28 +1894,28 @@ bool CPaintView::executeOpt()
 	so_print("CPaintView","\tChecking for errors.");
 	
 	switch (m_solver->getLastError()) {
-	case CFemGridSolver2::ET_NO_ERROR:
+	case fp::FemGridSolver2::ET_NO_ERROR:
 		errors = false;
 		break;
-	case CFemGridSolver2::ET_NO_ELEMENTS:
+	case fp::FemGridSolver2::ET_NO_ELEMENTS:
         doInfoMessage("No structure to solve.");
 		break;
-	case CFemGridSolver2::ET_NO_BCS:
+	case fp::FemGridSolver2::ET_NO_BCS:
         doInfoMessage("Add locks to structure.");
 		break;
-	case CFemGridSolver2::ET_NO_LOADS:
+	case fp::FemGridSolver2::ET_NO_LOADS:
         doInfoMessage("No loads defined on structure.");
 		break;
-	case CFemGridSolver2::ET_UNSTABLE:
+	case fp::FemGridSolver2::ET_UNSTABLE:
         doInfoMessage("Structure unstable. Try adding locks.");
 		break;
-	case CFemGridSolver2::ET_INVALID_MODEL:
+	case fp::FemGridSolver2::ET_INVALID_MODEL:
         doInfoMessage("Model invalid.");
 		break;
-	case CFemGridSolver2::ET_LOAD_OUTSIDE_AE:
+	case fp::FemGridSolver2::ET_LOAD_OUTSIDE_AE:
         doInfoMessage("Loads defined outside structure.");
 		break;
-	case CFemGridSolver2::ET_BC_OUTSIDE_AE:
+	case fp::FemGridSolver2::ET_BC_OUTSIDE_AE:
         doInfoMessage("Locks defined outside structure.");
 		break;
 	default:
@@ -2899,7 +2899,7 @@ bool CPaintView::getUseWeight()
 	return m_useWeight;
 }
 
-void CPaintView::setStressMode(CFemGrid2::TStressMode mode)
+void CPaintView::setStressMode(fp::FemGrid2::TStressMode mode)
 {
 	m_femGrid->setStressMode(mode);
     this->doRedraw();
@@ -3093,14 +3093,14 @@ void CPaintView::setVisualisationMode(TVisualisationMode mode)
 	case VM_PRINCIPAL_STRESS:
 		m_femGrid->setDrawStructure(false);
 		this->setDrawDisplacements(false);
-		this->setStressType(CFemGrid2::ST_PRINCIPAL);
+		this->setStressType(fp::FemGrid2::ST_PRINCIPAL);
 		this->setDrawStress(true);
 		this->setDrawForcesAndConstraints(true);
 		break;
 	case VM_MISES_STRESS:
 		m_femGrid->setDrawStructure(false);
 		this->setDrawDisplacements(false);
-		this->setStressType(CFemGrid2::ST_MISES_SMOOTH);
+		this->setStressType(fp::FemGrid2::ST_MISES_SMOOTH);
 		this->setDrawStress(true);
 		this->setDrawForcesAndConstraints(true);
 		break;
@@ -3163,7 +3163,7 @@ const std::string CPaintView::getApplicationPath()
 }
 
 
-void CPaintView::setConstraintType(CConstraint::TConstraintType constraintType)
+void CPaintView::setConstraintType(fp::Constraint::TConstraintType constraintType)
 {
 	m_constraintType = constraintType;
 }
@@ -3339,11 +3339,11 @@ void CPaintView::setDimmedConstraints(bool flag)
 }
 
 
-void CPaintView::setStressType(CFemGrid2::TStressType stressType)
+void CPaintView::setStressType(fp::FemGrid2::TStressType stressType)
 {
 	// Make sure a colormap is loaded
 
-	if ((stressType == CFemGrid2::ST_MISES)||(stressType == CFemGrid2::ST_MISES_SMOOTH))
+	if ((stressType == fp::FemGrid2::ST_MISES)||(stressType == fp::FemGrid2::ST_MISES_SMOOTH))
 		this->setColorMap(1);
 
 	m_femGrid->setStressType(stressType);
@@ -3567,32 +3567,32 @@ int CPaintView::getOptMaxLoops()
 
 void CPaintView::setUiLineThickness(double thickness)
 {
-	CUiSettings::getInstance()->setLineThickness(thickness);
+	fp::UiSettings::getInstance()->setLineThickness(thickness);
     this->doRedraw();
 }
 
 double CPaintView::getUiLineThickness()
 {
-	return CUiSettings::getInstance()->getLineThickness();
+	return fp::UiSettings::getInstance()->getLineThickness();
 }
 
 void CPaintView::setUiSymbolLength(double length)
 {
-	CUiSettings::getInstance()->setSymbolLength(length);
+	fp::UiSettings::getInstance()->setSymbolLength(length);
     this->doRedraw();
 }
 
 double CPaintView::getUiSymbolLength()
 {
-    return CUiSettings::getInstance()->getSymbolLength();
+    return fp::UiSettings::getInstance()->getSymbolLength();
 }
 
-void CPaintView::setOptFilterType(CFemGridSolver2::TFilterType filterType)
+void CPaintView::setOptFilterType(fp::FemGridSolver2::TFilterType filterType)
 {
 	m_optFilterType = filterType;
 }
 
-CFemGridSolver2::TFilterType CPaintView::getOptFilterType()
+fp::FemGridSolver2::TFilterType CPaintView::getOptFilterType()
 {
 	return m_optFilterType;
 }

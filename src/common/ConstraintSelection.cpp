@@ -24,27 +24,29 @@
 
 #include "ConstraintSelection.h"
 
-CConstraintSelection::CConstraintSelection()
+namespace fp {
+
+ConstraintSelection::ConstraintSelection()
 {
 
 }
 
-CConstraintSelection::~CConstraintSelection()
+ConstraintSelection::~ConstraintSelection()
 {
 
 }
 
-void CConstraintSelection::add(CConstraintPtr constraint)
+void ConstraintSelection::add(ConstraintPtr constraint)
 {
 	m_constraints.push_back(constraint);
 }
 
-void CConstraintSelection::clear()
+void ConstraintSelection::clear()
 {
 	m_constraints.clear();
 }
 
-CConstraint* CConstraintSelection::getConstraint(int idx)
+Constraint* ConstraintSelection::getConstraint(int idx)
 {
 	if ((idx>=0)&&(idx<(int)m_constraints.size()))
 	{
@@ -54,7 +56,9 @@ CConstraint* CConstraintSelection::getConstraint(int idx)
 		return nullptr;
 }
 
-int CConstraintSelection::getSize()
+int ConstraintSelection::getSize()
 {
 	return m_constraints.size();
 }
+
+} // namespace fp

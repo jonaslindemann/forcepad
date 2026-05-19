@@ -22,19 +22,21 @@
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
 
-#ifndef _CElementGrid_h_
-#define _CElementGrid_h_
+#ifndef _ElementGrid_h_
+#define _ElementGrid_h_
 
 #include "Base.h"
 #include "Node.h"
 #include "ElementGridCell.h"
 
-IvfSmartPointer(CElementGrid);
+namespace fp {
 
-class CElementGrid : public ivf2d::Base {
+IvfSmartPointer(ElementGrid);
+
+class ElementGrid : public ivf2d::Base {
 private:
-	std::vector< std::vector<CNodePtr> > m_nodes;
-	std::vector< std::vector<CElementGridCellPtr> > m_elementGrid;
+	std::vector< std::vector<NodePtr> > m_nodes;
+	std::vector< std::vector<ElementGridCellPtr> > m_elementGrid;
 	int m_rows;
 	int m_cols;
 
@@ -42,16 +44,19 @@ private:
 
 	void initGrid();
 public:
-	CElementGrid();
-	virtual ~CElementGrid();
+	ElementGrid();
+	virtual ~ElementGrid();
 
-	static CElementGridPtr create() { return std::make_shared<CElementGrid>(); }
+	static ElementGridPtr create() { return std::make_shared<ElementGrid>(); }
 
 	void setSize(int rows, int cols);
 	void setWidth(double width);
 
-	IvfClassInfo("CElementGrid",ivf2d::Base);
+	IvfClassInfo("ElementGrid",ivf2d::Base);
 };
+
+
+} // namespace fp
 
 #endif 
 

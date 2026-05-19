@@ -32,7 +32,9 @@
 #include <GL/gl.h>
 #endif
 
-CImageGrid::CImageGrid()
+namespace fp {
+
+ImageGrid::ImageGrid()
 {
 	m_image = nullptr;
 	m_stride = 8;
@@ -45,7 +47,7 @@ CImageGrid::CImageGrid()
 	m_averageOverGridSquare = true;
 }
 
-CImageGrid::~CImageGrid()
+ImageGrid::~ImageGrid()
 {
 	int i, j;
 
@@ -70,7 +72,7 @@ CImageGrid::~CImageGrid()
 	}
 }
 
-void CImageGrid::setImage(ivf2d::ImagePtr image)
+void ImageGrid::setImage(ivf2d::ImagePtr image)
 {
 	m_image = image;
 
@@ -78,7 +80,7 @@ void CImageGrid::setImage(ivf2d::ImagePtr image)
 	m_height = m_image->getHeight();
 }
 
-void CImageGrid::doGeometry()
+void ImageGrid::doGeometry()
 {
 	int i, j;
 
@@ -138,12 +140,12 @@ void CImageGrid::doGeometry()
 	}
 }
 
-void CImageGrid::setStride(int stride)
+void ImageGrid::setStride(int stride)
 {
 	m_stride = stride;
 }
 
-void CImageGrid::initGrid()
+void ImageGrid::initGrid()
 {
 	int i, j, k, l;
 	double gridSum1, gridSum2, gridSumDiag;
@@ -355,23 +357,23 @@ void CImageGrid::initGrid()
 	}
 }
 
-void CImageGrid::getGridSize(int &rows, int &cols)
+void ImageGrid::getGridSize(int &rows, int &cols)
 {
 	rows = m_rows;
 	cols = m_cols;
 }
 
-ivf2d::Image* CImageGrid::getImage()
+ivf2d::Image* ImageGrid::getImage()
 {
 	return m_image.get();
 }
 
-int CImageGrid::getStride()
+int ImageGrid::getStride()
 {
 	return m_stride;
 }
 
-double CImageGrid::getGridValue(int row, int col, int element)
+double ImageGrid::getGridValue(int row, int col, int element)
 {
 	if (m_grid!=nullptr)
 	{
@@ -384,7 +386,7 @@ double CImageGrid::getGridValue(int row, int col, int element)
 		return 0.0;
 }
 
-bool CImageGrid::isSpecialElement(int row, int col, int element)
+bool ImageGrid::isSpecialElement(int row, int col, int element)
 {
 	if (m_specialElement!=nullptr)
 	{
@@ -397,15 +399,15 @@ bool CImageGrid::isSpecialElement(int row, int col, int element)
 		return false;
 }
 
-CImageGrid::TElementType CImageGrid::getGridElementType(int row, int col)
+ImageGrid::TElementType ImageGrid::getGridElementType(int row, int col)
 {
 	if (((row+col)%2)==0)
-		return CImageGrid::ET_RIGHT_DIAGONAL;
+		return ImageGrid::ET_RIGHT_DIAGONAL;
 	else
-		return CImageGrid::ET_LEFT_DIAGONAL;
+		return ImageGrid::ET_LEFT_DIAGONAL;
 }
 
-void CImageGrid::snapToGrid(int& x, int& y)
+void ImageGrid::snapToGrid(int& x, int& y)
 {
 	int row, col;
 
@@ -416,7 +418,7 @@ void CImageGrid::snapToGrid(int& x, int& y)
 	y = m_stride * row;
 }
 
-void CImageGrid::getElementCoords(int row, int col, int element, double *ex, double *ey)
+void ImageGrid::getElementCoords(int row, int col, int element, double *ex, double *ey)
 {
 	if (m_grid!=nullptr)
 	{
@@ -472,7 +474,7 @@ void CImageGrid::getElementCoords(int row, int col, int element, double *ex, dou
 	}
 }
 
-void CImageGrid::getElementTopo(int row, int col, int element, int *dx, int *dy)
+void ImageGrid::getElementTopo(int row, int col, int element, int *dx, int *dy)
 {
 	//
 	//     ET_RIGHT_DIAGONAL
@@ -566,23 +568,23 @@ void CImageGrid::getElementTopo(int row, int col, int element, int *dx, int *dy)
 	}
 }
 
-void CImageGrid::setMaxIntensity(double maxIntensity)
+void ImageGrid::setMaxIntensity(double maxIntensity)
 {
 	m_maxIntensity = maxIntensity;
 }
 
-void CImageGrid::setGridSize(int rows, int cols)
+void ImageGrid::setGridSize(int rows, int cols)
 {
 	m_rows = rows;
 	m_cols = cols;
 }
 
-void CImageGrid::setUseImage(bool flag)
+void ImageGrid::setUseImage(bool flag)
 {
 	m_useImage = flag;
 }
 
-void CImageGrid::setGridValue(int row, int col, int element, double value)
+void ImageGrid::setGridValue(int row, int col, int element, double value)
 {
 	if (m_grid!=nullptr)
 	{
@@ -591,7 +593,7 @@ void CImageGrid::setGridValue(int row, int col, int element, double value)
 	}
 }
 
-void CImageGrid::setSpecialElement(int row, int col, int element, bool special)
+void ImageGrid::setSpecialElement(int row, int col, int element, bool special)
 {
 	if (m_specialElement!=nullptr)
 	{
@@ -600,8 +602,10 @@ void CImageGrid::setSpecialElement(int row, int col, int element, bool special)
 	}
 }
 
-void CImageGrid::setImageSize(int width, int height)
+void ImageGrid::setImageSize(int width, int height)
 {
 	m_width = width;
 	m_height = height;
 }
+
+} // namespace fp
