@@ -3,12 +3,12 @@
 #include "DrawingProps.h"
 #include "PaintView.h"
 
-void CDrawingProps::cb_btnOk_i(Fl_HoverButton*, void*) {
+void DrawingProps::cb_btnOk_i(Fl_HoverButton*, void*) {
   m_modalResult = MR_OK;
 wndDrawingProps->hide();
 }
-void CDrawingProps::cb_btnOk(Fl_HoverButton* o, void* v) {
-  ((CDrawingProps*)(o->parent()->user_data()))->cb_btnOk_i(o,v);
+void DrawingProps::cb_btnOk(Fl_HoverButton* o, void* v) {
+  ((DrawingProps*)(o->parent()->user_data()))->cb_btnOk_i(o,v);
 }
 
 #include <FL/Fl_Pixmap.H>
@@ -71,29 +71,29 @@ static const char *idata_additional_close[] = {
 };
 static Fl_Pixmap image_additional_close(idata_additional_close);
 
-void CDrawingProps::cb_sldBlendFactor_i(Fl_Value_Slider*, void*) {
+void DrawingProps::cb_sldBlendFactor_i(Fl_Value_Slider*, void*) {
   if (m_view!=NULL)
 {
-	CPaintView* paintView = (CPaintView*)m_view;
+	fp::PaintView* paintView = (fp::PaintView*)m_view;
 	paintView->setBlendFactor((int)sldBlendFactor->value());
 };
 }
-void CDrawingProps::cb_sldBlendFactor(Fl_Value_Slider* o, void* v) {
-  ((CDrawingProps*)(o->parent()->user_data()))->cb_sldBlendFactor_i(o,v);
+void DrawingProps::cb_sldBlendFactor(Fl_Value_Slider* o, void* v) {
+  ((DrawingProps*)(o->parent()->user_data()))->cb_sldBlendFactor_i(o,v);
 }
 
-void CDrawingProps::cb_sldLineWidth_i(Fl_Value_Slider*, void*) {
+void DrawingProps::cb_sldLineWidth_i(Fl_Value_Slider*, void*) {
   if (m_view!=NULL)
 {
-	CPaintView* paintView = (CPaintView*)m_view;
+	fp::PaintView* paintView = (fp::PaintView*)m_view;
 	paintView->setLineWidth((int)sldLineWidth->value());
 };
 }
-void CDrawingProps::cb_sldLineWidth(Fl_Value_Slider* o, void* v) {
-  ((CDrawingProps*)(o->parent()->user_data()))->cb_sldLineWidth_i(o,v);
+void DrawingProps::cb_sldLineWidth(Fl_Value_Slider* o, void* v) {
+  ((DrawingProps*)(o->parent()->user_data()))->cb_sldLineWidth_i(o,v);
 }
 
-CDrawingProps::CDrawingProps() {
+DrawingProps::DrawingProps() {
   { wndDrawingProps = new Fl_Double_Window(184, 73, "Drawing properties");
     wndDrawingProps->box(FL_UP_BOX);
     wndDrawingProps->user_data((void*)(this));
@@ -136,16 +136,16 @@ CDrawingProps::CDrawingProps() {
   } // Fl_Double_Window* wndDrawingProps
 }
 
-CDrawingProps::~CDrawingProps() {
+DrawingProps::~DrawingProps() {
   delete wndDrawingProps;
 }
 
-void CDrawingProps::show() {
+void DrawingProps::show() {
   setSize(wndDrawingProps->w(),btnOk->h()+2);
 
 if (m_view!=NULL)
 {
-	CPaintView* paintView = (CPaintView*) m_view;
+	fp::PaintView* paintView = (fp::PaintView*) m_view;
 	sldBlendFactor->value(paintView->getBlendFactor());
 	sldLineWidth->value(paintView->getLineWidth());
 }
@@ -154,19 +154,19 @@ wndDrawingProps->show();
 //while (wndDrawingProps->visible()) Fl::wait();
 }
 
-void CDrawingProps::setPosition(int x, int y) {
+void DrawingProps::setPosition(int x, int y) {
   wndDrawingProps->position(x, y);
 }
 
-void CDrawingProps::setSize(int width, int height) {
+void DrawingProps::setSize(int width, int height) {
   wndDrawingProps->size_range(0, 0);
 wndDrawingProps->size(width, height);
 }
 
-void CDrawingProps::setView(void* p) {
+void DrawingProps::setView(void* p) {
   m_view = p;
 }
 
-void CDrawingProps::hide() {
+void DrawingProps::hide() {
   wndDrawingProps->hide();
 }

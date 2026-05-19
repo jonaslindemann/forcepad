@@ -44,21 +44,21 @@
 #include "calfem.h"
 
 
-class CGSStatusMessageEvent {
+class GSStatusMessageEvent {
 public:
-	virtual ~CGSStatusMessageEvent() {};
+	virtual ~GSStatusMessageEvent() {};
 	virtual void onStatusMessage(const std::string& message, const int progress) = 0;
 };
 
-class CGSLogMessageEvent {
+class GSLogMessageEvent {
 public:
-	virtual ~CGSLogMessageEvent() {};
+	virtual ~GSLogMessageEvent() {};
 	virtual void onLogMessage(const std::string& context, const std::string& message) = 0;
 };
 
-class CGSContinueCalcEvent {
+class GSContinueCalcEvent {
 public:
-	virtual ~CGSContinueCalcEvent() {};
+	virtual ~GSContinueCalcEvent() {};
 	virtual bool onContinueCalc() = 0;
 };
 
@@ -141,9 +141,9 @@ private:
 	bool m_rminInPixels;
 
 
-	CGSStatusMessageEvent* m_statusMessageEvent;
-	CGSLogMessageEvent* m_logMessageEvent;
-	CGSContinueCalcEvent* m_continueCalcEvent;
+	GSStatusMessageEvent* m_statusMessageEvent;
+	GSLogMessageEvent* m_logMessageEvent;
+	GSContinueCalcEvent* m_continueCalcEvent;
 public:
 	/** FemInternalSolver class constructor. */
 	FemGridSolver2();
@@ -254,9 +254,9 @@ public:
 	void setOptFilterType(TFilterType filterType);
 	TFilterType getOptFilterType();
 
-	void setStatusMessageEvent(CGSStatusMessageEvent* eventMethod);
-	void setLogMessageEvent(CGSLogMessageEvent* eventMethod);
-	void setContinueCalcEvent(CGSContinueCalcEvent* eventMethod);
+	void setStatusMessageEvent(GSStatusMessageEvent* eventMethod);
+	void setLogMessageEvent(GSLogMessageEvent* eventMethod);
+	void setContinueCalcEvent(GSContinueCalcEvent* eventMethod);
 };
 
 } // namespace fp

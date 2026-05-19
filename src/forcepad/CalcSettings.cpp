@@ -3,22 +3,22 @@
 #include "CalcSettings.h"
 #include "FlPaintView.h"
 
-void CCalcSettings::cb_cancelButton_i(Fl_Button*, void*) {
+void CalcSettings::cb_cancelButton_i(Fl_Button*, void*) {
   mainWindow->hide();
 }
-void CCalcSettings::cb_cancelButton(Fl_Button* o, void* v) {
-  ((CCalcSettings*)(o->parent()->user_data()))->cb_cancelButton_i(o,v);
+void CalcSettings::cb_cancelButton(Fl_Button* o, void* v) {
+  ((CalcSettings*)(o->parent()->user_data()))->cb_cancelButton_i(o,v);
 }
 
-void CCalcSettings::cb_okButton_i(Fl_Button*, void*) {
+void CalcSettings::cb_okButton_i(Fl_Button*, void*) {
   this->getData();
 mainWindow->hide();
 }
-void CCalcSettings::cb_okButton(Fl_Button* o, void* v) {
-  ((CCalcSettings*)(o->parent()->user_data()))->cb_okButton_i(o,v);
+void CalcSettings::cb_okButton(Fl_Button* o, void* v) {
+  ((CalcSettings*)(o->parent()->user_data()))->cb_okButton_i(o,v);
 }
 
-CCalcSettings::CCalcSettings() {
+CalcSettings::CalcSettings() {
   { mainWindow = new Fl_Double_Window(318, 244, "Calculation Settings");
     mainWindow->color(FL_FOREGROUND_COLOR);
     mainWindow->user_data((void*)(this));
@@ -160,20 +160,20 @@ CCalcSettings::CCalcSettings() {
   m_paintView = NULL;
 }
 
-void CCalcSettings::show() {
+void CalcSettings::show() {
   this->setData();
   mainWindow->show();
   while (mainWindow->visible()) Fl::wait();
 }
 
-void CCalcSettings::setView(void* view) {
-  m_paintView = (CFlPaintView*)view;
+void CalcSettings::setView(void* view) {
+  m_paintView = (FlPaintView*)view;
 }
 
-void CCalcSettings::setData() {
+void CalcSettings::setData() {
   if (m_paintView!=NULL)
   {
-  	CFlPaintView* view = (CFlPaintView*)m_paintView;
+  	FlPaintView* view = (FlPaintView*)m_paintView;
   	elasticModulus->value(view->getElasticModulus());
   	stiffnessScaleFactor->value(view->getStiffnessScaleFactor());
   	youngsModulus->value(view->getYoungsModulus());
@@ -188,10 +188,10 @@ void CCalcSettings::setData() {
   }
 }
 
-void CCalcSettings::getData() {
+void CalcSettings::getData() {
   if (m_paintView!=NULL)
   {
-  	CFlPaintView* view = (CFlPaintView*)m_paintView;
+  	FlPaintView* view = (FlPaintView*)m_paintView;
   	
   	view->setElasticModulus(elasticModulus->value());
   	view->setStiffnessScaleFactor(stiffnessScaleFactor->value());
@@ -208,6 +208,6 @@ void CCalcSettings::getData() {
   }
 }
 
-void CCalcSettings::centerWindow(Fl_Window* window) {
+void CalcSettings::centerWindow(Fl_Window* window) {
   mainWindow->position(window->x()+window->w()/2-mainWindow->w()/2, window->y()+window->h()/2-mainWindow->h()/2);
 }

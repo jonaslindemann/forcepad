@@ -7,7 +7,7 @@
 
 #include "PaintView.h"
 
-class QtPaintView : public QOpenGLWidget, public CPaintView {
+class QtPaintView : public QOpenGLWidget, public fp::PaintView {
     Q_OBJECT
 public:
     explicit QtPaintView(QWidget *parent = nullptr);
@@ -19,8 +19,8 @@ public:
     void reinitGL();  // Re-runs onInitContext() after canvas resize, then repaints
 
 Q_SIGNALS:
-    void editModeChanged(CPaintView::TEditMode newMode);
-    void viewModeChanged(CPaintView::TViewMode newMode);
+    void editModeChanged(fp::PaintView::TEditMode newMode);
+    void viewModeChanged(fp::PaintView::TViewMode newMode);
     void modelLoaded();
     void newModelCreated();
 
@@ -35,7 +35,7 @@ protected:
     void wheelEvent(QWheelEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
 
-    // CPaintView virtual UI bridge
+    // fp::PaintView virtual UI bridge
     int height() override;
     int width() override;
     int physicalWidth() override;

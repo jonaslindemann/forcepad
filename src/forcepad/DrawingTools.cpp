@@ -3,12 +3,12 @@
 #include "DrawingTools.h"
 #include "PaintView.h"
 
-inline void CDrawingTools::cb_btnOk_i(Fl_HoverButton*, void*) {
+inline void DrawingTools::cb_btnOk_i(Fl_HoverButton*, void*) {
   m_modalResult = MR_OK;
 wndBrushProps->hide();
 }
-void CDrawingTools::cb_btnOk(Fl_HoverButton* o, void* v) {
-  ((CDrawingTools*)(o->parent()->user_data()))->cb_btnOk_i(o,v);
+void DrawingTools::cb_btnOk(Fl_HoverButton* o, void* v) {
+  ((DrawingTools*)(o->parent()->user_data()))->cb_btnOk_i(o,v);
 }
 
 #include <FL/Fl_Pixmap.H>
@@ -71,16 +71,16 @@ static const char *idata_additional_close[] = {
 };
 static Fl_Pixmap image_additional_close(idata_additional_close);
 
-inline void CDrawingTools::cb_btnRectangle_i(Fl_HoverButton*, void*) {
+inline void DrawingTools::cb_btnRectangle_i(Fl_HoverButton*, void*) {
   if (m_view!=NULL)
 {
-	CPaintView* paintView = (CPaintView*) m_view;
-	paintView->setEditMode(CPaintView::EM_RECTANGLE);
+	fp::PaintView* paintView = (fp::PaintView*) m_view;
+	paintView->setEditMode(fp::PaintView::EM_RECTANGLE);
 }
 wndBrushProps->hide();
 }
-void CDrawingTools::cb_btnRectangle(Fl_HoverButton* o, void* v) {
-  ((CDrawingTools*)(o->parent()->user_data()))->cb_btnRectangle_i(o,v);
+void DrawingTools::cb_btnRectangle(Fl_HoverButton* o, void* v) {
+  ((DrawingTools*)(o->parent()->user_data()))->cb_btnRectangle_i(o,v);
 }
 
 static const char *idata_rectangle[] = {
@@ -229,16 +229,16 @@ static const char *idata_rectangle[] = {
 };
 static Fl_Pixmap image_rectangle(idata_rectangle);
 
-inline void CDrawingTools::cb_btnEllipse_i(Fl_HoverButton*, void*) {
+inline void DrawingTools::cb_btnEllipse_i(Fl_HoverButton*, void*) {
   if (m_view!=NULL)
 {
-	CPaintView* paintView = (CPaintView*) m_view;
-	paintView->setEditMode(CPaintView::EM_ELLIPSE);
+	fp::PaintView* paintView = (fp::PaintView*) m_view;
+	paintView->setEditMode(fp::PaintView::EM_ELLIPSE);
 }
 wndBrushProps->hide();
 }
-void CDrawingTools::cb_btnEllipse(Fl_HoverButton* o, void* v) {
-  ((CDrawingTools*)(o->parent()->user_data()))->cb_btnEllipse_i(o,v);
+void DrawingTools::cb_btnEllipse(Fl_HoverButton* o, void* v) {
+  ((DrawingTools*)(o->parent()->user_data()))->cb_btnEllipse_i(o,v);
 }
 
 static const char *idata_ellipse[] = {
@@ -464,16 +464,16 @@ static const char *idata_ellipse[] = {
 };
 static Fl_Pixmap image_ellipse(idata_ellipse);
 
-inline void CDrawingTools::cb_btnLine_i(Fl_HoverButton*, void*) {
+inline void DrawingTools::cb_btnLine_i(Fl_HoverButton*, void*) {
   if (m_view!=NULL)
 {
-	CPaintView* paintView = (CPaintView*) m_view;
-	paintView->setEditMode(CPaintView::EM_LINE);
+	fp::PaintView* paintView = (fp::PaintView*) m_view;
+	paintView->setEditMode(fp::PaintView::EM_LINE);
 }
 wndBrushProps->hide();
 }
-void CDrawingTools::cb_btnLine(Fl_HoverButton* o, void* v) {
-  ((CDrawingTools*)(o->parent()->user_data()))->cb_btnLine_i(o,v);
+void DrawingTools::cb_btnLine(Fl_HoverButton* o, void* v) {
+  ((DrawingTools*)(o->parent()->user_data()))->cb_btnLine_i(o,v);
 }
 
 static const char *idata_line[] = {
@@ -642,7 +642,7 @@ static const char *idata_line[] = {
 };
 static Fl_Pixmap image_line(idata_line);
 
-CDrawingTools::CDrawingTools() {
+DrawingTools::DrawingTools() {
   Fl_Double_Window* w;
   { Fl_Double_Window* o = wndBrushProps = new Fl_Double_Window(143, 103, "Brush properties");
     w = o;
@@ -711,30 +711,30 @@ CDrawingTools::CDrawingTools() {
   m_view = NULL;
 }
 
-CDrawingTools::~CDrawingTools() {
+DrawingTools::~DrawingTools() {
   delete wndBrushProps;
 }
 
-void CDrawingTools::show() {
+void DrawingTools::show() {
   setSize(wndBrushProps->w(),btnOk->h()+4);
 
 wndBrushProps->show();
 //while (wndBrushProps->visible()) Fl::wait();
 }
 
-void CDrawingTools::setPosition(int x, int y) {
+void DrawingTools::setPosition(int x, int y) {
   wndBrushProps->position(x, y);
 }
 
-void CDrawingTools::setSize(int width, int height) {
+void DrawingTools::setSize(int width, int height) {
   wndBrushProps->size_range(0, 0);
 wndBrushProps->size(width, height);
 }
 
-void CDrawingTools::setView(void* p) {
+void DrawingTools::setView(void* p) {
   m_view = p;
 }
 
-void CDrawingTools::hide() {
+void DrawingTools::hide() {
   wndBrushProps->hide();
 }

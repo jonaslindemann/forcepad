@@ -29,16 +29,16 @@
 #include <FL/Fl_Progress.H>
 #include <FL/Fl_Button.H>
 
-class CMainFrame : CPVModeChangeEvent, CPVViewModeChangeEvent, CGSStatusMessageEvent, CGSLogMessageEvent, CGSContinueCalcEvent, CPVViewModeErrorEvent, CPVModelChangedEvent, CPVRulerChangedEvent, CPVVisualisationModeChangedEvent, CPVModelLoadedEvent, CPVNewModelEvent {
+class MainFrame : fp::PVModeChangeEvent, fp::PVViewModeChangeEvent, GSStatusMessageEvent, GSLogMessageEvent, GSContinueCalcEvent, fp::PVViewModeErrorEvent, fp::PVModelChangedEvent, fp::PVRulerChangedEvent, fp::PVVisualisationModeChangedEvent, fp::PVModelLoadedEvent, fp::PVNewModelEvent {
   bool m_continueCalc; 
-  CPaintView::TEditMode m_saveEditMode; 
-  CPaintView::TEditMode m_sketchEditMode; 
-  CPaintView::TEditMode m_physicsEditMode; 
-  CTabletToolbar* m_tabletToolbar; 
-  CVizMixerToolbar* m_vizMixer; 
-  COptSettings* m_optSettings; 
+  fp::PaintView::TEditMode m_saveEditMode; 
+  fp::PaintView::TEditMode m_sketchEditMode; 
+  fp::PaintView::TEditMode m_physicsEditMode; 
+  TabletToolbar* m_tabletToolbar; 
+  VizMixerToolbar* m_vizMixer; 
+  OptSettings* m_optSettings; 
 public:
-  CMainFrame();
+  MainFrame();
   Fl_Double_Window *wndMain;
   Fl_Sys_Menu_Bar *mainMenu;
   static Fl_Menu_Item menu_mainMenu[];
@@ -177,7 +177,7 @@ private:
   static void cb_btnOptLayer(Fl_HoverButton*, void*);
 public:
   Fl_Group *paintGroup;
-  CFlPaintView *paintView;
+  FlPaintView *paintView;
   Fl_Scroll *scrLeftResultToolbar;
   Fl_HoverButton *btnStress;
 private:
@@ -578,7 +578,7 @@ private:
   inline void cb_transferViewToImage_i(Fl_HoverButton*, void*);
   static void cb_transferViewToImage(Fl_HoverButton*, void*);
 public:
-  ~CMainFrame();
+  ~MainFrame();
   bool onContinueCalc();
   void show();
   void close();
@@ -589,20 +589,20 @@ public:
   void setPixelWeight(double weight);
   void setExternalForce(double force);
   void setCommandLine(int argc, char **argv);
-  void onModeChange(CPaintView::TEditMode oldMode, CPaintView::TEditMode newMode);
-  void onViewModeChange(CPaintView::TViewMode oldMode, CPaintView::TViewMode newMode);
+  void onModeChange(fp::PaintView::TEditMode oldMode, fp::PaintView::TEditMode newMode);
+  void onViewModeChange(fp::PaintView::TViewMode oldMode, fp::PaintView::TViewMode newMode);
   void onStatusMessage(const std::string& message, const int progress);
   void onLogMessage(const std::string& context, const std::string& message);
   void hideLeftToolbars();
   void hideRightToolbars();
   void showLeftToolbar(Fl_Widget* toolbar);
   void showRightToolbar(Fl_Widget* toolbar);
-  void onViewModeError(CPaintView::TViewMode oldMode, CPaintView::TViewMode newMode);
+  void onViewModeError(fp::PaintView::TViewMode oldMode, fp::PaintView::TViewMode newMode);
   void centerWindow(Fl_Window* window);
   Fl_Window* getMainWindow();
   void onModelChanged(const std::string& newModelName);
   void onRulerChanged(fp::Ruler* ruler);
-  void onVisualisationModeChanged(CPaintView::TVisualisationMode oldMode, CPaintView::TVisualisationMode newMode);
+  void onVisualisationModeChanged(fp::PaintView::TVisualisationMode oldMode, fp::PaintView::TVisualisationMode newMode);
   void disableUserInterface();
   void enableUserInterface();
   void onNewModel();

@@ -57,7 +57,7 @@ int
 main(int argc, char **argv)
 {
     std::string applicationExecutable = argv[0];
-    CPlatformInfoPtr platformInfo = CPlatformInfo::getInstance();
+    PlatformInfoPtr platformInfo = PlatformInfo::getInstance();
     platformInfo->setApplicationExecutable(applicationExecutable);
     
 	//
@@ -90,7 +90,7 @@ main(int argc, char **argv)
 	// Create main window
 	//
 
-	CMainFrame* frame = new CMainFrame();
+	MainFrame* frame = new MainFrame();
 	frame->setCommandLine(argc, argv);
 	frame->show();
 
@@ -99,7 +99,7 @@ main(int argc, char **argv)
 	//
 
 	
-	CSplashFrame* splash = new CSplashFrame();
+	SplashFrame* splash = new SplashFrame();
 	splash->setTimer(true);
 	splash->centerWindow(frame->getMainWindow());
 	splash->show();

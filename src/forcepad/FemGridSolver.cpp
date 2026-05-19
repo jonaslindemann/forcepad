@@ -34,13 +34,13 @@
 #include <set>
 #include <fstream>
 
-CFemGridSolver::CFemGridSolver()
+FemGridSolver::FemGridSolver()
 {
-	so_print("CFemGridSolver","Constructed.");
+	so_print("FemGridSolver","Constructed.");
 	m_maxNodeValue = -1.0e300;
 	m_maxStressValue = -1.0e300;
 	m_maxMisesStressValue = -1.0e300;
-	m_errorStatus = CFemGridSolver::ET_NO_ERROR;
+	m_errorStatus = FemGridSolver::ET_NO_ERROR;
 	m_elementTreshold = 1.0e-5;
 	m_forceMagnitude = 1.0;
 	m_weight = 0.0;
@@ -60,12 +60,12 @@ CFemGridSolver::CFemGridSolver()
 	m_logMessageEvent = NULL;
 }
 
-CFemGridSolver::~CFemGridSolver()
+FemGridSolver::~FemGridSolver()
 {
-	so_print("CFemGridSolver","Destroyed.");
+	so_print("FemGridSolver","Destroyed.");
 }
 
-void CFemGridSolver::progressMessage(const std::string message, const int progress)
+void FemGridSolver::progressMessage(const std::string message, const int progress)
 {
 	if (m_statusMessageEvent!=NULL)
 	{
@@ -73,7 +73,7 @@ void CFemGridSolver::progressMessage(const std::string message, const int progre
 	}
 }
 
-void CFemGridSolver::logMessage(const std::string context, const std::string message)
+void FemGridSolver::logMessage(const std::string context, const std::string message)
 {
 	if (m_logMessageEvent!=NULL)
 	{
@@ -81,32 +81,32 @@ void CFemGridSolver::logMessage(const std::string context, const std::string mes
 	}
 }
 
-CFemGridSolver::TErrorType CFemGridSolver::getLastError()
+FemGridSolver::TErrorType FemGridSolver::getLastError()
 {
 	return m_errorStatus;
 }
 
-void CFemGridSolver::setFemGrid(fp::FemGrid *femGrid)
+void FemGridSolver::setFemGrid(fp::FemGrid *femGrid)
 {
 	m_femGrid = femGrid;
 }
 
-fp::FemGrid* CFemGridSolver::getFemGrid()
+fp::FemGrid* FemGridSolver::getFemGrid()
 {
 	return m_femGrid;
 }
 
-double CFemGridSolver::getMaxStressValue()
+double FemGridSolver::getMaxStressValue()
 {
 	return m_maxStressValue;
 }
 
-double CFemGridSolver::getMaxNodeValue()
+double FemGridSolver::getMaxNodeValue()
 {
 	return m_maxNodeValue;
 }
 
-void CFemGridSolver::execute()
+void FemGridSolver::execute()
 {
 	int i, j, k, l;
 	int rows, cols;
@@ -127,7 +127,7 @@ void CFemGridSolver::execute()
 	// Reset error status
 	//
 
-	m_errorStatus = CFemGridSolver::ET_NO_ERROR;
+	m_errorStatus = FemGridSolver::ET_NO_ERROR;
 
 	//
 	// Apply hinge constraints directly to stiffness grid
@@ -164,7 +164,7 @@ void CFemGridSolver::execute()
 
 	m_femGrid->getGridSize(rows, cols);
 
-	logMessage("CFemGridSolver","Enumerating dofs and calculating bandwidth.");
+	logMessage("FemGridSolver","Enumerating dofs and calculating bandwidth.");
 
 	m_femGrid->resetDofs();
 	m_nDof =  m_femGrid->enumerateDofs(ED_LEFT_RIGHT);
@@ -183,8 +183,8 @@ void CFemGridSolver::execute()
 	else
 		maxBandwidth = bwBottomTop;
 
-    //so_print("CFemGridSolver",so_format("Total dofs = %d",m_nDof));
-    //so_print("CFemGridSolver",so_format("Bandwidth  = %d",maxBandwidth));
+    //so_print("FemGridSolver",so_format("Total dofs = %d",m_nDof));
+    //so_print("FemGridSolver",so_format("Bandwidth  = %d",maxBandwidth));
 	
 	if (m_nDof==0)
 	{
@@ -342,7 +342,7 @@ void CFemGridSolver::execute()
 		cf.close();
 	}
 
-    //so_print("CFemGridSolver",so_format("%d elements assembled.",nElements));
+    //so_print("FemGridSolver",so_format("%d elements assembled.",nElements));
 
 	///////////////////////////////////////////////////////////////////////////
 	// Scale load vector for body weight
@@ -350,7 +350,7 @@ void CFemGridSolver::execute()
 
 	if (m_useWeight)
 	{
-		so_print("CFemGridSolver","Applying weight.");
+		so_print("FemGridSolver","Applying weight.");
 		
 		double Fsum = 0.0;
 		
@@ -365,7 +365,7 @@ void CFemGridSolver::execute()
 	// Setup load vector
 	///////////////////////////////////////////////////////////////////////////
 
-	so_print("CFemGridSolver","Defining load vector.");
+	so_print("FemGridSolver","Defining load vector.");
 
 	progressMessage("Defining load vector.", 30);
 
@@ -394,7 +394,7 @@ void CFemGridSolver::execute()
 
 		if (dofs[0]>0)
 		{
-            //so_print("CFemGridSolver",so_format("\tLoad found at [ %g, %g ], dofs = [ %d, %d ]",x, y, dofs[0], dofs[1]));
+            //so_print("FemGridSolver",so_format("\tLoad found at [ %g, %g ], dofs = [ %d, %d ]",x, y, dofs[0], dofs[1]));
 
 			m_f(dofs[0]) += vx*value*m_forceMagnitude;
 			m_f(dofs[1]) += vy*value*m_forceMagnitude;
@@ -418,7 +418,7 @@ void CFemGridSolver::execute()
 	// Define constraints
 	//
 
-	so_print("CFemGridSolver","Defining constraints.");
+	so_print("FemGridSolver","Defining constraints.");
 	progressMessage("Setting up boundary conditions.", 40);
 
 	if (m_femGrid->getPointConstraintsSize()==0)
@@ -448,7 +448,7 @@ void CFemGridSolver::execute()
 
 		if (dofs[0]>0)
 		{
-            //so_print("CFemGridSolver",so_format("\tConstraint found at [ %g, %g ], dofs = [ %d, %d ]",x, y, dofs[0], dofs[1]));
+            //so_print("FemGridSolver",so_format("\tConstraint found at [ %g, %g ], dofs = [ %d, %d ]",x, y, dofs[0], dofs[1]));
 
 			switch (pointConstraint->getConstraintType()) {
 			case fp::Constraint::CT_XY:
@@ -529,7 +529,7 @@ void CFemGridSolver::execute()
 	// Remove doubly defined dofs
 	//
 
-	so_print("CFemGridSolver","\tUnique dofs:\n");
+	so_print("FemGridSolver","\tUnique dofs:\n");
 
 	Matrix Bc(uniqueDofs.size(),2);
 	Bc = 0.0;
@@ -538,7 +538,7 @@ void CFemGridSolver::execute()
 	for (si=uniqueDofs.begin(); si!=uniqueDofs.end(); si++)
 	{
 		int dof = (*si);
-        //so_print("CFemGridSolver",so_format("\t%d",dof));
+        //so_print("FemGridSolver",so_format("\t%d",dof));
 		
 		Bc(bcCount,1) = dof;
 		Bc(bcCount,2) = prescribedValues[dof];
@@ -566,7 +566,7 @@ void CFemGridSolver::execute()
 		// WARNING!! routine does not handle prescribed displacements!=0.0
 		//
 
-		so_print("CFemGridSolver","Removing boundary conditions from system matrix.");
+		so_print("FemGridSolver","Removing boundary conditions from system matrix.");
 		progressMessage("Removing bc:s from system matrix.", 50);
 
 
@@ -575,19 +575,19 @@ void CFemGridSolver::execute()
 
 		nVars = K.Nrows() - Bc.Nrows();
 
-        //so_print("CFemGridSolver",so_format("\tFree variables = %d",nVars));
+        //so_print("FemGridSolver",so_format("\tFree variables = %d",nVars));
 
 		if (maxBandwidth>nVars)
 			maxBandwidth = nVars;
 
-		so_print("CFemGridSolver","\tCreating reduced system matrix.");
+		so_print("FemGridSolver","\tCreating reduced system matrix.");
 		Ksys.ReSize(nVars,maxBandwidth);
 
 		fsys.ReSize(K.Nrows()-Bc.Nrows(),1);
 		gdof.ReSize(K.Nrows() - Bc.Nrows(),1);
 		ldof.ReSize(K.Nrows(),1);
 
-		so_print("CFemGridSolver","\tZeroing matrices.");
+		so_print("FemGridSolver","\tZeroing matrices.");
 		Ksys = 0.0;
 		fsys = 0.0;
 		gdof = 0.0;
@@ -596,7 +596,7 @@ void CFemGridSolver::execute()
 		int row = 1;
 		int col = 1;
 
-		so_print("CFemGridSolver","\tCopying K into Ksys.");
+		so_print("FemGridSolver","\tCopying K into Ksys.");
 		for (i=1; i<=K.Nrows(); i++)
 		{
 			if (Idx(i)<1.0)
@@ -623,7 +623,7 @@ void CFemGridSolver::execute()
 			}
 		}
 
-		so_print("CFemGridSolver","\tRemoving K.");
+		so_print("FemGridSolver","\tRemoving K.");
 		K.CleanUp();
 	}
 
@@ -636,7 +636,7 @@ void CFemGridSolver::execute()
 		m_a.ReSize(nVars,1);
 		m_a = 0.0;
 
-		so_print("CFemGridSolver","Solving reduced system.");
+		so_print("FemGridSolver","Solving reduced system.");
 		progressMessage("Solving.", 60);
 
 		Try 
@@ -650,14 +650,14 @@ void CFemGridSolver::execute()
 			return;
 		}
 
-		so_print("CFemGridSolver","Done.");
+		so_print("FemGridSolver","Done.");
 	}
 	else
 	{
 		m_a.ReSize(m_nDof,1);
 		m_a = 0.0;
 
-		so_print("CFemGridSolver","Solving system.");
+		so_print("FemGridSolver","Solving system.");
 		progressMessage("Solving.", 60);
 
 		Try 
@@ -671,16 +671,16 @@ void CFemGridSolver::execute()
 			return;
 		}
 
-		so_print("CFemGridSolver","Done.");
+		so_print("FemGridSolver","Done.");
 	}
 
-	so_print("CFemGridSolver","Calculating results.");
+	so_print("FemGridSolver","Calculating results.");
 
 	//
 	// Create global displacement vector
 	//
 
-	so_print("CFemGridSolver","\tCreating global displacement vector.");
+	so_print("FemGridSolver","\tCreating global displacement vector.");
 
 	progressMessage("Storing results.", 80);
 
@@ -727,7 +727,7 @@ void CFemGridSolver::execute()
 	m_maxPosStressValue = -1.0e300;
 	m_maxNegStressValue = -1.0e300;
 
-	so_print("CFemGridSolver:","\tCalculating element forces.");
+	so_print("FemGridSolver:","\tCalculating element forces.");
 
 	for (i=0; i<rows; i++)
 	{
@@ -967,7 +967,7 @@ void CFemGridSolver::execute()
 
 }
 
-void CFemGridSolver::executeUpdate()
+void FemGridSolver::executeUpdate()
 {
 	int i, j, k, l;
 	int rows, cols;
@@ -1402,92 +1402,92 @@ void CFemGridSolver::executeUpdate()
 	m_femGrid->setMaxMisesStressValue(m_maxMisesStressValue);
 }
 
-void CFemGridSolver::setElementTreshold(double treshold)
+void FemGridSolver::setElementTreshold(double treshold)
 {
 	m_elementTreshold = treshold;
 }
 
-double CFemGridSolver::getMaxPosStressValue()
+double FemGridSolver::getMaxPosStressValue()
 {
 	return m_maxPosStressValue;
 }
 
-double CFemGridSolver::getMaxNegStressValue()
+double FemGridSolver::getMaxNegStressValue()
 {
 	return m_maxNegStressValue;
 }
 
-int CFemGridSolver::getDofs()
+int FemGridSolver::getDofs()
 {
 	return m_femGrid->enumerateDofs(ED_BOTTOM_TOP);
 }
 
-void CFemGridSolver::setWeight(double weight)
+void FemGridSolver::setWeight(double weight)
 {
 	m_weight = weight;
 }
 
-void CFemGridSolver::setForceMagnitude(double value)
+void FemGridSolver::setForceMagnitude(double value)
 {
 	m_forceMagnitude = value;
 }
 
-void CFemGridSolver::setUseWeight(bool flag)
+void FemGridSolver::setUseWeight(bool flag)
 {
 	m_useWeight = flag;
 }
 
-void CFemGridSolver::setOutputMatlab(bool flag)
+void FemGridSolver::setOutputMatlab(bool flag)
 {
 	m_outputMatlab = flag;
 }
 
-void CFemGridSolver::setMatlabFilename(const char *name)
+void FemGridSolver::setMatlabFilename(const char *name)
 {
 	m_matlabFilename = name;
 }
 
-void CFemGridSolver::setStiffnessScalefactor(const double scalefactor)
+void FemGridSolver::setStiffnessScalefactor(const double scalefactor)
 {
 	m_stiffnessScalefactor = scalefactor;
 }
 
-double CFemGridSolver::getStiffnessScalefactor()
+double FemGridSolver::getStiffnessScalefactor()
 {
 	return m_stiffnessScalefactor;
 }
 
-void CFemGridSolver::setElasticModulus(double elasticModulus)
+void FemGridSolver::setElasticModulus(double elasticModulus)
 {
 	m_elasticModulus = elasticModulus;
 }
 
-void CFemGridSolver::setThickness(double thickness)
+void FemGridSolver::setThickness(double thickness)
 {
 	m_thickness = thickness;
 }
 
-void CFemGridSolver::setYoungsModulus(double youngsModulus)
+void FemGridSolver::setYoungsModulus(double youngsModulus)
 {
 	m_youngsModulus = youngsModulus;
 }
 
-void CFemGridSolver::setConstraintStiffnessScale(double scale)
+void FemGridSolver::setConstraintStiffnessScale(double scale)
 {
 	m_constraintStiffnessScale = scale;
 }
 
-double CFemGridSolver::getConstraintStiffnessScale()
+double FemGridSolver::getConstraintStiffnessScale()
 {
 	return m_constraintStiffnessScale;
 }
 
-void CFemGridSolver::setStatusMessageEvent(CGSStatusMessageEvent* eventMethod)
+void FemGridSolver::setStatusMessageEvent(GSStatusMessageEvent* eventMethod)
 {
 	m_statusMessageEvent = eventMethod;
 }
 
-void CFemGridSolver::setLogMessageEvent(CGSLogMessageEvent* eventMethod)
+void FemGridSolver::setLogMessageEvent(GSLogMessageEvent* eventMethod)
 {
 	m_logMessageEvent = eventMethod;
 }

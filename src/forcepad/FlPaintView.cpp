@@ -17,54 +17,54 @@
 
 using namespace std;
 
-CFlPaintView::CFlPaintView(int x,int y,int w,int h,const char *l)
-: Fl_Gl_Window(x,y,w,h,l), CPaintView(x, y, w, h, l)
+FlPaintView::FlPaintView(int x,int y,int w,int h,const char *l)
+: Fl_Gl_Window(x,y,w,h,l), fp::PaintView(x, y, w, h, l)
 {
-    //so_print("CFlPaintView","CPaintView(...)");
+    //so_print("FlPaintView","fp::PaintView(...)");
     
     this->doCreateCursors();
 }
 
-CFlPaintView::~CFlPaintView()
+FlPaintView::~FlPaintView()
 {
     
 }
 
 /////////////////////////////////////////////////////////////
-// CPaintView FLTK overrides
+// fp::PaintView FLTK overrides
 /////////////////////////////////////////////////////////////
 
-int CFlPaintView::height()
+int FlPaintView::height()
 {
     return this->h();
 }
 
-int CFlPaintView::width()
+int FlPaintView::width()
 {
     return this->w();
 }
 
-void CFlPaintView::doRedraw()
+void FlPaintView::doRedraw()
 {
     this->redraw();
 }
 
-void CFlPaintView::doFlush()
+void FlPaintView::doFlush()
 {
     this->flush();
 }
 
-void CFlPaintView::doInvalidate()
+void FlPaintView::doInvalidate()
 {
     this->invalidate();
 }
 
-void CFlPaintView::doMakeCurrent()
+void FlPaintView::doMakeCurrent()
 {
     this->make_current();
 }
 
-void CFlPaintView::doCreateCursors()
+void FlPaintView::doCreateCursors()
 {
 #ifndef __APPLE__
     int i;
@@ -93,7 +93,7 @@ void CFlPaintView::doCreateCursors()
 #endif
 }
 
-void CFlPaintView::doUpdateCursor(TEditMode mode)
+void FlPaintView::doUpdateCursor(TEditMode mode)
 {
 #ifndef __APPLE__
     switch (mode) {
@@ -139,7 +139,7 @@ void CFlPaintView::doUpdateCursor(TEditMode mode)
 #endif
 }
 
-void CFlPaintView::doDeleteCursors()
+void FlPaintView::doDeleteCursors()
 {
 #ifndef __APPLE__
     int i;
@@ -149,7 +149,7 @@ void CFlPaintView::doDeleteCursors()
 #endif
 }
 
-void CFlPaintView::draw()
+void FlPaintView::draw()
 {
     // Clear screen
     
@@ -169,7 +169,7 @@ void CFlPaintView::draw()
 }
 
 
-int CFlPaintView::handle(int event)
+int FlPaintView::handle(int event)
 {
     //
     // Overridden FLTK handle method for capturing
@@ -253,7 +253,7 @@ int CFlPaintView::handle(int event)
     return Fl_Gl_Window::handle(event);
 }
 
-const std::string CFlPaintView::doSaveDialog(const string title, const string filter, const string defaultFilename)
+const std::string FlPaintView::doSaveDialog(const string title, const string filter, const string defaultFilename)
 {
 #ifdef NATIVE_FS
     // Create native chooser
@@ -283,7 +283,7 @@ const std::string CFlPaintView::doSaveDialog(const string title, const string fi
     return fname;
 }
 
-bool CFlPaintView::doNewModel(int &width, int &height, int& initialStiffness)
+bool FlPaintView::doNewModel(int &width, int &height, int& initialStiffness)
 {
     NewModelDlg* dlg = new NewModelDlg();
     dlg->setSize(640, 480);
@@ -305,17 +305,17 @@ bool CFlPaintView::doNewModel(int &width, int &height, int& initialStiffness)
     }
 }
 
-void CFlPaintView::doInfoMessage(const string message)
+void FlPaintView::doInfoMessage(const string message)
 {
     fl_message(message.c_str());
 }
 
-bool CFlPaintView::doAskYesNo(const string question)
+bool FlPaintView::doAskYesNo(const string question)
 {
     return fl_ask(question.c_str());
 }
 
-const std::string CFlPaintView::doOpenDialog(const string title, const string filter)
+const std::string FlPaintView::doOpenDialog(const string title, const string filter)
 {
 #ifdef NATIVE_FS
     // Create native chooser
@@ -353,14 +353,14 @@ const std::string CFlPaintView::doOpenDialog(const string title, const string fi
     return fname;
 }
 
-void CFlPaintView::doShowAbout()
+void FlPaintView::doShowAbout()
 {
 #ifdef WIN32
     ShellExecute(0, "open", "https://structarch.org/forcepad/documentation/", NULL, NULL, SW_SHOWNORMAL);
 #endif
 }
 
-void CFlPaintView::doShowHelp()
+void FlPaintView::doShowHelp()
 {
 #ifdef WIN32
 #ifdef FORCEPAD_KIOSK

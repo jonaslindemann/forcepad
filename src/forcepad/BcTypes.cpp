@@ -74,9 +74,9 @@ static Fl_Pixmap image_additional_close(idata_additional_close);
 inline void CBcTypes::cb_btnBcX_i(Fl_HoverButton*, void*) {
   if (m_view!=NULL)
 {
-	CPaintView* paintView = (CPaintView*) m_view;
+	fp::PaintView* paintView = (fp::PaintView*) m_view;
 	paintView->setConstraintType(fp::Constraint::CT_X);
-	paintView->setEditMode(CPaintView::EM_CONSTRAINT);
+	paintView->setEditMode(fp::PaintView::EM_CONSTRAINT);
 }
 wnd->hide();
 }
@@ -224,9 +224,9 @@ static Fl_Pixmap image_bcx(idata_bcx);
 inline void CBcTypes::cb_btnBcY_i(Fl_HoverButton*, void*) {
   if (m_view!=NULL)
 {
-	CPaintView* paintView = (CPaintView*) m_view;
+	fp::PaintView* paintView = (fp::PaintView*) m_view;
 	paintView->setConstraintType(fp::Constraint::CT_Y);
-	paintView->setEditMode(CPaintView::EM_CONSTRAINT);
+	paintView->setEditMode(fp::PaintView::EM_CONSTRAINT);
 }
 wnd->hide();
 }
@@ -387,9 +387,9 @@ static Fl_Pixmap image_bcy(idata_bcy);
 inline void CBcTypes::cb_btnBcXY_i(Fl_HoverButton*, void*) {
   if (m_view!=NULL)
 {
-	CPaintView* paintView = (CPaintView*) m_view;
+	fp::PaintView* paintView = (fp::PaintView*) m_view;
 	paintView->setConstraintType(fp::Constraint::CT_XY);
-	paintView->setEditMode(CPaintView::EM_CONSTRAINT);
+	paintView->setEditMode(fp::PaintView::EM_CONSTRAINT);
 }
 wnd->hide();
 }

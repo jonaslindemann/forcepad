@@ -12,15 +12,15 @@
 #include <FL/x.H>
 #endif
 
-void CTabletToolbar::cb_btnOpen_i(Fl_HoverButton*, void*) {
+void TabletToolbar::cb_btnOpen_i(Fl_HoverButton*, void*) {
   if (m_paintView!=NULL)
 {
-	CFlPaintView* view = (CFlPaintView*)m_paintView;
+	FlPaintView* view = (FlPaintView*)m_paintView;
 	view->openModel();
 };
 }
-void CTabletToolbar::cb_btnOpen(Fl_HoverButton* o, void* v) {
-  ((CTabletToolbar*)(o->parent()->user_data()))->cb_btnOpen_i(o,v);
+void TabletToolbar::cb_btnOpen(Fl_HoverButton* o, void* v) {
+  ((TabletToolbar*)(o->parent()->user_data()))->cb_btnOpen_i(o,v);
 }
 
 #include <FL/Fl_Pixmap.H>
@@ -324,15 +324,15 @@ static Fl_Image *image_open_black() {
   return image;
 }
 
-void CTabletToolbar::cb_btnNew_i(Fl_HoverButton*, void*) {
+void TabletToolbar::cb_btnNew_i(Fl_HoverButton*, void*) {
   if (m_paintView!=NULL)
 {
-	CFlPaintView* view = (CFlPaintView*)m_paintView;
+	FlPaintView* view = (FlPaintView*)m_paintView;
 	view->newModel();
 };
 }
-void CTabletToolbar::cb_btnNew(Fl_HoverButton* o, void* v) {
-  ((CTabletToolbar*)(o->parent()->user_data()))->cb_btnNew_i(o,v);
+void TabletToolbar::cb_btnNew(Fl_HoverButton* o, void* v) {
+  ((TabletToolbar*)(o->parent()->user_data()))->cb_btnNew_i(o,v);
 }
 
 static const char *idata_new_model_black[] = {
@@ -635,15 +635,15 @@ static Fl_Image *image_new_model_black() {
   return image;
 }
 
-void CTabletToolbar::cb_btnSaveAs_i(Fl_HoverButton*, void*) {
+void TabletToolbar::cb_btnSaveAs_i(Fl_HoverButton*, void*) {
   if (m_paintView!=NULL)
 {
-	CFlPaintView* view = (CFlPaintView*)m_paintView;
+	FlPaintView* view = (FlPaintView*)m_paintView;
 	view->saveModelAs();
 };
 }
-void CTabletToolbar::cb_btnSaveAs(Fl_HoverButton* o, void* v) {
-  ((CTabletToolbar*)(o->parent()->user_data()))->cb_btnSaveAs_i(o,v);
+void TabletToolbar::cb_btnSaveAs(Fl_HoverButton* o, void* v) {
+  ((TabletToolbar*)(o->parent()->user_data()))->cb_btnSaveAs_i(o,v);
 }
 
 static const char *idata_save_black[] = {
@@ -946,15 +946,15 @@ static Fl_Image *image_save_black() {
   return image;
 }
 
-void CTabletToolbar::cb_btnUndo_i(Fl_HoverButton*, void*) {
+void TabletToolbar::cb_btnUndo_i(Fl_HoverButton*, void*) {
   if (m_paintView!=NULL)
 {
-	CFlPaintView* view = (CFlPaintView*)m_paintView;
+	FlPaintView* view = (FlPaintView*)m_paintView;
 	view->undo();
 };
 }
-void CTabletToolbar::cb_btnUndo(Fl_HoverButton* o, void* v) {
-  ((CTabletToolbar*)(o->parent()->user_data()))->cb_btnUndo_i(o,v);
+void TabletToolbar::cb_btnUndo(Fl_HoverButton* o, void* v) {
+  ((TabletToolbar*)(o->parent()->user_data()))->cb_btnUndo_i(o,v);
 }
 
 static const char *idata_undo_black[] = {
@@ -1257,21 +1257,21 @@ static Fl_Image *image_undo_black() {
   return image;
 }
 
-void CTabletToolbar::cb_btnSettings_i(Fl_HoverButton*, void*) {
+void TabletToolbar::cb_btnSettings_i(Fl_HoverButton*, void*) {
   if (m_paintView!=NULL)
 {
-	CFlPaintView* view = (CFlPaintView*)m_paintView;
+	FlPaintView* view = (FlPaintView*)m_paintView;
 	
-	CCalcSettings* calcSettings = new CCalcSettings();
+	CalcSettings* calcSettings = new CalcSettings();
 	calcSettings->setView(view);
 	calcSettings->centerWindow(mainWindow);
 	calcSettings->show();
 	delete calcSettings;
-	view->setViewMode(CPaintView::VM_SKETCH);
+	view->setViewMode(fp::PaintView::VM_SKETCH);
 };
 }
-void CTabletToolbar::cb_btnSettings(Fl_HoverButton* o, void* v) {
-  ((CTabletToolbar*)(o->parent()->user_data()))->cb_btnSettings_i(o,v);
+void TabletToolbar::cb_btnSettings(Fl_HoverButton* o, void* v) {
+  ((TabletToolbar*)(o->parent()->user_data()))->cb_btnSettings_i(o,v);
 }
 
 static const char *idata_settings_black[] = {
@@ -1574,7 +1574,7 @@ static Fl_Image *image_settings_black() {
   return image;
 }
 
-CTabletToolbar::CTabletToolbar() {
+TabletToolbar::TabletToolbar() {
   { mainWindow = new Fl_Double_Window(232, 49, "Tablet Toolbar");
     mainWindow->color(FL_FOREGROUND_COLOR);
     mainWindow->user_data((void*)(this));
@@ -1654,8 +1654,8 @@ CTabletToolbar::CTabletToolbar() {
   m_paintView = NULL;
 }
 
-void CTabletToolbar::show() {
-  CPlatformInfoPtr platformInfo = CPlatformInfo::getInstance();
+void TabletToolbar::show() {
+  PlatformInfoPtr platformInfo = PlatformInfo::getInstance();
   
   mainWindow->show();
   
@@ -1669,18 +1669,18 @@ void CTabletToolbar::show() {
   #endif
 }
 
-void CTabletToolbar::setView(void* view) {
+void TabletToolbar::setView(void* view) {
   m_paintView = view;
 }
 
-void CTabletToolbar::centerWindow(Fl_Window* window) {
+void TabletToolbar::centerWindow(Fl_Window* window) {
   mainWindow->position(window->x()+window->w()/2-mainWindow->w()/2, window->y()+window->h()/2-mainWindow->h()/2);
 }
 
-void CTabletToolbar::placeWindow(Fl_Window* window) {
+void TabletToolbar::placeWindow(Fl_Window* window) {
   mainWindow->position(window->x()+window->w()-mainWindow->w()-100, window->y()+window->h()-mainWindow->h()-100);
 }
 
-void CTabletToolbar::hide() {
+void TabletToolbar::hide() {
   mainWindow->hide();
 }

@@ -10,11 +10,11 @@
 #include <FL/Fl_Value_Slider.H>
 #include <FL/Fl_Light_Button.H>
 
-class CCalcProps {
+class CalcProps {
   void* m_view;
   int m_modalResult;
 public:
-  CCalcProps();
+  CalcProps();
   Fl_Double_Window *wndCalcProps;
   Fl_HoverButton *btnOk;
 private:
@@ -31,7 +31,7 @@ private:
   inline void cb_chkUseWeight_i(Fl_Light_Button*, void*);
   static void cb_chkUseWeight(Fl_Light_Button*, void*);
 public:
-  ~CCalcProps();
+  ~CalcProps();
   void show();
   void setPosition(int x, int y);
   void setSize(int width, int height);

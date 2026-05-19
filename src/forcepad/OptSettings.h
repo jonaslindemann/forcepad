@@ -9,10 +9,10 @@
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Round_Button.H>
 
-class COptSettings {
+class OptSettings {
   void* m_paintView; 
 public:
-  COptSettings();
+  OptSettings();
   Fl_Double_Window *mainWindow;
   Fl_Button *cancelButton;
 private:
@@ -31,7 +31,7 @@ public:
   Fl_Round_Button *noFilter;
   Fl_Round_Button *sigmundFilter;
   Fl_Round_Button *backPedersenFilter;
-  ~COptSettings();
+  ~OptSettings();
   void show();
   void setView(void* view);
   void setData();

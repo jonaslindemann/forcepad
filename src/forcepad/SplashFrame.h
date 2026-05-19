@@ -9,10 +9,10 @@ void cbHide(void* w);
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Output.H>
 
-class CSplashFrame {
+class SplashFrame {
   bool m_timer; 
 public:
-  CSplashFrame();
+  SplashFrame();
   Fl_Double_Window *wndSplash;
   Fl_Box *boxImage;
   Fl_Button *btnClose;
@@ -25,7 +25,7 @@ public:
   void center();
   void setTimer(bool flag);
   void hide();
-  virtual ~CSplashFrame();
+  virtual ~SplashFrame();
   void showModal();
   void centerWindow(Fl_Window* window);
 };

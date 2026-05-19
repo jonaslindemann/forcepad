@@ -222,7 +222,7 @@ MainWindow::MainWindow(QWidget *parent)
 // CPV event callbacks
 // ---------------------------------------------------------------------------
 
-void MainWindow::onModeChange(CPaintView::TEditMode /*oldMode*/, CPaintView::TEditMode newMode)
+void MainWindow::onModeChange(fp::PaintView::TEditMode /*oldMode*/, fp::PaintView::TEditMode newMode)
 {
     const char *names[] = {
         "Brush", "Direct Brush", "Erase", "Direct Erase",
@@ -236,19 +236,19 @@ void MainWindow::onModeChange(CPaintView::TEditMode /*oldMode*/, CPaintView::TEd
         m_statusMode->setText(QString("  Tool: %1").arg(names[idx]));
 
     // Leaving paste mode re-enables copy/cut; entering select mode does too
-    if (newMode != CPaintView::EM_PASTE) {
+    if (newMode != fp::PaintView::EM_PASTE) {
         m_actCopy->setEnabled(true);
         m_actCut->setEnabled(true);
     }
 }
 
-void MainWindow::onViewModeChange(CPaintView::TViewMode /*oldMode*/, CPaintView::TViewMode newMode)
+void MainWindow::onViewModeChange(fp::PaintView::TViewMode /*oldMode*/, fp::PaintView::TViewMode newMode)
 {
     switch (newMode)
     {
-        case CPaintView::VM_SKETCH:  m_statusModel->setText("View: Sketch  ");  break;
-        case CPaintView::VM_PHYSICS: m_statusModel->setText("View: Physics  "); break;
-        case CPaintView::VM_ACTION:  m_statusModel->setText("View: Action  ");  break;
+        case fp::PaintView::VM_SKETCH:  m_statusModel->setText("View: Sketch  ");  break;
+        case fp::PaintView::VM_PHYSICS: m_statusModel->setText("View: Physics  "); break;
+        case fp::PaintView::VM_ACTION:  m_statusModel->setText("View: Action  ");  break;
     }
 }
 
@@ -289,20 +289,20 @@ void MainWindow::editCut()
 
 void MainWindow::editPaste()
 {
-    m_paintView->setEditMode(CPaintView::EM_PASTE);
+    m_paintView->setEditMode(fp::PaintView::EM_PASTE);
     m_actCopy->setEnabled(false);
     m_actCut->setEnabled(false);
 }
 
 void MainWindow::runCalculate()
 {
-    m_paintView->setViewMode(CPaintView::VM_PHYSICS);
+    m_paintView->setViewMode(fp::PaintView::VM_PHYSICS);
     m_paintView->execute();
 }
 
 void MainWindow::runOptimise()
 {
-    m_paintView->setViewMode(CPaintView::VM_ACTION);
+    m_paintView->setViewMode(fp::PaintView::VM_ACTION);
     m_paintView->executeOpt();
 }
 
@@ -319,17 +319,17 @@ void MainWindow::onModeTabChanged(int index)
         case 0:
             m_paintView->setZoomResults(false);
             if (m_btnZoom) m_btnZoom->setChecked(false);
-            m_paintView->setViewMode(CPaintView::VM_SKETCH);
-            m_paintView->setEditMode(CPaintView::EM_DIRECT_BRUSH);
+            m_paintView->setViewMode(fp::PaintView::VM_SKETCH);
+            m_paintView->setEditMode(fp::PaintView::EM_DIRECT_BRUSH);
             break;
         case 1:
             m_paintView->setZoomResults(false);
             if (m_btnZoom) m_btnZoom->setChecked(false);
-            m_paintView->setViewMode(CPaintView::VM_PHYSICS);
-            m_paintView->setEditMode(CPaintView::EM_SELECT_BOX);
+            m_paintView->setViewMode(fp::PaintView::VM_PHYSICS);
+            m_paintView->setEditMode(fp::PaintView::EM_SELECT_BOX);
             break;
         case 2:
-            m_paintView->setViewMode(CPaintView::VM_PHYSICS);
+            m_paintView->setViewMode(fp::PaintView::VM_PHYSICS);
             m_paintView->execute();
             showPrincipalStress();
             setModeRotateLoad();
@@ -341,33 +341,33 @@ void MainWindow::onModeTabChanged(int index)
 // Slots — sketch tools
 // ---------------------------------------------------------------------------
 
-void MainWindow::setModeSelect()    { m_paintView->setEditMode(CPaintView::EM_SELECT_BOX); }
-void MainWindow::setModeDrawBeam()  { m_paintView->setEditMode(CPaintView::EM_DIRECT_BRUSH); }
-void MainWindow::setModeRectangle() { m_paintView->setEditMode(CPaintView::EM_RECTANGLE); }
+void MainWindow::setModeSelect()    { m_paintView->setEditMode(fp::PaintView::EM_SELECT_BOX); }
+void MainWindow::setModeDrawBeam()  { m_paintView->setEditMode(fp::PaintView::EM_DIRECT_BRUSH); }
+void MainWindow::setModeRectangle() { m_paintView->setEditMode(fp::PaintView::EM_RECTANGLE); }
 void MainWindow::setModeEllipse()
 {
-    m_paintView->setEditMode(CPaintView::EM_ELLIPSE);
+    m_paintView->setEditMode(fp::PaintView::EM_ELLIPSE);
 }
-void MainWindow::setModeFloodFill() { m_paintView->setEditMode(CPaintView::EM_FLOODFILL); }
-void MainWindow::setModeLine()      { m_paintView->setEditMode(CPaintView::EM_LINE); }
-void MainWindow::setModeErase()     { m_paintView->setEditMode(CPaintView::EM_DIRECT_ERASE); }
+void MainWindow::setModeFloodFill() { m_paintView->setEditMode(fp::PaintView::EM_FLOODFILL); }
+void MainWindow::setModeLine()      { m_paintView->setEditMode(fp::PaintView::EM_LINE); }
+void MainWindow::setModeErase()     { m_paintView->setEditMode(fp::PaintView::EM_DIRECT_ERASE); }
 
 // ---------------------------------------------------------------------------
 // Slots — physicks tools
 // ---------------------------------------------------------------------------
 
-void MainWindow::setModeForce()         { m_paintView->setEditMode(CPaintView::EM_FORCE); }
-void MainWindow::setModePinSupport()    { m_paintView->setEditMode(CPaintView::EM_CONSTRAINT); }
-void MainWindow::setModeRollerSupport() { m_paintView->setEditMode(CPaintView::EM_CONSTRAINT_VECTOR); }
-void MainWindow::setModeHinge()         { m_paintView->setEditMode(CPaintView::EM_CONSTRAINT_HINGE); }
+void MainWindow::setModeForce()         { m_paintView->setEditMode(fp::PaintView::EM_FORCE); }
+void MainWindow::setModePinSupport()    { m_paintView->setEditMode(fp::PaintView::EM_CONSTRAINT); }
+void MainWindow::setModeRollerSupport() { m_paintView->setEditMode(fp::PaintView::EM_CONSTRAINT_VECTOR); }
+void MainWindow::setModeHinge()         { m_paintView->setEditMode(fp::PaintView::EM_CONSTRAINT_HINGE); }
 void MainWindow::setModeCut()
 {
-    m_paintView->setEditMode(CPaintView::EM_ERASE_CONSTRAINTS_FORCES);
+    m_paintView->setEditMode(fp::PaintView::EM_ERASE_CONSTRAINTS_FORCES);
 }
 
 void MainWindow::setModeEraseForcesConstraints()
 {
-    m_paintView->setEditMode(CPaintView::EM_ERASE_CONSTRAINTS_FORCES);
+    m_paintView->setEditMode(fp::PaintView::EM_ERASE_CONSTRAINTS_FORCES);
 }
 
 void MainWindow::toggleSelfLoad()
@@ -398,7 +398,7 @@ void MainWindow::setActionModeButton(QToolButton *active)
 void MainWindow::showPrincipalStress()
 {
     setVisButton(m_btnVisPrincipal);
-    m_paintView->setVisualisationMode(CPaintView::VM_PRINCIPAL_STRESS);
+    m_paintView->setVisualisationMode(fp::PaintView::VM_PRINCIPAL_STRESS);
     if (m_actionPropsStack)
         m_actionPropsStack->setCurrentIndex(0);
     m_paintView->update();
@@ -408,7 +408,7 @@ void MainWindow::showPrincipalStress()
 void MainWindow::showStress()
 {
     setVisButton(m_btnVisMises);
-    m_paintView->setVisualisationMode(CPaintView::VM_MISES_STRESS);
+    m_paintView->setVisualisationMode(fp::PaintView::VM_MISES_STRESS);
     if (m_actionPropsStack)
         m_actionPropsStack->setCurrentIndex(1);
     m_paintView->update();
@@ -418,7 +418,7 @@ void MainWindow::showStress()
 void MainWindow::showDisplacement()
 {
     setVisButton(m_btnVisDisp);
-    m_paintView->setVisualisationMode(CPaintView::VM_DISPLACEMENTS);
+    m_paintView->setVisualisationMode(fp::PaintView::VM_DISPLACEMENTS);
     if (m_actionPropsStack)
         m_actionPropsStack->setCurrentIndex(2);
     m_paintView->update();
@@ -428,7 +428,7 @@ void MainWindow::showDisplacement()
 void MainWindow::showStructure()
 {
     setVisButton(m_btnVisStruct);
-    m_paintView->setVisualisationMode(CPaintView::VM_STRUCTURE);
+    m_paintView->setVisualisationMode(fp::PaintView::VM_STRUCTURE);
     if (m_actionPropsStack)
         m_actionPropsStack->setCurrentIndex(0);
     m_paintView->update();
@@ -438,14 +438,14 @@ void MainWindow::showStructure()
 void MainWindow::setModeMoveLoad()
 {
     setActionModeButton(m_btnMoveLoad);
-    m_paintView->setEditMode(CPaintView::EM_DYNAMIC_FORCE_UPDATE);
+    m_paintView->setEditMode(fp::PaintView::EM_DYNAMIC_FORCE_UPDATE);
     m_paintView->setMoveLoad(true);
 }
 
 void MainWindow::setModeRotateLoad()
 {
     setActionModeButton(m_btnRotateLoad);
-    m_paintView->setEditMode(CPaintView::EM_DYNAMIC_FORCE_UPDATE);
+    m_paintView->setEditMode(fp::PaintView::EM_DYNAMIC_FORCE_UPDATE);
     m_paintView->setMoveLoad(false);
 }
 
@@ -529,9 +529,9 @@ void MainWindow::onDisplacementScaleChanged(int value)
 // Legacy view slots
 // ---------------------------------------------------------------------------
 
-void MainWindow::setViewSketch()  { m_paintView->setViewMode(CPaintView::VM_SKETCH); }
-void MainWindow::setViewPhysics() { m_paintView->setViewMode(CPaintView::VM_PHYSICS); }
-void MainWindow::setViewAction()  { m_paintView->setViewMode(CPaintView::VM_ACTION); }
+void MainWindow::setViewSketch()  { m_paintView->setViewMode(fp::PaintView::VM_SKETCH); }
+void MainWindow::setViewPhysics() { m_paintView->setViewMode(fp::PaintView::VM_PHYSICS); }
+void MainWindow::setViewAction()  { m_paintView->setViewMode(fp::PaintView::VM_ACTION); }
 
 // ---------------------------------------------------------------------------
 // Slots — Settings menu

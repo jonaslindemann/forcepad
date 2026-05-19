@@ -21,134 +21,134 @@ static void mainWindowCB(Fl_Widget* w, void* v) {
   while( Fl::first_window() ) Fl::first_window()->hide();
 }
 
-void CMainFrame::cb_fileMenuNew_i(Fl_Menu_*, void*) {
+void MainFrame::cb_fileMenuNew_i(Fl_Menu_*, void*) {
   paintView->newModel();
 }
-void CMainFrame::cb_fileMenuNew(Fl_Menu_* o, void* v) {
-  ((CMainFrame*)(o->parent()->user_data()))->cb_fileMenuNew_i(o,v);
+void MainFrame::cb_fileMenuNew(Fl_Menu_* o, void* v) {
+  ((MainFrame*)(o->parent()->user_data()))->cb_fileMenuNew_i(o,v);
 }
 
-void CMainFrame::cb_fileMenuOpen_i(Fl_Menu_*, void*) {
+void MainFrame::cb_fileMenuOpen_i(Fl_Menu_*, void*) {
   paintView->openModel();
 if (paintView->getUseWeight())
 	btnUseWeight->value(1);
 else
 	btnUseWeight->value(0);
 }
-void CMainFrame::cb_fileMenuOpen(Fl_Menu_* o, void* v) {
-  ((CMainFrame*)(o->parent()->user_data()))->cb_fileMenuOpen_i(o,v);
+void MainFrame::cb_fileMenuOpen(Fl_Menu_* o, void* v) {
+  ((MainFrame*)(o->parent()->user_data()))->cb_fileMenuOpen_i(o,v);
 }
 
-void CMainFrame::cb_fileMenuSave_i(Fl_Menu_*, void*) {
+void MainFrame::cb_fileMenuSave_i(Fl_Menu_*, void*) {
   paintView->saveModel();
 }
-void CMainFrame::cb_fileMenuSave(Fl_Menu_* o, void* v) {
-  ((CMainFrame*)(o->parent()->user_data()))->cb_fileMenuSave_i(o,v);
+void MainFrame::cb_fileMenuSave(Fl_Menu_* o, void* v) {
+  ((MainFrame*)(o->parent()->user_data()))->cb_fileMenuSave_i(o,v);
 }
 
-void CMainFrame::cb_fileMenuSaveAs_i(Fl_Menu_*, void*) {
+void MainFrame::cb_fileMenuSaveAs_i(Fl_Menu_*, void*) {
   paintView->saveModelAs();
 }
-void CMainFrame::cb_fileMenuSaveAs(Fl_Menu_* o, void* v) {
-  ((CMainFrame*)(o->parent()->user_data()))->cb_fileMenuSaveAs_i(o,v);
+void MainFrame::cb_fileMenuSaveAs(Fl_Menu_* o, void* v) {
+  ((MainFrame*)(o->parent()->user_data()))->cb_fileMenuSaveAs_i(o,v);
 }
 
-void CMainFrame::cb_fileMenuExit_i(Fl_Menu_*, void*) {
+void MainFrame::cb_fileMenuExit_i(Fl_Menu_*, void*) {
   m_tabletToolbar->hide();
 wndMain->hide();
 this->close();
 }
-void CMainFrame::cb_fileMenuExit(Fl_Menu_* o, void* v) {
-  ((CMainFrame*)(o->parent()->user_data()))->cb_fileMenuExit_i(o,v);
+void MainFrame::cb_fileMenuExit(Fl_Menu_* o, void* v) {
+  ((MainFrame*)(o->parent()->user_data()))->cb_fileMenuExit_i(o,v);
 }
 
-void CMainFrame::cb_editMenuUndo_i(Fl_Menu_*, void*) {
+void MainFrame::cb_editMenuUndo_i(Fl_Menu_*, void*) {
   paintView->undo();
 }
-void CMainFrame::cb_editMenuUndo(Fl_Menu_* o, void* v) {
-  ((CMainFrame*)(o->parent()->user_data()))->cb_editMenuUndo_i(o,v);
+void MainFrame::cb_editMenuUndo(Fl_Menu_* o, void* v) {
+  ((MainFrame*)(o->parent()->user_data()))->cb_editMenuUndo_i(o,v);
 }
 
-void CMainFrame::cb_editMenuCut_i(Fl_Menu_*, void*) {
+void MainFrame::cb_editMenuCut_i(Fl_Menu_*, void*) {
   paintView->cut();
 editMenuPaste->activate();
 }
-void CMainFrame::cb_editMenuCut(Fl_Menu_* o, void* v) {
-  ((CMainFrame*)(o->parent()->user_data()))->cb_editMenuCut_i(o,v);
+void MainFrame::cb_editMenuCut(Fl_Menu_* o, void* v) {
+  ((MainFrame*)(o->parent()->user_data()))->cb_editMenuCut_i(o,v);
 }
 
-void CMainFrame::cb_editMenuCopy_i(Fl_Menu_*, void*) {
+void MainFrame::cb_editMenuCopy_i(Fl_Menu_*, void*) {
   paintView->copy();
 editMenuPaste->activate();
 }
-void CMainFrame::cb_editMenuCopy(Fl_Menu_* o, void* v) {
-  ((CMainFrame*)(o->parent()->user_data()))->cb_editMenuCopy_i(o,v);
+void MainFrame::cb_editMenuCopy(Fl_Menu_* o, void* v) {
+  ((MainFrame*)(o->parent()->user_data()))->cb_editMenuCopy_i(o,v);
 }
 
-void CMainFrame::cb_editMenuPaste_i(Fl_Menu_*, void*) {
-  paintView->setEditMode(CPaintView::EM_PASTE);
+void MainFrame::cb_editMenuPaste_i(Fl_Menu_*, void*) {
+  paintView->setEditMode(fp::PaintView::EM_PASTE);
 editMenuCut->deactivate();
 editMenuCopy->deactivate();
 }
-void CMainFrame::cb_editMenuPaste(Fl_Menu_* o, void* v) {
-  ((CMainFrame*)(o->parent()->user_data()))->cb_editMenuPaste_i(o,v);
+void MainFrame::cb_editMenuPaste(Fl_Menu_* o, void* v) {
+  ((MainFrame*)(o->parent()->user_data()))->cb_editMenuPaste_i(o,v);
 }
 
-void CMainFrame::cb_viewMenuZoomIn_i(Fl_Menu_*, void*) {
+void MainFrame::cb_viewMenuZoomIn_i(Fl_Menu_*, void*) {
   paintView->zoomIn();
 }
-void CMainFrame::cb_viewMenuZoomIn(Fl_Menu_* o, void* v) {
-  ((CMainFrame*)(o->parent()->user_data()))->cb_viewMenuZoomIn_i(o,v);
+void MainFrame::cb_viewMenuZoomIn(Fl_Menu_* o, void* v) {
+  ((MainFrame*)(o->parent()->user_data()))->cb_viewMenuZoomIn_i(o,v);
 }
 
-void CMainFrame::cb_viewMenuZoomOut_i(Fl_Menu_*, void*) {
+void MainFrame::cb_viewMenuZoomOut_i(Fl_Menu_*, void*) {
   paintView->zoomOut();
 }
-void CMainFrame::cb_viewMenuZoomOut(Fl_Menu_* o, void* v) {
-  ((CMainFrame*)(o->parent()->user_data()))->cb_viewMenuZoomOut_i(o,v);
+void MainFrame::cb_viewMenuZoomOut(Fl_Menu_* o, void* v) {
+  ((MainFrame*)(o->parent()->user_data()))->cb_viewMenuZoomOut_i(o,v);
 }
 
-void CMainFrame::cb_modeMenuSketch_i(Fl_Menu_*, void*) {
-  paintView->setViewMode(CPaintView::VM_SKETCH);
+void MainFrame::cb_modeMenuSketch_i(Fl_Menu_*, void*) {
+  paintView->setViewMode(fp::PaintView::VM_SKETCH);
 }
-void CMainFrame::cb_modeMenuSketch(Fl_Menu_* o, void* v) {
-  ((CMainFrame*)(o->parent()->user_data()))->cb_modeMenuSketch_i(o,v);
-}
-
-void CMainFrame::cb_modeMenuPhysics_i(Fl_Menu_*, void*) {
-  paintView->setViewMode(CPaintView::VM_PHYSICS);
-}
-void CMainFrame::cb_modeMenuPhysics(Fl_Menu_* o, void* v) {
-  ((CMainFrame*)(o->parent()->user_data()))->cb_modeMenuPhysics_i(o,v);
+void MainFrame::cb_modeMenuSketch(Fl_Menu_* o, void* v) {
+  ((MainFrame*)(o->parent()->user_data()))->cb_modeMenuSketch_i(o,v);
 }
 
-void CMainFrame::cb_modeMenuAction_i(Fl_Menu_*, void*) {
-  paintView->setViewMode(CPaintView::VM_ACTION);
+void MainFrame::cb_modeMenuPhysics_i(Fl_Menu_*, void*) {
+  paintView->setViewMode(fp::PaintView::VM_PHYSICS);
 }
-void CMainFrame::cb_modeMenuAction(Fl_Menu_* o, void* v) {
-  ((CMainFrame*)(o->parent()->user_data()))->cb_modeMenuAction_i(o,v);
+void MainFrame::cb_modeMenuPhysics(Fl_Menu_* o, void* v) {
+  ((MainFrame*)(o->parent()->user_data()))->cb_modeMenuPhysics_i(o,v);
 }
 
-void CMainFrame::cb_settingsMenuCalculation_i(Fl_Menu_*, void*) {
-  CCalcSettings* calcSettings = new CCalcSettings();
+void MainFrame::cb_modeMenuAction_i(Fl_Menu_*, void*) {
+  paintView->setViewMode(fp::PaintView::VM_ACTION);
+}
+void MainFrame::cb_modeMenuAction(Fl_Menu_* o, void* v) {
+  ((MainFrame*)(o->parent()->user_data()))->cb_modeMenuAction_i(o,v);
+}
+
+void MainFrame::cb_settingsMenuCalculation_i(Fl_Menu_*, void*) {
+  CalcSettings* calcSettings = new CalcSettings();
 calcSettings->setView(paintView);
 calcSettings->centerWindow(wndMain);
 calcSettings->show();
 delete calcSettings;
-paintView->setViewMode(CPaintView::VM_SKETCH);
+paintView->setViewMode(fp::PaintView::VM_SKETCH);
 }
-void CMainFrame::cb_settingsMenuCalculation(Fl_Menu_* o, void* v) {
-  ((CMainFrame*)(o->parent()->user_data()))->cb_settingsMenuCalculation_i(o,v);
+void MainFrame::cb_settingsMenuCalculation(Fl_Menu_* o, void* v) {
+  ((MainFrame*)(o->parent()->user_data()))->cb_settingsMenuCalculation_i(o,v);
 }
 
-void CMainFrame::cb_settingsMenuGeneral_i(Fl_Menu_*, void*) {
-  CGeneralSettings* generalSettings = new CGeneralSettings();
+void MainFrame::cb_settingsMenuGeneral_i(Fl_Menu_*, void*) {
+  GeneralSettings* generalSettings = new GeneralSettings();
 generalSettings->setView(paintView);
 generalSettings->centerWindow(wndMain);
 generalSettings->show();
 delete generalSettings;
 
-if (CPlatformInfo::getInstance()->isTabletPC())
+if (PlatformInfo::getInstance()->isTabletPC())
 {
 	m_tabletToolbar->show();
 	m_tabletToolbar->placeWindow(wndMain);
@@ -159,126 +159,126 @@ else
 	btnTabletToolbar->hide();
 };
 }
-void CMainFrame::cb_settingsMenuGeneral(Fl_Menu_* o, void* v) {
-  ((CMainFrame*)(o->parent()->user_data()))->cb_settingsMenuGeneral_i(o,v);
+void MainFrame::cb_settingsMenuGeneral(Fl_Menu_* o, void* v) {
+  ((MainFrame*)(o->parent()->user_data()))->cb_settingsMenuGeneral_i(o,v);
 }
 
-void CMainFrame::cb_settingsMenuSnapToGrid_i(Fl_Menu_*, void*) {
+void MainFrame::cb_settingsMenuSnapToGrid_i(Fl_Menu_*, void*) {
   if (settingsMenuSnapToGrid->value()>0)
 	paintView->setSnapToGrid(true);
 else
 	paintView->setSnapToGrid(false);
 }
-void CMainFrame::cb_settingsMenuSnapToGrid(Fl_Menu_* o, void* v) {
-  ((CMainFrame*)(o->parent()->user_data()))->cb_settingsMenuSnapToGrid_i(o,v);
+void MainFrame::cb_settingsMenuSnapToGrid(Fl_Menu_* o, void* v) {
+  ((MainFrame*)(o->parent()->user_data()))->cb_settingsMenuSnapToGrid_i(o,v);
 }
 
-void CMainFrame::cb_helpMenuContents_i(Fl_Menu_*, void*) {
+void MainFrame::cb_helpMenuContents_i(Fl_Menu_*, void*) {
   paintView->showAbout();
 }
-void CMainFrame::cb_helpMenuContents(Fl_Menu_* o, void* v) {
-  ((CMainFrame*)(o->parent()->user_data()))->cb_helpMenuContents_i(o,v);
+void MainFrame::cb_helpMenuContents(Fl_Menu_* o, void* v) {
+  ((MainFrame*)(o->parent()->user_data()))->cb_helpMenuContents_i(o,v);
 }
 
-void CMainFrame::cb_helpMenuAbout_i(Fl_Menu_*, void*) {
-  CSplashFrame* splashFrame = new CSplashFrame();
+void MainFrame::cb_helpMenuAbout_i(Fl_Menu_*, void*) {
+  SplashFrame* splashFrame = new SplashFrame();
 splashFrame->centerWindow(wndMain);
 splashFrame->showModal();
 delete splashFrame;
 }
-void CMainFrame::cb_helpMenuAbout(Fl_Menu_* o, void* v) {
-  ((CMainFrame*)(o->parent()->user_data()))->cb_helpMenuAbout_i(o,v);
+void MainFrame::cb_helpMenuAbout(Fl_Menu_* o, void* v) {
+  ((MainFrame*)(o->parent()->user_data()))->cb_helpMenuAbout_i(o,v);
 }
 
-void CMainFrame::cb_helpMenuLog_i(Fl_Menu_*, void*) {
+void MainFrame::cb_helpMenuLog_i(Fl_Menu_*, void*) {
   so_show();
 }
-void CMainFrame::cb_helpMenuLog(Fl_Menu_* o, void* v) {
-  ((CMainFrame*)(o->parent()->user_data()))->cb_helpMenuLog_i(o,v);
+void MainFrame::cb_helpMenuLog(Fl_Menu_* o, void* v) {
+  ((MainFrame*)(o->parent()->user_data()))->cb_helpMenuLog_i(o,v);
 }
 
-Fl_Menu_Item CMainFrame::menu_mainMenu[] = {
+Fl_Menu_Item MainFrame::menu_mainMenu[] = {
  {"&File", 0,  0, 0, 64, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
- {"&New", 0x4006e,  (Fl_Callback*)CMainFrame::cb_fileMenuNew, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
- {"&Open...", 0x4006f,  (Fl_Callback*)CMainFrame::cb_fileMenuOpen, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
- {"&Save.", 0x40073,  (Fl_Callback*)CMainFrame::cb_fileMenuSave, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
- {"S&ave as...", 0x50073,  (Fl_Callback*)CMainFrame::cb_fileMenuSaveAs, 0, 128, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
+ {"&New", 0x4006e,  (Fl_Callback*)MainFrame::cb_fileMenuNew, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
+ {"&Open...", 0x4006f,  (Fl_Callback*)MainFrame::cb_fileMenuOpen, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
+ {"&Save.", 0x40073,  (Fl_Callback*)MainFrame::cb_fileMenuSave, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
+ {"S&ave as...", 0x50073,  (Fl_Callback*)MainFrame::cb_fileMenuSaveAs, 0, 128, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
  {"Save as MATLAB...", 0,  0, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
  {"Save as NumPy...", 0,  0, 0, 128, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
- {"E&xit", 0,  (Fl_Callback*)CMainFrame::cb_fileMenuExit, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
+ {"E&xit", 0,  (Fl_Callback*)MainFrame::cb_fileMenuExit, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
  {0,0,0,0,0,0,0,0,0},
  {"&Edit", 0,  0, 0, 64, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
- {"Undo", 0x4007a,  (Fl_Callback*)CMainFrame::cb_editMenuUndo, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
- {"&Cut", 0x40078,  (Fl_Callback*)CMainFrame::cb_editMenuCut, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
- {"C&opy", 0x40063,  (Fl_Callback*)CMainFrame::cb_editMenuCopy, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
- {"&Paste", 0x40076,  (Fl_Callback*)CMainFrame::cb_editMenuPaste, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
+ {"Undo", 0x4007a,  (Fl_Callback*)MainFrame::cb_editMenuUndo, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
+ {"&Cut", 0x40078,  (Fl_Callback*)MainFrame::cb_editMenuCut, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
+ {"C&opy", 0x40063,  (Fl_Callback*)MainFrame::cb_editMenuCopy, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
+ {"&Paste", 0x40076,  (Fl_Callback*)MainFrame::cb_editMenuPaste, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
  {0,0,0,0,0,0,0,0,0},
  {"&View", 0,  0, 0, 64, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
- {"Zoom In", 0xff55,  (Fl_Callback*)CMainFrame::cb_viewMenuZoomIn, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
- {"Zoom Out", 0xff56,  (Fl_Callback*)CMainFrame::cb_viewMenuZoomOut, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
+ {"Zoom In", 0xff55,  (Fl_Callback*)MainFrame::cb_viewMenuZoomIn, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
+ {"Zoom Out", 0xff56,  (Fl_Callback*)MainFrame::cb_viewMenuZoomOut, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
  {0,0,0,0,0,0,0,0,0},
  {"&Mode", 0,  0, 0, 64, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
- {"Sketch", 0x40031,  (Fl_Callback*)CMainFrame::cb_modeMenuSketch, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
- {"&Physics", 0x40032,  (Fl_Callback*)CMainFrame::cb_modeMenuPhysics, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
- {"&Action", 0x40033,  (Fl_Callback*)CMainFrame::cb_modeMenuAction, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
+ {"Sketch", 0x40031,  (Fl_Callback*)MainFrame::cb_modeMenuSketch, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
+ {"&Physics", 0x40032,  (Fl_Callback*)MainFrame::cb_modeMenuPhysics, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
+ {"&Action", 0x40033,  (Fl_Callback*)MainFrame::cb_modeMenuAction, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
  {0,0,0,0,0,0,0,0,0},
  {"&Settings", 0,  0, 0, 64, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
- {"&Calculation...", 0,  (Fl_Callback*)CMainFrame::cb_settingsMenuCalculation, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
- {"&General...", 0,  (Fl_Callback*)CMainFrame::cb_settingsMenuGeneral, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
- {"&Snap to grid", 0x40067,  (Fl_Callback*)CMainFrame::cb_settingsMenuSnapToGrid, 0, 2, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
+ {"&Calculation...", 0,  (Fl_Callback*)MainFrame::cb_settingsMenuCalculation, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
+ {"&General...", 0,  (Fl_Callback*)MainFrame::cb_settingsMenuGeneral, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
+ {"&Snap to grid", 0x40067,  (Fl_Callback*)MainFrame::cb_settingsMenuSnapToGrid, 0, 2, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
  {0,0,0,0,0,0,0,0,0},
  {"&Help", 0,  0, 0, 64, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
- {"&Documentation", 0,  (Fl_Callback*)CMainFrame::cb_helpMenuContents, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
- {"&About", 0,  (Fl_Callback*)CMainFrame::cb_helpMenuAbout, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
- {"Application &Log", 0,  (Fl_Callback*)CMainFrame::cb_helpMenuLog, 0, 16, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
+ {"&Documentation", 0,  (Fl_Callback*)MainFrame::cb_helpMenuContents, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
+ {"&About", 0,  (Fl_Callback*)MainFrame::cb_helpMenuAbout, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
+ {"Application &Log", 0,  (Fl_Callback*)MainFrame::cb_helpMenuLog, 0, 16, (uchar)FL_NORMAL_LABEL, 0, 12, 0},
  {0,0,0,0,0,0,0,0,0},
  {0,0,0,0,0,0,0,0,0}
 };
-Fl_Menu_Item* CMainFrame::fileMenu = CMainFrame::menu_mainMenu + 0;
-Fl_Menu_Item* CMainFrame::fileMenuNew = CMainFrame::menu_mainMenu + 1;
-Fl_Menu_Item* CMainFrame::fileMenuOpen = CMainFrame::menu_mainMenu + 2;
-Fl_Menu_Item* CMainFrame::fileMenuSave = CMainFrame::menu_mainMenu + 3;
-Fl_Menu_Item* CMainFrame::fileMenuSaveAs = CMainFrame::menu_mainMenu + 4;
-Fl_Menu_Item* CMainFrame::fileMenuSaveMatlab = CMainFrame::menu_mainMenu + 5;
-Fl_Menu_Item* CMainFrame::fileMenuSaveNumPy = CMainFrame::menu_mainMenu + 6;
-Fl_Menu_Item* CMainFrame::fileMenuExit = CMainFrame::menu_mainMenu + 7;
-Fl_Menu_Item* CMainFrame::editMenu = CMainFrame::menu_mainMenu + 9;
-Fl_Menu_Item* CMainFrame::editMenuUndo = CMainFrame::menu_mainMenu + 10;
-Fl_Menu_Item* CMainFrame::editMenuCut = CMainFrame::menu_mainMenu + 11;
-Fl_Menu_Item* CMainFrame::editMenuCopy = CMainFrame::menu_mainMenu + 12;
-Fl_Menu_Item* CMainFrame::editMenuPaste = CMainFrame::menu_mainMenu + 13;
-Fl_Menu_Item* CMainFrame::viewMenu = CMainFrame::menu_mainMenu + 15;
-Fl_Menu_Item* CMainFrame::viewMenuZoomIn = CMainFrame::menu_mainMenu + 16;
-Fl_Menu_Item* CMainFrame::viewMenuZoomOut = CMainFrame::menu_mainMenu + 17;
-Fl_Menu_Item* CMainFrame::modeMenu = CMainFrame::menu_mainMenu + 19;
-Fl_Menu_Item* CMainFrame::modeMenuSketch = CMainFrame::menu_mainMenu + 20;
-Fl_Menu_Item* CMainFrame::modeMenuPhysics = CMainFrame::menu_mainMenu + 21;
-Fl_Menu_Item* CMainFrame::modeMenuAction = CMainFrame::menu_mainMenu + 22;
-Fl_Menu_Item* CMainFrame::settingsMenu = CMainFrame::menu_mainMenu + 24;
-Fl_Menu_Item* CMainFrame::settingsMenuCalculation = CMainFrame::menu_mainMenu + 25;
-Fl_Menu_Item* CMainFrame::settingsMenuGeneral = CMainFrame::menu_mainMenu + 26;
-Fl_Menu_Item* CMainFrame::settingsMenuSnapToGrid = CMainFrame::menu_mainMenu + 27;
-Fl_Menu_Item* CMainFrame::helpMenu = CMainFrame::menu_mainMenu + 29;
-Fl_Menu_Item* CMainFrame::helpMenuContents = CMainFrame::menu_mainMenu + 30;
-Fl_Menu_Item* CMainFrame::helpMenuAbout = CMainFrame::menu_mainMenu + 31;
-Fl_Menu_Item* CMainFrame::helpMenuLog = CMainFrame::menu_mainMenu + 32;
+Fl_Menu_Item* MainFrame::fileMenu = MainFrame::menu_mainMenu + 0;
+Fl_Menu_Item* MainFrame::fileMenuNew = MainFrame::menu_mainMenu + 1;
+Fl_Menu_Item* MainFrame::fileMenuOpen = MainFrame::menu_mainMenu + 2;
+Fl_Menu_Item* MainFrame::fileMenuSave = MainFrame::menu_mainMenu + 3;
+Fl_Menu_Item* MainFrame::fileMenuSaveAs = MainFrame::menu_mainMenu + 4;
+Fl_Menu_Item* MainFrame::fileMenuSaveMatlab = MainFrame::menu_mainMenu + 5;
+Fl_Menu_Item* MainFrame::fileMenuSaveNumPy = MainFrame::menu_mainMenu + 6;
+Fl_Menu_Item* MainFrame::fileMenuExit = MainFrame::menu_mainMenu + 7;
+Fl_Menu_Item* MainFrame::editMenu = MainFrame::menu_mainMenu + 9;
+Fl_Menu_Item* MainFrame::editMenuUndo = MainFrame::menu_mainMenu + 10;
+Fl_Menu_Item* MainFrame::editMenuCut = MainFrame::menu_mainMenu + 11;
+Fl_Menu_Item* MainFrame::editMenuCopy = MainFrame::menu_mainMenu + 12;
+Fl_Menu_Item* MainFrame::editMenuPaste = MainFrame::menu_mainMenu + 13;
+Fl_Menu_Item* MainFrame::viewMenu = MainFrame::menu_mainMenu + 15;
+Fl_Menu_Item* MainFrame::viewMenuZoomIn = MainFrame::menu_mainMenu + 16;
+Fl_Menu_Item* MainFrame::viewMenuZoomOut = MainFrame::menu_mainMenu + 17;
+Fl_Menu_Item* MainFrame::modeMenu = MainFrame::menu_mainMenu + 19;
+Fl_Menu_Item* MainFrame::modeMenuSketch = MainFrame::menu_mainMenu + 20;
+Fl_Menu_Item* MainFrame::modeMenuPhysics = MainFrame::menu_mainMenu + 21;
+Fl_Menu_Item* MainFrame::modeMenuAction = MainFrame::menu_mainMenu + 22;
+Fl_Menu_Item* MainFrame::settingsMenu = MainFrame::menu_mainMenu + 24;
+Fl_Menu_Item* MainFrame::settingsMenuCalculation = MainFrame::menu_mainMenu + 25;
+Fl_Menu_Item* MainFrame::settingsMenuGeneral = MainFrame::menu_mainMenu + 26;
+Fl_Menu_Item* MainFrame::settingsMenuSnapToGrid = MainFrame::menu_mainMenu + 27;
+Fl_Menu_Item* MainFrame::helpMenu = MainFrame::menu_mainMenu + 29;
+Fl_Menu_Item* MainFrame::helpMenuContents = MainFrame::menu_mainMenu + 30;
+Fl_Menu_Item* MainFrame::helpMenuAbout = MainFrame::menu_mainMenu + 31;
+Fl_Menu_Item* MainFrame::helpMenuLog = MainFrame::menu_mainMenu + 32;
 
-void CMainFrame::cb_btnBrushTools_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_btnBrushTools_i(Fl_HoverButton*, void*) {
   showRightToolbar(scrRightDrawToolbar);
 
 // Set edit mode to last value
 
 if (btnSelect->value()==1)
-	paintView->setEditMode(CPaintView::EM_SELECT_BOX);
+	paintView->setEditMode(fp::PaintView::EM_SELECT_BOX);
 if (btnBrush->value()==1)
-	paintView->setEditMode(CPaintView::EM_DIRECT_BRUSH);
+	paintView->setEditMode(fp::PaintView::EM_DIRECT_BRUSH);
 if (btnErase->value()==1)
-	paintView->setEditMode(CPaintView::EM_DIRECT_ERASE);
+	paintView->setEditMode(fp::PaintView::EM_DIRECT_ERASE);
 	
 m_sketchEditMode = paintView->getEditMode();
 }
-void CMainFrame::cb_btnBrushTools(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnBrushTools_i(o,v);
+void MainFrame::cb_btnBrushTools(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnBrushTools_i(o,v);
 }
 
 #include <FL/Fl_Image.H>
@@ -442,13 +442,13 @@ static Fl_Image *image_paint_black() {
   return image;
 }
 
-void CMainFrame::cb_btnFloodFill_i(Fl_HoverButton*, void*) {
-  paintView->setEditMode(CPaintView::EM_FLOODFILL);
+void MainFrame::cb_btnFloodFill_i(Fl_HoverButton*, void*) {
+  paintView->setEditMode(fp::PaintView::EM_FLOODFILL);
 showRightToolbar(scrRightFillToolbar);
 m_sketchEditMode = paintView->getEditMode();
 }
-void CMainFrame::cb_btnFloodFill(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnFloodFill_i(o,v);
+void MainFrame::cb_btnFloodFill(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnFloodFill_i(o,v);
 }
 
 static const unsigned char idata_floodfill_black[] =
@@ -636,7 +636,7 @@ static Fl_Image *image_floodfill_black() {
   return image;
 }
 
-void CMainFrame::cb_btnDrawingTools_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_btnDrawingTools_i(Fl_HoverButton*, void*) {
   // Show drawing tools toolbar
 
 showRightToolbar(scrRightDrawingToolbar);
@@ -644,18 +644,18 @@ showRightToolbar(scrRightDrawingToolbar);
 // Set edit mode to last value
 
 if (btnRectangle->value()==1)
-	paintView->setEditMode(CPaintView::EM_RECTANGLE);
+	paintView->setEditMode(fp::PaintView::EM_RECTANGLE);
 if (btnEllipse->value()==1)
-	paintView->setEditMode(CPaintView::EM_ELLIPSE);
+	paintView->setEditMode(fp::PaintView::EM_ELLIPSE);
 if (btnLine->value()==1)
-	paintView->setEditMode(CPaintView::EM_LINE);
+	paintView->setEditMode(fp::PaintView::EM_LINE);
 if (btnArch->value()==1)
-	paintView->setEditMode(CPaintView::EM_ARCH);
+	paintView->setEditMode(fp::PaintView::EM_ARCH);
 	
 m_sketchEditMode = paintView->getEditMode();
 }
-void CMainFrame::cb_btnDrawingTools(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnDrawingTools_i(o,v);
+void MainFrame::cb_btnDrawingTools(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnDrawingTools_i(o,v);
 }
 
 static const unsigned char idata_drawing_tools_black[] =
@@ -840,16 +840,16 @@ static Fl_Image *image_drawing_tools_black() {
   return image;
 }
 
-void CMainFrame::cb_btnSelectTools_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_btnSelectTools_i(Fl_HoverButton*, void*) {
   showRightToolbar(scrRightSelectToolbar);
 
 if (btnSelect->value()==1)
-	paintView->setEditMode(CPaintView::EM_SELECT_BOX);
+	paintView->setEditMode(fp::PaintView::EM_SELECT_BOX);
 if (btnPaste->value()==1)
-	paintView->setEditMode(CPaintView::EM_PASTE);
+	paintView->setEditMode(fp::PaintView::EM_PASTE);
 }
-void CMainFrame::cb_btnSelectTools(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnSelectTools_i(o,v);
+void MainFrame::cb_btnSelectTools(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnSelectTools_i(o,v);
 }
 
 static const unsigned char idata_select_pointer_black[] =
@@ -1011,11 +1011,11 @@ static Fl_Image *image_select_pointer_black() {
   return image;
 }
 
-void CMainFrame::cb_btnOptLayer_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_btnOptLayer_i(Fl_HoverButton*, void*) {
   paintView->setOptLayer(btnOptLayer->value());
 }
-void CMainFrame::cb_btnOptLayer(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_btnOptLayer_i(o,v);
+void MainFrame::cb_btnOptLayer(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_btnOptLayer_i(o,v);
 }
 
 static const unsigned char idata_no_opt_black_grd[] =
@@ -1145,16 +1145,16 @@ static Fl_Image *image_no_opt_black_grd() {
   return image;
 }
 
-void CMainFrame::cb_btnStress_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_btnStress_i(Fl_HoverButton*, void*) {
   //showRightToolbar(scrRightStressToolbar);
-paintView->setVisualisationMode(CPaintView::VM_PRINCIPAL_STRESS);
+paintView->setVisualisationMode(fp::PaintView::VM_PRINCIPAL_STRESS);
 //paintView->setDrawDisplacements(false);
 //paintView->setStressType(fp::FemGrid2::ST_PRINCIPAL);
 //paintView->setDrawStress(true);
 //paintView->setDrawForcesAndConstraints(true);
 }
-void CMainFrame::cb_btnStress(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnStress_i(o,v);
+void MainFrame::cb_btnStress(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnStress_i(o,v);
 }
 
 static const unsigned char idata_stress2_black[] =
@@ -1296,15 +1296,15 @@ static Fl_Image *image_stress2_black() {
   return image;
 }
 
-void CMainFrame::cb_btnDisplacements_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_btnDisplacements_i(Fl_HoverButton*, void*) {
   //showRightToolbar(scrRightDisplacementToolbar);
-paintView->setVisualisationMode(CPaintView::VM_DISPLACEMENTS);
+paintView->setVisualisationMode(fp::PaintView::VM_DISPLACEMENTS);
 //paintView->setDrawDisplacements(true);
 //paintView->setDrawStress(false);
 //paintView->setDrawForcesAndConstraints(true);
 }
-void CMainFrame::cb_btnDisplacements(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnDisplacements_i(o,v);
+void MainFrame::cb_btnDisplacements(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnDisplacements_i(o,v);
 }
 
 static const unsigned char idata_displacements_black[] =
@@ -1445,16 +1445,16 @@ static Fl_Image *image_displacements_black() {
   return image;
 }
 
-void CMainFrame::cb_btnMisesStress_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_btnMisesStress_i(Fl_HoverButton*, void*) {
   //showRightToolbar(scrRightMisesStressToolbar);
-paintView->setVisualisationMode(CPaintView::VM_MISES_STRESS);
+paintView->setVisualisationMode(fp::PaintView::VM_MISES_STRESS);
 //paintView->setDrawDisplacements(false);
 //paintView->setStressType(fp::FemGrid2::ST_MISES_SMOOTH);
 //paintView->setDrawStress(true);
 //paintView->setDrawForcesAndConstraints(true);
 }
-void CMainFrame::cb_btnMisesStress(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnMisesStress_i(o,v);
+void MainFrame::cb_btnMisesStress(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnMisesStress_i(o,v);
 }
 
 static const unsigned char idata_stress_mises_black[] =
@@ -1595,11 +1595,11 @@ static Fl_Image *image_stress_mises_black() {
   return image;
 }
 
-void CMainFrame::cb_btnMoveLoad_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_btnMoveLoad_i(Fl_HoverButton*, void*) {
   paintView->setMoveLoad(true);
 }
-void CMainFrame::cb_btnMoveLoad(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_btnMoveLoad_i(o,v);
+void MainFrame::cb_btnMoveLoad(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_btnMoveLoad_i(o,v);
 }
 
 static const unsigned char idata_action_move_force_black[] =
@@ -1726,11 +1726,11 @@ static Fl_Image *image_action_move_force_black() {
   return image;
 }
 
-void CMainFrame::cb_btnRotateLoad_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_btnRotateLoad_i(Fl_HoverButton*, void*) {
   paintView->setMoveLoad(false);
 }
-void CMainFrame::cb_btnRotateLoad(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_btnRotateLoad_i(o,v);
+void MainFrame::cb_btnRotateLoad(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_btnRotateLoad_i(o,v);
 }
 
 static const unsigned char idata_action_rotate_force_black[] =
@@ -1857,7 +1857,7 @@ static Fl_Image *image_action_rotate_force_black() {
   return image;
 }
 
-void CMainFrame::cb_btnOptimize_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_btnOptimize_i(Fl_HoverButton*, void*) {
   m_continueCalc = true;
 
 m_optSettings->setView(paintView);
@@ -1869,8 +1869,8 @@ disableUserInterface();
 m_vizMixer->hide();
 paintView->executeOpt();
 }
-void CMainFrame::cb_btnOptimize(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnOptimize_i(o,v);
+void MainFrame::cb_btnOptimize(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnOptimize_i(o,v);
 }
 
 static const unsigned char idata_optimise_black[] =
@@ -2003,15 +2003,15 @@ static Fl_Image *image_optimise_black() {
   return image;
 }
 
-void CMainFrame::cb_btnStructure_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_btnStructure_i(Fl_HoverButton*, void*) {
   //showRightToolbar(scrRightStructureToolbar);
-paintView->setVisualisationMode(CPaintView::VM_STRUCTURE);
+paintView->setVisualisationMode(fp::PaintView::VM_STRUCTURE);
 //paintView->setDrawDisplacements(false);
 //paintView->setDrawStress(false);
 //paintView->setDrawForcesAndConstraints(false);
 }
-void CMainFrame::cb_btnStructure(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnStructure_i(o,v);
+void MainFrame::cb_btnStructure(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnStructure_i(o,v);
 }
 
 static const unsigned char idata_structure_black_grd[] =
@@ -2136,13 +2136,13 @@ static Fl_Image *image_structure_black_grd() {
   return image;
 }
 
-void CMainFrame::cb_btnVizMixer_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_btnVizMixer_i(Fl_HoverButton*, void*) {
   m_vizMixer->setView(paintView);
 m_vizMixer->show();
 m_vizMixer->placeWindow(wndMain);
 }
-void CMainFrame::cb_btnVizMixer(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnVizMixer_i(o,v);
+void MainFrame::cb_btnVizMixer(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnVizMixer_i(o,v);
 }
 
 static const unsigned char idata_visualisation_mixer_black[] =
@@ -2323,14 +2323,14 @@ static Fl_Image *image_visualisation_mixer_black() {
   return image;
 }
 
-void CMainFrame::cb_btnZoomResults_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_btnZoomResults_i(Fl_HoverButton*, void*) {
   if (btnZoomResults->value()>0)
 	paintView->setZoomResults(true);
 else
 	paintView->setZoomResults(false);
 }
-void CMainFrame::cb_btnZoomResults(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnZoomResults_i(o,v);
+void MainFrame::cb_btnZoomResults(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnZoomResults_i(o,v);
 }
 
 static const unsigned char idata_zoom[] =
@@ -2512,12 +2512,12 @@ static Fl_Image *image_zoom() {
   return image;
 }
 
-void CMainFrame::cb_btnAddForce_i(Fl_HoverButton*, void*) {
-  paintView->setEditMode(CPaintView::EM_FORCE);
+void MainFrame::cb_btnAddForce_i(Fl_HoverButton*, void*) {
+  paintView->setEditMode(fp::PaintView::EM_FORCE);
 m_physicsEditMode = paintView->getEditMode();
 }
-void CMainFrame::cb_btnAddForce(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnAddForce_i(o,v);
+void MainFrame::cb_btnAddForce(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnAddForce_i(o,v);
 }
 
 static const unsigned char idata_action_add_force_black[] =
@@ -2639,12 +2639,12 @@ static Fl_Image *image_action_add_force_black() {
   return image;
 }
 
-void CMainFrame::cb_btnEraseForces_i(Fl_HoverButton*, void*) {
-  paintView->setEditMode(CPaintView::EM_ERASE_CONSTRAINTS_FORCES);
+void MainFrame::cb_btnEraseForces_i(Fl_HoverButton*, void*) {
+  paintView->setEditMode(fp::PaintView::EM_ERASE_CONSTRAINTS_FORCES);
 m_physicsEditMode = paintView->getEditMode();
 }
-void CMainFrame::cb_btnEraseForces(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnEraseForces_i(o,v);
+void MainFrame::cb_btnEraseForces(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnEraseForces_i(o,v);
 }
 
 static const unsigned char idata_erase_black[] =
@@ -2812,21 +2812,21 @@ static Fl_Image *image_erase_black() {
   return image;
 }
 
-void CMainFrame::cb_forceMagnitude_i(Fl_Value_Input*, void*) {
+void MainFrame::cb_forceMagnitude_i(Fl_Value_Input*, void*) {
   paintView->setForceMagnitude(forceMagnitude->value());
 }
-void CMainFrame::cb_forceMagnitude(Fl_Value_Input* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_forceMagnitude_i(o,v);
+void MainFrame::cb_forceMagnitude(Fl_Value_Input* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_forceMagnitude_i(o,v);
 }
 
-void CMainFrame::cb_btnUseWeight_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_btnUseWeight_i(Fl_HoverButton*, void*) {
   if (btnUseWeight->value()==1)
 	paintView->setUseWeight(true);
 else
 	paintView->setUseWeight(false);
 }
-void CMainFrame::cb_btnUseWeight(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnUseWeight_i(o,v);
+void MainFrame::cb_btnUseWeight(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnUseWeight_i(o,v);
 }
 
 static const unsigned char idata_dead_load_black[] =
@@ -2949,12 +2949,12 @@ static Fl_Image *image_dead_load_black() {
   return image;
 }
 
-void CMainFrame::cb_btnAddBc2_i(Fl_HoverButton*, void*) {
-  paintView->setEditMode(CPaintView::EM_CONSTRAINT_VECTOR);
+void MainFrame::cb_btnAddBc2_i(Fl_HoverButton*, void*) {
+  paintView->setEditMode(fp::PaintView::EM_CONSTRAINT_VECTOR);
 m_physicsEditMode = paintView->getEditMode();
 }
-void CMainFrame::cb_btnAddBc2(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnAddBc2_i(o,v);
+void MainFrame::cb_btnAddBc2(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnAddBc2_i(o,v);
 }
 
 static const unsigned char idata_action_add_bc2_black[] =
@@ -3078,20 +3078,20 @@ static Fl_Image *image_action_add_bc2_black() {
   return image;
 }
 
-void CMainFrame::cb_btnRemoveBc2_i(Fl_HoverButton*, void*) {
-  paintView->setEditMode(CPaintView::EM_ERASE_CONSTRAINTS_FORCES);
+void MainFrame::cb_btnRemoveBc2_i(Fl_HoverButton*, void*) {
+  paintView->setEditMode(fp::PaintView::EM_ERASE_CONSTRAINTS_FORCES);
 m_physicsEditMode = paintView->getEditMode();
 }
-void CMainFrame::cb_btnRemoveBc2(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnRemoveBc2_i(o,v);
+void MainFrame::cb_btnRemoveBc2(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnRemoveBc2_i(o,v);
 }
 
-void CMainFrame::cb_btnRotateBc2_i(Fl_HoverButton*, void*) {
-  paintView->setEditMode(CPaintView::EM_ROTATE_CONSTRAINT_VECTOR);
+void MainFrame::cb_btnRotateBc2_i(Fl_HoverButton*, void*) {
+  paintView->setEditMode(fp::PaintView::EM_ROTATE_CONSTRAINT_VECTOR);
 m_physicsEditMode = paintView->getEditMode();
 }
-void CMainFrame::cb_btnRotateBc2(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnRotateBc2_i(o,v);
+void MainFrame::cb_btnRotateBc2(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnRotateBc2_i(o,v);
 }
 
 #include <FL/Fl_Pixmap.H>
@@ -3395,13 +3395,13 @@ static Fl_Image *image_action_rotate_bc() {
   return image;
 }
 
-void CMainFrame::cb_btnRectangle_i(Fl_HoverButton*, void*) {
-  paintView->setEditMode(CPaintView::EM_RECTANGLE);
+void MainFrame::cb_btnRectangle_i(Fl_HoverButton*, void*) {
+  paintView->setEditMode(fp::PaintView::EM_RECTANGLE);
 sldLineWidth->deactivate();
 m_sketchEditMode = paintView->getEditMode();
 }
-void CMainFrame::cb_btnRectangle(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnRectangle_i(o,v);
+void MainFrame::cb_btnRectangle(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnRectangle_i(o,v);
 }
 
 static const unsigned char idata_rectangle_black[] =
@@ -3598,13 +3598,13 @@ static Fl_Image *image_rectangle_black() {
   return image;
 }
 
-void CMainFrame::cb_btnEllipse_i(Fl_HoverButton*, void*) {
-  paintView->setEditMode(CPaintView::EM_ELLIPSE);
+void MainFrame::cb_btnEllipse_i(Fl_HoverButton*, void*) {
+  paintView->setEditMode(fp::PaintView::EM_ELLIPSE);
 sldLineWidth->deactivate();
 m_sketchEditMode = paintView->getEditMode();
 }
-void CMainFrame::cb_btnEllipse(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnEllipse_i(o,v);
+void MainFrame::cb_btnEllipse(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnEllipse_i(o,v);
 }
 
 static const unsigned char idata_ellipse_black[] =
@@ -3785,12 +3785,12 @@ static Fl_Image *image_ellipse_black() {
   return image;
 }
 
-void CMainFrame::cb_btnLine_i(Fl_HoverButton*, void*) {
-  paintView->setEditMode(CPaintView::EM_LINE);
+void MainFrame::cb_btnLine_i(Fl_HoverButton*, void*) {
+  paintView->setEditMode(fp::PaintView::EM_LINE);
 sldLineWidth->activate();
 }
-void CMainFrame::cb_btnLine(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnLine_i(o,v);
+void MainFrame::cb_btnLine(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnLine_i(o,v);
 }
 
 static const unsigned char idata_line_black[] =
@@ -3912,110 +3912,110 @@ static Fl_Image *image_line_black() {
   return image;
 }
 
-void CMainFrame::cb_btnArch_i(Fl_HoverButton*, void*) {
-  paintView->setEditMode(CPaintView::EM_ARCH);
+void MainFrame::cb_btnArch_i(Fl_HoverButton*, void*) {
+  paintView->setEditMode(fp::PaintView::EM_ARCH);
 sldLineWidth->activate();
 }
-void CMainFrame::cb_btnArch(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnArch_i(o,v);
+void MainFrame::cb_btnArch(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnArch_i(o,v);
 }
 
-void CMainFrame::cb__i(Fl_HoverButton*, void*) {
+void MainFrame::cb__i(Fl_HoverButton*, void*) {
   paintView->setStiffness(1.0);
 }
-void CMainFrame::cb_(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb__i(o,v);
+void MainFrame::cb_(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb__i(o,v);
 }
 
-void CMainFrame::cb_1_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_1_i(Fl_HoverButton*, void*) {
   paintView->setStiffness(0.6364);
 }
-void CMainFrame::cb_1(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_1_i(o,v);
+void MainFrame::cb_1(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_1_i(o,v);
 }
 
-void CMainFrame::cb_2_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_2_i(Fl_HoverButton*, void*) {
   paintView->setStiffness(0.2727);
 }
-void CMainFrame::cb_2(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_2_i(o,v);
+void MainFrame::cb_2(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_2_i(o,v);
 }
 
-void CMainFrame::cb_3_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_3_i(Fl_HoverButton*, void*) {
   paintView->setStiffness(0.9091);
 }
-void CMainFrame::cb_3(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_3_i(o,v);
+void MainFrame::cb_3(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_3_i(o,v);
 }
 
-void CMainFrame::cb_4_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_4_i(Fl_HoverButton*, void*) {
   paintView->setStiffness(0.5455);
 }
-void CMainFrame::cb_4(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_4_i(o,v);
+void MainFrame::cb_4(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_4_i(o,v);
 }
 
-void CMainFrame::cb_5_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_5_i(Fl_HoverButton*, void*) {
   paintView->setStiffness(0.1818);
 }
-void CMainFrame::cb_5(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_5_i(o,v);
+void MainFrame::cb_5(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_5_i(o,v);
 }
 
-void CMainFrame::cb_6_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_6_i(Fl_HoverButton*, void*) {
   paintView->setStiffness(0.8182);
 }
-void CMainFrame::cb_6(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_6_i(o,v);
+void MainFrame::cb_6(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_6_i(o,v);
 }
 
-void CMainFrame::cb_7_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_7_i(Fl_HoverButton*, void*) {
   paintView->setStiffness(0.4545);
 }
-void CMainFrame::cb_7(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_7_i(o,v);
+void MainFrame::cb_7(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_7_i(o,v);
 }
 
-void CMainFrame::cb_8_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_8_i(Fl_HoverButton*, void*) {
   paintView->setStiffness(0.0909);
 }
-void CMainFrame::cb_8(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_8_i(o,v);
+void MainFrame::cb_8(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_8_i(o,v);
 }
 
-void CMainFrame::cb_9_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_9_i(Fl_HoverButton*, void*) {
   paintView->setStiffness(0.7273);
 }
-void CMainFrame::cb_9(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_9_i(o,v);
+void MainFrame::cb_9(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_9_i(o,v);
 }
 
-void CMainFrame::cb_a_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_a_i(Fl_HoverButton*, void*) {
   paintView->setStiffness(0.3636);
 }
-void CMainFrame::cb_a(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_a_i(o,v);
+void MainFrame::cb_a(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_a_i(o,v);
 }
 
-void CMainFrame::cb_b_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_b_i(Fl_HoverButton*, void*) {
   paintView->setStiffness(0.0);
 }
-void CMainFrame::cb_b(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_b_i(o,v);
+void MainFrame::cb_b(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_b_i(o,v);
 }
 
-void CMainFrame::cb_sldLineWidth_i(Fl_Value_Slider*, void*) {
+void MainFrame::cb_sldLineWidth_i(Fl_Value_Slider*, void*) {
   paintView->setLineWidth(sldLineWidth->value());
 }
-void CMainFrame::cb_sldLineWidth(Fl_Value_Slider* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_sldLineWidth_i(o,v);
+void MainFrame::cb_sldLineWidth(Fl_Value_Slider* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_sldLineWidth_i(o,v);
 }
 
-void CMainFrame::cb_btnTensionCompression_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_btnTensionCompression_i(Fl_HoverButton*, void*) {
   paintView->setStressMode(fp::FemGrid2::SM_ALL);
 }
-void CMainFrame::cb_btnTensionCompression(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnTensionCompression_i(o,v);
+void MainFrame::cb_btnTensionCompression(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnTensionCompression_i(o,v);
 }
 
 static const unsigned char idata_tension_compression_black_grd[] =
@@ -4139,11 +4139,11 @@ static Fl_Image *image_tension_compression_black_grd() {
   return image;
 }
 
-void CMainFrame::cb_btnTension_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_btnTension_i(Fl_HoverButton*, void*) {
   paintView->setStressMode(fp::FemGrid2::SM_POSITIVE);
 }
-void CMainFrame::cb_btnTension(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnTension_i(o,v);
+void MainFrame::cb_btnTension(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnTension_i(o,v);
 }
 
 static const unsigned char idata_tension_black_grd[] =
@@ -4260,11 +4260,11 @@ static Fl_Image *image_tension_black_grd() {
   return image;
 }
 
-void CMainFrame::cb_btnCompression_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_btnCompression_i(Fl_HoverButton*, void*) {
   paintView->setStressMode(fp::FemGrid2::SM_NEGATIVE);
 }
-void CMainFrame::cb_btnCompression(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnCompression_i(o,v);
+void MainFrame::cb_btnCompression(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnCompression_i(o,v);
 }
 
 static const unsigned char idata_compression_black_grd[] =
@@ -4381,50 +4381,50 @@ static Fl_Image *image_compression_black_grd() {
   return image;
 }
 
-void CMainFrame::cb_rolArrowSize_i(Fl_Roller*, void*) {
+void MainFrame::cb_rolArrowSize_i(Fl_Roller*, void*) {
   paintView->setStressSize(rolArrowSize->value());
 }
-void CMainFrame::cb_rolArrowSize(Fl_Roller* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_rolArrowSize_i(o,v);
+void MainFrame::cb_rolArrowSize(Fl_Roller* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_rolArrowSize_i(o,v);
 }
 
-void CMainFrame::cb_rolTransparency_i(Fl_Roller*, void*) {
+void MainFrame::cb_rolTransparency_i(Fl_Roller*, void*) {
   paintView->setStressAlpha(rolTransparency->value());
 }
-void CMainFrame::cb_rolTransparency(Fl_Roller* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_rolTransparency_i(o,v);
+void MainFrame::cb_rolTransparency(Fl_Roller* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_rolTransparency_i(o,v);
 }
 
-void CMainFrame::cb_rolStep_i(Fl_Roller*, void*) {
+void MainFrame::cb_rolStep_i(Fl_Roller*, void*) {
   paintView->setStressStep(rolStep->value());
 }
-void CMainFrame::cb_rolStep(Fl_Roller* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_rolStep_i(o,v);
+void MainFrame::cb_rolStep(Fl_Roller* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_rolStep_i(o,v);
 }
 
-void CMainFrame::cb_btnLockScale_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_btnLockScale_i(Fl_HoverButton*, void*) {
   if (btnLockScale->value()>0)
 	paintView->unlockScaleFactor();
 else
 	paintView->lockScaleFactor();
 }
-void CMainFrame::cb_btnLockScale(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_btnLockScale_i(o,v);
+void MainFrame::cb_btnLockScale(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_btnLockScale_i(o,v);
 }
 
-void CMainFrame::cb_sldDisplacementScale_i(Fl_Slider*, void*) {
+void MainFrame::cb_sldDisplacementScale_i(Fl_Slider*, void*) {
   paintView->setDisplacementScale(sldDisplacementScale->value());
 }
-void CMainFrame::cb_sldDisplacementScale(Fl_Slider* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_sldDisplacementScale_i(o,v);
+void MainFrame::cb_sldDisplacementScale(Fl_Slider* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_sldDisplacementScale_i(o,v);
 }
 
-void CMainFrame::cb_btnSelect_i(Fl_HoverButton*, void*) {
-  paintView->setEditMode(CPaintView::EM_SELECT_BOX);
+void MainFrame::cb_btnSelect_i(Fl_HoverButton*, void*) {
+  paintView->setEditMode(fp::PaintView::EM_SELECT_BOX);
 m_sketchEditMode = paintView->getEditMode();
 }
-void CMainFrame::cb_btnSelect(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnSelect_i(o,v);
+void MainFrame::cb_btnSelect(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnSelect_i(o,v);
 }
 
 static const unsigned char idata_select_black[] =
@@ -4552,13 +4552,13 @@ static Fl_Image *image_select_black() {
   return image;
 }
 
-void CMainFrame::cb_btnCut_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_btnCut_i(Fl_HoverButton*, void*) {
   paintView->cut();
 editMenuPaste->activate();
 btnPaste->activate();
 }
-void CMainFrame::cb_btnCut(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnCut_i(o,v);
+void MainFrame::cb_btnCut(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnCut_i(o,v);
 }
 
 static const unsigned char idata_cut_black[] =
@@ -4726,13 +4726,13 @@ static Fl_Image *image_cut_black() {
   return image;
 }
 
-void CMainFrame::cb_btnCopy_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_btnCopy_i(Fl_HoverButton*, void*) {
   paintView->copy();
 editMenuPaste->activate();
 btnPaste->activate();
 }
-void CMainFrame::cb_btnCopy(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnCopy_i(o,v);
+void MainFrame::cb_btnCopy(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnCopy_i(o,v);
 }
 
 static const unsigned char idata_copy_black[] =
@@ -4904,16 +4904,16 @@ static Fl_Image *image_copy_black() {
   return image;
 }
 
-void CMainFrame::cb_btnPaste_i(Fl_HoverButton*, void*) {
-  paintView->setEditMode(CPaintView::EM_PASTE);
+void MainFrame::cb_btnPaste_i(Fl_HoverButton*, void*) {
+  paintView->setEditMode(fp::PaintView::EM_PASTE);
 editMenuCut->deactivate();
 editMenuCopy->deactivate();
 btnCut->deactivate();
 btnCopy->deactivate();
 m_sketchEditMode = paintView->getEditMode();
 }
-void CMainFrame::cb_btnPaste(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnPaste_i(o,v);
+void MainFrame::cb_btnPaste(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnPaste_i(o,v);
 }
 
 static const unsigned char idata_paste_black[] =
@@ -5089,20 +5089,20 @@ static Fl_Image *image_paste_black() {
   return image;
 }
 
-void CMainFrame::cb_btnPasteWin_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_btnPasteWin_i(Fl_HoverButton*, void*) {
   paintView->pasteFromWindows();
-paintView->setEditMode(CPaintView::EM_PASTE);
+paintView->setEditMode(fp::PaintView::EM_PASTE);
 m_sketchEditMode = paintView->getEditMode();
 }
-void CMainFrame::cb_btnPasteWin(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnPasteWin_i(o,v);
+void MainFrame::cb_btnPasteWin(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnPasteWin_i(o,v);
 }
 
-void CMainFrame::cb_btnExpandImage_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_btnExpandImage_i(Fl_HoverButton*, void*) {
   paintView->expandImage();
 }
-void CMainFrame::cb_btnExpandImage(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnExpandImage_i(o,v);
+void MainFrame::cb_btnExpandImage(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnExpandImage_i(o,v);
 }
 
 static const unsigned char idata_expand_image_black[] =
@@ -5279,105 +5279,105 @@ static Fl_Image *image_expand_image_black() {
   return image;
 }
 
-void CMainFrame::cb_c_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_c_i(Fl_HoverButton*, void*) {
   paintView->setStiffness(1.0);
 }
-void CMainFrame::cb_c(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_c_i(o,v);
+void MainFrame::cb_c(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_c_i(o,v);
 }
 
-void CMainFrame::cb_d_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_d_i(Fl_HoverButton*, void*) {
   paintView->setStiffness(0.6364);
 }
-void CMainFrame::cb_d(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_d_i(o,v);
+void MainFrame::cb_d(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_d_i(o,v);
 }
 
-void CMainFrame::cb_e_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_e_i(Fl_HoverButton*, void*) {
   paintView->setStiffness(0.2727);
 }
-void CMainFrame::cb_e(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_e_i(o,v);
+void MainFrame::cb_e(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_e_i(o,v);
 }
 
-void CMainFrame::cb_f_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_f_i(Fl_HoverButton*, void*) {
   paintView->setStiffness(0.9091);
 }
-void CMainFrame::cb_f(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_f_i(o,v);
+void MainFrame::cb_f(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_f_i(o,v);
 }
 
-void CMainFrame::cb_10_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_10_i(Fl_HoverButton*, void*) {
   paintView->setStiffness(0.5455);
 }
-void CMainFrame::cb_10(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_10_i(o,v);
+void MainFrame::cb_10(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_10_i(o,v);
 }
 
-void CMainFrame::cb_11_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_11_i(Fl_HoverButton*, void*) {
   paintView->setStiffness(0.1818);
 }
-void CMainFrame::cb_11(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_11_i(o,v);
+void MainFrame::cb_11(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_11_i(o,v);
 }
 
-void CMainFrame::cb_12_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_12_i(Fl_HoverButton*, void*) {
   paintView->setStiffness(0.8182);
 }
-void CMainFrame::cb_12(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_12_i(o,v);
+void MainFrame::cb_12(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_12_i(o,v);
 }
 
-void CMainFrame::cb_13_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_13_i(Fl_HoverButton*, void*) {
   paintView->setStiffness(0.4545);
 }
-void CMainFrame::cb_13(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_13_i(o,v);
+void MainFrame::cb_13(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_13_i(o,v);
 }
 
-void CMainFrame::cb_14_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_14_i(Fl_HoverButton*, void*) {
   paintView->setStiffness(0.0909);
 }
-void CMainFrame::cb_14(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_14_i(o,v);
+void MainFrame::cb_14(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_14_i(o,v);
 }
 
-void CMainFrame::cb_15_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_15_i(Fl_HoverButton*, void*) {
   paintView->setStiffness(0.7273);
 }
-void CMainFrame::cb_15(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_15_i(o,v);
+void MainFrame::cb_15(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_15_i(o,v);
 }
 
-void CMainFrame::cb_16_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_16_i(Fl_HoverButton*, void*) {
   paintView->setStiffness(0.3636);
 }
-void CMainFrame::cb_16(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_16_i(o,v);
+void MainFrame::cb_16(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_16_i(o,v);
 }
 
-void CMainFrame::cb_17_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_17_i(Fl_HoverButton*, void*) {
   paintView->setStiffness(0.0);
 }
-void CMainFrame::cb_17(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_17_i(o,v);
+void MainFrame::cb_17(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_17_i(o,v);
 }
 
-void CMainFrame::cb_chkInvertColorMap_i(Fl_Check_Button*, void*) {
+void MainFrame::cb_chkInvertColorMap_i(Fl_Check_Button*, void*) {
   if (chkInvertColorMap->value()==1)
 	paintView->setInvertColorMap(true);
 else
 	paintView->setInvertColorMap(false);
 }
-void CMainFrame::cb_chkInvertColorMap(Fl_Check_Button* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_chkInvertColorMap_i(o,v);
+void MainFrame::cb_chkInvertColorMap(Fl_Check_Button* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_chkInvertColorMap_i(o,v);
 }
 
-void CMainFrame::cb_btnColorMap1_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_btnColorMap1_i(Fl_HoverButton*, void*) {
   paintView->setColorMap(1);
 }
-void CMainFrame::cb_btnColorMap1(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnColorMap1_i(o,v);
+void MainFrame::cb_btnColorMap1(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnColorMap1_i(o,v);
 }
 
 static const unsigned char idata_colormap2_black[] =
@@ -5509,11 +5509,11 @@ static Fl_Image *image_colormap2_black() {
   return image;
 }
 
-void CMainFrame::cb_btnColorMap2_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_btnColorMap2_i(Fl_HoverButton*, void*) {
   paintView->setColorMap(2);
 }
-void CMainFrame::cb_btnColorMap2(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnColorMap2_i(o,v);
+void MainFrame::cb_btnColorMap2(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnColorMap2_i(o,v);
 }
 
 static const unsigned char idata_colormap3_black[] =
@@ -5641,34 +5641,34 @@ static Fl_Image *image_colormap3_black() {
   return image;
 }
 
-void CMainFrame::cb_sldUpperMisesTreshold_i(Fl_Slider*, void*) {
+void MainFrame::cb_sldUpperMisesTreshold_i(Fl_Slider*, void*) {
   paintView->setUpperMisesTreshold(sldUpperMisesTreshold->value());
 }
-void CMainFrame::cb_sldUpperMisesTreshold(Fl_Slider* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_sldUpperMisesTreshold_i(o,v);
+void MainFrame::cb_sldUpperMisesTreshold(Fl_Slider* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_sldUpperMisesTreshold_i(o,v);
 }
 
-void CMainFrame::cb_btnBrush_i(Fl_HoverButton*, void*) {
-  paintView->setEditMode(CPaintView::EM_DIRECT_BRUSH);
+void MainFrame::cb_btnBrush_i(Fl_HoverButton*, void*) {
+  paintView->setEditMode(fp::PaintView::EM_DIRECT_BRUSH);
 m_sketchEditMode = paintView->getEditMode();
 }
-void CMainFrame::cb_btnBrush(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnBrush_i(o,v);
+void MainFrame::cb_btnBrush(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnBrush_i(o,v);
 }
 
-void CMainFrame::cb_btnErase_i(Fl_HoverButton*, void*) {
-  paintView->setEditMode(CPaintView::EM_DIRECT_ERASE);
+void MainFrame::cb_btnErase_i(Fl_HoverButton*, void*) {
+  paintView->setEditMode(fp::PaintView::EM_DIRECT_ERASE);
 m_sketchEditMode = paintView->getEditMode();
 }
-void CMainFrame::cb_btnErase(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnErase_i(o,v);
+void MainFrame::cb_btnErase(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnErase_i(o,v);
 }
 
-void CMainFrame::cb_btnBrush4_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_btnBrush4_i(Fl_HoverButton*, void*) {
   paintView->setCurrentBrush(0);
 }
-void CMainFrame::cb_btnBrush4(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_btnBrush4_i(o,v);
+void MainFrame::cb_btnBrush4(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_btnBrush4_i(o,v);
 }
 
 static const unsigned char idata_brush1_black_grd[] =
@@ -5781,11 +5781,11 @@ static Fl_Image *image_brush1_black_grd() {
   return image;
 }
 
-void CMainFrame::cb_btnBrush8_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_btnBrush8_i(Fl_HoverButton*, void*) {
   paintView->setCurrentBrush(1);
 }
-void CMainFrame::cb_btnBrush8(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_btnBrush8_i(o,v);
+void MainFrame::cb_btnBrush8(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_btnBrush8_i(o,v);
 }
 
 static const unsigned char idata_brush2_black_grd[] =
@@ -5900,11 +5900,11 @@ static Fl_Image *image_brush2_black_grd() {
   return image;
 }
 
-void CMainFrame::cb_btnBrush16_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_btnBrush16_i(Fl_HoverButton*, void*) {
   paintView->setCurrentBrush(2);
 }
-void CMainFrame::cb_btnBrush16(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_btnBrush16_i(o,v);
+void MainFrame::cb_btnBrush16(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_btnBrush16_i(o,v);
 }
 
 static const unsigned char idata_brush3_black_grd[] =
@@ -6025,11 +6025,11 @@ static Fl_Image *image_brush3_black_grd() {
   return image;
 }
 
-void CMainFrame::cb_btnBrush32_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_btnBrush32_i(Fl_HoverButton*, void*) {
   paintView->setCurrentBrush(3);
 }
-void CMainFrame::cb_btnBrush32(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_btnBrush32_i(o,v);
+void MainFrame::cb_btnBrush32(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_btnBrush32_i(o,v);
 }
 
 static const unsigned char idata_brush4_black_grd[] =
@@ -6157,11 +6157,11 @@ static Fl_Image *image_brush4_black_grd() {
   return image;
 }
 
-void CMainFrame::cb_btnBrush64_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_btnBrush64_i(Fl_HoverButton*, void*) {
   paintView->setCurrentBrush(4);
 }
-void CMainFrame::cb_btnBrush64(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_btnBrush64_i(o,v);
+void MainFrame::cb_btnBrush64(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_btnBrush64_i(o,v);
 }
 
 static const unsigned char idata_brush5_black_grd[] =
@@ -6299,91 +6299,91 @@ static Fl_Image *image_brush5_black_grd() {
   return image;
 }
 
-void CMainFrame::cb_18_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_18_i(Fl_HoverButton*, void*) {
   paintView->setStiffness(1.0);
 }
-void CMainFrame::cb_18(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_18_i(o,v);
+void MainFrame::cb_18(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_18_i(o,v);
 }
 
-void CMainFrame::cb_19_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_19_i(Fl_HoverButton*, void*) {
   paintView->setStiffness(0.6364);
 }
-void CMainFrame::cb_19(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_19_i(o,v);
+void MainFrame::cb_19(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_19_i(o,v);
 }
 
-void CMainFrame::cb_1a_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_1a_i(Fl_HoverButton*, void*) {
   paintView->setStiffness(0.2727);
 }
-void CMainFrame::cb_1a(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_1a_i(o,v);
+void MainFrame::cb_1a(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_1a_i(o,v);
 }
 
-void CMainFrame::cb_1b_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_1b_i(Fl_HoverButton*, void*) {
   paintView->setStiffness(0.9091);
 }
-void CMainFrame::cb_1b(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_1b_i(o,v);
+void MainFrame::cb_1b(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_1b_i(o,v);
 }
 
-void CMainFrame::cb_1c_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_1c_i(Fl_HoverButton*, void*) {
   paintView->setStiffness(0.5455);
 }
-void CMainFrame::cb_1c(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_1c_i(o,v);
+void MainFrame::cb_1c(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_1c_i(o,v);
 }
 
-void CMainFrame::cb_1d_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_1d_i(Fl_HoverButton*, void*) {
   paintView->setStiffness(0.1818);
 }
-void CMainFrame::cb_1d(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_1d_i(o,v);
+void MainFrame::cb_1d(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_1d_i(o,v);
 }
 
-void CMainFrame::cb_1e_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_1e_i(Fl_HoverButton*, void*) {
   paintView->setStiffness(0.8182);
 }
-void CMainFrame::cb_1e(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_1e_i(o,v);
+void MainFrame::cb_1e(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_1e_i(o,v);
 }
 
-void CMainFrame::cb_1f_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_1f_i(Fl_HoverButton*, void*) {
   paintView->setStiffness(0.4545);
 }
-void CMainFrame::cb_1f(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_1f_i(o,v);
+void MainFrame::cb_1f(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_1f_i(o,v);
 }
 
-void CMainFrame::cb_20_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_20_i(Fl_HoverButton*, void*) {
   paintView->setStiffness(0.0909);
 }
-void CMainFrame::cb_20(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_20_i(o,v);
+void MainFrame::cb_20(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_20_i(o,v);
 }
 
-void CMainFrame::cb_21_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_21_i(Fl_HoverButton*, void*) {
   paintView->setStiffness(0.7273);
 }
-void CMainFrame::cb_21(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_21_i(o,v);
+void MainFrame::cb_21(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_21_i(o,v);
 }
 
-void CMainFrame::cb_22_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_22_i(Fl_HoverButton*, void*) {
   paintView->setStiffness(0.3636);
 }
-void CMainFrame::cb_22(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_22_i(o,v);
+void MainFrame::cb_22(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_22_i(o,v);
 }
 
-void CMainFrame::cb_23_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_23_i(Fl_HoverButton*, void*) {
   paintView->setStiffness(0.0);
 }
-void CMainFrame::cb_23(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_23_i(o,v);
+void MainFrame::cb_23(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->parent()->user_data()))->cb_23_i(o,v);
 }
 
-void CMainFrame::cb_btnForce_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_btnForce_i(Fl_HoverButton*, void*) {
   // Show constraints dialog
 
 showRightToolbar(scrRightForceToolbar);
@@ -6391,14 +6391,14 @@ showRightToolbar(scrRightForceToolbar);
 // Set the last edit mode
 
 if (btnAddForce->value()==1)
-	paintView->setEditMode(CPaintView::EM_FORCE);
+	paintView->setEditMode(fp::PaintView::EM_FORCE);
 if (btnEraseForces->value()==1)
-	paintView->setEditMode(CPaintView::EM_ERASE_CONSTRAINTS_FORCES);
+	paintView->setEditMode(fp::PaintView::EM_ERASE_CONSTRAINTS_FORCES);
 
 m_physicsEditMode = paintView->getEditMode();
 }
-void CMainFrame::cb_btnForce(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnForce_i(o,v);
+void MainFrame::cb_btnForce(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnForce_i(o,v);
 }
 
 static const unsigned char idata_force_black[] =
@@ -6517,7 +6517,7 @@ static Fl_Image *image_force_black() {
   return image;
 }
 
-void CMainFrame::cb_btnConstraint2_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_btnConstraint2_i(Fl_HoverButton*, void*) {
   // Show constraints dialog
 
 showRightToolbar(scrRightBCToolbar);
@@ -6525,14 +6525,14 @@ showRightToolbar(scrRightBCToolbar);
 // Set the last edit mode
 
 if (btnAddBc2->value()==1)
-	paintView->setEditMode(CPaintView::EM_CONSTRAINT_VECTOR);
+	paintView->setEditMode(fp::PaintView::EM_CONSTRAINT_VECTOR);
 if (btnRemoveBc2->value()==1)
-	paintView->setEditMode(CPaintView::EM_ERASE_CONSTRAINTS_FORCES);
+	paintView->setEditMode(fp::PaintView::EM_ERASE_CONSTRAINTS_FORCES);
 
 m_physicsEditMode = paintView->getEditMode();
 }
-void CMainFrame::cb_btnConstraint2(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnConstraint2_i(o,v);
+void MainFrame::cb_btnConstraint2(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnConstraint2_i(o,v);
 }
 
 static const unsigned char idata_bc2_black[] =
@@ -6653,7 +6653,7 @@ static Fl_Image *image_bc2_black() {
   return image;
 }
 
-void CMainFrame::cb_btnConstraintHinge_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_btnConstraintHinge_i(Fl_HoverButton*, void*) {
   // Show constraints dialog
 
 showRightToolbar(scrRightBCHingeToolbar);
@@ -6661,14 +6661,14 @@ showRightToolbar(scrRightBCHingeToolbar);
 // Set the last edit mode
 
 if (btnAddBcHinge->value()==1)
-	paintView->setEditMode(CPaintView::EM_CONSTRAINT_HINGE);
+	paintView->setEditMode(fp::PaintView::EM_CONSTRAINT_HINGE);
 if (btnRemoveBcHinge->value()==1)
-	paintView->setEditMode(CPaintView::EM_ERASE_CONSTRAINTS_FORCES);
+	paintView->setEditMode(fp::PaintView::EM_ERASE_CONSTRAINTS_FORCES);
 
 m_physicsEditMode = paintView->getEditMode();
 }
-void CMainFrame::cb_btnConstraintHinge(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnConstraintHinge_i(o,v);
+void MainFrame::cb_btnConstraintHinge(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnConstraintHinge_i(o,v);
 }
 
 static const char *idata_bc_hinge_black[] = {
@@ -6971,16 +6971,16 @@ static Fl_Image *image_bc_hinge_black() {
   return image;
 }
 
-void CMainFrame::cb_btnDimensionTools_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_btnDimensionTools_i(Fl_HoverButton*, void*) {
   // Show constraints dialog
 
 showRightToolbar(scrRightDimensionToolbar);
-paintView->setEditMode(CPaintView::EM_RULER);
+paintView->setEditMode(fp::PaintView::EM_RULER);
 actualLength->value(paintView->getRulerLength());
 m_physicsEditMode = paintView->getEditMode();
 }
-void CMainFrame::cb_btnDimensionTools(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnDimensionTools_i(o,v);
+void MainFrame::cb_btnDimensionTools(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnDimensionTools_i(o,v);
 }
 
 static const unsigned char idata_ruler_black[] =
@@ -7111,11 +7111,11 @@ static Fl_Image *image_ruler_black() {
   return image;
 }
 
-void CMainFrame::cb_btnThickness_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_btnThickness_i(Fl_HoverButton*, void*) {
   showRightToolbar(scrRightThicknessToolbar);
 }
-void CMainFrame::cb_btnThickness(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnThickness_i(o,v);
+void MainFrame::cb_btnThickness(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnThickness_i(o,v);
 }
 
 static const unsigned char idata_thickness_black[] =
@@ -7246,12 +7246,12 @@ static Fl_Image *image_thickness_black() {
   return image;
 }
 
-void CMainFrame::cb_btnAddBcHinge_i(Fl_HoverButton*, void*) {
-  paintView->setEditMode(CPaintView::EM_CONSTRAINT_HINGE);
+void MainFrame::cb_btnAddBcHinge_i(Fl_HoverButton*, void*) {
+  paintView->setEditMode(fp::PaintView::EM_CONSTRAINT_HINGE);
 m_physicsEditMode = paintView->getEditMode();
 }
-void CMainFrame::cb_btnAddBcHinge(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnAddBcHinge_i(o,v);
+void MainFrame::cb_btnAddBcHinge(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnAddBcHinge_i(o,v);
 }
 
 static const char *idata_actions_add_bchinge[] = {
@@ -7554,12 +7554,12 @@ static Fl_Image *image_actions_add_bchinge() {
   return image;
 }
 
-void CMainFrame::cb_btnRemoveBcHinge_i(Fl_HoverButton*, void*) {
-  paintView->setEditMode(CPaintView::EM_ERASE_CONSTRAINTS_FORCES);
+void MainFrame::cb_btnRemoveBcHinge_i(Fl_HoverButton*, void*) {
+  paintView->setEditMode(fp::PaintView::EM_ERASE_CONSTRAINTS_FORCES);
 m_physicsEditMode = paintView->getEditMode();
 }
-void CMainFrame::cb_btnRemoveBcHinge(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnRemoveBcHinge_i(o,v);
+void MainFrame::cb_btnRemoveBcHinge(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnRemoveBcHinge_i(o,v);
 }
 
 static const char *idata_action_remove_bchinge[] = {
@@ -7862,41 +7862,41 @@ static Fl_Image *image_action_remove_bchinge() {
   return image;
 }
 
-void CMainFrame::cb_thickness_i(Fl_Value_Input*, void*) {
+void MainFrame::cb_thickness_i(Fl_Value_Input*, void*) {
   paintView->setThickness(thickness->value());
 }
-void CMainFrame::cb_thickness(Fl_Value_Input* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_thickness_i(o,v);
+void MainFrame::cb_thickness(Fl_Value_Input* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_thickness_i(o,v);
 }
 
-void CMainFrame::cb_actualLength_i(Fl_Value_Input*, void*) {
+void MainFrame::cb_actualLength_i(Fl_Value_Input*, void*) {
   paintView->setRulerLength(actualLength->value());
 }
-void CMainFrame::cb_actualLength(Fl_Value_Input* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_actualLength_i(o,v);
+void MainFrame::cb_actualLength(Fl_Value_Input* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_actualLength_i(o,v);
 }
 
-void CMainFrame::cb_btnStopCalculation_i(Fl_Button*, void*) {
+void MainFrame::cb_btnStopCalculation_i(Fl_Button*, void*) {
   m_continueCalc = false;
 enableUserInterface();
 }
-void CMainFrame::cb_btnStopCalculation(Fl_Button* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnStopCalculation_i(o,v);
+void MainFrame::cb_btnStopCalculation(Fl_Button* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnStopCalculation_i(o,v);
 }
 
-void CMainFrame::cb_btnTabletToolbar_i(Fl_Button*, void*) {
+void MainFrame::cb_btnTabletToolbar_i(Fl_Button*, void*) {
   m_tabletToolbar->show();
 m_tabletToolbar->placeWindow(wndMain);
 }
-void CMainFrame::cb_btnTabletToolbar(Fl_Button* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnTabletToolbar_i(o,v);
+void MainFrame::cb_btnTabletToolbar(Fl_Button* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnTabletToolbar_i(o,v);
 }
 
-void CMainFrame::cb_btnPhysical_i(Fl_HoverButton*, void*) {
-  paintView->setViewMode(CPaintView::VM_PHYSICS);
+void MainFrame::cb_btnPhysical_i(Fl_HoverButton*, void*) {
+  paintView->setViewMode(fp::PaintView::VM_PHYSICS);
 }
-void CMainFrame::cb_btnPhysical(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnPhysical_i(o,v);
+void MainFrame::cb_btnPhysical(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnPhysical_i(o,v);
 }
 
 static const unsigned char idata_physics_mode_black[] =
@@ -8329,12 +8329,12 @@ static Fl_Image *image_physics_mode_inactive_black() {
   return image;
 }
 
-void CMainFrame::cb_btnAction_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_btnAction_i(Fl_HoverButton*, void*) {
   m_continueCalc = true;
-paintView->setViewMode(CPaintView::VM_ACTION);
+paintView->setViewMode(fp::PaintView::VM_ACTION);
 }
-void CMainFrame::cb_btnAction(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnAction_i(o,v);
+void MainFrame::cb_btnAction(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnAction_i(o,v);
 }
 
 static const unsigned char idata_action_mode_black[] =
@@ -8770,11 +8770,11 @@ static Fl_Image *image_action_mode_inactive_black() {
   return image;
 }
 
-void CMainFrame::cb_btnSketch_i(Fl_HoverButton*, void*) {
-  paintView->setViewMode(CPaintView::VM_SKETCH);
+void MainFrame::cb_btnSketch_i(Fl_HoverButton*, void*) {
+  paintView->setViewMode(fp::PaintView::VM_SKETCH);
 }
-void CMainFrame::cb_btnSketch(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_btnSketch_i(o,v);
+void MainFrame::cb_btnSketch(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_btnSketch_i(o,v);
 }
 
 static const unsigned char idata_sketch_mode_black[] =
@@ -9206,11 +9206,11 @@ static Fl_Image *image_sketch_mode_inactive_black() {
   return image;
 }
 
-void CMainFrame::cb_transferViewToImage_i(Fl_HoverButton*, void*) {
+void MainFrame::cb_transferViewToImage_i(Fl_HoverButton*, void*) {
   paintView->transferViewToImage();
 }
-void CMainFrame::cb_transferViewToImage(Fl_HoverButton* o, void* v) {
-  ((CMainFrame*)(o->parent()->parent()->user_data()))->cb_transferViewToImage_i(o,v);
+void MainFrame::cb_transferViewToImage(Fl_HoverButton* o, void* v) {
+  ((MainFrame*)(o->parent()->parent()->user_data()))->cb_transferViewToImage_i(o,v);
 }
 
 static const char *idata_transferStructure[] = {
@@ -9513,7 +9513,7 @@ static Fl_Image *image_transferStructure() {
   return image;
 }
 
-CMainFrame::CMainFrame() {
+MainFrame::MainFrame() {
   { wndMain = new Fl_Double_Window(861, 686, "ForcePAD 2");
     wndMain->color(FL_FOREGROUND_COLOR);
     wndMain->user_data((void*)(this));
@@ -9627,7 +9627,7 @@ CMainFrame::CMainFrame() {
       scrLeftToolbar->end();
     } // Fl_Scroll* scrLeftToolbar
     { paintGroup = new Fl_Group(52, 26, 750, 627);
-      { paintView = new CFlPaintView(53, 27, 747, 625);
+      { paintView = new FlPaintView(53, 27, 747, 625);
         paintView->box(FL_FLAT_BOX);
         paintView->color(FL_FOREGROUND_COLOR);
         paintView->selection_color(FL_BACKGROUND_COLOR);
@@ -9637,7 +9637,7 @@ CMainFrame::CMainFrame() {
         paintView->labelcolor(FL_FOREGROUND_COLOR);
         paintView->align(Fl_Align(FL_ALIGN_CENTER));
         paintView->when(FL_WHEN_RELEASE);
-      } // CFlPaintView* paintView
+      } // FlPaintView* paintView
       paintGroup->end();
       Fl_Group::current()->resizable(paintGroup);
     } // Fl_Group* paintGroup
@@ -11221,24 +11221,24 @@ CMainFrame::CMainFrame() {
   paintView->setModelLoadedEvent(this);
   paintView->setNewModelEvent(this);
   
-  m_tabletToolbar = new CTabletToolbar();
+  m_tabletToolbar = new TabletToolbar();
   m_tabletToolbar->setView(paintView);
   
-  m_vizMixer = new CVizMixerToolbar();
+  m_vizMixer = new VizMixerToolbar();
   m_vizMixer->setView(paintView);
   
-  m_optSettings = new COptSettings();
+  m_optSettings = new OptSettings();
   m_optSettings->setView(paintView);
   
-  m_sketchEditMode = CPaintView::EM_BRUSH;
-  m_physicsEditMode = CPaintView::EM_FORCE;
+  m_sketchEditMode = fp::PaintView::EM_BRUSH;
+  m_physicsEditMode = fp::PaintView::EM_FORCE;
   
   // Add a callback for closing windows at application end.
   
   wndMain->callback(mainWindowCB);
 }
 
-CMainFrame::~CMainFrame() {
+MainFrame::~MainFrame() {
   m_tabletToolbar->hide();
   m_vizMixer->hide();
   m_optSettings->hide();
@@ -11248,11 +11248,11 @@ CMainFrame::~CMainFrame() {
   delete paintView;
 }
 
-bool CMainFrame::onContinueCalc() {
+bool MainFrame::onContinueCalc() {
   return m_continueCalc;
 }
 
-void CMainFrame::show() {
+void MainFrame::show() {
   #ifdef WIN32
   extern HINSTANCE fl_display;
   wndMain->icon((char *)LoadIcon(fl_display, MAKEINTRESOURCE(IDI_FORCEPAD)));
@@ -11266,7 +11266,7 @@ void CMainFrame::show() {
   
   //Set margins, extend bottom
   
-  CPlatformInfoPtr platformInfo = CPlatformInfo::getInstance();
+  PlatformInfoPtr platformInfo = PlatformInfo::getInstance();
   
   #ifdef WIN32
      if (platformInfo->isVista())
@@ -11326,20 +11326,20 @@ void CMainFrame::show() {
   forceMagnitude->value(paintView->getForceMagnitude());
 }
 
-void CMainFrame::close() {
+void MainFrame::close() {
   m_tabletToolbar->hide();
   m_vizMixer->hide();
   wndMain->hide();
   so_hide();
 }
 
-void CMainFrame::resetButtons() {
+void MainFrame::resetButtons() {
   btnDrawingTools->value(0);
   //btnConstraint->value(0);
   btnConstraint2->value(0);
 }
 
-void CMainFrame::resetButtons(Fl_HoverButton* self) {
+void MainFrame::resetButtons(Fl_HoverButton* self) {
   if (self!=btnBrush)
   	btnBrush->value(0);
   if (self!=btnFloodFill)
@@ -11373,25 +11373,25 @@ void CMainFrame::resetButtons(Fl_HoverButton* self) {
   	btnConstraint2->value(0);
 }
 
-void CMainFrame::setPixelWeight(double weight) {
+void MainFrame::setPixelWeight(double weight) {
   //lblPixelWeight->value(weight);
 }
 
-void CMainFrame::setExternalForce(double force) {
+void MainFrame::setExternalForce(double force) {
   //lblExternalForce->value(force);
 }
 
-void CMainFrame::setCommandLine(int argc, char **argv) {
+void MainFrame::setCommandLine(int argc, char **argv) {
   if (argc>0)
   	cout << argv[0] << endl;
   
   this->paintView->setCommandLine(argc, argv);
 }
 
-void CMainFrame::onModeChange(CPaintView::TEditMode oldMode, CPaintView::TEditMode newMode) {
+void MainFrame::onModeChange(fp::PaintView::TEditMode oldMode, fp::PaintView::TEditMode newMode) {
   cout << "Edit mode = " << paintView->getEditMode() << endl;
   
-  if (newMode==CPaintView::EM_SELECT_BOX)
+  if (newMode==fp::PaintView::EM_SELECT_BOX)
   {
   	editMenuCut->activate();
   	editMenuCopy->activate();
@@ -11407,8 +11407,8 @@ void CMainFrame::onModeChange(CPaintView::TEditMode oldMode, CPaintView::TEditMo
   }
 }
 
-void CMainFrame::onViewModeChange(CPaintView::TViewMode oldMode, CPaintView::TViewMode newMode) {
-  if (newMode == CPaintView::VM_SKETCH)
+void MainFrame::onViewModeChange(fp::PaintView::TViewMode oldMode, fp::PaintView::TViewMode newMode) {
+  if (newMode == fp::PaintView::VM_SKETCH)
   {
   	cout << "Mode = VM_SKETCH" << endl;
   	modeMenuSketch->deactivate();
@@ -11434,7 +11434,7 @@ void CMainFrame::onViewModeChange(CPaintView::TViewMode oldMode, CPaintView::TVi
   	btnZoomResults->value(0);
   	
   }
-  else if (newMode == CPaintView::VM_PHYSICS)
+  else if (newMode == fp::PaintView::VM_PHYSICS)
   {
   	cout << "Mode = VM_PHYSICS" << endl;
   	modeMenuSketch->activate();
@@ -11483,7 +11483,7 @@ void CMainFrame::onViewModeChange(CPaintView::TViewMode oldMode, CPaintView::TVi
   	btnOptLayer->value(0);
   	paintView->setOptLayer(false);
   	
-  	paintView->setEditMode(CPaintView::EM_DYNAMIC_FORCE_UPDATE);
+  	paintView->setEditMode(fp::PaintView::EM_DYNAMIC_FORCE_UPDATE);
   	
   	if (btnStress->value()==1)
   	{
@@ -11524,7 +11524,7 @@ void CMainFrame::onViewModeChange(CPaintView::TViewMode oldMode, CPaintView::TVi
   }
 }
 
-void CMainFrame::onStatusMessage(const std::string& message, const int progress) {
+void MainFrame::onStatusMessage(const std::string& message, const int progress) {
   statusOutput->value(message.c_str());
   calcProgress->value(progress);
   paintView->redraw();
@@ -11535,11 +11535,11 @@ void CMainFrame::onStatusMessage(const std::string& message, const int progress)
   #endif
 }
 
-void CMainFrame::onLogMessage(const std::string& context, const std::string& message) {
+void MainFrame::onLogMessage(const std::string& context, const std::string& message) {
   std::cout << context << ": " << message << std::endl;
 }
 
-void CMainFrame::hideLeftToolbars() {
+void MainFrame::hideLeftToolbars() {
   scrLeftToolbar->hide();
   scrLeftToolbar->deactivate();
   scrLeftResultToolbar->hide();
@@ -11548,7 +11548,7 @@ void CMainFrame::hideLeftToolbars() {
   scrLeftPhysicsToolbar->deactivate();
 }
 
-void CMainFrame::hideRightToolbars() {
+void MainFrame::hideRightToolbars() {
   scrRightForceToolbar->hide();
   scrRightForceToolbar->deactivate();
   scrRightBCToolbar->hide();
@@ -11577,7 +11577,7 @@ void CMainFrame::hideRightToolbars() {
   scrRightStructureToolbar->deactivate();
 }
 
-void CMainFrame::showLeftToolbar(Fl_Widget* toolbar) {
+void MainFrame::showLeftToolbar(Fl_Widget* toolbar) {
   hideLeftToolbars();
   
   wndMain->remove(*toolbar);
@@ -11592,7 +11592,7 @@ void CMainFrame::showLeftToolbar(Fl_Widget* toolbar) {
   wndMain->insert(*toolbar,0);
 }
 
-void CMainFrame::showRightToolbar(Fl_Widget* toolbar) {
+void MainFrame::showRightToolbar(Fl_Widget* toolbar) {
   hideRightToolbars();
   
   wndMain->remove(*toolbar);
@@ -11608,58 +11608,58 @@ void CMainFrame::showRightToolbar(Fl_Widget* toolbar) {
   wndMain->insert(*toolbar,0);
 }
 
-void CMainFrame::onViewModeError(CPaintView::TViewMode oldMode, CPaintView::TViewMode newMode) {
-  if (oldMode == CPaintView::VM_SKETCH)
+void MainFrame::onViewModeError(fp::PaintView::TViewMode oldMode, fp::PaintView::TViewMode newMode) {
+  if (oldMode == fp::PaintView::VM_SKETCH)
   	btnSketch->setonly();
-  if (oldMode == CPaintView::VM_PHYSICS)
+  if (oldMode == fp::PaintView::VM_PHYSICS)
   	btnPhysical->setonly();
 }
 
-void CMainFrame::centerWindow(Fl_Window* window) {
+void MainFrame::centerWindow(Fl_Window* window) {
   window->position(wndMain->x()+wndMain->w()/2-wndMain->w()/2, wndMain->y()+wndMain->h()/2-window->h()/2);
 }
 
-Fl_Window* CMainFrame::getMainWindow() {
+Fl_Window* MainFrame::getMainWindow() {
   return wndMain;
 }
 
-void CMainFrame::onModelChanged(const std::string& newModelName) {
+void MainFrame::onModelChanged(const std::string& newModelName) {
   string caption = newModelName + " - ForcePAD 2";
   wndMain->label(caption.c_str());
 }
 
-void CMainFrame::onRulerChanged(fp::Ruler* ruler) {
+void MainFrame::onRulerChanged(fp::Ruler* ruler) {
   pixelLength->precision(1);
   pixelLength->value(ruler->getPixelLength());
 }
 
-void CMainFrame::onVisualisationModeChanged(CPaintView::TVisualisationMode oldMode, CPaintView::TVisualisationMode newMode) {
-  if (newMode == CPaintView::VM_PRINCIPAL_STRESS)
+void MainFrame::onVisualisationModeChanged(fp::PaintView::TVisualisationMode oldMode, fp::PaintView::TVisualisationMode newMode) {
+  if (newMode == fp::PaintView::VM_PRINCIPAL_STRESS)
   {
   	showRightToolbar(scrRightStressToolbar);
   	if (btnStress->value()==0)
   		btnStress->setonly();
   }
   	
-  if (newMode == CPaintView::VM_MISES_STRESS)
+  if (newMode == fp::PaintView::VM_MISES_STRESS)
   {
   	showRightToolbar(scrRightMisesStressToolbar);
   	if (btnMisesStress->value()==0)
   		btnMisesStress->setonly();
   }
   	
-  if (newMode == CPaintView::VM_DISPLACEMENTS)
+  if (newMode == fp::PaintView::VM_DISPLACEMENTS)
   {
   	showRightToolbar(scrRightDisplacementToolbar);
   	if (btnDisplacements->value()==0)
   		btnDisplacements->setonly();
   }
   	
-  if (newMode == CPaintView::VM_STRUCTURE)
+  if (newMode == fp::PaintView::VM_STRUCTURE)
   	showRightToolbar(scrRightStructureToolbar);
 }
 
-void CMainFrame::disableUserInterface() {
+void MainFrame::disableUserInterface() {
   //scrRightForceToolbar->deactivate();
   //scrRightBCToolbar->deactivate();
   //scrRightDrawToolbar->deactivate();
@@ -11683,7 +11683,7 @@ void CMainFrame::disableUserInterface() {
   btnOptimize->deactivate();
 }
 
-void CMainFrame::enableUserInterface() {
+void MainFrame::enableUserInterface() {
   //scrRightForceToolbar->activate();
   //scrRightBCToolbar->activate();
   //scrRightDrawToolbar->activate();
@@ -11707,14 +11707,14 @@ void CMainFrame::enableUserInterface() {
   btnOptimize->activate();
 }
 
-void CMainFrame::onNewModel() {
+void MainFrame::onNewModel() {
   if (paintView->getUseWeight())
   	btnUseWeight->value(1);
   else
   	btnUseWeight->value(0);
 }
 
-void CMainFrame::onModelLoaded() {
+void MainFrame::onModelLoaded() {
   if (paintView->getUseWeight())
   	btnUseWeight->value(1);
   else

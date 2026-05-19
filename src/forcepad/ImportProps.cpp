@@ -3,12 +3,12 @@
 #include "ImportProps.h"
 #include "PaintView.h"
 
-inline void CImportProps::cb_btnOk_i(Fl_HoverButton*, void*) {
+inline void ImportProps::cb_btnOk_i(Fl_HoverButton*, void*) {
   m_modalResult = MR_OK;
 wndImportProps->hide();
 }
-void CImportProps::cb_btnOk(Fl_HoverButton* o, void* v) {
-  ((CImportProps*)(o->parent()->user_data()))->cb_btnOk_i(o,v);
+void ImportProps::cb_btnOk(Fl_HoverButton* o, void* v) {
+  ((ImportProps*)(o->parent()->user_data()))->cb_btnOk_i(o,v);
 }
 
 #include <FL/Fl_Pixmap.H>
@@ -71,23 +71,23 @@ static const char *idata_additional[] = {
 };
 static Fl_Pixmap image_additional(idata_additional);
 
-inline void CImportProps::cb_rbImportNewModel_i(Fl_Round_Button*, void*) {
-  CPaintView* paintView = (CPaintView*)m_view;
-paintView->setImportMode(CPaintView::IM_NEW_MODEL);
+inline void ImportProps::cb_rbImportNewModel_i(Fl_Round_Button*, void*) {
+  fp::PaintView* paintView = (fp::PaintView*)m_view;
+paintView->setImportMode(fp::PaintView::IM_NEW_MODEL);
 }
-void CImportProps::cb_rbImportNewModel(Fl_Round_Button* o, void* v) {
-  ((CImportProps*)(o->parent()->user_data()))->cb_rbImportNewModel_i(o,v);
-}
-
-inline void CImportProps::cb_rbImportAndPaste_i(Fl_Round_Button*, void*) {
-  CPaintView* paintView = (CPaintView*)m_view;
-paintView->setImportMode(CPaintView::IM_PASTE);
-}
-void CImportProps::cb_rbImportAndPaste(Fl_Round_Button* o, void* v) {
-  ((CImportProps*)(o->parent()->user_data()))->cb_rbImportAndPaste_i(o,v);
+void ImportProps::cb_rbImportNewModel(Fl_Round_Button* o, void* v) {
+  ((ImportProps*)(o->parent()->user_data()))->cb_rbImportNewModel_i(o,v);
 }
 
-CImportProps::CImportProps() {
+inline void ImportProps::cb_rbImportAndPaste_i(Fl_Round_Button*, void*) {
+  fp::PaintView* paintView = (fp::PaintView*)m_view;
+paintView->setImportMode(fp::PaintView::IM_PASTE);
+}
+void ImportProps::cb_rbImportAndPaste(Fl_Round_Button* o, void* v) {
+  ((ImportProps*)(o->parent()->user_data()))->cb_rbImportAndPaste_i(o,v);
+}
+
+ImportProps::ImportProps() {
   Fl_Double_Window* w;
   { Fl_Double_Window* o = wndImportProps = new Fl_Double_Window(184, 73, "Drawing properties");
     w = o;
@@ -126,18 +126,18 @@ CImportProps::CImportProps() {
   }
 }
 
-CImportProps::~CImportProps() {
+ImportProps::~ImportProps() {
   delete wndImportProps;
 }
 
-void CImportProps::show() {
+void ImportProps::show() {
   setSize(wndImportProps->w(),btnOk->h()+2);
 
 if (m_view!=NULL)
 {
-	CPaintView* paintView = (CPaintView*) m_view;
+	fp::PaintView* paintView = (fp::PaintView*) m_view;
 	
-	if (paintView->getImportMode()==CPaintView::IM_NEW_MODEL)
+	if (paintView->getImportMode()==fp::PaintView::IM_NEW_MODEL)
 		rbImportNewModel->value(1);
 	else
 		rbImportAndPaste->value(1);
@@ -146,19 +146,19 @@ if (m_view!=NULL)
 wndImportProps->show();
 }
 
-void CImportProps::setPosition(int x, int y) {
+void ImportProps::setPosition(int x, int y) {
   wndImportProps->position(x, y);
 }
 
-void CImportProps::setSize(int width, int height) {
+void ImportProps::setSize(int width, int height) {
   wndImportProps->size_range(0, 0);
 wndImportProps->size(width, height);
 }
 
-void CImportProps::setView(void* p) {
+void ImportProps::setView(void* p) {
   m_view = p;
 }
 
-void CImportProps::hide() {
+void ImportProps::hide() {
   wndImportProps->hide();
 }

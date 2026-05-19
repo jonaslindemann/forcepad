@@ -4,31 +4,31 @@
 #include "PaintView.h"
 #include "PlatformInfo.h"
 
-void CGeneralSettings::cb_okButton_i(Fl_Button*, void*) {
+void GeneralSettings::cb_okButton_i(Fl_Button*, void*) {
   this->getData();
 mainWindow->hide();
 }
-void CGeneralSettings::cb_okButton(Fl_Button* o, void* v) {
-  ((CGeneralSettings*)(o->parent()->user_data()))->cb_okButton_i(o,v);
+void GeneralSettings::cb_okButton(Fl_Button* o, void* v) {
+  ((GeneralSettings*)(o->parent()->user_data()))->cb_okButton_i(o,v);
 }
 
-void CGeneralSettings::cb_lineThickness_i(Fl_Value_Slider*, void*) {
-  CPaintView* view = (CPaintView*)m_paintView;
+void GeneralSettings::cb_lineThickness_i(Fl_Value_Slider*, void*) {
+  fp::PaintView* view = (fp::PaintView*)m_paintView;
 view->setUiLineThickness(lineThickness->value());
 }
-void CGeneralSettings::cb_lineThickness(Fl_Value_Slider* o, void* v) {
-  ((CGeneralSettings*)(o->parent()->user_data()))->cb_lineThickness_i(o,v);
+void GeneralSettings::cb_lineThickness(Fl_Value_Slider* o, void* v) {
+  ((GeneralSettings*)(o->parent()->user_data()))->cb_lineThickness_i(o,v);
 }
 
-void CGeneralSettings::cb_symbolLength_i(Fl_Value_Slider*, void*) {
-  CPaintView* view = (CPaintView*)m_paintView;
+void GeneralSettings::cb_symbolLength_i(Fl_Value_Slider*, void*) {
+  fp::PaintView* view = (fp::PaintView*)m_paintView;
 view->setUiSymbolLength(symbolLength->value());
 }
-void CGeneralSettings::cb_symbolLength(Fl_Value_Slider* o, void* v) {
-  ((CGeneralSettings*)(o->parent()->user_data()))->cb_symbolLength_i(o,v);
+void GeneralSettings::cb_symbolLength(Fl_Value_Slider* o, void* v) {
+  ((GeneralSettings*)(o->parent()->user_data()))->cb_symbolLength_i(o,v);
 }
 
-CGeneralSettings::CGeneralSettings() {
+GeneralSettings::GeneralSettings() {
   { mainWindow = new Fl_Double_Window(309, 167, "General Settings");
     mainWindow->color(FL_FOREGROUND_COLOR);
     mainWindow->user_data((void*)(this));
@@ -83,43 +83,43 @@ CGeneralSettings::CGeneralSettings() {
   m_paintView = NULL;
 }
 
-void CGeneralSettings::show() {
+void GeneralSettings::show() {
   this->setData();
   mainWindow->show();
   while (mainWindow->visible()) Fl::wait();
 }
 
-void CGeneralSettings::setView(void* view) {
-  m_paintView = (CPaintView*)view;
+void GeneralSettings::setView(void* view) {
+  m_paintView = (fp::PaintView*)view;
 }
 
-void CGeneralSettings::setData() {
+void GeneralSettings::setData() {
   if (m_paintView!=NULL)
   {
-  	CPaintView* view = (CPaintView*)m_paintView;
+  	fp::PaintView* view = (fp::PaintView*)m_paintView;
   	
   	lineThickness->value(view->getUiLineThickness());
   	symbolLength->value(view->getUiSymbolLength());
   }
   
-  if (CPlatformInfo::getInstance()->getFakeTabletPC())
+  if (PlatformInfo::getInstance()->getFakeTabletPC())
   	showTabletPCToolbar->set();
   else
   	showTabletPCToolbar->clear();
 }
 
-void CGeneralSettings::getData() {
+void GeneralSettings::getData() {
   if (m_paintView!=NULL)
   {
-  	CPaintView* view = (CPaintView*)m_paintView;	
+  	fp::PaintView* view = (fp::PaintView*)m_paintView;	
   }
   
   if (showTabletPCToolbar->value()==1)
-  	CPlatformInfo::getInstance()->setFakeTabletPC(true);
+  	PlatformInfo::getInstance()->setFakeTabletPC(true);
   else
-  	CPlatformInfo::getInstance()->setFakeTabletPC(false);
+  	PlatformInfo::getInstance()->setFakeTabletPC(false);
 }
 
-void CGeneralSettings::centerWindow(Fl_Window* window) {
+void GeneralSettings::centerWindow(Fl_Window* window) {
   mainWindow->position(window->x()+window->w()/2-mainWindow->w()/2, window->y()+window->h()/2-mainWindow->h()/2);
 }

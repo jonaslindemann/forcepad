@@ -12,10 +12,10 @@
 #include <FL/Fl_Value_Input.H>
 #include <FL/Fl_Button.H>
 
-class CCalcSettings {
+class CalcSettings {
   void* m_paintView; 
 public:
-  CCalcSettings();
+  CalcSettings();
   Fl_Double_Window *mainWindow;
   Fl_Group *meshGroup;
   Fl_Value_Slider *gridStep;

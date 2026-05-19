@@ -3,22 +3,22 @@
 #include "OptSettings.h"
 #include "FlPaintView.h"
 
-void COptSettings::cb_cancelButton_i(Fl_Button*, void*) {
+void OptSettings::cb_cancelButton_i(Fl_Button*, void*) {
   mainWindow->hide();
 }
-void COptSettings::cb_cancelButton(Fl_Button* o, void* v) {
-  ((COptSettings*)(o->parent()->user_data()))->cb_cancelButton_i(o,v);
+void OptSettings::cb_cancelButton(Fl_Button* o, void* v) {
+  ((OptSettings*)(o->parent()->user_data()))->cb_cancelButton_i(o,v);
 }
 
-void COptSettings::cb_okButton_i(Fl_Button*, void*) {
+void OptSettings::cb_okButton_i(Fl_Button*, void*) {
   this->getData();
 mainWindow->hide();
 }
-void COptSettings::cb_okButton(Fl_Button* o, void* v) {
-  ((COptSettings*)(o->parent()->user_data()))->cb_okButton_i(o,v);
+void OptSettings::cb_okButton(Fl_Button* o, void* v) {
+  ((OptSettings*)(o->parent()->user_data()))->cb_okButton_i(o,v);
 }
 
-COptSettings::COptSettings() {
+OptSettings::OptSettings() {
   { mainWindow = new Fl_Double_Window(312, 290, "Optimisation Settings");
     mainWindow->color(FL_FOREGROUND_COLOR);
     mainWindow->labelcolor(FL_BACKGROUND2_COLOR);
@@ -121,24 +121,24 @@ COptSettings::COptSettings() {
   m_paintView = NULL;
 }
 
-COptSettings::~COptSettings() {
+OptSettings::~OptSettings() {
   mainWindow->hide();
 }
 
-void COptSettings::show() {
+void OptSettings::show() {
   this->setData();
   mainWindow->show();
   while (mainWindow->visible()) Fl::wait();
 }
 
-void COptSettings::setView(void* view) {
-  m_paintView = (CFlPaintView*)view;
+void OptSettings::setView(void* view) {
+  m_paintView = (FlPaintView*)view;
 }
 
-void COptSettings::setData() {
+void OptSettings::setData() {
   if (m_paintView!=NULL)
   {
-  	CFlPaintView* view = (CFlPaintView*)m_paintView;
+  	FlPaintView* view = (FlPaintView*)m_paintView;
   	
   	volFrac->value(view->getOptVolumeFraction());
   	rmin->value(view->getOptRmin());
@@ -155,10 +155,10 @@ void COptSettings::setData() {
   }
 }
 
-void COptSettings::getData() {
+void OptSettings::getData() {
   if (m_paintView!=NULL)
   {
-  	CFlPaintView* view = (CFlPaintView*)m_paintView;
+  	FlPaintView* view = (FlPaintView*)m_paintView;
   	
   	view->setOptVolumeFraction(volFrac->value());
   	view->setOptRmin(rmin->value());
@@ -175,10 +175,10 @@ void COptSettings::getData() {
   }
 }
 
-void COptSettings::centerWindow(Fl_Window* window) {
+void OptSettings::centerWindow(Fl_Window* window) {
   mainWindow->position(window->x()+window->w()/2-mainWindow->w()/2, window->y()+window->h()/2-mainWindow->h()/2);
 }
 
-void COptSettings::hide() {
+void OptSettings::hide() {
   mainWindow->hide();
 }

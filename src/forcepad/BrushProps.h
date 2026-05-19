@@ -10,11 +10,11 @@
 #include <FL/Fl_Value_Slider.H>
 #include <FL/Fl_Choice.H>
 
-class CBrushProps {
+class BrushProps {
   void* m_view;
   int m_modalResult;
 public:
-  CBrushProps();
+  BrushProps();
   Fl_Double_Window *wndBrushProps;
   Fl_HoverButton *btnOk;
 private:
@@ -42,7 +42,7 @@ public:
   static Fl_Menu_Item *mnuBrushS16;
   static Fl_Menu_Item *mnuBrushS32;
   static Fl_Menu_Item *mnuBrushS64;
-  ~CBrushProps();
+  ~BrushProps();
   void show();
   void setPosition(int x, int y);
   void setSize(int width, int height);

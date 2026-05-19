@@ -22,8 +22,8 @@
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
 
-#ifndef _CFemGridSolver_h_
-#define _CFemGridSolver_h_
+#ifndef _FemGridSolver_h_
+#define _FemGridSolver_h_
 
 #define BS_NO_ERROR			0 
 #define BS_NO_NODES			1
@@ -42,19 +42,19 @@
 #include "Base.h"
 #include "FemGrid.h"
 
-class CGSStatusMessageEvent {
+class GSStatusMessageEvent {
 public:
-	virtual ~CGSStatusMessageEvent() {};
+	virtual ~GSStatusMessageEvent() {};
 	virtual void onStatusMessage(const std::string& message, const int progress) = 0;
 };
 
-class CGSLogMessageEvent {
+class GSLogMessageEvent {
 public:
-	virtual ~CGSLogMessageEvent() {};
+	virtual ~GSLogMessageEvent() {};
 	virtual void onLogMessage(const std::string& context, const std::string& message) = 0;
 };
 
-IvfSmartPointer(CFemGridSolver);
+IvfSmartPointer(FemGridSolver);
 
 /** 
  * Fem Internal solver class.
@@ -62,7 +62,7 @@ IvfSmartPointer(CFemGridSolver);
  * This class is responsible for converting the FemModel class
  * into a finite element problem and then solving it.
  */
-class CFemGridSolver : public ivf2d::Base {
+class FemGridSolver : public ivf2d::Base {
 public:
 	enum TErrorType {
 		ET_NO_ERROR,
@@ -109,14 +109,14 @@ private:
 	int						m_nDof;
 
 
-	CGSStatusMessageEvent* m_statusMessageEvent;
-	CGSLogMessageEvent* m_logMessageEvent;
+	GSStatusMessageEvent* m_statusMessageEvent;
+	GSLogMessageEvent* m_logMessageEvent;
 public:
 	/** FemInternalSolver class constructor. */
-	CFemGridSolver();
+	FemGridSolver();
 
 	/** FeminternalSolver class destructor. */
-	virtual ~CFemGridSolver();
+	virtual ~FemGridSolver();
 
 	/* ---- Methods ----- */
 
@@ -177,8 +177,8 @@ public:
 	void setConstraintStiffnessScale(const double scalefactor);
 	double getConstraintStiffnessScale();
 
-	void setStatusMessageEvent(CGSStatusMessageEvent* eventMethod);
-	void setLogMessageEvent(CGSLogMessageEvent* eventMethod);
+	void setStatusMessageEvent(GSStatusMessageEvent* eventMethod);
+	void setLogMessageEvent(GSLogMessageEvent* eventMethod);
 };
 
 #endif 

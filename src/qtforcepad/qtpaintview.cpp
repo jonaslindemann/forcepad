@@ -20,7 +20,7 @@
 #endif
 
 QtPaintView::QtPaintView(QWidget *parent)
-    : QOpenGLWidget(parent), CPaintView(0, 0, 800, 600, "ForcePAD Qt")
+    : QOpenGLWidget(parent), fp::PaintView(0, 0, 800, 600, "ForcePAD Qt")
 {
     setMouseTracking(true);
     setFocusPolicy(Qt::StrongFocus);
@@ -184,7 +184,7 @@ void QtPaintView::keyPressEvent(QKeyEvent *event)
 }
 
 // ---------------------------------------------------------------------------
-// CPaintView virtual UI bridge implementations
+// fp::PaintView virtual UI bridge implementations
 // ---------------------------------------------------------------------------
 
 int QtPaintView::height()

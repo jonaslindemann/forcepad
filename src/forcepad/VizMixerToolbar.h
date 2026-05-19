@@ -13,10 +13,10 @@
 #include <FL/Fl_Slider.H>
 #include <FL/Fl_Check_Button.H>
 
-class CVizMixerToolbar {
+class VizMixerToolbar {
   void* m_paintView; 
 public:
-  CVizMixerToolbar();
+  VizMixerToolbar();
   Fl_Double_Window *mainWindow;
   Fl_HoverButton *btnStress;
 private:

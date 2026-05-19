@@ -75,6 +75,8 @@ typedef struct _FPRGBTRIPLE { //rgbt
 
 #endif
 
+namespace fp {
+
 void splitPath(const std::string& fullPathAndFilename, std::string& path, std::string& filename)
 {
 	using namespace std;
@@ -93,15 +95,15 @@ void splitPath(const std::string& fullPathAndFilename, std::string& path, std::s
 	}
 }
 
-class CPaintView;
+class PaintView;
 
 /////////////////////////////////////////////////////////////
-// CPaintView constructor destructor
+// PaintView constructor destructor
 /////////////////////////////////////////////////////////////
 
-CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
+PaintView::PaintView(int x,int y,int w,int h,const char *l)
 {
-	so_print("CPaintView","CPaintView(...)");
+	so_print("PaintView","PaintView(...)");
 
 	m_lastSize[0] = 0;
 	m_lastSize[1] = 0;
@@ -298,9 +300,9 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 }
 
 
-CPaintView::~CPaintView()
+PaintView::~PaintView()
 {
-    so_print("CPaintView","~CPaintViewidth()");
+    so_print("PaintView","~CPaintViewidth()");
 	
 	// Do the usual cleanup
 	
@@ -308,102 +310,102 @@ CPaintView::~CPaintView()
 	deleteCursors();
 }
 
-int CPaintView::height()
+int PaintView::height()
 {
     return -1;
 }
 
-int CPaintView::width()
+int PaintView::width()
 {
     return -1;
 }
 
-int CPaintView::physicalWidth()
+int PaintView::physicalWidth()
 {
     return width();
 }
 
-int CPaintView::physicalHeight()
+int PaintView::physicalHeight()
 {
     return height();
 }
 
-float CPaintView::doDevicePixelRatio()
+float PaintView::doDevicePixelRatio()
 {
     return 1.0f;
 }
 
-void CPaintView::doRedraw()
+void PaintView::doRedraw()
 {
 }
 
-void CPaintView::doFlush()
+void PaintView::doFlush()
 {
 }
 
-void CPaintView::doInvalidate()
+void PaintView::doInvalidate()
 {
 }
 
-void CPaintView::doMakeCurrent()
+void PaintView::doMakeCurrent()
 {
 }
 
-const std::string CPaintView::doSaveDialog(const string title, const string filter, const string defaultFilename)
-{
-    return "";
-}
-
-bool CPaintView::doNewModel(int &width, int &height, int& initialStiffness)
-{
-    return false;
-}
-
-void CPaintView::doInfoMessage(const string message)
-{
-
-}
-
-bool CPaintView::doAskYesNo(const string question)
-{
-    return false;
-}
-
-const std::string CPaintView::doOpenDialog(const string title, const string filter)
+const std::string PaintView::doSaveDialog(const string title, const string filter, const string defaultFilename)
 {
     return "";
 }
 
-void CPaintView::doCreateCursors()
+bool PaintView::doNewModel(int &width, int &height, int& initialStiffness)
+{
+    return false;
+}
+
+void PaintView::doInfoMessage(const string message)
 {
 
 }
 
-void CPaintView::doUpdateCursor(TEditMode mode)
+bool PaintView::doAskYesNo(const string question)
+{
+    return false;
+}
+
+const std::string PaintView::doOpenDialog(const string title, const string filter)
+{
+    return "";
+}
+
+void PaintView::doCreateCursors()
 {
 
 }
 
-void CPaintView::doDeleteCursors()
+void PaintView::doUpdateCursor(TEditMode mode)
 {
 
 }
 
-void CPaintView::doShowAbout()
+void PaintView::doDeleteCursors()
 {
 
 }
 
-void CPaintView::doShowHelp()
+void PaintView::doShowAbout()
+{
+
+}
+
+void PaintView::doShowHelp()
 {
 
 }
 
 /////////////////////////////////////////////////////////////
-// CPaintView event methods
+// PaintView event methods
 /////////////////////////////////////////////////////////////
 
-void CPaintView::onMouseWheel(int dx, int dy)
+void PaintView::onMouseWheel(int dx, int dy)
 {
 #ifndef USE_QT
 	const bool inActionView = (m_viewMode == VM_ACTION);
@@ -423,7 +425,7 @@ void CPaintView::onMouseWheel(int dx, int dy)
 	}
 }
 
-void CPaintView::onPush(int x, int y)
+void PaintView::onPush(int x, int y)
 {
 	//
 	// Handle FLTK push event (MouseDown)
@@ -570,7 +572,7 @@ void CPaintView::onPush(int x, int y)
 }
 
 
-void CPaintView::onDrag(int x, int y)
+void PaintView::onDrag(int x, int y)
 {
 	//
 	// Handle FLTK drag event
@@ -913,7 +915,7 @@ void CPaintView::onDrag(int x, int y)
 }
 
 
-void CPaintView::onRelease(int x, int y)
+void PaintView::onRelease(int x, int y)
 {
 	//
 	// Handle FLTK release event (MouseUp).
@@ -978,14 +980,14 @@ void CPaintView::onRelease(int x, int y)
 
 }
 
-void CPaintView::onClear()
+void PaintView::onClear()
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void CPaintView::onInitContext()
+void PaintView::onInitContext()
 {
-	so_print("CPaintView", "onInitContext()");
+	so_print("PaintView", "onInitContext()");
 
 	if (m_checkOpenGL)
 	{
@@ -1060,13 +1062,13 @@ void CPaintView::onInitContext()
 	}
 }
 
-void CPaintView::onResize(int w, int h)
+void PaintView::onResize(int w, int h)
 {
 	m_zoomPos[0] = w/2;
 	m_zoomPos[1] = h/2;
 }
 
-void CPaintView::onDraw()
+void PaintView::onDraw()
 {
 	glEnable(GL_LINE_SMOOTH);
 	//glEnable(GL_POLYGON_SMOOTH);
@@ -1344,7 +1346,7 @@ void CPaintView::onDraw()
 	glPopAttrib();
 }
 
-void CPaintView::onMove(int x, int y)
+void PaintView::onMove(int x, int y)
 {
 	//
 	// Handle passive mouse movement
@@ -1374,12 +1376,12 @@ void CPaintView::onMove(int x, int y)
 }
 
 /////////////////////////////////////////////////////////////
-// CPaintView private methods
+// PaintView private methods
 /////////////////////////////////////////////////////////////
 
-void CPaintView::loadBrushes()
+void PaintView::loadBrushes()
 {
-	so_print("CPaintView","loadBrushes()");
+	so_print("PaintView","loadBrushes()");
 	
 	ivf2d::SgiImagePtr brush;
 	ivf2d::SgiImagePtr invertedBrush;
@@ -1586,9 +1588,9 @@ void CPaintView::loadBrushes()
 	m_currentInvertedBrush = m_invertedBrushes[0];
 }
 
-void CPaintView::deleteBrushes()
+void PaintView::deleteBrushes()
 {
-	so_print("CPaintView","deleteBrushes()");
+	so_print("PaintView","deleteBrushes()");
 	
 	m_brushes.clear();
 	m_invertedBrushes.clear();
@@ -1597,39 +1599,39 @@ void CPaintView::deleteBrushes()
 	m_currentInvertedBrush = nullptr;
 }
 
-void CPaintView::clearMesh()
+void PaintView::clearMesh()
 {
-    so_print("CPaintView","clearMesh()");
+    so_print("PaintView","clearMesh()");
 	m_femGrid->setShowGrid(false);
     this->doRedraw();
 }
 
-void CPaintView::clearResults()
+void PaintView::clearResults()
 {
-	so_print("CPaintView", "clearResults()");
+	so_print("PaintView", "clearResults()");
 	m_femGrid->clearResults();
     this->doRedraw();
 }
 
-void CPaintView::updateSelectionBox()
+void PaintView::updateSelectionBox()
 {
-	so_print("CPaintView", "updateSelectionBox()");
+	so_print("PaintView", "updateSelectionBox()");
 	m_selectionBox->setPosition(m_selectionStart[0]+m_drawingOffsetX, m_selectionStart[1]+m_drawingOffsetY);
 	m_selectionBox->setSize(m_selectionEnd[0]-m_selectionStart[0], m_selectionEnd[1]-m_selectionStart[1]);
 }
 
-void CPaintView::resetUndoArea()
+void PaintView::resetUndoArea()
 {
-	so_print("CPaintView", "resetUndoArea()");
+	so_print("PaintView", "resetUndoArea()");
 	m_undoStart[0] = 65000;
 	m_undoStart[1] = 65000;
 	m_undoEnd[0] = -65000;
 	m_undoEnd[1] = -65000;
 }
 
-void CPaintView::updateUndo()
+void PaintView::updateUndo()
 {
-	so_print("CPaintView", "updateUndo()");
+	so_print("PaintView", "updateUndo()");
 	int x1, y1, x2, y2;
 	
 	if (m_undoStart[0]==65000)
@@ -1660,45 +1662,45 @@ void CPaintView::updateUndo()
 	m_undoClipboard->copy(x1, y1, x2, y2);
 }
 
-void CPaintView::disableDrawing()
+void PaintView::disableDrawing()
 {
 	m_lockDrawing = true;
 }
 
-void CPaintView::enableDrawing()
+void PaintView::enableDrawing()
 {
 	m_lockDrawing = false;
 }
 
-void CPaintView::updateModel()
+void PaintView::updateModel()
 {
-	so_print("CPaintView","updateModel()");
+	so_print("PaintView","updateModel()");
 #ifndef USE_QT
 	if (m_mainFrame!=NULL)
 	{
-		((CMainFrame*)m_mainFrame)->setPixelWeight(m_femGrid->getPixelArea()*1e-3);
-		((CMainFrame*)m_mainFrame)->setExternalForce(m_femGrid->getPixelArea()*m_relativeForceSize*1e-3);
+		((MainFrame*)m_mainFrame)->setPixelWeight(m_femGrid->getPixelArea()*1e-3);
+		((MainFrame*)m_mainFrame)->setExternalForce(m_femGrid->getPixelArea()*m_relativeForceSize*1e-3);
         this->doRedraw();
 	}
 #endif
 }
 
-void CPaintView::updateCursor()
+void PaintView::updateCursor()
 {
     doUpdateCursor(m_editMode);
 }
 
-void CPaintView::createCursors()
+void PaintView::createCursors()
 {
     doCreateCursors();
 }
 
-void CPaintView::deleteCursors()
+void PaintView::deleteCursors()
 {
     doDeleteCursors();
 }
 
-void CPaintView::checkOpenGLVersion()
+void PaintView::checkOpenGLVersion()
 {
 	m_checkOpenGL = false;
 	so_print("checkOpenGLVersion", (const char *)glGetString(GL_VENDOR));
@@ -1707,10 +1709,10 @@ void CPaintView::checkOpenGLVersion()
 }
 
 /////////////////////////////////////////////////////////////
-// CPaintView public methods
+// PaintView public methods
 /////////////////////////////////////////////////////////////
 
-void CPaintView::zoomIn()
+void PaintView::zoomIn()
 {
 	m_zoomFactor -= 0.01;
 	if (m_zoomFactor < 0.01)
@@ -1720,7 +1722,7 @@ void CPaintView::zoomIn()
     this->doRedraw();
 }
 
-void CPaintView::zoomOut()
+void PaintView::zoomOut()
 {
 	m_zoomFactor += 0.01;
     this->doFlush();
@@ -1728,11 +1730,11 @@ void CPaintView::zoomOut()
 }
 
 
-bool CPaintView::execute()
+bool PaintView::execute()
 {
 	bool errors = true;
 	
-	so_print("CPaintView","execute()");
+	so_print("PaintView","execute()");
 	
 	//
 	// Initialize grid
@@ -1748,7 +1750,7 @@ bool CPaintView::execute()
 	// Initiate solver
 	//
 
-	so_print("CPaintView","\tInitiating solver.");
+	so_print("PaintView","\tInitiating solver.");
 
 	m_solver = fp::FemGridSolver2::create();
 	m_solver->setStatusMessageEvent(m_statusMessageEvent);
@@ -1770,7 +1772,7 @@ bool CPaintView::execute()
 	// Execute calculation
 	//
 	
-	so_print("CPaintView","\tExecuting solver.");
+	so_print("PaintView","\tExecuting solver.");
 	
 	m_solver->execute();
 	
@@ -1778,7 +1780,7 @@ bool CPaintView::execute()
 	// Check for errors
 	//
 	
-	so_print("CPaintView","\tChecking for errors.");
+	so_print("PaintView","\tChecking for errors.");
 	
 	switch (m_solver->getLastError()) {
 	case fp::FemGridSolver2::ET_NO_ERROR:
@@ -1814,7 +1816,7 @@ bool CPaintView::execute()
 	// Clean up and redraw
 	//
 	
-	so_print("CPaintView","\tDestroying solver.");
+	so_print("PaintView","\tDestroying solver.");
 	
 	// delete solver;
 	
@@ -1826,18 +1828,18 @@ bool CPaintView::execute()
 	else
 		m_femGrid->setShowGrid(true);
 	
-	so_print("CPaintView","\tRedraw.");
+	so_print("PaintView","\tRedraw.");
 	
     this->doRedraw();
 
 	return !errors;
 }
 
-bool CPaintView::executeOpt()
+bool PaintView::executeOpt()
 {
 	bool errors = true;
 	
-	so_print("CPaintView","execute()");
+	so_print("PaintView","execute()");
 	
 	//
 	// Initialize grid
@@ -1853,7 +1855,7 @@ bool CPaintView::executeOpt()
 	// Initiate solver
 	//
 
-	so_print("CPaintView","\tInitiating solver.");
+	so_print("PaintView","\tInitiating solver.");
 
 	m_solver = fp::FemGridSolver2::create();
 	m_solver->setStatusMessageEvent(m_statusMessageEvent);
@@ -1883,7 +1885,7 @@ bool CPaintView::executeOpt()
 	// Execute calculation
 	//
 	
-	so_print("CPaintView","\tExecuting solver.");
+	so_print("PaintView","\tExecuting solver.");
 	
 	m_solver->executeOptimizer();
 	
@@ -1891,7 +1893,7 @@ bool CPaintView::executeOpt()
 	// Check for errors
 	//
 	
-	so_print("CPaintView","\tChecking for errors.");
+	so_print("PaintView","\tChecking for errors.");
 	
 	switch (m_solver->getLastError()) {
 	case fp::FemGridSolver2::ET_NO_ERROR:
@@ -1927,7 +1929,7 @@ bool CPaintView::executeOpt()
 	// Clean up and redraw
 	//
 	
-	so_print("CPaintView","\tDestroying solver.");
+	so_print("PaintView","\tDestroying solver.");
 	
 	// delete solver;
 	
@@ -1940,18 +1942,18 @@ bool CPaintView::executeOpt()
 	else
 		m_femGrid->setShowDensity(false);
 	
-	so_print("CPaintView","\tRedraw.");
+	so_print("PaintView","\tRedraw.");
 	
     this->doRedraw();
 
 	return !errors;
 }
 
-void CPaintView::newModel()
+void PaintView::newModel()
 {
 	disableDrawing();
 
-	so_print("CPaintView","newModel()");
+	so_print("PaintView","newModel()");
 	
     int width = 640;
     int height = 480;
@@ -2014,19 +2016,19 @@ void CPaintView::newModel()
 			m_newModelEvent->onNewModel();
 	}
 
-	this->setViewMode(CPaintView::VM_SKETCH);	
+	this->setViewMode(PaintView::VM_SKETCH);	
 	enableDrawing();
 }
 
-void CPaintView::executeCorba()
+void PaintView::executeCorba()
 {
 }
 
-void CPaintView::openImage()
+void PaintView::openImage()
 {
 	disableDrawing();
 	
-	so_print("CPaintView","openImage()");
+	so_print("PaintView","openImage()");
 	
     std::string fname = this->doOpenDialog("Open image file", "*.*");
 
@@ -2116,9 +2118,9 @@ void CPaintView::openImage()
 	enableDrawing();
 }
 
-void CPaintView::saveModelAs()
+void PaintView::saveModelAs()
 {
-	so_print("CPaintView", "saveModelAs()");
+	so_print("PaintView", "saveModelAs()");
 	
 	//
 	// Ask for file name
@@ -2145,9 +2147,9 @@ void CPaintView::saveModelAs()
 	f.close();
 }
 
-void CPaintView::saveModel()
+void PaintView::saveModel()
 {
-	so_print("CPaintView", "saveModel()");
+	so_print("PaintView", "saveModel()");
 	
 	//
 	// Ask for file name
@@ -2179,7 +2181,7 @@ void CPaintView::saveModel()
 	f.close();
 }
 
-void CPaintView::expandImage()
+void PaintView::expandImage()
 {
     disableDrawing();
 
@@ -2256,7 +2258,7 @@ void CPaintView::expandImage()
     enableDrawing();
 }
 
-void CPaintView::expandImageToWindow()
+void PaintView::expandImageToWindow()
 {
 	disableDrawing();
 
@@ -2315,13 +2317,13 @@ void CPaintView::expandImageToWindow()
 	enableDrawing();
 }
 
-void CPaintView::openModel(const std::string filename)
+void PaintView::openModel(const std::string filename)
 {
 	using namespace std;
 	
 	disableDrawing();
 	
-	so_print("CPaintView", "openModel()");
+	so_print("PaintView", "openModel()");
 	so_print("CPatinView", filename.c_str());
 	
 	m_danglingRelease = true;
@@ -2358,19 +2360,19 @@ void CPaintView::openModel(const std::string filename)
 
 	enableDrawing();
 
-	this->setViewMode(CPaintView::VM_SKETCH);	
+	this->setViewMode(PaintView::VM_SKETCH);	
 
 	if (m_modelLoadedEvent!=NULL)
 		m_modelLoadedEvent->onModelLoaded();
 }
 
-void CPaintView::openModel()
+void PaintView::openModel()
 {
 	using namespace std;
 	
 	disableDrawing();
 	
-	so_print("CPaintView", "openModel()");
+	so_print("PaintView", "openModel()");
 	
     std::string fname = doOpenDialog("Open forcepad model", "*.fp2");
 	m_danglingRelease = true;
@@ -2410,15 +2412,15 @@ void CPaintView::openModel()
 		if (m_modelLoadedEvent!=NULL)
 			m_modelLoadedEvent->onModelLoaded();
 
-		this->setViewMode(CPaintView::VM_SKETCH);	
+		this->setViewMode(PaintView::VM_SKETCH);	
 
 	}
 	enableDrawing();
 }
 
-void CPaintView::copy()
+void PaintView::copy()
 {
-	so_print("CPaintView", "copy()");
+	so_print("PaintView", "copy()");
 	int x1, y1, x2, y2;
 	
 	if (m_selectionStart[0]>m_selectionEnd[0])
@@ -2449,9 +2451,9 @@ void CPaintView::copy()
     this->doRedraw();
 }
 
-void CPaintView::cut()
+void PaintView::cut()
 {
-	so_print("CPaintView", "cut()");
+	so_print("PaintView", "cut()");
 	int x1, y1, x2, y2;
 	
 	if (m_selectionStart[0]>m_selectionEnd[0])
@@ -2481,9 +2483,9 @@ void CPaintView::cut()
     this->doRedraw();
 }
 
-void CPaintView::undo()
+void PaintView::undo()
 {
-	so_print("CPaintView", "undo()");
+	so_print("PaintView", "undo()");
 	
 	int x1, y1;
 	
@@ -2505,9 +2507,9 @@ void CPaintView::undo()
     this->doRedraw();
 }
 
-void CPaintView::updateUndoArea(int x, int y, int brushSize)
+void PaintView::updateUndoArea(int x, int y, int brushSize)
 {
-	so_print("CPaintView", "updateUndoArea()");
+	so_print("PaintView", "updateUndoArea()");
 
 	int xx, yy;
 
@@ -2529,13 +2531,13 @@ void CPaintView::updateUndoArea(int x, int y, int brushSize)
 		m_undoEnd[1] = yy+brushSize/2;
 }
 
-void CPaintView::undoToDrawing()
+void PaintView::undoToDrawing()
 {
 	updateUndoArea(0,0,0);
     updateUndoArea(m_drawing->getWidth(), m_drawing->getHeight(),0);
 }
 
-void CPaintView::transferViewToImage()
+void PaintView::transferViewToImage()
 {
     int w = m_drawing->getWidth();
     int h = m_drawing->getHeight();
@@ -2577,9 +2579,9 @@ void CPaintView::transferViewToImage()
     }
 }
 
-void CPaintView::copyToWindows()
+void PaintView::copyToWindows()
 {
-	so_print("CPaintView", "copyToWindows()");
+	so_print("PaintView", "copyToWindows()");
 #ifdef WIN32
 	
 	// Extract copy area from selection 
@@ -2724,9 +2726,9 @@ void CPaintView::copyToWindows()
 #endif
 }
 
-void CPaintView::pasteFromWindows()
+void PaintView::pasteFromWindows()
 {
-	so_print("CPaintView", "pasteFromWindows()");
+	so_print("PaintView", "pasteFromWindows()");
 #ifdef WIN32
 	
 	HGLOBAL   hglb; 
@@ -2853,12 +2855,12 @@ void CPaintView::pasteFromWindows()
 #endif
 }
 
-void CPaintView::lockScaleFactor()
+void PaintView::lockScaleFactor()
 {
 	m_femGrid->setLockScale(true);
 }
 
-void CPaintView::unlockScaleFactor()
+void PaintView::unlockScaleFactor()
 {
 	m_femGrid->setLockScale(false);
 }
@@ -2867,50 +2869,50 @@ void CPaintView::unlockScaleFactor()
 // Get/set methods
 /////////////////////////////////////////////////////////////
 
-void CPaintView::setRelativeForceSize(double size)
+void PaintView::setRelativeForceSize(double size)
 {
 	m_relativeForceSize = size;
 	updateModel();
 }
 
-void CPaintView::setMainFrame(void *frame)
+void PaintView::setMainFrame(void *frame)
 {
 	m_mainFrame = frame;
 }
 
-void CPaintView::setStressStep(int step)
+void PaintView::setStressStep(int step)
 {
 	m_femGrid->setStressStep(step);
     this->doRedraw();
 }
 
-int CPaintView::getStressStep()
+int PaintView::getStressStep()
 {
 	return m_femGrid->getStressStep();
 }
 
-void CPaintView::setUseWeight(bool flag)
+void PaintView::setUseWeight(bool flag)
 {
 	m_useWeight = flag;
 }
 
-bool CPaintView::getUseWeight()
+bool PaintView::getUseWeight()
 {
 	return m_useWeight;
 }
 
-void CPaintView::setStressMode(fp::FemGrid2::TStressMode mode)
+void PaintView::setStressMode(fp::FemGrid2::TStressMode mode)
 {
 	m_femGrid->setStressMode(mode);
     this->doRedraw();
 }
 
-void CPaintView::setBrushMagnification(int factor)
+void PaintView::setBrushMagnification(int factor)
 {
 	m_brushScale = factor;
 }
 
-void CPaintView::setForegroundColor(float red, float green, float blue)
+void PaintView::setForegroundColor(float red, float green, float blue)
 {
 	m_brushColor[0] = red;
 	m_brushColor[1] = green;
@@ -2919,28 +2921,28 @@ void CPaintView::setForegroundColor(float red, float green, float blue)
 	m_drawing->setFillColor((GLubyte)(red*255),(GLubyte)(green*255),(GLubyte)(blue*255));
 }
 
-void CPaintView::setBackgroundColor(float red, float green, float blue)
+void PaintView::setBackgroundColor(float red, float green, float blue)
 {
 	m_backColor[0] = red;
 	m_backColor[0] = green;
 	m_backColor[0] = blue;
 }
 
-void CPaintView::getForegroundColor(float &red, float &green, float &blue)
+void PaintView::getForegroundColor(float &red, float &green, float &blue)
 {
 	red = m_brushColor[0];
 	green = m_brushColor[1];
 	blue = m_brushColor[2];
 }
 
-void CPaintView::setBlendFactor(int factor)
+void PaintView::setBlendFactor(int factor)
 {
 	m_blendFactor = factor;
 	m_currentBrush->createAlphaMask(0,m_blendFactor);
 	m_rectangle->getColor()->setAlpha((float)m_blendFactor/255.0f);
 }
 
-void CPaintView::setCurrentBrush(int idx)
+void PaintView::setCurrentBrush(int idx)
 {
 	if ((idx>=0)||(idx<(int)m_brushes.size()))
 	{
@@ -2951,7 +2953,7 @@ void CPaintView::setCurrentBrush(int idx)
 	}
 }
 
-void CPaintView::setGridStride(int stride)
+void PaintView::setGridStride(int stride)
 {
 	m_femGrid->setStride(stride);
 	this->clearResults();
@@ -2959,13 +2961,13 @@ void CPaintView::setGridStride(int stride)
 	m_gridSpacing = stride;
 }
 
-int CPaintView::getGridStride()
+int PaintView::getGridStride()
 {
 	return m_femGrid->getStride();
 }
 
 
-void CPaintView::setEditMode(TEditMode mode)
+void PaintView::setEditMode(TEditMode mode)
 {
 	TEditMode oldMode = m_editMode;
 	m_editMode = mode;
@@ -2987,90 +2989,90 @@ void CPaintView::setEditMode(TEditMode mode)
 	}
 }
 
-CPaintView::TEditMode CPaintView::getEditMode()
+PaintView::TEditMode PaintView::getEditMode()
 {
 	return m_editMode;
 }
 
-void CPaintView::setLineWidth(int width)
+void PaintView::setLineWidth(int width)
 {
 	m_line->setWidth(width);
     m_arch->setLineWidth(width);
 }
 
-int CPaintView::getBlendFactor()
+int PaintView::getBlendFactor()
 {
 	return m_blendFactor;
 }
 
-int CPaintView::getCurrentBrushIdx()
+int PaintView::getCurrentBrushIdx()
 {
 	return m_currentBrushIdx;
 }
 
-int CPaintView::getLineWidth()
+int PaintView::getLineWidth()
 {
     return 	m_line->getWidth();
 }
 
-void CPaintView::setStiffness(double stiffness)
+void PaintView::setStiffness(double stiffness)
 {
 	this->setForegroundColor(1.0f-stiffness, 1.0f-stiffness, 1.0f-stiffness);
 }
 
-double CPaintView::getStiffness()
+double PaintView::getStiffness()
 {
 	return 1.0-m_brushColor[0];
 }
 
-void CPaintView::setDisplacementScale(double value)
+void PaintView::setDisplacementScale(double value)
 {
 	m_femGrid->setDisplacementScale(value);
     this->doRedraw();
 }
 
-void CPaintView::setStressAlpha(double alpha)
+void PaintView::setStressAlpha(double alpha)
 {
 	m_femGrid->setStressAlpha(alpha);
     this->doRedraw();
 }
 
-void CPaintView::setStressSize(double size)
+void PaintView::setStressSize(double size)
 {
 	m_femGrid->setStressSize(size);
     this->doRedraw();
 }
 
-void CPaintView::setStressWidth(double width)
+void PaintView::setStressWidth(double width)
 {
 	m_femGrid->setStressWidth(width);
     this->doRedraw();
 }
 
-void CPaintView::setStressTreshold(double lower, double upper)
+void PaintView::setStressTreshold(double lower, double upper)
 {
 	m_femGrid->setStressTreshold(lower, upper);
     this->doRedraw();
 }
 
-void CPaintView::setLockScaling(bool flag)
+void PaintView::setLockScaling(bool flag)
 {
 	m_femGrid->setLockScale(flag);
 }
 
-void CPaintView::setMaxIntensity(float intensity)
+void PaintView::setMaxIntensity(float intensity)
 {
 	m_maxIntensity = intensity;
 	m_femGrid->setMaxIntensity(intensity);
     this->doRedraw();
 }
 
-void CPaintView::applyElementScale()
+void PaintView::applyElementScale()
 {
     this->m_femGrid->setElementScaleFactor(m_ruler->getActualLength()/m_ruler->getPixelLength());
 }
 
-void CPaintView::setRulerLength(double actualLength)
+void PaintView::setRulerLength(double actualLength)
 {
 	if (actualLength>0.0)
 	{
@@ -3079,12 +3081,12 @@ void CPaintView::setRulerLength(double actualLength)
 	}
 }
 
-double CPaintView::getRulerLength()
+double PaintView::getRulerLength()
 {
     return m_ruler->getActualLength();
 }
 
-void CPaintView::setVisualisationMode(TVisualisationMode mode)
+void PaintView::setVisualisationMode(TVisualisationMode mode)
 {
 	TVisualisationMode oldMode = m_visualisationMode;
 	m_visualisationMode = mode;
@@ -3125,12 +3127,12 @@ void CPaintView::setVisualisationMode(TVisualisationMode mode)
 
 }
 
-CPaintView::TVisualisationMode CPaintView::getVisualisationMode()
+PaintView::TVisualisationMode PaintView::getVisualisationMode()
 {
 	return m_visualisationMode;
 }
 
-void CPaintView::setCommandLine(int argc, char **argv)
+void PaintView::setCommandLine(int argc, char **argv)
 {
 	m_argc = argc;
 	m_argv = argv;
@@ -3147,7 +3149,7 @@ void CPaintView::setCommandLine(int argc, char **argv)
 	setCurrentBrush(3);
 }
 
-const std::string CPaintView::getApplicationPath()
+const std::string PaintView::getApplicationPath()
 {
     std::string exePath = m_argv[0];
 #ifdef WIN32
@@ -3163,12 +3165,12 @@ const std::string CPaintView::getApplicationPath()
 }
 
 
-void CPaintView::setConstraintType(fp::Constraint::TConstraintType constraintType)
+void PaintView::setConstraintType(fp::Constraint::TConstraintType constraintType)
 {
 	m_constraintType = constraintType;
 }
 
-void CPaintView::setModelName(const std::string& modelName)
+void PaintView::setModelName(const std::string& modelName)
 {
 	m_modelName = modelName;
 
@@ -3177,29 +3179,29 @@ void CPaintView::setModelName(const std::string& modelName)
 		string filePath;
 		string filename;
 
-		::splitPath(m_modelName, filePath, filename);
+		splitPath(m_modelName, filePath, filename);
 		if (m_modelChangedEvent!=NULL)
 			m_modelChangedEvent->onModelChanged(filename);
 	}
 }
 
-//const char* CPaintView::getModelName()
+//const char* PaintView::getModelName()
 //{
 //	return m_modelName;
 //}
 
-void CPaintView::setZoomResults(bool flag)
+void PaintView::setZoomResults(bool flag)
 {
 	m_zoomResults = flag;
     this->doRedraw();
 }
 
-bool CPaintView::getZoomResults()
+bool PaintView::getZoomResults()
 {
 	return m_zoomResults;
 }
 
-void CPaintView::setCalcCG(bool flag)
+void PaintView::setCalcCG(bool flag)
 {
 	m_calcCG = flag;
 	int cgx, cgy;
@@ -3219,32 +3221,32 @@ void CPaintView::setCalcCG(bool flag)
     this->doRedraw();
 }
 
-bool CPaintView::getCalcCG()
+bool PaintView::getCalcCG()
 {
 	return m_calcCG;
 }
 
-void CPaintView::showAbout()
+void PaintView::showAbout()
 {
     this->doShowAbout();
 }
 
-void CPaintView::showHelp() 
+void PaintView::showHelp() 
 {
     this->doShowHelp();
 }
 
-void CPaintView::setImportMode(TImportMode mode)
+void PaintView::setImportMode(TImportMode mode)
 {
 	m_importMode = mode;
 }
 
-CPaintView::TImportMode CPaintView::getImportMode()
+PaintView::TImportMode PaintView::getImportMode()
 {
 	return m_importMode;
 }
 
-void CPaintView::setViewMode(TViewMode mode)
+void PaintView::setViewMode(TViewMode mode)
 {
 	TViewMode oldMode = m_viewMode;
 
@@ -3303,43 +3305,43 @@ void CPaintView::setViewMode(TViewMode mode)
 	}
 }
 
-void CPaintView::setDrawStress(bool flag)
+void PaintView::setDrawStress(bool flag)
 {
 	m_femGrid->setDrawStress(flag);
     this->doRedraw();
 }
 
-bool CPaintView::getDrawStress()
+bool PaintView::getDrawStress()
 {
 	return m_femGrid->getDrawStress();
 }
 
-void CPaintView::setDrawDisplacements(bool flag)
+void PaintView::setDrawDisplacements(bool flag)
 {
 	m_femGrid->setDrawDisplacements(flag);
 	m_femGrid->setUndeformedGrid(flag);
     this->doRedraw();
 }
 
-bool CPaintView::getDrawDisplacements()
+bool PaintView::getDrawDisplacements()
 {
 	return m_femGrid->getDrawDisplacements();
 }
 
-void CPaintView::setDrawForcesAndConstraints(bool flag)
+void PaintView::setDrawForcesAndConstraints(bool flag)
 {
 	m_femGrid->setDrawForcesAndConstraints(flag);
     this->doRedraw();
 }
 
-void CPaintView::setDimmedConstraints(bool flag)
+void PaintView::setDimmedConstraints(bool flag)
 {
 	m_femGrid->setDimmedConstraints(flag);
     this->doRedraw();
 }
 
 
-void CPaintView::setStressType(fp::FemGrid2::TStressType stressType)
+void PaintView::setStressType(fp::FemGrid2::TStressType stressType)
 {
 	// Make sure a colormap is loaded
 
@@ -3350,9 +3352,9 @@ void CPaintView::setStressType(fp::FemGrid2::TStressType stressType)
     this->doRedraw();
 }
 
-void CPaintView::setColorMap(int index)
+void PaintView::setColorMap(int index)
 {
-	so_print("CPaintView", "setColorMap()");
+	so_print("PaintView", "setColorMap()");
 	if ((index>=1)&&(index<=17))
 	{
 		string filename = "";
@@ -3392,130 +3394,130 @@ void CPaintView::setColorMap(int index)
 	}
 }
 
-void CPaintView::setInvertColorMap(bool flag)
+void PaintView::setInvertColorMap(bool flag)
 {
 	m_femGrid->getColorMap()->setInvert(flag);
     this->doRedraw();
 }
 
-void CPaintView::setUpperMisesTreshold(double upper)
+void PaintView::setUpperMisesTreshold(double upper)
 {
 	m_femGrid->setUpperMisesTreshold(upper);
     this->doRedraw();
 }
 
-void CPaintView::setElementTreshold(double value)
+void PaintView::setElementTreshold(double value)
 {
 	m_femGrid->setElementTreshold(value);
 }
 
-double CPaintView::getElementTreshold()
+double PaintView::getElementTreshold()
 {
 	return m_femGrid->getElementTreshold();
 }
 
-void CPaintView::setForceMagnitude(double value)
+void PaintView::setForceMagnitude(double value)
 {
 	m_forceMagnitude = value;
 }
 
-double CPaintView::getForceMagnitude()
+double PaintView::getForceMagnitude()
 {
 	return m_forceMagnitude;
 }
 
-void CPaintView::setOutputMatlab(bool flag)
+void PaintView::setOutputMatlab(bool flag)
 {
 	m_outputMatlab = flag;
 }
 
-bool CPaintView::getOutputMatlab()
+bool PaintView::getOutputMatlab()
 {
 	return m_outputMatlab;
 }
 
-void CPaintView::setStiffnessScaleFactor(double value)
+void PaintView::setStiffnessScaleFactor(double value)
 {
 	m_stiffnessScalefactor = value;
 }
 
-double CPaintView::getStiffnessScaleFactor()
+double PaintView::getStiffnessScaleFactor()
 {
 	return m_stiffnessScalefactor;
 }
 
-void CPaintView::setElasticModulus(double value)
+void PaintView::setElasticModulus(double value)
 {
 	m_elasticModulus = value;
 }
 
-double CPaintView::getElasticModulus()
+double PaintView::getElasticModulus()
 {
 	return m_elasticModulus;
 }
 
-void CPaintView::setYoungsModulus(double value)
+void PaintView::setYoungsModulus(double value)
 {
 	if (value>0.0)
 		m_youngsModulus = value;
 }
 
-double CPaintView::getYoungsModulus()
+double PaintView::getYoungsModulus()
 {
 	return m_youngsModulus;
 }
 
-void CPaintView::setThickness(double value)
+void PaintView::setThickness(double value)
 {
 	if (value>0.0)
 		m_thickness = value;
 }
 
-double CPaintView::getThickness()
+double PaintView::getThickness()
 {
 	return m_thickness;
 }
 
-void CPaintView::setConstraintStiffnessScale(double value)
+void PaintView::setConstraintStiffnessScale(double value)
 {
 	if (value>0.0)
 		m_constraintStiffnessScale = value;
 }
 
-double CPaintView::getConstraintStiffnessScale()
+double PaintView::getConstraintStiffnessScale()
 {
 	return m_constraintStiffnessScale;
 }
 
-void CPaintView::setWeight(double value)
+void PaintView::setWeight(double value)
 {
 	if (value>0.0)
 		m_weight = value;
 }
 
-double CPaintView::getWeight()
+double PaintView::getWeight()
 {
 	return m_weight;
 }
 
-void CPaintView::setSnapToGrid(bool flag)
+void PaintView::setSnapToGrid(bool flag)
 {
 	m_snapToGrid = flag;
 }
 
 bool getSnapToGrid();
 
-void CPaintView::setMoveLoad(bool flag)
+void PaintView::setMoveLoad(bool flag)
 {
 	m_moveLoad = flag;
 }
 
-bool CPaintView::getMoveLoad()
+bool PaintView::getMoveLoad()
 {
 	return m_moveLoad;
 }
 
-void CPaintView::setOptLayer(bool active)
+void PaintView::setOptLayer(bool active)
 {
 	m_optLayerActive = active;
 	if (active)
@@ -3525,140 +3527,141 @@ void CPaintView::setOptLayer(bool active)
     this->doRedraw();
 }
 
-void CPaintView::setOptVolumeFraction(double fraction)
+void PaintView::setOptVolumeFraction(double fraction)
 {
 	m_optVolfrac = fraction;
 }
 
-double CPaintView::getOptVolumeFraction()
+double PaintView::getOptVolumeFraction()
 {
 	return m_optVolfrac;
 }
 
-void CPaintView::setOptRmin(double rmin)
+void PaintView::setOptRmin(double rmin)
 {
 	m_optRmin = rmin;
 }
 
-double CPaintView::getOptRmin()
+double PaintView::getOptRmin()
 {
 	return m_optRmin;
 }
 
-void CPaintView::setOptMinChange(double minChange)
+void PaintView::setOptMinChange(double minChange)
 {
 	m_optMinChange = minChange;
 }
 
-double CPaintView::getOptMinChange()
+double PaintView::getOptMinChange()
 {
 	return m_optMinChange;
 }
 
-void CPaintView::setOptMaxLoops(int loops)
+void PaintView::setOptMaxLoops(int loops)
 {
 	m_optMaxLoops = loops;
 }
 
-int CPaintView::getOptMaxLoops()
+int PaintView::getOptMaxLoops()
 {
 	return m_optMaxLoops;
 }
 
-void CPaintView::setUiLineThickness(double thickness)
+void PaintView::setUiLineThickness(double thickness)
 {
 	fp::UiSettings::getInstance()->setLineThickness(thickness);
     this->doRedraw();
 }
 
-double CPaintView::getUiLineThickness()
+double PaintView::getUiLineThickness()
 {
 	return fp::UiSettings::getInstance()->getLineThickness();
 }
 
-void CPaintView::setUiSymbolLength(double length)
+void PaintView::setUiSymbolLength(double length)
 {
 	fp::UiSettings::getInstance()->setSymbolLength(length);
     this->doRedraw();
 }
 
-double CPaintView::getUiSymbolLength()
+double PaintView::getUiSymbolLength()
 {
     return fp::UiSettings::getInstance()->getSymbolLength();
 }
 
-void CPaintView::setOptFilterType(fp::FemGridSolver2::TFilterType filterType)
+void PaintView::setOptFilterType(fp::FemGridSolver2::TFilterType filterType)
 {
 	m_optFilterType = filterType;
 }
 
-fp::FemGridSolver2::TFilterType CPaintView::getOptFilterType()
+fp::FemGridSolver2::TFilterType PaintView::getOptFilterType()
 {
 	return m_optFilterType;
 }
 
-void CPaintView::setWarnOnLargeModels(bool flag)
+void PaintView::setWarnOnLargeModels(bool flag)
 {
 	m_warnOnLargeModels = flag;
 }
 
-bool CPaintView::getWarnOnLargeModels()
+bool PaintView::getWarnOnLargeModels()
 {
 	return m_warnOnLargeModels;
 }
 
-void CPaintView::setModeChangeEvent(CPVModeChangeEvent* eventMethod)
+void PaintView::setModeChangeEvent(PVModeChangeEvent* eventMethod)
 {
 	m_modeChangeEvent = eventMethod;
 }
 
-void CPaintView::setViewModeChangeEvent(CPVViewModeChangeEvent* eventMethod)
+void PaintView::setViewModeChangeEvent(PVViewModeChangeEvent* eventMethod)
 {
 	m_viewModeChangeEvent = eventMethod;
 }
 
-void CPaintView::setViewModeErrorEvent(CPVViewModeErrorEvent* eventMethod)
+void PaintView::setViewModeErrorEvent(PVViewModeErrorEvent* eventMethod)
 {
 	m_viewModeErrorEvent = eventMethod;
 }
 
-void CPaintView::setStatusMessageEvent(CGSStatusMessageEvent* eventMethod)
+void PaintView::setStatusMessageEvent(GSStatusMessageEvent* eventMethod)
 {
 	m_statusMessageEvent = eventMethod;
 }
 
-void CPaintView::setLogMessageEvent(CGSLogMessageEvent* eventMethod)
+void PaintView::setLogMessageEvent(GSLogMessageEvent* eventMethod)
 {
 	m_logMessageEvent = eventMethod;
 }
 
-void CPaintView::setContinueCalcEvent(CGSContinueCalcEvent* eventMethod)
+void PaintView::setContinueCalcEvent(GSContinueCalcEvent* eventMethod)
 {
 	m_continueCalcEvent = eventMethod;
 }
 
-void CPaintView::setModelChangedEvent(CPVModelChangedEvent* eventMethod)
+void PaintView::setModelChangedEvent(PVModelChangedEvent* eventMethod)
 {
 	m_modelChangedEvent = eventMethod;
 }
 
-void CPaintView::setRulerChangedEvent(CPVRulerChangedEvent* eventMethod)
+void PaintView::setRulerChangedEvent(PVRulerChangedEvent* eventMethod)
 {
 	m_rulerChangedEvent = eventMethod;
 }
 
-void CPaintView::setVisualisationModeChangedEvent(CPVVisualisationModeChangedEvent* eventMethod)
+void PaintView::setVisualisationModeChangedEvent(PVVisualisationModeChangedEvent* eventMethod)
 {
 	m_visualisationModeChangedEvent = eventMethod;
 }
 
-void CPaintView::setModelLoadedEvent(CPVModelLoadedEvent* eventMethod) 
+void PaintView::setModelLoadedEvent(PVModelLoadedEvent* eventMethod) 
 {
 	m_modelLoadedEvent = eventMethod;
 }
 
-void CPaintView::setNewModelEvent(CPVNewModelEvent* eventMethod)
+void PaintView::setNewModelEvent(PVNewModelEvent* eventMethod)
 {
 	m_newModelEvent = eventMethod;
 }
 
+} // namespace fp

@@ -7,10 +7,10 @@
 #include "Fl_HoverButton.h"
 #include <FL/Fl_Box.H>
 
-class CTabletToolbar {
+class TabletToolbar {
   void* m_paintView; 
 public:
-  CTabletToolbar();
+  TabletToolbar();
   Fl_Double_Window *mainWindow;
   Fl_HoverButton *btnNew;
 private:

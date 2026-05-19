@@ -17792,14 +17792,14 @@ static unsigned char idata_splash[] =
 255,255,255,255};
 static Fl_RGB_Image image_splash(idata_splash, 400, 300, 3, 0);
 
-void CSplashFrame::cb_btnClose_i(Fl_Button*, void*) {
+void SplashFrame::cb_btnClose_i(Fl_Button*, void*) {
   wndSplash->hide();
 }
-void CSplashFrame::cb_btnClose(Fl_Button* o, void* v) {
-  ((CSplashFrame*)(o->parent()->user_data()))->cb_btnClose_i(o,v);
+void SplashFrame::cb_btnClose(Fl_Button* o, void* v) {
+  ((SplashFrame*)(o->parent()->user_data()))->cb_btnClose_i(o,v);
 }
 
-CSplashFrame::CSplashFrame() {
+SplashFrame::SplashFrame() {
   { wndSplash = new Fl_Double_Window(402, 302);
     wndSplash->user_data((void*)(this));
     { boxImage = new Fl_Box(0, 0, 402, 302);
@@ -17824,7 +17824,7 @@ CSplashFrame::CSplashFrame() {
   } // Fl_Double_Window* wndSplash
 }
 
-void CSplashFrame::show() {
+void SplashFrame::show() {
   using namespace std;
   
   string versionString = FORCEPAD_VERSION_STRING;
@@ -17841,24 +17841,24 @@ void CSplashFrame::show() {
   wndSplash->show();
 }
 
-void CSplashFrame::center() {
+void SplashFrame::center() {
   wndSplash->position(Fl::w()/2-wndSplash->w()/2,Fl::h()/2-wndSplash->h()/2);
 }
 
-void CSplashFrame::setTimer(bool flag) {
+void SplashFrame::setTimer(bool flag) {
   m_timer = flag;
 }
 
-void CSplashFrame::hide() {
+void SplashFrame::hide() {
   wndSplash->hide();
 }
 
-CSplashFrame::~CSplashFrame() {
+SplashFrame::~SplashFrame() {
   wndSplash->hide();
   delete wndSplash;
 }
 
-void CSplashFrame::showModal() {
+void SplashFrame::showModal() {
   using namespace std;
   
   string versionString = FORCEPAD_VERSION_STRING;
@@ -17874,6 +17874,6 @@ void CSplashFrame::showModal() {
   while (wndSplash->visible()) Fl::wait();
 }
 
-void CSplashFrame::centerWindow(Fl_Window* window) {
+void SplashFrame::centerWindow(Fl_Window* window) {
   wndSplash->position(window->x()+window->w()/2-wndSplash->w()/2, window->y()+window->h()/2-wndSplash->h()/2);
 }

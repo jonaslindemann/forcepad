@@ -9,11 +9,11 @@
 #include "Fl_HoverButton.h"
 #include <FL/Fl_Value_Slider.H>
 
-class CDrawingProps {
+class DrawingProps {
   void* m_view; 
   int m_modalResult; 
 public:
-  CDrawingProps();
+  DrawingProps();
   Fl_Double_Window *wndDrawingProps;
   Fl_HoverButton *btnOk;
 private:
@@ -30,7 +30,7 @@ private:
   void cb_sldLineWidth_i(Fl_Value_Slider*, void*);
   static void cb_sldLineWidth(Fl_Value_Slider*, void*);
 public:
-  ~CDrawingProps();
+  ~DrawingProps();
   void show();
   void setPosition(int x, int y);
   void setSize(int width, int height);

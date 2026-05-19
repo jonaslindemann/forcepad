@@ -3,12 +3,12 @@
 #include "CalcProps.h"
 #include "PaintView.h"
 
-inline void CCalcProps::cb_btnOk_i(Fl_HoverButton*, void*) {
+inline void CalcProps::cb_btnOk_i(Fl_HoverButton*, void*) {
   m_modalResult = MR_OK;
 wndCalcProps->hide();
 }
-void CCalcProps::cb_btnOk(Fl_HoverButton* o, void* v) {
-  ((CCalcProps*)(o->parent()->user_data()))->cb_btnOk_i(o,v);
+void CalcProps::cb_btnOk(Fl_HoverButton* o, void* v) {
+  ((CalcProps*)(o->parent()->user_data()))->cb_btnOk_i(o,v);
 }
 
 #include <FL/Fl_Pixmap.H>
@@ -71,29 +71,29 @@ static const char *idata_additional_close[] = {
 };
 static Fl_Pixmap image_additional_close(idata_additional_close);
 
-inline void CCalcProps::cb_sldGridSize_i(Fl_Value_Slider*, void*) {
+inline void CalcProps::cb_sldGridSize_i(Fl_Value_Slider*, void*) {
   if (m_view!=NULL)
 {
-	CPaintView* paintView = (CPaintView*)m_view;
+	fp::PaintView* paintView = (fp::PaintView*)m_view;
 	paintView->setGridStride(sldGridSize->value());
 };
 }
-void CCalcProps::cb_sldGridSize(Fl_Value_Slider* o, void* v) {
-  ((CCalcProps*)(o->parent()->user_data()))->cb_sldGridSize_i(o,v);
+void CalcProps::cb_sldGridSize(Fl_Value_Slider* o, void* v) {
+  ((CalcProps*)(o->parent()->user_data()))->cb_sldGridSize_i(o,v);
 }
 
-inline void CCalcProps::cb_chkUseWeight_i(Fl_Light_Button*, void*) {
+inline void CalcProps::cb_chkUseWeight_i(Fl_Light_Button*, void*) {
   if (m_view!=NULL)
 {
-	CPaintView* paintView = (CPaintView*)m_view;
+	fp::PaintView* paintView = (fp::PaintView*)m_view;
 	paintView->setUseWeight(chkUseWeight->value());
 };
 }
-void CCalcProps::cb_chkUseWeight(Fl_Light_Button* o, void* v) {
-  ((CCalcProps*)(o->parent()->user_data()))->cb_chkUseWeight_i(o,v);
+void CalcProps::cb_chkUseWeight(Fl_Light_Button* o, void* v) {
+  ((CalcProps*)(o->parent()->user_data()))->cb_chkUseWeight_i(o,v);
 }
 
-CCalcProps::CCalcProps() {
+CalcProps::CalcProps() {
   Fl_Double_Window* w;
   { Fl_Double_Window* o = wndCalcProps = new Fl_Double_Window(184, 73, "Drawing properties");
     w = o;
@@ -137,34 +137,34 @@ CCalcProps::CCalcProps() {
   }
 }
 
-CCalcProps::~CCalcProps() {
+CalcProps::~CalcProps() {
   delete wndCalcProps;
 }
 
-void CCalcProps::show() {
+void CalcProps::show() {
   setSize(wndCalcProps->w(),btnOk->h()+2);
 
 if (m_view!=NULL)
 {
-	CPaintView* paintView = (CPaintView*) m_view;
+	fp::PaintView* paintView = (fp::PaintView*) m_view;
 }
 
 wndCalcProps->show();
 }
 
-void CCalcProps::setPosition(int x, int y) {
+void CalcProps::setPosition(int x, int y) {
   wndCalcProps->position(x, y);
 }
 
-void CCalcProps::setSize(int width, int height) {
+void CalcProps::setSize(int width, int height) {
   wndCalcProps->size_range(0, 0);
 wndCalcProps->size(width, height);
 }
 
-void CCalcProps::setView(void* p) {
+void CalcProps::setView(void* p) {
   m_view = p;
 }
 
-void CCalcProps::hide() {
+void CalcProps::hide() {
   wndCalcProps->hide();
 }

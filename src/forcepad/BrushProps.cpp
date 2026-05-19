@@ -3,12 +3,12 @@
 #include "BrushProps.h"
 #include "PaintView.h"
 
-inline void CBrushProps::cb_btnOk_i(Fl_HoverButton*, void*) {
+inline void BrushProps::cb_btnOk_i(Fl_HoverButton*, void*) {
   m_modalResult = MR_OK;
 wndBrushProps->hide();
 }
-void CBrushProps::cb_btnOk(Fl_HoverButton* o, void* v) {
-  ((CBrushProps*)(o->parent()->user_data()))->cb_btnOk_i(o,v);
+void BrushProps::cb_btnOk(Fl_HoverButton* o, void* v) {
+  ((BrushProps*)(o->parent()->user_data()))->cb_btnOk_i(o,v);
 }
 
 #include <FL/Fl_Pixmap.H>
@@ -71,29 +71,29 @@ static const char *idata_additional_close[] = {
 };
 static Fl_Pixmap image_additional_close(idata_additional_close);
 
-inline void CBrushProps::cb_sldBlendFactor_i(Fl_Value_Slider*, void*) {
+inline void BrushProps::cb_sldBlendFactor_i(Fl_Value_Slider*, void*) {
   if (m_view!=NULL)
 {
-	CPaintView* paintView = (CPaintView*)m_view;
+	fp::PaintView* paintView = (fp::PaintView*)m_view;
 	paintView->setBlendFactor((int)sldBlendFactor->value());
 };
 }
-void CBrushProps::cb_sldBlendFactor(Fl_Value_Slider* o, void* v) {
-  ((CBrushProps*)(o->parent()->user_data()))->cb_sldBlendFactor_i(o,v);
+void BrushProps::cb_sldBlendFactor(Fl_Value_Slider* o, void* v) {
+  ((BrushProps*)(o->parent()->user_data()))->cb_sldBlendFactor_i(o,v);
 }
 
-inline void CBrushProps::cb_mnuBrush_i(Fl_Choice*, void*) {
+inline void BrushProps::cb_mnuBrush_i(Fl_Choice*, void*) {
   if (m_view!=NULL)
 {
-	CPaintView* paintView = (CPaintView*)m_view;
+	fp::PaintView* paintView = (fp::PaintView*)m_view;
 	paintView->setCurrentBrush(mnuBrush->value());
 };
 }
-void CBrushProps::cb_mnuBrush(Fl_Choice* o, void* v) {
-  ((CBrushProps*)(o->parent()->user_data()))->cb_mnuBrush_i(o,v);
+void BrushProps::cb_mnuBrush(Fl_Choice* o, void* v) {
+  ((BrushProps*)(o->parent()->user_data()))->cb_mnuBrush_i(o,v);
 }
 
-Fl_Menu_Item CBrushProps::menu_mnuBrush[] = {
+Fl_Menu_Item BrushProps::menu_mnuBrush[] = {
  {"Round 4", 0,  0, 0, 0, 0, 0, 10, 56},
  {"Round 8", 0,  0, 0, 0, 0, 0, 10, 56},
  {"Round 16", 0,  0, 0, 0, 0, 0, 10, 56},
@@ -106,18 +106,18 @@ Fl_Menu_Item CBrushProps::menu_mnuBrush[] = {
  {"Square 64", 0,  0, 0, 0, 0, 0, 10, 56},
  {0,0,0,0,0,0,0,0,0}
 };
-Fl_Menu_Item* CBrushProps::mnuBrushR4 = CBrushProps::menu_mnuBrush + 0;
-Fl_Menu_Item* CBrushProps::mnuBrushR8 = CBrushProps::menu_mnuBrush + 1;
-Fl_Menu_Item* CBrushProps::mnuBrushR16 = CBrushProps::menu_mnuBrush + 2;
-Fl_Menu_Item* CBrushProps::mnuBrushR32 = CBrushProps::menu_mnuBrush + 3;
-Fl_Menu_Item* CBrushProps::mnuBrushR64 = CBrushProps::menu_mnuBrush + 4;
-Fl_Menu_Item* CBrushProps::mnuBrushS4 = CBrushProps::menu_mnuBrush + 5;
-Fl_Menu_Item* CBrushProps::mnuBrushS8 = CBrushProps::menu_mnuBrush + 6;
-Fl_Menu_Item* CBrushProps::mnuBrushS16 = CBrushProps::menu_mnuBrush + 7;
-Fl_Menu_Item* CBrushProps::mnuBrushS32 = CBrushProps::menu_mnuBrush + 8;
-Fl_Menu_Item* CBrushProps::mnuBrushS64 = CBrushProps::menu_mnuBrush + 9;
+Fl_Menu_Item* BrushProps::mnuBrushR4 = BrushProps::menu_mnuBrush + 0;
+Fl_Menu_Item* BrushProps::mnuBrushR8 = BrushProps::menu_mnuBrush + 1;
+Fl_Menu_Item* BrushProps::mnuBrushR16 = BrushProps::menu_mnuBrush + 2;
+Fl_Menu_Item* BrushProps::mnuBrushR32 = BrushProps::menu_mnuBrush + 3;
+Fl_Menu_Item* BrushProps::mnuBrushR64 = BrushProps::menu_mnuBrush + 4;
+Fl_Menu_Item* BrushProps::mnuBrushS4 = BrushProps::menu_mnuBrush + 5;
+Fl_Menu_Item* BrushProps::mnuBrushS8 = BrushProps::menu_mnuBrush + 6;
+Fl_Menu_Item* BrushProps::mnuBrushS16 = BrushProps::menu_mnuBrush + 7;
+Fl_Menu_Item* BrushProps::mnuBrushS32 = BrushProps::menu_mnuBrush + 8;
+Fl_Menu_Item* BrushProps::mnuBrushS64 = BrushProps::menu_mnuBrush + 9;
 
-CBrushProps::CBrushProps() {
+BrushProps::BrushProps() {
   Fl_Double_Window* w;
   { Fl_Double_Window* o = wndBrushProps = new Fl_Double_Window(184, 73, "Brush properties");
     w = o;
@@ -163,16 +163,16 @@ CBrushProps::CBrushProps() {
   m_view = NULL;
 }
 
-CBrushProps::~CBrushProps() {
+BrushProps::~BrushProps() {
   delete wndBrushProps;
 }
 
-void CBrushProps::show() {
+void BrushProps::show() {
   setSize(wndBrushProps->w(),btnOk->h()+2);
 
 if (m_view!=NULL)
 {
-	CPaintView* paintView = (CPaintView*)m_view;
+	fp::PaintView* paintView = (fp::PaintView*)m_view;
 	sldBlendFactor->value(paintView->getBlendFactor());
 	mnuBrush->value(paintView->getCurrentBrushIdx());
 }
@@ -181,19 +181,19 @@ wndBrushProps->show();
 //while (wndBrushProps->visible()) Fl::wait();
 }
 
-void CBrushProps::setPosition(int x, int y) {
+void BrushProps::setPosition(int x, int y) {
   wndBrushProps->position(x, y);
 }
 
-void CBrushProps::setSize(int width, int height) {
+void BrushProps::setSize(int width, int height) {
   wndBrushProps->size_range(0, 0);
 wndBrushProps->size(width, height);
 }
 
-void CBrushProps::hide() {
+void BrushProps::hide() {
   wndBrushProps->hide();
 }
 
-void CBrushProps::setView(void* p) {
+void BrushProps::setView(void* p) {
   m_view = p;
 }

@@ -1495,17 +1495,17 @@ double FemGridSolver2::getConstraintStiffnessScale()
 	return m_constraintStiffnessScale;
 }
 
-void FemGridSolver2::setStatusMessageEvent(CGSStatusMessageEvent* eventMethod)
+void FemGridSolver2::setStatusMessageEvent(GSStatusMessageEvent* eventMethod)
 {
 	m_statusMessageEvent = eventMethod;
 }
 
-void FemGridSolver2::setLogMessageEvent(CGSLogMessageEvent* eventMethod)
+void FemGridSolver2::setLogMessageEvent(GSLogMessageEvent* eventMethod)
 {
 	m_logMessageEvent = eventMethod;
 }
 
-void FemGridSolver2::setContinueCalcEvent(CGSContinueCalcEvent* eventMethod)
+void FemGridSolver2::setContinueCalcEvent(GSContinueCalcEvent* eventMethod)
 {
 	m_continueCalcEvent = eventMethod;
 }

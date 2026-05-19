@@ -8,12 +8,12 @@
 #include <FL/Fl_Double_Window.H>
 #include "Fl_HoverButton.h"
 
-class CDrawingTools {
+class DrawingTools {
   int m_modalResult;
   int m_currentTool;
   void* m_view;
 public:
-  CDrawingTools();
+  DrawingTools();
   Fl_Double_Window *wndBrushProps;
   Fl_HoverButton *btnOk;
 private:
@@ -35,7 +35,7 @@ private:
   inline void cb_btnLine_i(Fl_HoverButton*, void*);
   static void cb_btnLine(Fl_HoverButton*, void*);
 public:
-  ~CDrawingTools();
+  ~DrawingTools();
   void show();
   void setPosition(int x, int y);
   void setSize(int width, int height);

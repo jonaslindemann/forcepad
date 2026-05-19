@@ -9,11 +9,11 @@
 #include "Fl_HoverButton.h"
 #include <FL/Fl_Round_Button.H>
 
-class CImportProps {
+class ImportProps {
   void* m_view;
   int m_modalResult;
 public:
-  CImportProps();
+  ImportProps();
   Fl_Double_Window *wndImportProps;
   Fl_HoverButton *btnOk;
 private:
@@ -30,7 +30,7 @@ private:
   inline void cb_rbImportAndPaste_i(Fl_Round_Button*, void*);
   static void cb_rbImportAndPaste(Fl_Round_Button*, void*);
 public:
-  ~CImportProps();
+  ~ImportProps();
   void show();
   void setPosition(int x, int y);
   void setSize(int width, int height);

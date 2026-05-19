@@ -8,10 +8,10 @@
 #include <FL/Fl_Value_Slider.H>
 #include <FL/Fl_Check_Button.H>
 
-class CGeneralSettings {
+class GeneralSettings {
   void* m_paintView; 
 public:
-  CGeneralSettings();
+  GeneralSettings();
   Fl_Double_Window *mainWindow;
   Fl_Button *okButton;
 private:

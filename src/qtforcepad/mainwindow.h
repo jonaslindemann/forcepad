@@ -16,10 +16,10 @@ class QPushButton;
 class QButtonGroup;
 
 class MainWindow : public QMainWindow,
-                   public CPVModeChangeEvent,
-                   public CPVViewModeChangeEvent,
-                   public CPVModelLoadedEvent,
-                   public CPVNewModelEvent
+                   public fp::PVModeChangeEvent,
+                   public fp::PVViewModeChangeEvent,
+                   public fp::PVModelLoadedEvent,
+                   public fp::PVNewModelEvent
 {
     Q_OBJECT
 public:
@@ -28,16 +28,16 @@ public:
 
     QtPaintView* paintView() const { return m_paintView; }
 
-    // CPVModeChangeEvent
-    void onModeChange(CPaintView::TEditMode oldMode, CPaintView::TEditMode newMode) override;
+    // fp::PVModeChangeEvent
+    void onModeChange(fp::PaintView::TEditMode oldMode, fp::PaintView::TEditMode newMode) override;
 
-    // CPVViewModeChangeEvent
-    void onViewModeChange(CPaintView::TViewMode oldMode, CPaintView::TViewMode newMode) override;
+    // fp::PVViewModeChangeEvent
+    void onViewModeChange(fp::PaintView::TViewMode oldMode, fp::PaintView::TViewMode newMode) override;
 
-    // CPVModelLoadedEvent
+    // fp::PVModelLoadedEvent
     void onModelLoaded() override;
 
-    // CPVNewModelEvent
+    // fp::PVNewModelEvent
     void onNewModel() override;
 
 private Q_SLOTS:

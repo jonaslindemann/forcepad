@@ -6,14 +6,14 @@
 #include <FL/x.H>
 #endif
 
-void CVizMixerToolbar::cb_btnStress_i(Fl_HoverButton*, void*) {
+void VizMixerToolbar::cb_btnStress_i(Fl_HoverButton*, void*) {
   wizard->value(groupPrincipalStress);
 
-CFlPaintView* paintView = (CFlPaintView*)m_paintView;
-paintView->setVisualisationMode(CPaintView::VM_PRINCIPAL_STRESS);
+FlPaintView* paintView = (FlPaintView*)m_paintView;
+paintView->setVisualisationMode(fp::PaintView::VM_PRINCIPAL_STRESS);
 }
-void CVizMixerToolbar::cb_btnStress(Fl_HoverButton* o, void* v) {
-  ((CVizMixerToolbar*)(o->parent()->user_data()))->cb_btnStress_i(o,v);
+void VizMixerToolbar::cb_btnStress(Fl_HoverButton* o, void* v) {
+  ((VizMixerToolbar*)(o->parent()->user_data()))->cb_btnStress_i(o,v);
 }
 
 #include <FL/Fl_Pixmap.H>
@@ -317,18 +317,18 @@ static Fl_Image *image_stress2_black() {
   return image;
 }
 
-void CVizMixerToolbar::cb_btnDisplacements_i(Fl_HoverButton*, void*) {
+void VizMixerToolbar::cb_btnDisplacements_i(Fl_HoverButton*, void*) {
   wizard->value(groupDisplacement);
 
-CFlPaintView* paintView = (CFlPaintView*)m_paintView;
-paintView->setVisualisationMode(CPaintView::VM_DISPLACEMENTS);
+FlPaintView* paintView = (FlPaintView*)m_paintView;
+paintView->setVisualisationMode(fp::PaintView::VM_DISPLACEMENTS);
 
 paintView->setDrawDisplacements(true);
 paintView->setDrawStress(false);
 paintView->setDrawForcesAndConstraints(true);
 }
-void CVizMixerToolbar::cb_btnDisplacements(Fl_HoverButton* o, void* v) {
-  ((CVizMixerToolbar*)(o->parent()->user_data()))->cb_btnDisplacements_i(o,v);
+void VizMixerToolbar::cb_btnDisplacements(Fl_HoverButton* o, void* v) {
+  ((VizMixerToolbar*)(o->parent()->user_data()))->cb_btnDisplacements_i(o,v);
 }
 
 static const char *idata_displacements_black[] = {
@@ -631,14 +631,14 @@ static Fl_Image *image_displacements_black() {
   return image;
 }
 
-void CVizMixerToolbar::cb_btnMisesStress_i(Fl_HoverButton*, void*) {
+void VizMixerToolbar::cb_btnMisesStress_i(Fl_HoverButton*, void*) {
   wizard->value(groupMisesStress);
 
-CFlPaintView* paintView = (CFlPaintView*)m_paintView;
-paintView->setVisualisationMode(CPaintView::VM_MISES_STRESS);
+FlPaintView* paintView = (FlPaintView*)m_paintView;
+paintView->setVisualisationMode(fp::PaintView::VM_MISES_STRESS);
 }
-void CVizMixerToolbar::cb_btnMisesStress(Fl_HoverButton* o, void* v) {
-  ((CVizMixerToolbar*)(o->parent()->user_data()))->cb_btnMisesStress_i(o,v);
+void VizMixerToolbar::cb_btnMisesStress(Fl_HoverButton* o, void* v) {
+  ((VizMixerToolbar*)(o->parent()->user_data()))->cb_btnMisesStress_i(o,v);
 }
 
 static const char *idata_stress_mises_black[] = {
@@ -941,12 +941,12 @@ static Fl_Image *image_stress_mises_black() {
   return image;
 }
 
-void CVizMixerToolbar::cb_btnTensionCompression_i(Fl_HoverButton*, void*) {
-  CFlPaintView* paintView = (CFlPaintView*)m_paintView;
+void VizMixerToolbar::cb_btnTensionCompression_i(Fl_HoverButton*, void*) {
+  FlPaintView* paintView = (FlPaintView*)m_paintView;
 paintView->setStressMode(fp::FemGrid2::SM_ALL);
 }
-void CVizMixerToolbar::cb_btnTensionCompression(Fl_HoverButton* o, void* v) {
-  ((CVizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_btnTensionCompression_i(o,v);
+void VizMixerToolbar::cb_btnTensionCompression(Fl_HoverButton* o, void* v) {
+  ((VizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_btnTensionCompression_i(o,v);
 }
 
 static const char *idata_tension_compression_black[] = {
@@ -1249,12 +1249,12 @@ static Fl_Image *image_tension_compression_black() {
   return image;
 }
 
-void CVizMixerToolbar::cb_btnTension_i(Fl_HoverButton*, void*) {
-  CFlPaintView* paintView = (CFlPaintView*)m_paintView;
+void VizMixerToolbar::cb_btnTension_i(Fl_HoverButton*, void*) {
+  FlPaintView* paintView = (FlPaintView*)m_paintView;
 paintView->setStressMode(fp::FemGrid2::SM_POSITIVE);
 }
-void CVizMixerToolbar::cb_btnTension(Fl_HoverButton* o, void* v) {
-  ((CVizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_btnTension_i(o,v);
+void VizMixerToolbar::cb_btnTension(Fl_HoverButton* o, void* v) {
+  ((VizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_btnTension_i(o,v);
 }
 
 static const char *idata_tension_black[] = {
@@ -1557,12 +1557,12 @@ static Fl_Image *image_tension_black() {
   return image;
 }
 
-void CVizMixerToolbar::cb_btnCompression_i(Fl_HoverButton*, void*) {
-  CFlPaintView* paintView = (CFlPaintView*)m_paintView;
+void VizMixerToolbar::cb_btnCompression_i(Fl_HoverButton*, void*) {
+  FlPaintView* paintView = (FlPaintView*)m_paintView;
 paintView->setStressMode(fp::FemGrid2::SM_NEGATIVE);
 }
-void CVizMixerToolbar::cb_btnCompression(Fl_HoverButton* o, void* v) {
-  ((CVizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_btnCompression_i(o,v);
+void VizMixerToolbar::cb_btnCompression(Fl_HoverButton* o, void* v) {
+  ((VizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_btnCompression_i(o,v);
 }
 
 static const char *idata_compression_black[] = {
@@ -1865,79 +1865,79 @@ static Fl_Image *image_compression_black() {
   return image;
 }
 
-void CVizMixerToolbar::cb_rolArrowSize_i(Fl_Roller*, void*) {
-  CFlPaintView* paintView = (CFlPaintView*) m_paintView;
+void VizMixerToolbar::cb_rolArrowSize_i(Fl_Roller*, void*) {
+  FlPaintView* paintView = (FlPaintView*) m_paintView;
 paintView->setStressSize(rolArrowSize->value());
 }
-void CVizMixerToolbar::cb_rolArrowSize(Fl_Roller* o, void* v) {
-  ((CVizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_rolArrowSize_i(o,v);
+void VizMixerToolbar::cb_rolArrowSize(Fl_Roller* o, void* v) {
+  ((VizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_rolArrowSize_i(o,v);
 }
 
-void CVizMixerToolbar::cb_rolTransparency_i(Fl_Roller*, void*) {
-  CFlPaintView* paintView = (CFlPaintView*) m_paintView;
+void VizMixerToolbar::cb_rolTransparency_i(Fl_Roller*, void*) {
+  FlPaintView* paintView = (FlPaintView*) m_paintView;
 paintView->setStressAlpha(rolTransparency->value());
 }
-void CVizMixerToolbar::cb_rolTransparency(Fl_Roller* o, void* v) {
-  ((CVizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_rolTransparency_i(o,v);
+void VizMixerToolbar::cb_rolTransparency(Fl_Roller* o, void* v) {
+  ((VizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_rolTransparency_i(o,v);
 }
 
-void CVizMixerToolbar::cb_rolStep_i(Fl_Roller*, void*) {
-  CFlPaintView* paintView = (CFlPaintView*)m_paintView;
+void VizMixerToolbar::cb_rolStep_i(Fl_Roller*, void*) {
+  FlPaintView* paintView = (FlPaintView*)m_paintView;
 paintView->setStressStep(rolStep->value());
 }
-void CVizMixerToolbar::cb_rolStep(Fl_Roller* o, void* v) {
-  ((CVizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_rolStep_i(o,v);
+void VizMixerToolbar::cb_rolStep(Fl_Roller* o, void* v) {
+  ((VizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_rolStep_i(o,v);
 }
 
-void CVizMixerToolbar::cb_btnLockScale_i(Fl_HoverButton*, void*) {
-  CFlPaintView* paintView = (CFlPaintView*)m_paintView;
+void VizMixerToolbar::cb_btnLockScale_i(Fl_HoverButton*, void*) {
+  FlPaintView* paintView = (FlPaintView*)m_paintView;
 if (btnLockScale->value()>0)
 	paintView->unlockScaleFactor();
 else
 	paintView->lockScaleFactor();
 }
-void CVizMixerToolbar::cb_btnLockScale(Fl_HoverButton* o, void* v) {
-  ((CVizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_btnLockScale_i(o,v);
+void VizMixerToolbar::cb_btnLockScale(Fl_HoverButton* o, void* v) {
+  ((VizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_btnLockScale_i(o,v);
 }
 
-void CVizMixerToolbar::cb_minStress_i(Fl_Slider*, void*) {
-  CFlPaintView* paintView = (CFlPaintView*)m_paintView;
+void VizMixerToolbar::cb_minStress_i(Fl_Slider*, void*) {
+  FlPaintView* paintView = (FlPaintView*)m_paintView;
 paintView->setStressTreshold(minStress->value(),maxStress->value());
 }
-void CVizMixerToolbar::cb_minStress(Fl_Slider* o, void* v) {
-  ((CVizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_minStress_i(o,v);
+void VizMixerToolbar::cb_minStress(Fl_Slider* o, void* v) {
+  ((VizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_minStress_i(o,v);
 }
 
-void CVizMixerToolbar::cb_maxStress_i(Fl_Slider*, void*) {
-  CFlPaintView* paintView = (CFlPaintView*)m_paintView;
+void VizMixerToolbar::cb_maxStress_i(Fl_Slider*, void*) {
+  FlPaintView* paintView = (FlPaintView*)m_paintView;
 paintView->setStressTreshold(minStress->value(),maxStress->value());
 }
-void CVizMixerToolbar::cb_maxStress(Fl_Slider* o, void* v) {
-  ((CVizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_maxStress_i(o,v);
+void VizMixerToolbar::cb_maxStress(Fl_Slider* o, void* v) {
+  ((VizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_maxStress_i(o,v);
 }
 
-void CVizMixerToolbar::cb_maxIntensity_i(Fl_Roller*, void*) {
-  CFlPaintView* paintView = (CFlPaintView*)m_paintView;
+void VizMixerToolbar::cb_maxIntensity_i(Fl_Roller*, void*) {
+  FlPaintView* paintView = (FlPaintView*)m_paintView;
 paintView->setMaxIntensity(maxIntensity->value());
 }
-void CVizMixerToolbar::cb_maxIntensity(Fl_Roller* o, void* v) {
-  ((CVizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_maxIntensity_i(o,v);
+void VizMixerToolbar::cb_maxIntensity(Fl_Roller* o, void* v) {
+  ((VizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_maxIntensity_i(o,v);
 }
 
-void CVizMixerToolbar::cb_stressWidth_i(Fl_Roller*, void*) {
-  CFlPaintView* paintView = (CFlPaintView*)m_paintView;
+void VizMixerToolbar::cb_stressWidth_i(Fl_Roller*, void*) {
+  FlPaintView* paintView = (FlPaintView*)m_paintView;
 paintView->setStressWidth(stressWidth->value());
 }
-void CVizMixerToolbar::cb_stressWidth(Fl_Roller* o, void* v) {
-  ((CVizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_stressWidth_i(o,v);
+void VizMixerToolbar::cb_stressWidth(Fl_Roller* o, void* v) {
+  ((VizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_stressWidth_i(o,v);
 }
 
-void CVizMixerToolbar::cb_btnColorMap1_i(Fl_HoverButton*, void*) {
-  CFlPaintView* paintView = (CFlPaintView*)m_paintView;
+void VizMixerToolbar::cb_btnColorMap1_i(Fl_HoverButton*, void*) {
+  FlPaintView* paintView = (FlPaintView*)m_paintView;
 paintView->setColorMap(1);
 }
-void CVizMixerToolbar::cb_btnColorMap1(Fl_HoverButton* o, void* v) {
-  ((CVizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_btnColorMap1_i(o,v);
+void VizMixerToolbar::cb_btnColorMap1(Fl_HoverButton* o, void* v) {
+  ((VizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_btnColorMap1_i(o,v);
 }
 
 static const char *idata_colormap2_black[] = {
@@ -2240,12 +2240,12 @@ static Fl_Image *image_colormap2_black() {
   return image;
 }
 
-void CVizMixerToolbar::cb_btnColorMap2_i(Fl_HoverButton*, void*) {
-  CFlPaintView* paintView = (CFlPaintView*)m_paintView;
+void VizMixerToolbar::cb_btnColorMap2_i(Fl_HoverButton*, void*) {
+  FlPaintView* paintView = (FlPaintView*)m_paintView;
 paintView->setColorMap(2);
 }
-void CVizMixerToolbar::cb_btnColorMap2(Fl_HoverButton* o, void* v) {
-  ((CVizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_btnColorMap2_i(o,v);
+void VizMixerToolbar::cb_btnColorMap2(Fl_HoverButton* o, void* v) {
+  ((VizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_btnColorMap2_i(o,v);
 }
 
 static const char *idata_colormap3_black[] = {
@@ -2548,40 +2548,40 @@ static Fl_Image *image_colormap3_black() {
   return image;
 }
 
-void CVizMixerToolbar::cb_sldUpperMisesTreshold_i(Fl_Slider*, void*) {
-  CFlPaintView* paintView = (CFlPaintView*)m_paintView;
+void VizMixerToolbar::cb_sldUpperMisesTreshold_i(Fl_Slider*, void*) {
+  FlPaintView* paintView = (FlPaintView*)m_paintView;
 paintView->setUpperMisesTreshold(sldUpperMisesTreshold->value());
 }
-void CVizMixerToolbar::cb_sldUpperMisesTreshold(Fl_Slider* o, void* v) {
-  ((CVizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_sldUpperMisesTreshold_i(o,v);
+void VizMixerToolbar::cb_sldUpperMisesTreshold(Fl_Slider* o, void* v) {
+  ((VizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_sldUpperMisesTreshold_i(o,v);
 }
 
-void CVizMixerToolbar::cb_chkInvertColorMap_i(Fl_Check_Button*, void*) {
-  CFlPaintView* paintView = (CFlPaintView*)m_paintView;
+void VizMixerToolbar::cb_chkInvertColorMap_i(Fl_Check_Button*, void*) {
+  FlPaintView* paintView = (FlPaintView*)m_paintView;
 
 if (chkInvertColorMap->value()==1)
 	paintView->setInvertColorMap(true);
 else
 	paintView->setInvertColorMap(false);
 }
-void CVizMixerToolbar::cb_chkInvertColorMap(Fl_Check_Button* o, void* v) {
-  ((CVizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_chkInvertColorMap_i(o,v);
+void VizMixerToolbar::cb_chkInvertColorMap(Fl_Check_Button* o, void* v) {
+  ((VizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_chkInvertColorMap_i(o,v);
 }
 
-void CVizMixerToolbar::cb_sldDisplacementScale_i(Fl_Slider*, void*) {
-  CFlPaintView* paintView = (CFlPaintView*) m_paintView;
+void VizMixerToolbar::cb_sldDisplacementScale_i(Fl_Slider*, void*) {
+  FlPaintView* paintView = (FlPaintView*) m_paintView;
 paintView->setDisplacementScale(sldDisplacementScale->value());
 }
-void CVizMixerToolbar::cb_sldDisplacementScale(Fl_Slider* o, void* v) {
-  ((CVizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_sldDisplacementScale_i(o,v);
+void VizMixerToolbar::cb_sldDisplacementScale(Fl_Slider* o, void* v) {
+  ((VizMixerToolbar*)(o->parent()->parent()->parent()->user_data()))->cb_sldDisplacementScale_i(o,v);
 }
 
-void CVizMixerToolbar::cb_btnMoveLoad_i(Fl_HoverButton*, void*) {
-  CFlPaintView* paintView = (CFlPaintView*)m_paintView;
+void VizMixerToolbar::cb_btnMoveLoad_i(Fl_HoverButton*, void*) {
+  FlPaintView* paintView = (FlPaintView*)m_paintView;
 paintView->setMoveLoad(true);
 }
-void CVizMixerToolbar::cb_btnMoveLoad(Fl_HoverButton* o, void* v) {
-  ((CVizMixerToolbar*)(o->parent()->parent()->user_data()))->cb_btnMoveLoad_i(o,v);
+void VizMixerToolbar::cb_btnMoveLoad(Fl_HoverButton* o, void* v) {
+  ((VizMixerToolbar*)(o->parent()->parent()->user_data()))->cb_btnMoveLoad_i(o,v);
 }
 
 static const char *idata_action_move_force_black[] = {
@@ -2884,12 +2884,12 @@ static Fl_Image *image_action_move_force_black() {
   return image;
 }
 
-void CVizMixerToolbar::cb_btnRotateLoad_i(Fl_HoverButton*, void*) {
-  CFlPaintView* paintView = (CFlPaintView*) m_paintView;
+void VizMixerToolbar::cb_btnRotateLoad_i(Fl_HoverButton*, void*) {
+  FlPaintView* paintView = (FlPaintView*) m_paintView;
 paintView->setMoveLoad(false);
 }
-void CVizMixerToolbar::cb_btnRotateLoad(Fl_HoverButton* o, void* v) {
-  ((CVizMixerToolbar*)(o->parent()->parent()->user_data()))->cb_btnRotateLoad_i(o,v);
+void VizMixerToolbar::cb_btnRotateLoad(Fl_HoverButton* o, void* v) {
+  ((VizMixerToolbar*)(o->parent()->parent()->user_data()))->cb_btnRotateLoad_i(o,v);
 }
 
 static const char *idata_action_rotate_force_black[] = {
@@ -3192,7 +3192,7 @@ static Fl_Image *image_action_rotate_force_black() {
   return image;
 }
 
-CVizMixerToolbar::CVizMixerToolbar() {
+VizMixerToolbar::VizMixerToolbar() {
   { mainWindow = new Fl_Double_Window(655, 417, "Viz Mixer");
     mainWindow->color(FL_FOREGROUND_COLOR);
     mainWindow->user_data((void*)(this));
@@ -3526,7 +3526,7 @@ CVizMixerToolbar::CVizMixerToolbar() {
   mainWindow->size(273,200);
 }
 
-void CVizMixerToolbar::show() {
+void VizMixerToolbar::show() {
   mainWindow->show();
   #ifdef WIN32
   HWND handle = fl_xid(mainWindow);
@@ -3535,18 +3535,18 @@ void CVizMixerToolbar::show() {
   #endif
 }
 
-void CVizMixerToolbar::setView(void* view) {
+void VizMixerToolbar::setView(void* view) {
   m_paintView = view;
 }
 
-void CVizMixerToolbar::centerWindow(Fl_Window* window) {
+void VizMixerToolbar::centerWindow(Fl_Window* window) {
   mainWindow->position(window->x()+window->w()/2-mainWindow->w()/2, window->y()+window->h()/2-mainWindow->h()/2);
 }
 
-void CVizMixerToolbar::placeWindow(Fl_Window* window) {
+void VizMixerToolbar::placeWindow(Fl_Window* window) {
   mainWindow->position(window->x()+window->w()-mainWindow->w()-100, window->y()+window->h()-mainWindow->h()-100);
 }
 
-void CVizMixerToolbar::hide() {
+void VizMixerToolbar::hide() {
   mainWindow->hide();
 }

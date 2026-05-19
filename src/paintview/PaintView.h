@@ -22,8 +22,8 @@
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
 
-#ifndef _CPaintView_h_
-#define _CPaintView_h_
+#ifndef _PaintView_h_
+#define _PaintView_h_
 
 #include "forcepad_config.h"
 
@@ -44,16 +44,18 @@
 #include "FemGridSolver2.h"
 #include "CGIndicator.h"
 
-class CPVModeChangeEvent;
-class CPVViewModeChangeEvent;
-class CPVViewModeErrorEvent;
-class CPVModelChangedEvent;
-class CPVRulerChangedEvent;
-class CPVVisualisationModeChangedEvent;
-class CPVModelLoadedEvent;
-class CPVNewModelEvent;
+namespace fp {
 
-class CPaintView {
+class PVModeChangeEvent;
+class PVViewModeChangeEvent;
+class PVViewModeErrorEvent;
+class PVModelChangedEvent;
+class PVRulerChangedEvent;
+class PVVisualisationModeChangedEvent;
+class PVModelLoadedEvent;
+class PVNewModelEvent;
+
+class PaintView {
 public:
     /*
      *    Edit modes
@@ -263,18 +265,18 @@ protected:
      *    Events
      */
 
-    CPVModeChangeEvent *m_modeChangeEvent;
-    CPVViewModeChangeEvent *m_viewModeChangeEvent;
-    CPVViewModeErrorEvent *m_viewModeErrorEvent;
-    CPVModelChangedEvent *m_modelChangedEvent;
-    CPVRulerChangedEvent *m_rulerChangedEvent;
-    CPVVisualisationModeChangedEvent *m_visualisationModeChangedEvent;
-    CPVModelLoadedEvent *m_modelLoadedEvent;
-    CPVNewModelEvent *m_newModelEvent;
+    PVModeChangeEvent *m_modeChangeEvent;
+    PVViewModeChangeEvent *m_viewModeChangeEvent;
+    PVViewModeErrorEvent *m_viewModeErrorEvent;
+    PVModelChangedEvent *m_modelChangedEvent;
+    PVRulerChangedEvent *m_rulerChangedEvent;
+    PVVisualisationModeChangedEvent *m_visualisationModeChangedEvent;
+    PVModelLoadedEvent *m_modelLoadedEvent;
+    PVNewModelEvent *m_newModelEvent;
 
-    CGSStatusMessageEvent *m_statusMessageEvent;
-    CGSLogMessageEvent *m_logMessageEvent;
-    CGSContinueCalcEvent *m_continueCalcEvent;
+    GSStatusMessageEvent *m_statusMessageEvent;
+    GSLogMessageEvent *m_logMessageEvent;
+    GSContinueCalcEvent *m_continueCalcEvent;
 
     /*
      *    Private event handlers
@@ -359,10 +361,10 @@ public:
      * This is constructor corresponds to a standard FLTK
      * window constructor.
      */
-    CPaintView(int x, int y, int w, int h, const char *l = 0);
+    PaintView(int x, int y, int w, int h, const char *l = 0);
 
     /** ForcePadView class destructor. */
-    virtual ~CPaintView();
+    virtual ~PaintView();
 
     /*
      *    Methods
@@ -550,66 +552,69 @@ public:
 
     // Events
 
-    void setModeChangeEvent(CPVModeChangeEvent *eventMethod);
-    void setViewModeChangeEvent(CPVViewModeChangeEvent *eventMethod);
-    void setViewModeErrorEvent(CPVViewModeErrorEvent *eventMethod);
-    void setStatusMessageEvent(CGSStatusMessageEvent *eventMethod);
-    void setLogMessageEvent(CGSLogMessageEvent *eventMethod);
-    void setContinueCalcEvent(CGSContinueCalcEvent *eventMethod);
-    void setModelChangedEvent(CPVModelChangedEvent *eventMethod);
-    void setRulerChangedEvent(CPVRulerChangedEvent *eventMethod);
-    void setVisualisationModeChangedEvent(CPVVisualisationModeChangedEvent *eventMethod);
-    void setModelLoadedEvent(CPVModelLoadedEvent *eventMethod);
-    void setNewModelEvent(CPVNewModelEvent *eventMethod);
+    void setModeChangeEvent(PVModeChangeEvent *eventMethod);
+    void setViewModeChangeEvent(PVViewModeChangeEvent *eventMethod);
+    void setViewModeErrorEvent(PVViewModeErrorEvent *eventMethod);
+    void setStatusMessageEvent(GSStatusMessageEvent *eventMethod);
+    void setLogMessageEvent(GSLogMessageEvent *eventMethod);
+    void setContinueCalcEvent(GSContinueCalcEvent *eventMethod);
+    void setModelChangedEvent(PVModelChangedEvent *eventMethod);
+    void setRulerChangedEvent(PVRulerChangedEvent *eventMethod);
+    void setVisualisationModeChangedEvent(PVVisualisationModeChangedEvent *eventMethod);
+    void setModelLoadedEvent(PVModelLoadedEvent *eventMethod);
+    void setNewModelEvent(PVNewModelEvent *eventMethod);
 };
 
-class CPVModeChangeEvent {
+class PVModeChangeEvent {
 public:
-    virtual ~CPVModeChangeEvent(){};
-    virtual void onModeChange(CPaintView::TEditMode oldMode, CPaintView::TEditMode newMode) = 0;
+    virtual ~PVModeChangeEvent(){};
+    virtual void onModeChange(PaintView::TEditMode oldMode, PaintView::TEditMode newMode) = 0;
 };
 
-class CPVViewModeChangeEvent {
+class PVViewModeChangeEvent {
 public:
-    virtual ~CPVViewModeChangeEvent(){};
-    virtual void onViewModeChange(CPaintView::TViewMode oldMode, CPaintView::TViewMode newMode) = 0;
+    virtual ~PVViewModeChangeEvent(){};
+    virtual void onViewModeChange(PaintView::TViewMode oldMode, PaintView::TViewMode newMode) = 0;
 };
 
-class CPVViewModeErrorEvent {
+class PVViewModeErrorEvent {
 public:
-    virtual ~CPVViewModeErrorEvent(){};
-    virtual void onViewModeError(CPaintView::TViewMode oldMode, CPaintView::TViewMode newMode) = 0;
+    virtual ~PVViewModeErrorEvent(){};
+    virtual void onViewModeError(PaintView::TViewMode oldMode, PaintView::TViewMode newMode) = 0;
 };
 
-class CPVModelChangedEvent {
+class PVModelChangedEvent {
 public:
-    virtual ~CPVModelChangedEvent(){};
+    virtual ~PVModelChangedEvent(){};
     virtual void onModelChanged(const std::string &newModelName) = 0;
 };
 
-class CPVRulerChangedEvent {
+class PVRulerChangedEvent {
 public:
-    virtual ~CPVRulerChangedEvent(){};
+    virtual ~PVRulerChangedEvent(){};
     virtual void onRulerChanged(fp::Ruler *ruler) = 0;
 };
 
-class CPVVisualisationModeChangedEvent {
+class PVVisualisationModeChangedEvent {
 public:
-    virtual ~CPVVisualisationModeChangedEvent(){};
-    virtual void onVisualisationModeChanged(CPaintView::TVisualisationMode oldMode,
-                                            CPaintView::TVisualisationMode newMode) = 0;
+    virtual ~PVVisualisationModeChangedEvent(){};
+    virtual void onVisualisationModeChanged(PaintView::TVisualisationMode oldMode,
+                                            PaintView::TVisualisationMode newMode) = 0;
 };
 
-class CPVModelLoadedEvent {
+class PVModelLoadedEvent {
 public:
-    virtual ~CPVModelLoadedEvent(){};
+    virtual ~PVModelLoadedEvent(){};
     virtual void onModelLoaded() = 0;
 };
 
-class CPVNewModelEvent {
+class PVNewModelEvent {
 public:
-    virtual ~CPVNewModelEvent(){};
+    virtual ~PVNewModelEvent(){};
     virtual void onNewModel() = 0;
 };
+
+
+} // namespace fp
 
 #endif

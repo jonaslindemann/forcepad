@@ -22,8 +22,8 @@
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
 
-#ifndef _CFlPaintView_h_
-#define _CFlPaintView_h_
+#ifndef _FlPaintView_h_
+#define _FlPaintView_h_
 
 #include "forcepad_config.h"
 
@@ -46,14 +46,14 @@
 
 #include "PaintView.h"
 
-class CFlPaintView : public Fl_Gl_Window, public CPaintView {
+class FlPaintView : public Fl_Gl_Window, public fp::PaintView {
 private:
     #ifndef __APPLE__
         Fl_Cursor_Shape* m_cursors[20];
     #endif
 public:
-    CFlPaintView(int x,int y,int w,int h,const char *l=0);
-    virtual ~CFlPaintView();
+    FlPaintView(int x,int y,int w,int h,const char *l=0);
+    virtual ~FlPaintView();
 
     /*
      *    Virtual overrides from FLTK
