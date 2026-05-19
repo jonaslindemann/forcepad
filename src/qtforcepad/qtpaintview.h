@@ -7,6 +7,8 @@
 
 #include "PaintView.h"
 
+class InfoOverlay;
+
 class QtPaintView : public QOpenGLWidget, public fp::PaintView {
     Q_OBJECT
 public:
@@ -18,11 +20,14 @@ public:
 
     void reinitGL();  // Re-runs onInitContext() after canvas resize, then repaints
 
+    void showInfoOverlay(const QString &msg, int msec = 4000);
+
 Q_SIGNALS:
     void editModeChanged(fp::PaintView::TEditMode newMode);
     void viewModeChanged(fp::PaintView::TViewMode newMode);
     void modelLoaded();
     void newModelCreated();
+    void infoMessage(const QString &msg);
 
 protected:
     void initializeGL() override;
@@ -56,4 +61,7 @@ protected:
     void doDeleteCursors() override;
     void doShowAbout() override;
     void doShowHelp() override;
+
+private:
+    InfoOverlay *m_infoOverlay{nullptr};
 };

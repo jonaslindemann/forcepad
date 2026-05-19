@@ -3,6 +3,7 @@
 #include "CalcSettingsDialog.h"
 #include "GeneralSettingsDialog.h"
 #include "AboutDialog.h"
+#include "OptimisationSettingsDialog.h"
 
 #include <QMenuBar>
 #include <QMenu>
@@ -32,6 +33,8 @@
 #include <QIcon>
 #include <QSize>
 #include <QSvgRenderer>
+#include <QProgressBar>
+#include <QString>
 
 // ---------------------------------------------------------------------------
 // Small helper: stiffness gradient widget shown at the bottom of sketch panel
@@ -207,6 +210,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_paintView->setModelLoadedEvent(this);
     m_paintView->setNewModelEvent(this);
 
+
     createActions();
     createMenus();
     createModeTabBar();
@@ -302,8 +306,53 @@ void MainWindow::runCalculate()
 
 void MainWindow::runOptimise()
 {
+    OptimisationSettingsDialog dlg(m_paintView, this);
+    if (dlg.exec() != QDialog::Accepted)
+        return;
+
     m_paintView->setViewMode(fp::PaintView::VM_ACTION);
-    m_paintView->executeOpt();
+    m_paintView->setStatusMessageEvent(this);
+    m_paintView->setContinueCalcEvent(this);
+
+    m_continueCalc = true;
+    m_optStatusLabel->setVisible(true);
+    m_optProgressBar->setValue(0);
+    m_optProgressBar->setVisible(true);
+    m_btnStopOpt->setVisible(true);
+
+    bool ok = m_paintView->executeOpt();
+
+    m_btnStopOpt->setVisible(false);
+    m_optProgressBar->setVisible(false);
+    m_optStatusLabel->setText("");
+    m_optStatusLabel->setVisible(false);
+
+    m_paintView->setStatusMessageEvent(nullptr);
+    m_paintView->setContinueCalcEvent(nullptr);
+
+    if (!ok)
+    {
+        m_paintView->setViewMode(fp::PaintView::VM_PHYSICS);
+        m_paintView->execute();
+        showPrincipalStress();
+    }
+}
+
+void MainWindow::stopOptimise()
+{
+    m_continueCalc = false;
+}
+
+void MainWindow::onStatusMessage(const std::string &message, const int progress)
+{
+    if (m_optStatusLabel)  m_optStatusLabel->setText(QString::fromStdString(message));
+    if (m_optProgressBar)  m_optProgressBar->setValue(progress);
+    m_paintView->update();
+}
+
+bool MainWindow::onContinueCalc()
+{
+    return m_continueCalc;
 }
 
 // ---------------------------------------------------------------------------
@@ -841,7 +890,7 @@ QWidget* MainWindow::createActionToolPanel()
     m_btnVisMises     = makeSvgToolBtn("icons/mises.svg",     "Show Mises Stress");
     m_btnVisDisp      = makeSvgToolBtn("icons/deflections.svg","Show Displacement");
     m_btnVisStruct    = makeSvgToolBtn("icons/structure.svg", "Show Structure");
-    auto *btnOpt      = makeSvgToolBtn("icons/optimisation.svg", "Optimise (F6)");
+    auto *btnOpt    = makeSvgToolBtn("icons/optimisation.svg", "Optimise (F6)");
 
     m_btnMoveLoad   = makeSvgToolBtn("icons/move_load.svg",   "Move Load");
     m_btnRotateLoad = makeSvgToolBtn("icons/rotate_load.svg", "Rotate Load");
@@ -1253,6 +1302,36 @@ void MainWindow::createStatusBar()
     m_statusMode  = new QLabel("  Tool: Draw Beam");
     m_statusModel = new QLabel("View: Sketch  ");
     statusBar()->addWidget(m_statusMode);
+
+    // Fixed-width label so changing text does not shift the progress bar.
+    m_optStatusLabel = new QLabel;
+    m_optStatusLabel->setFixedWidth(220);
+    m_optStatusLabel->setVisible(false);
+    statusBar()->addWidget(m_optStatusLabel);
+
+    m_optProgressBar = new QProgressBar;
+    m_optProgressBar->setRange(0, 100);
+    m_optProgressBar->setFixedWidth(140);
+    m_optProgressBar->setFixedHeight(13);
+    m_optProgressBar->setTextVisible(false);
+    m_optProgressBar->setVisible(false);
+    m_optProgressBar->setStyleSheet(
+        "QProgressBar { background: #404040; border-radius: 3px; }"
+        "QProgressBar::chunk { background: #2563eb; border-radius: 3px; }");
+    statusBar()->addWidget(m_optProgressBar);
+
+    // Stop button — lives in the status bar so it is always reachable.
+    m_btnStopOpt = new QPushButton("Stop");
+    m_btnStopOpt->setFixedHeight(20);
+    m_btnStopOpt->setVisible(false);
+    m_btnStopOpt->setStyleSheet(
+        "QPushButton { background: #dc2626; color: white; border: none;"
+        "  border-radius: 3px; padding: 0 10px; font-size: 11px; }"
+        "QPushButton:hover { background: #ef4444; }"
+        "QPushButton:pressed { background: #b91c1c; }");
+    connect(m_btnStopOpt, &QPushButton::clicked, this, &MainWindow::stopOptimise);
+    statusBar()->addWidget(m_btnStopOpt);
+
     statusBar()->addPermanentWidget(m_statusModel);
 }
 

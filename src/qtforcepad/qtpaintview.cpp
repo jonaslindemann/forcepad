@@ -2,6 +2,9 @@
 
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QPainter>
+#include <QTimer>
+#include <QFontMetrics>
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QFormLayout>
@@ -21,6 +24,71 @@
 #include <GL/glu.h>
 #endif
 
+// ---------------------------------------------------------------------------
+// Semi-transparent toast overlay shown on top of the GL canvas
+// ---------------------------------------------------------------------------
+class InfoOverlay : public QWidget
+{
+    QString  m_text;
+    QTimer  *m_timer;
+
+    static constexpr int kHPad   = 24;
+    static constexpr int kVPad   = 12;
+    static constexpr int kRadius = 10;
+    static constexpr int kMargin = 28;
+    static constexpr int kMaxW   = 440;
+
+public:
+    explicit InfoOverlay(QWidget *parent)
+        : QWidget(parent), m_timer(new QTimer(this))
+    {
+        setAttribute(Qt::WA_TransparentForMouseEvents);
+        setAttribute(Qt::WA_NoSystemBackground);
+        setAttribute(Qt::WA_TranslucentBackground);
+        setVisible(false);
+        m_timer->setSingleShot(true);
+        connect(m_timer, &QTimer::timeout, this, &QWidget::hide);
+    }
+
+    void showMessage(const QString &text, int msec)
+    {
+        m_text = text;
+        reposition();
+        setVisible(true);
+        raise();
+        update();
+        m_timer->start(msec);
+    }
+
+    void reposition()
+    {
+        if (!parentWidget()) return;
+        QFontMetrics fm(font());
+        QRect tb = fm.boundingRect(QRect(0, 0, kMaxW - 2 * kHPad, 2000),
+                                   Qt::TextWordWrap | Qt::AlignCenter, m_text);
+        int w = tb.width()  + 2 * kHPad;
+        int h = tb.height() + 2 * kVPad;
+        int x = (parentWidget()->width()  - w) / 2;
+        int y =  parentWidget()->height() - h - kMargin;
+        setGeometry(x, y, w, h);
+    }
+
+protected:
+    void paintEvent(QPaintEvent *) override
+    {
+        QPainter p(this);
+        p.setRenderHint(QPainter::Antialiasing);
+        p.setPen(Qt::NoPen);
+        p.setBrush(QColor(20, 20, 20, 210));
+        p.drawRoundedRect(rect(), kRadius, kRadius);
+        p.setPen(QColor(255, 255, 255, 230));
+        p.drawText(rect().adjusted(kHPad, kVPad, -kHPad, -kVPad),
+                   Qt::TextWordWrap | Qt::AlignCenter, m_text);
+    }
+};
+
+// ---------------------------------------------------------------------------
+
 QtPaintView::QtPaintView(QWidget *parent)
     : QOpenGLWidget(parent), fp::PaintView(0, 0, 800, 600, "ForcePAD Qt")
 {
@@ -28,6 +96,7 @@ QtPaintView::QtPaintView(QWidget *parent)
     setFocusPolicy(Qt::StrongFocus);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     doCreateCursors();
+    m_infoOverlay = new InfoOverlay(this);
 }
 
 QtPaintView::~QtPaintView()
@@ -80,6 +149,8 @@ void QtPaintView::resizeGL(int w, int h)
 {
     fp::UiSettings::getInstance()->setDevicePixelRatio(doDevicePixelRatio());
     onInitContext();  // Recalculates drawing offset and scissor for the actual widget size
+    if (m_infoOverlay && m_infoOverlay->isVisible())
+        m_infoOverlay->reposition();
 }
 
 void QtPaintView::reinitGL()
@@ -309,7 +380,13 @@ bool QtPaintView::doNewModel(int &w, int &h, int &initialStiffness)
 
 void QtPaintView::doInfoMessage(const std::string message)
 {
-    QMessageBox::information(this, "ForcePAD", QString::fromStdString(message));
+    showInfoOverlay(QString::fromStdString(message));
+    Q_EMIT infoMessage(QString::fromStdString(message));
+}
+
+void QtPaintView::showInfoOverlay(const QString &msg, int msec)
+{
+    m_infoOverlay->showMessage(msg, msec);
 }
 
 bool QtPaintView::doAskYesNo(const std::string question)

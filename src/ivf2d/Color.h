@@ -22,8 +22,7 @@
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
 
-#ifndef _Color_h_
-#define _Color_h_
+#pragma once
 
 #include "DrawableBase.h"
 
@@ -81,8 +80,6 @@ public:
 	virtual void doMaterial() override;
 };
 
-
 } // namespace ivf2d
 
-#endif 
 

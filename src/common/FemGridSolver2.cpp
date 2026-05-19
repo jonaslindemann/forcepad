@@ -829,7 +829,6 @@ void FemGridSolver2::objectiveFunctionAndSensitivity(calfem::Matrix& X, calfem::
 
 				Ke.setZero();
 				calfem::plani4e(Ex, Ey, Ep, D, m_Eq, Ke, fe);
-				Ke = Ke * pow(X(i,j), penalty);
 
 				if (L(i,j)<0.2)
 				{

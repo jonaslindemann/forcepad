@@ -21,8 +21,8 @@
 //
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
-#ifndef _ScreenImage_h_
-#define _ScreenImage_h_
+
+#pragma once
 
 #include "Shape.h"
 #include "Image.h"
@@ -79,5 +79,3 @@ public:
 
 
 } // namespace ivf2d
-
-#endif 

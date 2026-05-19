@@ -9,6 +9,7 @@ set(SOURCES
     CalcSettingsDialog.cpp
     GeneralSettingsDialog.cpp
     AboutDialog.cpp
+    OptimisationSettingsDialog.cpp
     ../paintview/PaintView.cpp
     ../common/FemGridSolver2.cpp
 )
@@ -19,6 +20,7 @@ set(HEADERS
     CalcSettingsDialog.h
     GeneralSettingsDialog.h
     AboutDialog.h
+    OptimisationSettingsDialog.h
 )
 
 qt_add_executable(qtforcepad ${SOURCES} ${HEADERS})

@@ -2,6 +2,7 @@
 
 #include <QMainWindow>
 #include "QtPaintView.h"
+#include "../common/FemGridSolver2.h"
 
 class QAction;
 class QToolBar;
@@ -14,12 +15,15 @@ class QSpinBox;
 class QComboBox;
 class QPushButton;
 class QButtonGroup;
+class QProgressBar;
 
 class MainWindow : public QMainWindow,
                    public fp::PVModeChangeEvent,
                    public fp::PVViewModeChangeEvent,
                    public fp::PVModelLoadedEvent,
-                   public fp::PVNewModelEvent
+                   public fp::PVNewModelEvent,
+                   public GSStatusMessageEvent,
+                   public GSContinueCalcEvent
 {
     Q_OBJECT
 public:
@@ -40,6 +44,12 @@ public:
     // fp::PVNewModelEvent
     void onNewModel() override;
 
+    // GSStatusMessageEvent
+    void onStatusMessage(const std::string &message, const int progress) override;
+
+    // GSContinueCalcEvent
+    bool onContinueCalc() override;
+
 private Q_SLOTS:
     void fileNew();
     void fileOpen();
@@ -51,6 +61,7 @@ private Q_SLOTS:
     void editPaste();
     void runCalculate();
     void runOptimise();
+    void stopOptimise();
     void settingsCalc();
     void settingsGeneral();
     void helpDocumentation();
@@ -209,4 +220,12 @@ private:
     // Status bar labels
     QLabel *m_statusMode{nullptr};
     QLabel *m_statusModel{nullptr};
+
+    // Optimisation progress widgets (all live in the status bar)
+    QLabel       *m_optStatusLabel{nullptr};
+    QProgressBar *m_optProgressBar{nullptr};
+    QPushButton  *m_btnStopOpt{nullptr};
+
+    // Optimisation stop flag (checked by onContinueCalc)
+    bool m_continueCalc{true};
 };

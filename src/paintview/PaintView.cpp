@@ -1839,19 +1839,31 @@ bool PaintView::execute()
 bool PaintView::executeOpt()
 {
 	bool errors = true;
-	
-	so_print("PaintView","execute()");
-	
+
+	so_print("PaintView","executeOpt()");
+
 	//
 	// Initialize grid
 	//
-	
+
 	m_femGrid->initGrid();
-	
-	//
-	// Check for long computational times >10000 dofs. (today...)
-	//
-	
+
+	if (m_femGrid->getElementCount() == 0)
+	{
+		doInfoMessage("No structure to solve.");
+		return false;
+	}
+	if (m_femGrid->getPointLoadSize() == 0 && !m_useWeight)
+	{
+		doInfoMessage("No loads defined on structure.");
+		return false;
+	}
+	if (m_femGrid->getPointConstraintsSize() == 0)
+	{
+		doInfoMessage("Add locks to structure.");
+		return false;
+	}
+
 	//
 	// Initiate solver
 	//

@@ -1,5 +1,5 @@
 //
-// Copyright 1999-2006 by Structural Mechanics, Lund University.
+// Copyright 1999-2026 by Structural Mechanics, Lund University.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -22,8 +22,7 @@
 // Written by Jonas Lindemann
 //
 
-#ifndef _SingletonDestroyer_h_
-#define _SingletonDestroyer_h_
+#pragma once
 
 namespace ivf2d {
 
@@ -80,5 +79,3 @@ void SingletonDestroyer<T>::setSingleton (T* d) {
 
 
 } // namespace ivf2d
-
-#endif

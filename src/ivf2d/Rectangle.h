@@ -1,6 +1,6 @@
 //
 // ForcePAD - Educational Finite Element Software
-// Copyright (C) 2000-2003 Division of Structural Mecahnics, Lund University
+// Copyright (C) 2000-2026 Division of Structural Mecahnics, Lund University
 //
 // Written by Jonas Lindemann
 //
@@ -22,8 +22,7 @@
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
 
-#ifndef _Rectangle_h_
-#define _Rectangle_h_
+#pragma once
 
 #include "Shape.h"
 #include "Texture.h"
@@ -96,4 +95,3 @@ public:
 
 } // namespace ivf2d
 
-#endif

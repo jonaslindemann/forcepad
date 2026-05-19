@@ -16,3 +16,4 @@ win32_build_release/
 win32_build_debug/
 vcpkg_installed/
 *.ps1
+/docs/site
