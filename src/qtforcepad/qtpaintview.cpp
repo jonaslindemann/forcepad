@@ -10,6 +10,7 @@
 #include <QUrl>
 #include <QDesktopServices>
 #include <QApplication>
+#include <QOpenGLFunctions>
 
 #include "UiSettings.h"
 
@@ -155,8 +156,22 @@ void QtPaintView::mouseReleaseEvent(QMouseEvent *event)
             // geometry to the canvas image.  Qt does NOT make the context
             // current in mouse-event handlers, so we must do it explicitly.
             makeCurrent();
+            // Qt 6 does NOT automatically re-bind the widget FBO when
+            // makeCurrent() is called outside of paintGL().  Without this
+            // explicit bind, onClear()/onDraw() render to framebuffer 0
+            // (meaningless in an offscreen-surface context) and glReadPixels
+            // inside onRelease() reads back zeros instead of the drawn shape.
+            QOpenGLContext::currentContext()->functions()->glBindFramebuffer(
+                GL_FRAMEBUFFER, defaultFramebufferObject());
             onClear();
+            // Mirror the glPixelTransfer state from paintGL() so glDrawPixels
+            // inside onDraw() emits alpha=1.0 into the FBO.
+            glPixelTransferf(GL_ALPHA_SCALE, 0.0f);
+            glPixelTransferf(GL_ALPHA_BIAS,  1.0f);
             onDraw();   // m_leftMouseDown still true → line/rect/ellipse rendered
+            glPixelTransferf(GL_ALPHA_SCALE, 1.0f);
+            glPixelTransferf(GL_ALPHA_BIAS,  0.0f);
+            glFinish(); // ensure GPU rendering is complete before glReadPixels
             m_leftMouseDown = false;
             onRelease(x, y);
         }

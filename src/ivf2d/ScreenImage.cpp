@@ -256,7 +256,7 @@ void ScreenImage::update(int x1, int y1, int x2, int y2)
 			}
 		}
 
-		m_image->fillRectAlpha(x1, y1, x2, y2, 128);
+		m_image->fillRectAlpha(xmin, ymin, xmax - 1, ymax - 1, 128);
 	}
 }
 
