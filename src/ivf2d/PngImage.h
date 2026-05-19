@@ -22,12 +22,14 @@
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
 
-#ifndef _CPngImage_h_
-#define _CPngImage_h_
+#ifndef _PngImage_h_
+#define _PngImage_h_
 
 #include "Image.h"
 
-IvfSmartPointer(CPngImage);
+namespace ivf2d {
+
+IvfSmartPointer(PngImage);
 
 /**
  * PNG file loader 
@@ -37,19 +39,19 @@ IvfSmartPointer(CPngImage);
  *
  * @author Jonas Lindemann
  */
-class CPngImage : public CImage {
+class PngImage : public Image {
 private:
 	std::string m_fileName;
 public:
 	/** CIvfPngImage constructor */
-	CPngImage();
+	PngImage();
 
 	/** CIvfPngImage destructor */
-	virtual ~CPngImage();
+	virtual ~PngImage();
 
-	static CPngImagePtr create() { return std::make_shared<CPngImage>(); }
+	static PngImagePtr create() { return std::make_shared<PngImage>(); }
 
-	IvfClassInfo("CPngImage",CImage);
+	IvfClassInfo("PngImage",Image);
 
 	/** Reads PNG image */
 	virtual bool read();
@@ -57,5 +59,8 @@ public:
 	void setFileName(const std::string& name);
 	const std::string& getFileName();
 };
+
+
+} // namespace ivf2d
 
 #endif 

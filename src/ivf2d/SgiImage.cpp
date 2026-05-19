@@ -27,19 +27,21 @@
 #include <cstring>
 #include <cstdlib>
 
-CSgiImage::CSgiImage()
+namespace ivf2d {
+
+SgiImage::SgiImage()
 {
 	m_fileName = nullptr;
 	m_alphaChannel = false;
 }
 
-CSgiImage::~CSgiImage()
+SgiImage::~SgiImage()
 {
 	if (m_fileName!=nullptr)
 		delete [] m_fileName;
 }
 
-void CSgiImage::setFileName(const char *name)
+void SgiImage::setFileName(const char *name)
 {
 	if (m_fileName!=nullptr)
 		delete [] m_fileName;
@@ -48,7 +50,7 @@ void CSgiImage::setFileName(const char *name)
 	strcpy(m_fileName, name);
 }
 
-void CSgiImage::expandrow(unsigned char *optr, unsigned char *iptr, int z)
+void SgiImage::expandrow(unsigned char *optr, unsigned char *iptr, int z)
 {
 	unsigned char pixel, count;
 	
@@ -80,7 +82,7 @@ void CSgiImage::expandrow(unsigned char *optr, unsigned char *iptr, int z)
 	}
 }
 
-void CSgiImage::convertLong(unsigned int *array, unsigned int length)
+void SgiImage::convertLong(unsigned int *array, unsigned int length)
 {
     unsigned long b1, b2, b3, b4;
     unsigned char *ptr;
@@ -95,7 +97,7 @@ void CSgiImage::convertLong(unsigned int *array, unsigned int length)
     }
 }
 
-bool CSgiImage::read()
+bool SgiImage::read()
 {
 	unsigned char buf[80];
 	unsigned int i, j, k;
@@ -266,7 +268,7 @@ bool CSgiImage::read()
 	return true;
 }
 
-unsigned short CSgiImage::getshort(FILE *inf)
+unsigned short SgiImage::getshort(FILE *inf)
 {
 	unsigned char buf[2];
 
@@ -274,7 +276,7 @@ unsigned short CSgiImage::getshort(FILE *inf)
 	return (buf[0]<<8)+(buf[1]<<0);
 }
 
-unsigned long CSgiImage::getlong(FILE *inf)
+unsigned long SgiImage::getlong(FILE *inf)
 {
 	unsigned char buf[4];
 
@@ -282,7 +284,7 @@ unsigned long CSgiImage::getlong(FILE *inf)
 	return (buf[0]<<24)+(buf[1]<<16)+(buf[2]<<8)+(buf[3]<<0);
 }
 
-unsigned char CSgiImage::getbyte(FILE *inf)
+unsigned char SgiImage::getbyte(FILE *inf)
 {
 	unsigned char buf[1];
 
@@ -290,13 +292,14 @@ unsigned char CSgiImage::getbyte(FILE *inf)
 	return buf[0]<<0;
 }
 
-void CSgiImage::setAlphaChannel(bool flag)
+void SgiImage::setAlphaChannel(bool flag)
 {
 	m_alphaChannel = flag;
 }
 
-const char* CSgiImage::getFileName()
+const char* SgiImage::getFileName()
 {
 	return m_fileName;
 }
 
+} // namespace ivf2d

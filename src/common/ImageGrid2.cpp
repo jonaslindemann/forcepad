@@ -57,7 +57,7 @@ void CImageGrid2::clearGrid()
 	m_specialElement.clear();
 }
 
-void CImageGrid2::setImage(CImagePtr image)
+void CImageGrid2::setImage(ivf2d::ImagePtr image)
 {
 	m_image = image;
 
@@ -175,7 +175,7 @@ void CImageGrid2::getGridSize(int &rows, int &cols)
 	cols = m_cols;
 }
 
-CImage* CImageGrid2::getImage()
+ivf2d::Image* CImageGrid2::getImage()
 {
 	return m_image.get();
 }

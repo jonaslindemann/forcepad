@@ -29,7 +29,7 @@
 
 IvfSmartPointer(CNode);
 
-class CNode : public CPoint {
+class CNode : public ivf2d::Point {
 private:
 	int m_dofs[2];
 public:
@@ -41,7 +41,7 @@ public:
 
 	static CNodePtr create() { return std::make_shared<CNode>(); }
 
-	IvfClassInfo("CNode",CBase);
+	IvfClassInfo("CNode",ivf2d::Base);
 	int enumerate(int start);
 	void setDof(int idx, int value);
 	int getDof(int idx);

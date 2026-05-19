@@ -22,13 +22,15 @@
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
 
-#ifndef _CImage_h_
-#define _CImage_h_
+#ifndef _Image_h_
+#define _Image_h_
 
 #include "Base.h"
 #include "DrawableBase.h" // OpenGL stuff
 
-IvfSmartPointer(CImage);
+namespace ivf2d {
+
+IvfSmartPointer(Image);
 
 /**
  * Image class
@@ -36,7 +38,7 @@ IvfSmartPointer(CImage);
  * The image class handles a general 2D color image, which
  * can be used in conjunction with the Texture class.
  */
-class CImage : public CBase {
+class Image : public Base {
 private:
 	int m_layers;
 	int m_currentLayer;
@@ -58,14 +60,14 @@ private:
 	void clearLayers();
 	void destroyLayers();
 public:
-	CImage();
-	CImage(int nLayers);
-	virtual ~CImage();
+	Image();
+	Image(int nLayers);
+	virtual ~Image();
 
-	static CImagePtr create() { return std::make_shared<CImage>(); }
-	static CImagePtr create(int nLayers) { return std::make_shared<CImage>(nLayers); }
+	static ImagePtr create() { return std::make_shared<Image>(); }
+	static ImagePtr create(int nLayers) { return std::make_shared<Image>(nLayers); }
 
-	IvfClassInfo("CImage",CBase);
+	IvfClassInfo("Image",Base);
 
 	// Methods
 
@@ -93,15 +95,15 @@ public:
 	/** Retrieve pixel color at position (\c x, \c y). */
     void getPixel(int x, int y, unsigned char &red, unsigned char &green, unsigned char &blue);
 
-	void drawImage(int x, int y, CImage* image);
-	void drawImageLine(CImage* image, int x1, int y1, int x2, int y2, float* color);
+	void drawImage(int x, int y, Image* image);
+	void drawImageLine(Image* image, int x1, int y1, int x2, int y2, float* color);
 	void grayscale();
 	int getChannels();
     void setImageMap(int width, int height, unsigned char* data, bool ownData);
 	void* getData();
-	void copyFrom(CImage* image);
-	void copyFrom(CImage* image, int startx, int starty);
-	void copyFrom(CImage* image, int startx, int starty, const float* color);
+	void copyFrom(Image* image);
+	void copyFrom(Image* image, int startx, int starty);
+	void copyFrom(Image* image, int startx, int starty, const float* color);
     void setFillColor(unsigned char red, unsigned char green, unsigned char blue);
 	bool validPixel(int x, int y);
 	void floodFill(int x, int y);
@@ -152,5 +154,8 @@ public:
     void addValue(int x, int y, int channel, unsigned char value);
     void subtractValue(int x, int y, int channel, unsigned char value);
 };
+
+
+} // namespace ivf2d
 
 #endif 

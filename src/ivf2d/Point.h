@@ -22,25 +22,27 @@
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
 
-#ifndef _CPoint_h_
-#define _CPoint_h_
+#ifndef _Point_h_
+#define _Point_h_
 
 #include "Base.h"
+
+namespace ivf2d {
 
 /**
  * Point class
  *
  * The point class implements a simple 2D point.
  */
-class CPoint : public CBase {
+class Point : public Base {
 private:
 	double m_pos[2];
 public:
 	/** Point class constructor. */
-	CPoint();
+	Point();
 
 	/** Point class destructor. */
-	virtual ~CPoint();
+	virtual ~Point();
 
 	// Get/set methods
 
@@ -62,5 +64,8 @@ public:
 	/** Return point y position. */
 	double y();
 };
+
+
+} // namespace ivf2d
 
 #endif 

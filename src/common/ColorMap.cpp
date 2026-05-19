@@ -48,7 +48,7 @@ void CColorMap::open(const char *fname)
 	int nColors;
 	int i;
 	float r, g, b;
-	CColorPtr color;
+	ivf2d::ColorPtr color;
 
 	// Clear previous color map
 	
@@ -65,7 +65,7 @@ void CColorMap::open(const char *fname)
 	for (i=0; i<nColors; i++)
 	{
 		f >> r >> g >> b;
-		color = CColor::create();
+		color = ivf2d::Color::create();
 		color->setColor(r, g, b, 1.0f);
 		m_colors.push_back(color);
 	}
@@ -91,7 +91,7 @@ void CColorMap::getColor(double value, float &r, float &g, float &b)
 	{
 		double clampedValue;
 		int colorIndex;
-		CColor* color;
+		ivf2d::Color* color;
 
 		// Clamp value
 

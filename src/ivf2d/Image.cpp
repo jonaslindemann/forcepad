@@ -32,7 +32,9 @@
 #include <GL/gl.h>
 #endif
 
-CImage::CImage()
+namespace ivf2d {
+
+Image::Image()
 {
 	m_imageMap = nullptr;
 	m_imageMaps = nullptr;
@@ -51,7 +53,7 @@ CImage::CImage()
 	initLayers();
 }
 
-CImage::CImage(int nLayers)
+Image::Image(int nLayers)
 {
 	m_imageMap = nullptr;
 	m_imageMaps = nullptr;
@@ -70,7 +72,7 @@ CImage::CImage(int nLayers)
 	initLayers();
 }
 
-CImage::~CImage()
+Image::~Image()
 {
 	if (m_ownData)
 	{
@@ -78,7 +80,7 @@ CImage::~CImage()
 	}
 }
 
-void CImage::clearLayers()
+void Image::clearLayers()
 {
 	int i;
 
@@ -90,7 +92,7 @@ void CImage::clearLayers()
 			delete [] m_imageMaps[i];
 }
 
-void CImage::initLayers()
+void Image::initLayers()
 {
 	int i;
 
@@ -102,13 +104,13 @@ void CImage::initLayers()
 	m_imageMap = m_imageMaps[m_currentLayer];
 }
 
-void CImage::destroyLayers()
+void Image::destroyLayers()
 {
 	clearLayers();
 	delete [] m_imageMaps;
 }
 
-void CImage::setSize(int width, int height)
+void Image::setSize(int width, int height)
 {
 	if (m_ownData)
 	{
@@ -132,17 +134,17 @@ void CImage::setSize(int width, int height)
 	}
 }
 
-int CImage::getWidth()
+int Image::getWidth()
 {
 	return m_size[0];
 }
 
-int CImage::getHeight()
+int Image::getHeight()
 {
 	return m_size[1];
 }
 
-void CImage::setLayer(int layer)
+void Image::setLayer(int layer)
 {
 	if ((layer>=0)&&(layer<m_layers))
 	{
@@ -151,23 +153,23 @@ void CImage::setLayer(int layer)
 	}
 }
 
-int CImage::getLayer()
+int Image::getLayer()
 {
 	return m_currentLayer;
 }
 
-int CImage::getLayerCount()
+int Image::getLayerCount()
 {
 	return m_layers;
 }
 
 
-unsigned char* CImage::getImageMap()
+unsigned char* Image::getImageMap()
 {
 	return m_imageMap;
 }
 
-void CImage::setPixel(int x, int y, unsigned char red, unsigned char green, unsigned char blue)
+void Image::setPixel(int x, int y, unsigned char red, unsigned char green, unsigned char blue)
 {
 	if (valid(x, y))
 	{
@@ -179,7 +181,7 @@ void CImage::setPixel(int x, int y, unsigned char red, unsigned char green, unsi
 	}
 }
 
-void CImage::setPixelAlpha(int x, int y, unsigned char alpha)
+void Image::setPixelAlpha(int x, int y, unsigned char alpha)
 {
 	if (valid(x, y))
 	{
@@ -188,7 +190,7 @@ void CImage::setPixelAlpha(int x, int y, unsigned char alpha)
 	}
 }
 
-void CImage::addPixel(int x, int y, unsigned char red, unsigned char green, unsigned char blue)
+void Image::addPixel(int x, int y, unsigned char red, unsigned char green, unsigned char blue)
 {
 	if (valid(x, y))
 	{
@@ -200,7 +202,7 @@ void CImage::addPixel(int x, int y, unsigned char red, unsigned char green, unsi
 	}
 }
 
-void CImage::subtractPixel(int x, int y, unsigned char red, unsigned char green, unsigned char blue)
+void Image::subtractPixel(int x, int y, unsigned char red, unsigned char green, unsigned char blue)
 {
 	if (valid(x, y))
 	{
@@ -212,12 +214,12 @@ void CImage::subtractPixel(int x, int y, unsigned char red, unsigned char green,
 	}
 }
 
-bool CImage::valid(int x, int y)
+bool Image::valid(int x, int y)
 {
 	return ((x>=0)&&(x<m_size[0])&&(y>=0)&&(y<m_size[1]));
 }
 
-void CImage::getPixel(int x, int y, unsigned char &red, unsigned char &green, unsigned char &blue)
+void Image::getPixel(int x, int y, unsigned char &red, unsigned char &green, unsigned char &blue)
 {
 	if (valid(x, y))
 	{
@@ -227,12 +229,12 @@ void CImage::getPixel(int x, int y, unsigned char &red, unsigned char &green, un
 	}
 }
 
-void CImage::clear()
+void Image::clear()
 {
 	fillColor(0,0,0);
 }
 
-void CImage::fillColor(unsigned char red, unsigned char green, unsigned char blue)
+void Image::fillColor(unsigned char red, unsigned char green, unsigned char blue)
 {
 	int i, j;
 
@@ -241,7 +243,7 @@ void CImage::fillColor(unsigned char red, unsigned char green, unsigned char blu
 			setPixel(i, j, red, green, blue);
 }
 
-void CImage::fillRect(int x1, int y1, int x2, int y2, unsigned char red, unsigned char green, unsigned char blue)
+void Image::fillRect(int x1, int y1, int x2, int y2, unsigned char red, unsigned char green, unsigned char blue)
 {
 	if ( (valid(x1, y1))&&(valid(x2, y2)) )
 	{
@@ -253,7 +255,7 @@ void CImage::fillRect(int x1, int y1, int x2, int y2, unsigned char red, unsigne
 	}
 }
 
-void CImage::fillRectAlpha(int x1, int y1, int x2, int y2, unsigned char alpha)
+void Image::fillRectAlpha(int x1, int y1, int x2, int y2, unsigned char alpha)
 {
 	if ( (valid(x1, y1))&&(valid(x2, y2)) )
 	{
@@ -265,13 +267,13 @@ void CImage::fillRectAlpha(int x1, int y1, int x2, int y2, unsigned char alpha)
 	}
 }
 
-double CImage::getRatio()
+double Image::getRatio()
 {
 	return m_ratio;
 }
 
 
-void CImage::drawFrame(int x1, int y1, int x2, int y2, unsigned char red, unsigned char green, unsigned char blue)
+void Image::drawFrame(int x1, int y1, int x2, int y2, unsigned char red, unsigned char green, unsigned char blue)
 {
 	if ( (valid(x1, y1))&&(valid(x2, y2)) )
 	{
@@ -291,7 +293,7 @@ void CImage::drawFrame(int x1, int y1, int x2, int y2, unsigned char red, unsign
 	}
 }
 
-void CImage::setChannels(int number)
+void Image::setChannels(int number)
 {
 	if (m_ownData)
 	{
@@ -304,17 +306,17 @@ void CImage::setChannels(int number)
 	}
 }
 
-void CImage::setAlpha(unsigned char alpha)
+void Image::setAlpha(unsigned char alpha)
 {
 	m_currentAlpha = alpha;
 }
 
-unsigned char CImage::getAlpha()
+unsigned char Image::getAlpha()
 {
 	return m_currentAlpha;
 }
 
-void CImage::setValue(int x, int y, int channel, unsigned char value)
+void Image::setValue(int x, int y, int channel, unsigned char value)
 {
 	//	if (valid(x, y))
 	//	{
@@ -322,7 +324,7 @@ void CImage::setValue(int x, int y, int channel, unsigned char value)
 	//	}
 }
 
-void CImage::addValue(int x, int y, int channel, unsigned char value)
+void Image::addValue(int x, int y, int channel, unsigned char value)
 {
 	if ((int)m_imageMap[x*m_channels + m_size[0]*y*m_channels + channel]+(int)value > 255)
 		m_imageMap[x*m_channels + m_size[0]*y*m_channels + channel] = 255;
@@ -330,7 +332,7 @@ void CImage::addValue(int x, int y, int channel, unsigned char value)
 		m_imageMap[x*m_channels + m_size[0]*y*m_channels + channel] += value;
 }
 
-void CImage::subtractValue(int x, int y, int channel, unsigned char value)
+void Image::subtractValue(int x, int y, int channel, unsigned char value)
 {
 	if ((int)m_imageMap[x*m_channels + m_size[0]*y*m_channels + channel]-(int)value < 0)
 		m_imageMap[x*m_channels + m_size[0]*y*m_channels + channel] = 0;
@@ -339,7 +341,7 @@ void CImage::subtractValue(int x, int y, int channel, unsigned char value)
 }
 
 
-void CImage::createAlphaAll(unsigned char max, unsigned char min)
+void Image::createAlphaAll(unsigned char max, unsigned char min)
 {
 	int i, j;
 
@@ -363,12 +365,12 @@ void CImage::createAlphaAll(unsigned char max, unsigned char min)
 	}
 }
 
-void CImage::getValue(int x, int y, int channel, unsigned char &value)
+void Image::getValue(int x, int y, int channel, unsigned char &value)
 {
 	value = m_imageMap[x*m_channels + m_size[0]*y*m_channels + channel];
 }
 
-void CImage::fillAlpha(unsigned char alpha)
+void Image::fillAlpha(unsigned char alpha)
 {
 	int i, j;
 
@@ -377,7 +379,7 @@ void CImage::fillAlpha(unsigned char alpha)
 			setPixelAlpha(i, j, alpha);
 }
 
-void CImage::createMask(unsigned char comp, unsigned char treshold, unsigned char over, unsigned char under)
+void Image::createMask(unsigned char comp, unsigned char treshold, unsigned char over, unsigned char under)
 {
 	int i, j;
 
@@ -414,7 +416,7 @@ void CImage::createMask(unsigned char comp, unsigned char treshold, unsigned cha
 	}
 }
 
-void CImage::createAlphaMask(unsigned char min, unsigned char max)
+void Image::createAlphaMask(unsigned char min, unsigned char max)
 {
 	int i, j;
 
@@ -436,7 +438,7 @@ void CImage::createAlphaMask(unsigned char min, unsigned char max)
 	}
 }
 
-void CImage::colorAlpha(unsigned char red, unsigned char green, unsigned char blue)
+void Image::colorAlpha(unsigned char red, unsigned char green, unsigned char blue)
 {
 	int i, j;
 
@@ -464,7 +466,7 @@ void CImage::colorAlpha(unsigned char red, unsigned char green, unsigned char bl
 	}
 }
 
-void CImage::invert()
+void Image::invert()
 {
 	int i, j;
     unsigned char red, green, blue;
@@ -480,7 +482,7 @@ void CImage::invert()
 }
 
 
-void CImage::doFloodFill(int x, int y)
+void Image::doFloodFill(int x, int y)
 {
 	if (validPixel(x, y))
 	{
@@ -497,13 +499,13 @@ void CImage::doFloodFill(int x, int y)
 	}
 }
 
-void CImage::pushPixel(int x, int y)
+void Image::pushPixel(int x, int y)
 {
 	m_processListX.push_back(x);
 	m_processListY.push_back(y);
 }
 
-bool CImage::popPixel(int &x, int &y)
+bool Image::popPixel(int &x, int &y)
 {
 	if (!m_processListX.empty())
 	{
@@ -517,13 +519,13 @@ bool CImage::popPixel(int &x, int &y)
 		return false;
 }
 
-void CImage::pushNextPixel(int x, int y)
+void Image::pushNextPixel(int x, int y)
 {
 	m_nextListX.push_back(x);
 	m_nextListY.push_back(y);
 }
 
-bool CImage::popNextPixel(int &x, int &y)
+bool Image::popNextPixel(int &x, int &y)
 {
 
 	if (!m_nextListX.empty())
@@ -538,7 +540,7 @@ bool CImage::popNextPixel(int &x, int &y)
 		return false;
 }
 
-void CImage::floodFill(int x, int y)
+void Image::floodFill(int x, int y)
 {
 	m_processListX.clear();
 	m_processListY.clear();
@@ -581,7 +583,7 @@ void CImage::floodFill(int x, int y)
 	} while (!m_processListX.empty());
 }
 
-bool CImage::validPixel(int x, int y)
+bool Image::validPixel(int x, int y)
 {
 	if (valid(x, y))
 	{
@@ -597,14 +599,14 @@ bool CImage::validPixel(int x, int y)
 		return false;
 }
 
-void CImage::setFillColor(unsigned char red, unsigned char green, unsigned char blue)
+void Image::setFillColor(unsigned char red, unsigned char green, unsigned char blue)
 {
 	m_fillColor[0] = red;
 	m_fillColor[1] = green;
 	m_fillColor[2] = blue;
 }
 
-void CImage::copyFrom(CImage *image)
+void Image::copyFrom(Image *image)
 {
 	int i, j;
 	int w, h;
@@ -624,7 +626,7 @@ void CImage::copyFrom(CImage *image)
 		}
 }
 
-void CImage::copyFrom(CImage* image, int startx, int starty)
+void Image::copyFrom(Image* image, int startx, int starty)
 {
 	int i, j;
 	int w, h;
@@ -647,7 +649,7 @@ void CImage::copyFrom(CImage* image, int startx, int starty)
 	}
 }
 
-void CImage::copyFrom(CImage* image, int startx, int starty, const float* color)
+void Image::copyFrom(Image* image, int startx, int starty, const float* color)
 {
 	int i, j;
 	int w, h;
@@ -677,12 +679,12 @@ void CImage::copyFrom(CImage* image, int startx, int starty, const float* color)
 }
 
 
-void* CImage::getData()
+void* Image::getData()
 {
 	return (void*)m_imageMap;
 }
 
-void CImage::setImageMap(int width, int height, unsigned char* data, bool ownData)
+void Image::setImageMap(int width, int height, unsigned char* data, bool ownData)
 {
 	if (m_ownData)
 	{
@@ -697,12 +699,12 @@ void CImage::setImageMap(int width, int height, unsigned char* data, bool ownDat
 	m_channels = 3;
 }
 
-int CImage::getChannels()
+int Image::getChannels()
 {
 	return m_channels;
 }
 
-void CImage::grayscale()
+void Image::grayscale()
 {
 	int i, j;
     unsigned char red, green, blue, byteMedian;
@@ -721,7 +723,7 @@ void CImage::grayscale()
 		}
 }
 
-void CImage::drawImage(int x, int y, CImage *image)
+void Image::drawImage(int x, int y, Image *image)
 {
 	int i, j;
 	int w, h;
@@ -748,7 +750,7 @@ void CImage::drawImage(int x, int y, CImage *image)
 		}
 }
 
-void CImage::drawImageLine(CImage* image, int x1, int y1, int x2, int y2, float* color)
+void Image::drawImageLine(Image* image, int x1, int y1, int x2, int y2, float* color)
 {
 	// From http://www.geocities.com/kirentanna/c_graphics.html
 
@@ -790,3 +792,5 @@ void CImage::drawImageLine(CImage* image, int x1, int y1, int x2, int y2, float*
 		}
 	}
 }
+
+} // namespace ivf2d

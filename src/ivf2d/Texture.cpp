@@ -32,7 +32,9 @@
 #include <GL/gl.h>
 #endif
 
-CTexture::CTexture()
+namespace ivf2d {
+
+Texture::Texture()
 {
 	m_bound = false;
 	m_image = nullptr;
@@ -50,18 +52,18 @@ CTexture::CTexture()
 	m_texRotate = 0.0;
 }
 
-CTexture::~CTexture()
+Texture::~Texture()
 {
 	if (isBound() == TRUE)
 		glDeleteTextures(1, &m_textureName);
 }
 
-bool CTexture::isBound()
+bool Texture::isBound()
 {
 	return m_bound;
 }
 
-void CTexture::bind()
+void Texture::bind()
 {
 	if (isBound() == TRUE)
 		glDeleteTextures(1, &m_textureName);
@@ -85,7 +87,7 @@ void CTexture::bind()
 	m_bound = true;
 }
 
-void CTexture::apply()
+void Texture::apply()
 {
 	glBindTexture(GL_TEXTURE_2D, m_textureName);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, m_minFilter);
@@ -102,12 +104,14 @@ void CTexture::apply()
 	glMatrixMode (GL_MODELVIEW);
 }
 
-void CTexture::setImage(CImagePtr image)
+void Texture::setImage(ImagePtr image)
 {
 	m_image = image;
 }
 
-CImage* CTexture::getImage()
+Image* Texture::getImage()
 {
 	return m_image.get();
 }
+
+} // namespace ivf2d

@@ -22,15 +22,17 @@
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
 
-#ifndef _CClipboard_h_
-#define _CClipboard_h_
+#ifndef _Clipboard_h_
+#define _Clipboard_h_
 
 #include "Base.h"
 #include "Image.h"
 
-IvfSmartPointer(CClipboard);
+namespace ivf2d {
 
-class CClipboard : public CBase {
+IvfSmartPointer(Clipboard);
+
+class Clipboard : public Base {
 public:
 	enum TPasteMode {
 		PM_REPLACE,
@@ -47,19 +49,19 @@ public:
 		IM_GRAYSCALE
 	};
 private:
-	CImagePtr m_baseImage;
-	CImagePtr m_clipboard;
+	ImagePtr m_baseImage;
+	ImagePtr m_clipboard;
 	TPasteMode m_pasteMode;
 	TCopyImageMode m_copyImageMode;
 	int m_selectionX[2];
 	int m_selectionY[2];
 public:
-	CClipboard();
-	virtual ~CClipboard();
+	Clipboard();
+	virtual ~Clipboard();
 
-	static CClipboardPtr create() { return std::make_shared<CClipboard>(); }
+	static ClipboardPtr create() { return std::make_shared<Clipboard>(); }
 
-	IvfClassInfo("CClipboard",CBase);
+	IvfClassInfo("Clipboard",Base);
 
 	virtual void copy(int x1, int y1, int x2, int y2);
 	virtual void cut(int x1, int y1, int x2, int y2);
@@ -68,12 +70,15 @@ public:
     void copyImage(int width, int height, unsigned char* imageMap);
 
 	void setPasteMode(TPasteMode mode);
-	void setImage(CImagePtr image);
-	CImage* getClipboardImage();
+	void setImage(ImagePtr image);
+	Image* getClipboardImage();
 	void setCopyImageMode(TCopyImageMode mode);
 	void getSelection(int &x1, int &y1, int &x2, int &y2);
 
-	CImage* getClipboard();
+	Image* getClipboard();
 };
+
+
+} // namespace ivf2d
 
 #endif 

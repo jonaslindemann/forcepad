@@ -24,20 +24,22 @@
 
 #include "DrawableBase.h"
 
+namespace ivf2d {
+
 // ------------------------------------------------------------
-CDrawableBase::CDrawableBase()
+DrawableBase::DrawableBase()
 {
 
 }
 
 // ------------------------------------------------------------
-CDrawableBase::~CDrawableBase()
+DrawableBase::~DrawableBase()
 {
 
 }
 
 // ------------------------------------------------------------
-void CDrawableBase::render()
+void DrawableBase::render()
 {
 	doMaterial();
 	doBeginTransform();
@@ -46,25 +48,27 @@ void CDrawableBase::render()
 }
 
 // ------------------------------------------------------------
-void CDrawableBase::doGeometry()
+void DrawableBase::doGeometry()
 {
 
 }
 
 // ------------------------------------------------------------
-void CDrawableBase::doBeginTransform()
+void DrawableBase::doBeginTransform()
 {
 
 }
 
 // ------------------------------------------------------------
-void CDrawableBase::doEndTransform()
+void DrawableBase::doEndTransform()
 {
 
 }
 
 // ------------------------------------------------------------
-void CDrawableBase::doMaterial()
+void DrawableBase::doMaterial()
 {
 
 }
+
+} // namespace ivf2d

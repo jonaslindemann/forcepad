@@ -30,64 +30,66 @@
 #define M_PI 3.1415926535897932384626433832795
 #endif
 
-CVec3d::CVec3d()
+namespace ivf2d {
+
+Vec3d::Vec3d()
 {
 	setComponents(0.0, 0.0, 0.0);
 }
 
-CVec3d::CVec3d(double vx, double vy, double vz)
+Vec3d::Vec3d(double vx, double vy, double vz)
 {
 	m_vector[0] = vx;
 	m_vector[1] = vy;
 	m_vector[2] = vz;
 }
 
-CVec3d::CVec3d(const CVec3d& v)
+Vec3d::Vec3d(const Vec3d& v)
 {
 	m_vector[0] = v.m_vector[0];
 	m_vector[1] = v.m_vector[1];
 	m_vector[2] = v.m_vector[2];
 }
 
-CVec3d::~CVec3d()
+Vec3d::~Vec3d()
 {
 
 }
 
-void CVec3d::setComponents(double vx, double vy, double vz)
+void Vec3d::setComponents(double vx, double vy, double vz)
 {
 	m_vector[0] = vx;
 	m_vector[1] = vy;
 	m_vector[2] = vz;
 }
 
-void CVec3d::setComponents(const double *v)
+void Vec3d::setComponents(const double *v)
 {
 	m_vector[0] = v[0];
 	m_vector[1] = v[1];
 	m_vector[2] = v[2];
 }
 
-void CVec3d::setComponents(int x, int y)
+void Vec3d::setComponents(int x, int y)
 {
 	m_vector[0] = static_cast<double>(x);
 	m_vector[1] = static_cast<double>(y);
 }
 
-void CVec3d::setComponents(const int* pos)
+void Vec3d::setComponents(const int* pos)
 {
 	m_vector[0] = static_cast<double>(pos[0]);
 	m_vector[1] = static_cast<double>(pos[1]);
 }
 
-void CVec3d::getComponents(double &vx, double &vy, double &vz)
+void Vec3d::getComponents(double &vx, double &vy, double &vz)
 {
 	vx = m_vector[0];
 	vy = m_vector[1];
 	vz = m_vector[2];
 }
 
-CVec3d& CVec3d::operator+=(CVec3d a)
+Vec3d& Vec3d::operator+=(Vec3d a)
 {
 	m_vector[0] += a.m_vector[0];
 	m_vector[1] += a.m_vector[1];
@@ -95,7 +97,7 @@ CVec3d& CVec3d::operator+=(CVec3d a)
 	return *this;
 }
 
-CVec3d& CVec3d::operator=(CVec3d a)
+Vec3d& Vec3d::operator=(Vec3d a)
 {
 	m_vector[0] = a.m_vector[0];
 	m_vector[1] = a.m_vector[1];
@@ -104,7 +106,7 @@ CVec3d& CVec3d::operator=(CVec3d a)
 }
 
 
-CVec3d& CVec3d::operator-=(CVec3d a)
+Vec3d& Vec3d::operator-=(Vec3d a)
 {
 	m_vector[0] -= a.m_vector[0];
 	m_vector[1] -= a.m_vector[1];
@@ -112,19 +114,19 @@ CVec3d& CVec3d::operator-=(CVec3d a)
 	return *this;
 }
 
-CVec3d operator+(CVec3d a, CVec3d b)
+Vec3d operator+(Vec3d a, Vec3d b)
 {
-	CVec3d r = a;
+	Vec3d r = a;
 	return r += b;
 }
 
-CVec3d operator-(CVec3d a, CVec3d b)
+Vec3d operator-(Vec3d a, Vec3d b)
 {
-	CVec3d r = a;
+	Vec3d r = a;
 	return r -= b;
 }
 
-double CVec3d::operator[](const int idx)
+double Vec3d::operator[](const int idx)
 {
 	if ((idx>=0)&&(idx<3))
 		return m_vector[idx];
@@ -132,7 +134,7 @@ double CVec3d::operator[](const int idx)
 		return 0.0;
 }
 
-CVec3d operator*(CVec3d a, CVec3d b)
+Vec3d operator*(Vec3d a, Vec3d b)
 {
 
 	double c1, c2, c3;
@@ -141,38 +143,38 @@ CVec3d operator*(CVec3d a, CVec3d b)
 	c2 = a[2] * b[0] - a[0] * b[2];
 	c3 = a[0] * b[1] - a[1] * b[0];
 	
-	CVec3d r(c1, c2, c3);
+	Vec3d r(c1, c2, c3);
 
 	return r;
 }
 
-CVec3d operator*(CVec3d a, double b)
+Vec3d operator*(Vec3d a, double b)
 {
-	CVec3d r(a[0]*b, a[1]*b, a[2]*b);
+	Vec3d r(a[0]*b, a[1]*b, a[2]*b);
 
 	return r;
 }
 
-CVec3d operator*(double a, CVec3d b)
+Vec3d operator*(double a, Vec3d b)
 {
-	CVec3d r(b[0]*a, b[1]*a, b[2]*a);
+	Vec3d r(b[0]*a, b[1]*a, b[2]*a);
 
 	return r;
 }
 
-void CVec3d::getComponents(double *v)
+void Vec3d::getComponents(double *v)
 {
 	v[0] = m_vector[0];
 	v[1] = m_vector[1];
 	v[2] = m_vector[2];
 }
 
-double CVec3d::length() const
+double Vec3d::length() const
 {
 	return sqrt(m_vector[0]*m_vector[0] + m_vector[1]*m_vector[1] + m_vector[2]*m_vector[2]);
 }
 
-void CVec3d::normalize()
+void Vec3d::normalize()
 {
 	double quote = 1.0/length();
 
@@ -182,7 +184,7 @@ void CVec3d::normalize()
 }
 
 
-void CVec3d::rotate(CVec3d &axis, double angle)
+void Vec3d::rotate(Vec3d &axis, double angle)
 {
 	double cost = cos(angle*2*M_PI/360.0);
 	double sint = sin(angle*2*M_PI/360.0);
@@ -209,14 +211,14 @@ void CVec3d::rotate(CVec3d &axis, double angle)
 	m_vector[2] = rv[2];
 }
 
-void CVec3d::getEulerAngles(double &pitch, double &heading)
+void Vec3d::getEulerAngles(double &pitch, double &heading)
 {
 	heading = atan2(m_vector[0], m_vector[2])*180.0/M_PI;
 	double t = sqrt(m_vector[0]*m_vector[0]+m_vector[2]*m_vector[2]);
 	pitch = atan2(m_vector[1], t)*180.0/M_PI;
 }
 
-void CVec3d::negate()
+void Vec3d::negate()
 {
 	m_vector[0] = - m_vector[0];
 	m_vector[1] = - m_vector[1];
@@ -224,51 +226,53 @@ void CVec3d::negate()
 }
 
 
-void CVec3d::setX(double value)
+void Vec3d::setX(double value)
 {
 	m_vector[0] = value;
 }
 
-void CVec3d::setY(double value)
+void Vec3d::setY(double value)
 {
 	m_vector[1] = value;
 }
 
-void CVec3d::setZ(double value)
+void Vec3d::setZ(double value)
 {
 	m_vector[2] = value;
 }
 
-void CVec3d::setFromPoints(CVec3d &pos, CVec3d &target)
+void Vec3d::setFromPoints(Vec3d &pos, Vec3d &target)
 {
-	CVec3d r;
+	Vec3d r;
 	r = target - pos;
 	r.getComponents(m_vector);
 }
 
-void CVec3d::add(double dx, double dy, double dz)
+void Vec3d::add(double dx, double dy, double dz)
 {
 	m_vector[0] += dx;
 	m_vector[1] += dy;
 	m_vector[2] += dz;
 }
 
-double* CVec3d::getComponents()
+double* Vec3d::getComponents()
 {
 	return &m_vector[0];
 }
 
-double CVec3d::getX() const
+double Vec3d::getX() const
 {
 	return m_vector[0];
 }
 
-double CVec3d::getY() const
+double Vec3d::getY() const
 {
 	return m_vector[1];
 }
 
-double CVec3d::getZ() const
+double Vec3d::getZ() const
 {
 	return m_vector[2];
 }
+
+} // namespace ivf2d

@@ -13,6 +13,8 @@
 #include "CalcSettings.h"
 #include "GeneralSettings.h"
 
+using namespace std;
+
 static void mainWindowCB(Fl_Widget* w, void* v) {
   // Make sure all windows are hidden when Window is closed.
   w->default_callback(w, v);

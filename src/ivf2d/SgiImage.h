@@ -22,16 +22,18 @@
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
 
-#ifndef _CSgiImage_h_
-#define _CSgiImage_h_
+#ifndef _SgiImage_h_
+#define _SgiImage_h_
 
 #include "Image.h"
 
 #include <cstdio>
 
-IvfSmartPointer(CSgiImage);
+namespace ivf2d {
 
-class CSgiImage : public CImage {
+IvfSmartPointer(SgiImage);
+
+class SgiImage : public Image {
 private:
 	char* m_fileName;
 	bool m_alphaChannel;
@@ -42,12 +44,12 @@ private:
 	void expandrow(unsigned char *optr, unsigned char *iptr, int z);
     void convertLong(unsigned int *array, unsigned int length);
 public:
-	CSgiImage();
-	virtual ~CSgiImage();
+	SgiImage();
+	virtual ~SgiImage();
 
-	static CSgiImagePtr create() { return std::make_shared<CSgiImage>(); }
+	static SgiImagePtr create() { return std::make_shared<SgiImage>(); }
 
-	IvfClassInfo("CSgiImage",CImage);
+	IvfClassInfo("SgiImage",Image);
 
 	bool read();
 
@@ -56,5 +58,8 @@ public:
 
 	void setAlphaChannel(bool flag);
 };
+
+
+} // namespace ivf2d
 
 #endif 

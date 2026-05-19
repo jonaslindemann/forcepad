@@ -22,18 +22,20 @@
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
 
-#ifndef _CVec3d_h_
-#define _CVec3d_h_
+#ifndef _Vec3d_h_
+#define _Vec3d_h_
+
+namespace ivf2d {
 
 /**
  * Simple 3 component vector class
  *
- * CVec3d implements a 3 component vector with standard
+ * Vec3d implements a 3 component vector with standard
  * operators and methods. It should also be used instead
  * of the cold IvfVector class. 
  * @author Jonas Lindemann
  */
-class CVec3d {
+class Vec3d {
 private:
 	double m_vector[3];
 public:
@@ -41,16 +43,16 @@ public:
 	double getY() const;
 	double getX() const;
 	/** Class constructor. */
-	CVec3d();
+	Vec3d();
 
 	/** Class constructor. */
-	CVec3d(double vx, double vy, double vz);
+	Vec3d(double vx, double vy, double vz);
 
 	/** Class assignment constructor. */
-	CVec3d(const CVec3d& v);
+	Vec3d(const Vec3d& v);
 
 	/** Class destructor. */
-	virtual ~CVec3d();
+	virtual ~Vec3d();
 
 	/** 
 	 * Rotate vector around an axis. 
@@ -58,7 +60,7 @@ public:
 	 * @param axis is the rotation axis
 	 * @param angle is the amount of rotation around the axis.
 	 */
-	void rotate(CVec3d& axis, double angle);
+	void rotate(Vec3d& axis, double angle);
 
 	/** Normalizes the vector. Length = 1.0.*/
 	void normalize();
@@ -78,7 +80,7 @@ public:
 	 * @param pos is the starting point of the vector.
 	 * @param target is the endpoint of the vector.
 	 */
-	void setFromPoints(CVec3d& pos, CVec3d& target);
+	void setFromPoints(Vec3d& pos, Vec3d& target);
 
 	/** Return a pointer to vector components */
 	double* getComponents();
@@ -110,29 +112,32 @@ public:
 	void setX(double value);
 
 	/** Vector addition operator. */
-	CVec3d& operator+=(CVec3d a);
+	Vec3d& operator+=(Vec3d a);
 	/** Vector subtraction operator. */
-	CVec3d& operator-=(CVec3d a);
+	Vec3d& operator-=(Vec3d a);
 	/** Assignment operator. */
-	CVec3d& operator=(CVec3d a);
+	Vec3d& operator=(Vec3d a);
 	/** Index operator. */
 	double operator[](const int idx);
 
 };
 
 /** Vector crossproduct operator. */
-CVec3d operator*(CVec3d a, CVec3d b);
+Vec3d operator*(Vec3d a, Vec3d b);
 
 /** Vector scalar multiplication operator. */
-CVec3d operator*(CVec3d a, double b); 
+Vec3d operator*(Vec3d a, double b); 
 
 /** Vector scalar multiplication operator. */
-CVec3d operator*(double a, CVec3d b);
+Vec3d operator*(double a, Vec3d b);
 
 /** Vector addition operator. */
-CVec3d operator+(CVec3d a, CVec3d b);
+Vec3d operator+(Vec3d a, Vec3d b);
 
 /** Vector subtraction operator. */
-CVec3d operator-(CVec3d a, CVec3d b);
+Vec3d operator-(Vec3d a, Vec3d b);
+
+
+} // namespace ivf2d
 
 #endif 

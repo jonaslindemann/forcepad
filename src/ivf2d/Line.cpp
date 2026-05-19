@@ -32,7 +32,9 @@
 #include <GL/gl.h>
 #endif
 
-CLine::CLine()
+namespace ivf2d {
+
+Line::Line()
 {
 	m_width = 1;
 	m_startPos[0] = 0;
@@ -41,32 +43,32 @@ CLine::CLine()
 	m_endPos[1] = 50;
 }
 
-CLine::~CLine()
+Line::~Line()
 {
 
 }
 
-void CLine::setWidth(int width)
+void Line::setWidth(int width)
 {
 	m_width = width;
 	initLine();
 }
 
-void CLine::setStartPos(int x, int y)
+void Line::setStartPos(int x, int y)
 {
 	m_startPos[0] = x;
 	m_startPos[1] = y;
 	initLine();
 }
 
-void CLine::setEndPos(int x, int y)
+void Line::setEndPos(int x, int y)
 {
 	m_endPos[0] = x;
 	m_endPos[1] = y;
 	initLine();
 }
 
-void CLine::doGeometry()
+void Line::doGeometry()
 {
 	glBegin(GL_QUADS);
 		glVertex2d(m_p1.getX(), m_p1.getY());
@@ -76,12 +78,12 @@ void CLine::doGeometry()
 	glEnd();
 }
 
-void CLine::initLine()
+void Line::initLine()
 {
-	CVec3d forward;
-	CVec3d right;
-	CVec3d p1;
-	CVec3d p2;
+	Vec3d forward;
+	Vec3d right;
+	Vec3d p1;
+	Vec3d p2;
 
 
 	double dx, dy, dz;
@@ -101,7 +103,9 @@ void CLine::initLine()
 	m_p4 = p2 + (double)m_width*0.5*right;
 }
 
-int CLine::getWidth()
+int Line::getWidth()
 {
 	return m_width;
 }
+
+} // namespace ivf2d

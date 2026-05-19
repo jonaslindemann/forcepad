@@ -30,7 +30,7 @@
 
 IvfSmartPointer(CConstraintSelection);
 
-class CConstraintSelection : public CBase {
+class CConstraintSelection : public ivf2d::Base {
 private:
 	std::vector<CConstraintPtr> m_constraints;
 public:
@@ -39,7 +39,7 @@ public:
 
 	static CConstraintSelectionPtr create() { return std::make_shared<CConstraintSelection>(); }
 
-	IvfClassInfo("CConstraintSelection",CBase);
+	IvfClassInfo("CConstraintSelection",ivf2d::Base);
 
 	void add(CConstraintPtr constraint);
 	void clear();

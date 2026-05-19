@@ -26,25 +26,27 @@
 
 #include "png.h"
 
-CPngImage::CPngImage()
+namespace ivf2d {
+
+PngImage::PngImage()
 {
 }
 
-CPngImage::~CPngImage()
+PngImage::~PngImage()
 {
 }
 
-void CPngImage::setFileName(const std::string& name)
+void PngImage::setFileName(const std::string& name)
 {
 	m_fileName = name;
 }
 
-const std::string& CPngImage::getFileName()
+const std::string& PngImage::getFileName()
 {
 	return m_fileName;
 }
 
-bool CPngImage::read()
+bool PngImage::read()
 {
 	png_structp png_ptr;
 	png_infop info_ptr;
@@ -140,3 +142,5 @@ bool CPngImage::read()
 	/* that's it */
 	return true;
 }
+
+} // namespace ivf2d

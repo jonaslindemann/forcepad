@@ -21,15 +21,17 @@
 //
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
-#ifndef _CScreenImage_h_
-#define _CScreenImage_h_
+#ifndef _ScreenImage_h_
+#define _ScreenImage_h_
 
 #include "Shape.h"
 #include "Image.h"
 
-IvfSmartPointer(CScreenImage);
+namespace ivf2d {
 
-class CScreenImage : public CShape {
+IvfSmartPointer(ScreenImage);
+
+class ScreenImage : public Shape {
 public:
 	enum TRenderMode {
 		RM_NORMAL,
@@ -37,7 +39,7 @@ public:
 		RM_TILED
 	};
 private:
-	CImagePtr m_image;
+	ImagePtr m_image;
 	int m_subImagePos[2];
 	int m_subImageSize[2];
 	TRenderMode m_renderMode;
@@ -46,12 +48,12 @@ private:
 	int m_tileSpacing[2];
 	int m_devicePixelRatio;
 public:
-	CScreenImage();
-	virtual ~CScreenImage();
+	ScreenImage();
+	virtual ~ScreenImage();
 
-	static CScreenImagePtr create() { return std::make_shared<CScreenImage>(); }
+	static ScreenImagePtr create() { return std::make_shared<ScreenImage>(); }
 
-	IvfClassInfo("CScreenImage",CShape);
+	IvfClassInfo("ScreenImage",Shape);
 
 	void reset();
 	void update(int x1, int y1, int x2, int y2);
@@ -65,7 +67,7 @@ public:
 	TRenderMode getRenderMode();
 	void setRenderMode(TRenderMode mode);
 
-	void setImage(CImagePtr image);
+	void setImage(ImagePtr image);
 	void getSubImageSize(int &width, int &height);
 	void setSubImageSize(int width, int height);
 
@@ -74,5 +76,8 @@ public:
 	virtual void doGeometry();
 
 };
+
+
+} // namespace ivf2d
 
 #endif 

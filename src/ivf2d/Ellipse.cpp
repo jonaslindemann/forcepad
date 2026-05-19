@@ -34,31 +34,33 @@
 #include <GL/gl.h>
 #endif
 
-CEllipse::CEllipse()
+namespace ivf2d {
+
+Ellipse::Ellipse()
 {
     m_size[0] = 25.0;
     m_size[1] = 25.0;
 	m_sectors = 12;
 }
 
-CEllipse::~CEllipse()
+Ellipse::~Ellipse()
 {
 
 }
 
-void CEllipse::setSize(int width, int height)
+void Ellipse::setSize(int width, int height)
 {
     m_size[0] = (double)width;
     m_size[1] = (double)height;
 }
 
-void CEllipse::setSizeDouble(double width, double height)
+void Ellipse::setSizeDouble(double width, double height)
 {
     m_size[0] = width;
     m_size[1] = height;
 }
 
-void CEllipse::doGeometry()
+void Ellipse::doGeometry()
 {
 	int i;
 
@@ -78,7 +80,9 @@ void CEllipse::doGeometry()
 	glEnd();
 }
 
-void CEllipse::setSectors(int sectors)
+void Ellipse::setSectors(int sectors)
 {
 	m_sectors = sectors;
 }
+
+} // namespace ivf2d

@@ -22,8 +22,8 @@
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
 
-#ifndef _CBase_H_
-#define _CBase_H_
+#ifndef _Base_h_
+#define _Base_h_
 
 #include "CommonDefs.h"
 
@@ -43,7 +43,9 @@
 #include <deque>
 #include <set>
 
-IvfSmartPointer(CBase);
+namespace ivf2d {
+
+IvfSmartPointer(Base);
 
 /**
  * Base class
@@ -52,24 +54,24 @@ IvfSmartPointer(CBase);
  * Contains code for reference counting, parent pointer and
  * stream handling.
  */
-class CBase {
+class Base {
 private:
-	CBase* m_parent;
+	Base* m_parent;
 public:
 	/** Base class constructor.*/
-	CBase ();
+	Base ();
 	/** Base class destructor.*/
-	virtual ~CBase ();
+	virtual ~Base ();
 
-	static CBasePtr create() { return std::make_shared<CBase>(); }
+	static BasePtr create() { return std::make_shared<Base>(); }
 
-	IvfClassInfoTop("CBase");
+	IvfClassInfoTop("Base");
 
 	/** Sets parent object. */
-	void setParent(CBase* parent);
+	void setParent(Base* parent);
 
 	/** Returns parent object. */
-	virtual CBase* getParent();
+	virtual Base* getParent();
 
 	/** Virtual method for retrieving object from a stream. */
 	virtual void readFromStream(std::istream &in);
@@ -77,4 +79,7 @@ public:
 	/** Virtual method for storing object to a stream. */
 	virtual void saveToStream(std::ostream &out);
 };
+
+} // namespace ivf2d
+
 #endif

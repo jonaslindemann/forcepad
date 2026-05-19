@@ -40,10 +40,10 @@ CFemGrid::CFemGrid()
 {
 	m_showGrid = false;
 
-	m_forceColor = CColor::create();
+	m_forceColor = ivf2d::Color::create();
 	m_forceColor->setColor(1.0f, 0.0f, 0.0f, 1.0f);
 
-	m_constraintColor = CColor::create();
+	m_constraintColor = ivf2d::Color::create();
 	m_constraintColor->setColor(0.0f, 0.3f, 1.0f, 1.0f);
 
 	m_colorMap = CColorMap::create();
@@ -174,7 +174,7 @@ bool CFemGrid::getShowGrid()
 	return m_showGrid;
 }
 
-void CFemGrid::setImage(CImagePtr image)
+void CFemGrid::setImage(ivf2d::ImagePtr image)
 {
 	CImageGrid::setImage(image);
 
@@ -1722,7 +1722,7 @@ void CFemGrid::setDrawStressOnce(bool flag)
 
 void CFemGrid::saveToStream(ostream &out)
 {
-	CImage* image = this->getImage();
+	ivf2d::Image* image = this->getImage();
 	int i, j;
 	int width, height;
 	GLubyte uivalue;
@@ -1820,7 +1820,7 @@ void CFemGrid::saveToStream(ostream &out)
 
 void CFemGrid::readFromStream(istream &in)
 {
-	CImage* image = this->getImage();
+	ivf2d::Image* image = this->getImage();
 	int width, height;
 	int i;
 	int value;
@@ -1974,7 +1974,7 @@ void CFemGrid::setMaxNegStressValue(double value)
 
 void CFemGrid::calcCenterOfGravity(int &x, int &y)
 {
-	CImage* image = this->getImage();
+	ivf2d::Image* image = this->getImage();
 	int i, j;
 
 	double sumFx, sumFy, sumF;
@@ -2072,22 +2072,22 @@ void CFemGrid::setStiffness(double x, double y, double value, int offsetElements
 
 void CFemGrid::setStiffnessLine(double x1, double y1, double x2, double y2, double value, double width)
 {
-	CVec3d v;
+	ivf2d::Vec3d v;
 	v.setComponents(x2-x1, y2-y1, 0.0);
 	double l = v.length();
 	v.normalize();
 
-	CVec3d up;
+	ivf2d::Vec3d up;
 	up.setComponents(0.0, 0.0, 1.0);
 	
-	CVec3d left = v * up;
+	ivf2d::Vec3d left = v * up;
 	left.normalize();
 
 	double step = 0.5;
 	double t = 0.0;
 	
-	CVec3d p0;
-	CVec3d p1;
+	ivf2d::Vec3d p0;
+	ivf2d::Vec3d p1;
 	p0.setComponents(x1, y1, 0.0);
 	double x, y, z;
 
@@ -2315,7 +2315,7 @@ void CFemGrid::removePointConstraint(CConstraint *constraint)
 
 void CFemGrid::calcCenterOfStiffness(int &cgx, int &cgy)
 {
-	CImage* image = this->getImage();
+	ivf2d::Image* image = this->getImage();
 	int i, j;
 
 	double sumFx, sumFy, sumF;
@@ -2429,7 +2429,7 @@ void CFemGrid::getElements(int x1, int y1, int x2, int y2, CElementList& list)
 	double ex = (double)(x2 - x1);
 	double ey = (double)(y2 - y1);
 
-	CVec3d v;
+	ivf2d::Vec3d v;
 	v.setComponents(ex, ey, 0.0);
 	double l = v.length();
 	v.normalize();
@@ -2437,7 +2437,7 @@ void CFemGrid::getElements(int x1, int y1, int x2, int y2, CElementList& list)
 	double t;
 	double x, y, z;
 	int r, c, oldR, oldC;
-	CVec3d p;
+	ivf2d::Vec3d p;
 
 	p.setComponents((double)x1, (double)y1, 0.0);
 	p.getComponents(x, y, z);
@@ -2498,7 +2498,7 @@ int CFemGrid::getStressStep()
 
 void CFemGrid::updatePixelArea()
 {
-	CImage* image = this->getImage();
+	ivf2d::Image* image = this->getImage();
 	int i, j;
 
 	double sumF;

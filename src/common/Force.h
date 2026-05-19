@@ -34,7 +34,7 @@ IvfSmartPointer(CForce);
  *
  * Implements a node force.
  */
-class CForce : public CShape {
+class CForce : public ivf2d::Shape {
 public:
 	enum TForceType {
 		FT_VECTOR,
@@ -60,7 +60,7 @@ public:
 
 	static CForcePtr create() { return std::make_shared<CForce>(); }
 
-	IvfClassInfo("CForce",CShape);
+	IvfClassInfo("CForce",ivf2d::Shape);
 
 	// Methods
 

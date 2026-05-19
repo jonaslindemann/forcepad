@@ -1,7 +1,7 @@
 #include "UiSettings.h"
 
 CUiSettings* CUiSettings::m_instance = 0;
-CSingletonDestroyer<CUiSettings> CUiSettings::m_destroyer;
+ivf2d::SingletonDestroyer<CUiSettings> CUiSettings::m_destroyer;
 
 CUiSettings* CUiSettings::getInstance () 
 {

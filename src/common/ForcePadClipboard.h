@@ -32,7 +32,7 @@
 
 IvfSmartPointer(CForcePadClipboard);
 
-class CForcePadClipboard : public CClipboard {
+class CForcePadClipboard : public ivf2d::Clipboard {
 private:
 	std::unique_ptr<CForceSelection> m_forceSelection;
 	std::unique_ptr<CConstraintSelection> m_constraintSelection;
@@ -45,7 +45,7 @@ public:
 
 	static CForcePadClipboardPtr create() { return std::make_shared<CForcePadClipboard>(); }
 
-	IvfClassInfo("CForcePadClipboard",CClipboard);
+	IvfClassInfo("CForcePadClipboard",ivf2d::Clipboard);
 
 	void render(int x, int y);
 

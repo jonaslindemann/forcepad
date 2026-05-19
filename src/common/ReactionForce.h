@@ -29,7 +29,7 @@
 
 IvfSmartPointer(CReactionForce);
 
-class CReactionForce : public CShape {
+class CReactionForce : public ivf2d::Shape {
 private:
 	void initAngle();
 
@@ -51,7 +51,7 @@ public:
 
 	static CReactionForcePtr create() { return std::make_shared<CReactionForce>(); }
 
-	IvfClassInfo("CReactionForce",CShape);
+	IvfClassInfo("CReactionForce",ivf2d::Shape);
 
 	// Get/set methods
 

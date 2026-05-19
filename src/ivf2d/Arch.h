@@ -22,39 +22,41 @@
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
 
-#ifndef _CArch_h_
-#define _CArch_h_
+#ifndef _Arch_h_
+#define _Arch_h_
 
 #include "Shape.h"
 #include "Texture.h"
 #include "Image.h"
 #include "Ellipse.h"
 
-IvfSmartPointer(CArch);
+namespace ivf2d {
+
+IvfSmartPointer(Arch);
 
 /**
  * Rectangle class
  *
  * Implements a textured rectangle.
  */
-class CArch : public CShape {
+class Arch : public Shape {
 public:
 private:
 	double m_size[2];
 	double m_lineWidth;
-	CColorPtr m_lineColor;
-    CEllipsePtr m_ellipse;
+	ColorPtr m_lineColor;
+    EllipsePtr m_ellipse;
     double f1(double x);
 public:
 	/** Rectangle class constructor. */
-    CArch();
+    Arch();
 
 	/** Rectangle class destructor. */
-    virtual ~CArch();
+    virtual ~Arch();
 
-	static CArchPtr create() { return std::make_shared<CArch>(); }
+	static ArchPtr create() { return std::make_shared<Arch>(); }
 
-    IvfClassInfo("CArch",CShape);
+    IvfClassInfo("Arch",Shape);
 
 	/** Set size of rectangle in world coordinates. */
 	void setSize(double width, double height);
@@ -65,9 +67,12 @@ public:
 	/** Draw rectangle in OpenGL. */
 	virtual void doGeometry();
 
-	void setLineColor(CColorPtr color);
+	void setLineColor(ColorPtr color);
 	void setLineWidth(double width);
     double getLineWidth();
 };
+
+
+} // namespace ivf2d
 
 #endif

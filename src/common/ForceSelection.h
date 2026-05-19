@@ -30,7 +30,7 @@
 
 IvfSmartPointer(CForceSelection);
 
-class CForceSelection : public CBase {
+class CForceSelection : public ivf2d::Base {
 private:
 	std::vector<CForcePtr> m_forces;
 public:
@@ -41,7 +41,7 @@ public:
 
 	static CForceSelectionPtr create() { return std::make_shared<CForceSelection>(); }
 
-	IvfClassInfo("CForceSelection",CBase);
+	IvfClassInfo("CForceSelection",ivf2d::Base);
 
 	void add(CForcePtr force);
 	void clear();

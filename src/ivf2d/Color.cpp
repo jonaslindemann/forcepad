@@ -32,7 +32,9 @@
 #include <GL/gl.h>
 #endif
 
-CColor::CColor()
+namespace ivf2d {
+
+Color::Color()
 {
 	m_color[0] = 0.8f;
 	m_color[1] = 0.8f;
@@ -40,12 +42,12 @@ CColor::CColor()
 	m_color[3] = 1.0f;
 }
 
-CColor::~CColor()
+Color::~Color()
 {
 
 }
 
-void CColor::setColor(float red, float green, float blue, float alpha)
+void Color::setColor(float red, float green, float blue, float alpha)
 {
 	m_color[0] = red;
 	m_color[1] = green;
@@ -53,24 +55,24 @@ void CColor::setColor(float red, float green, float blue, float alpha)
 	m_color[3] = alpha;
 }
 
-void CColor::doMaterial()
+void Color::doMaterial()
 {
 	glColor4fv(m_color);
 }
 
-void CColor::setAlpha(float alpha)
+void Color::setAlpha(float alpha)
 {
 	m_color[3] = alpha;
 }
 
-void CColor::getColor(float *array)
+void Color::getColor(float *array)
 {
 	array[0] = m_color[0];
 	array[1] = m_color[1];
 	array[2] = m_color[2];
 }
 
-void CColor::getColor(float &r, float &g, float &b, float &a)
+void Color::getColor(float &r, float &g, float &b, float &a)
 {
 	r = m_color[0];
 	g = m_color[1];
@@ -78,9 +80,11 @@ void CColor::getColor(float &r, float &g, float &b, float &a)
 	a = m_color[3];
 }
 
-void CColor::setColor(const float* color)
+void Color::setColor(const float* color)
 {
 	m_color[0] = color[0];
 	m_color[1] = color[1];
 	m_color[2] = color[2];
 }
+
+} // namespace ivf2d

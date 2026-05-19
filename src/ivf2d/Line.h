@@ -22,31 +22,33 @@
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
 
-#ifndef _CLine_h_
-#define _CLine_h_
+#ifndef _Line_h_
+#define _Line_h_
 
 #include "Vec3d.h"
 #include "Shape.h"
 
-IvfSmartPointer(CLine);
+namespace ivf2d {
 
-class CLine : public CShape {
+IvfSmartPointer(Line);
+
+class Line : public Shape {
 private:
 	void initLine();
 	int m_width;
 	int m_startPos[2];
 	int m_endPos[2];
-	CVec3d m_p1;
-	CVec3d m_p2;
-	CVec3d m_p3;
-	CVec3d m_p4;
+	Vec3d m_p1;
+	Vec3d m_p2;
+	Vec3d m_p3;
+	Vec3d m_p4;
 public:
-	CLine();
-	virtual ~CLine();
+	Line();
+	virtual ~Line();
 
-	static CLinePtr create() { return std::make_shared<CLine>(); }
+	static LinePtr create() { return std::make_shared<Line>(); }
 
-	IvfClassInfo("CLine",CShape);
+	IvfClassInfo("Line",Shape);
 
 	void doGeometry();
 
@@ -55,5 +57,8 @@ public:
 	void setStartPos(int x, int y);
 	void setWidth(int width);
 };
+
+
+} // namespace ivf2d
 
 #endif 

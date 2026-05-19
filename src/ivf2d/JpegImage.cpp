@@ -24,6 +24,8 @@
 
 #include "JpegImage.h"
 
+namespace ivf2d {
+
 extern "C" {
 #ifndef __APPLE__
 #include "jpeglib.h"
@@ -32,25 +34,25 @@ extern "C" {
 #endif
 }
 
-CJpegImage::CJpegImage()
+JpegImage::JpegImage()
 {
 }
 
-CJpegImage::~CJpegImage()
+JpegImage::~JpegImage()
 {
 }
 
-void CJpegImage::setFileName(const std::string& name)
+void JpegImage::setFileName(const std::string& name)
 {
 	m_fileName = name;
 }
 
-const std::string& CJpegImage::getFileName()
+const std::string& JpegImage::getFileName()
 {
 	return m_fileName;
 }
 
-bool CJpegImage::read()
+bool JpegImage::read()
 {
 	struct jpeg_decompress_struct cinfo;
 	FILE * infile;		
@@ -101,3 +103,5 @@ bool CJpegImage::read()
 	
 	return 1;
 }
+
+} // namespace ivf2d

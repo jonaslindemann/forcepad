@@ -70,7 +70,7 @@ CImageGrid::~CImageGrid()
 	}
 }
 
-void CImageGrid::setImage(CImagePtr image)
+void CImageGrid::setImage(ivf2d::ImagePtr image)
 {
 	m_image = image;
 
@@ -361,7 +361,7 @@ void CImageGrid::getGridSize(int &rows, int &cols)
 	cols = m_cols;
 }
 
-CImage* CImageGrid::getImage()
+ivf2d::Image* CImageGrid::getImage()
 {
 	return m_image.get();
 }

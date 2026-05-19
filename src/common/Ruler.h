@@ -34,7 +34,7 @@ IvfSmartPointer(CRuler);
  *
  * Implements a visual ruler for setting the size of the model.
  */
-class CRuler : public CShape {
+class CRuler : public ivf2d::Shape {
 private:
 	int m_startPos[2];
 	int m_endPos[2];
@@ -50,7 +50,7 @@ public:
 
 	static CRulerPtr create() { return std::make_shared<CRuler>(); }
 
-	IvfClassInfo("CRuler",CShape);
+	IvfClassInfo("CRuler",ivf2d::Shape);
 
 	void doGeometry();
 

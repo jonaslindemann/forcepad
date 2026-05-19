@@ -35,9 +35,9 @@ using EigenGridMatrix = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Ei
 
 IvfSmartPointer(CImageGrid2);
 
-class CImageGrid2 : public CShape {
+class CImageGrid2 : public ivf2d::Shape {
 private:
-	CImagePtr m_image;
+	ivf2d::ImagePtr m_image;
 	double m_maxIntensity;
 	bool m_useImage;
 	bool m_averageOverGridSquare;
@@ -60,12 +60,12 @@ public:
 
 	void clearGrid();
 
-	IvfClassInfo("CImageGrid",CShape);
+	IvfClassInfo("CImageGrid",ivf2d::Shape);
 
 	virtual void initGrid();
 
-	virtual void setImage(CImagePtr image);
-	CImage* getImage();
+	virtual void setImage(ivf2d::ImagePtr image);
+	ivf2d::Image* getImage();
 
 	void setImageSize(int width, int height);
 	void setStride(int stride);

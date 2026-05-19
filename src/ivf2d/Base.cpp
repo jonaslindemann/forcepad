@@ -26,38 +26,41 @@
 
 using namespace std;
 
+namespace ivf2d {
+
 // ------------------------------------------------------------
-CBase::CBase ()
+Base::Base ()
 {
 	m_parent = nullptr;
 }
 
 // ------------------------------------------------------------
-CBase::~CBase ()
+Base::~Base ()
 {
 }
 
 // ------------------------------------------------------------
-CBase* CBase::getParent()
+Base* Base::getParent()
 {
 	return m_parent;
 }
 
 // ------------------------------------------------------------
-void CBase::setParent(CBase *parent)
+void Base::setParent(Base *parent)
 {
 	m_parent = parent;
 }
 
 // ------------------------------------------------------------
-void CBase::saveToStream(ostream &out)
+void Base::saveToStream(ostream &out)
 {
 
 }
 
 // ------------------------------------------------------------
-void CBase::readFromStream(istream &in)
+void Base::readFromStream(istream &in)
 {
 
 }
 
+} // namespace ivf2d

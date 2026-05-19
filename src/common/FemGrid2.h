@@ -73,8 +73,8 @@ private:
 	bool m_drawForcesAndConstraints;
 	bool m_drawStructure;
 	
-	CColorPtr m_forceColor;
-	CColorPtr m_constraintColor;
+	ivf2d::ColorPtr m_forceColor;
+	ivf2d::ColorPtr m_constraintColor;
 
 	CColorMapPtr m_colorMap;
 
@@ -309,7 +309,7 @@ public:
 
 	void updateColorMapTexture();
 
-	virtual void setImage(CImagePtr image) override;
+	virtual void setImage(ivf2d::ImagePtr image) override;
 	virtual void initGrid() override;
 	virtual void doGeometry() override;
 };

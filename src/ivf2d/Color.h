@@ -22,12 +22,14 @@
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
 
-#ifndef _CColor_h_
-#define _CColor_h_
+#ifndef _Color_h_
+#define _Color_h_
 
 #include "DrawableBase.h"
 
-IvfSmartPointer(CColor);
+namespace ivf2d {
+
+IvfSmartPointer(Color);
 
 /**
  * Color class
@@ -35,19 +37,19 @@ IvfSmartPointer(CColor);
  * Implements a color value that can be used by all
  * drawable classes in ForcePAD.
  */
-class CColor : public CDrawableBase {
+class Color : public DrawableBase {
 private:
 	float m_color[4];
 public:
 	/** Color class constructor. */
-	CColor();
+	Color();
 
 	/** Color class destructor. */
-	virtual ~CColor();
+	virtual ~Color();
 
-	static CColorPtr create() { return std::make_shared<CColor>(); }
+	static ColorPtr create() { return std::make_shared<Color>(); }
 
-	IvfClassInfo("CColor",CDrawableBase);
+	IvfClassInfo("Color",DrawableBase);
 
 	// Get/set methods
 
@@ -78,6 +80,9 @@ public:
 	 */
 	virtual void doMaterial() override;
 };
+
+
+} // namespace ivf2d
 
 #endif 
 

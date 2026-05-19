@@ -34,49 +34,51 @@
 
 #include "Vec3d.h"
 
-CArch::CArch()
+namespace ivf2d {
+
+Arch::Arch()
 {
     m_size[0] = 1.0;
     m_size[1] = 1.0;
 
     m_lineWidth = 1.0;
-    m_lineColor = CColor::create();
+    m_lineColor = Color::create();
     m_lineColor->setColor(0.0f, 0.0f, 0.0f, 1.0f);
-    m_ellipse = CEllipse::create();
+    m_ellipse = Ellipse::create();
 }
 
-CArch::~CArch()
+Arch::~Arch()
 {
 
 }
 
-void CArch::setSize(double width, double height)
+void Arch::setSize(double width, double height)
 {
     m_size[0] = width;
     m_size[1] = height;
 }
 
-void CArch::getSize(double &width, double &height)
+void Arch::getSize(double &width, double &height)
 {
     width = m_size[0];
     height = m_size[1];
 }
 
-double CArch::f1(double x)
+double Arch::f1(double x)
 {
     return m_size[1]-(4*m_size[1])*x*x/(m_size[0]*m_size[0]);
 }
 
-void CArch::doGeometry()
+void Arch::doGeometry()
 {
     double x, y;
     double dX = m_size[0]/20.0;
 
-    CVec3d forward;
-    CVec3d right;
-    CVec3d p1;
-    CVec3d p2;
-    CVec3d qp1, qp2, qp3, qp4;
+    Vec3d forward;
+    Vec3d right;
+    Vec3d p1;
+    Vec3d p2;
+    Vec3d qp1, qp2, qp3, qp4;
 
     double dx, dy, dz;
 
@@ -132,18 +134,20 @@ void CArch::doGeometry()
     */
 }
 
-void CArch::setLineWidth(double width)
+void Arch::setLineWidth(double width)
 {
     m_lineWidth = width;
 }
 
-double CArch::getLineWidth()
+double Arch::getLineWidth()
 {
     return m_lineWidth;
 }
 
 
-void CArch::setLineColor(CColorPtr color)
+void Arch::setLineColor(ColorPtr color)
 {
     m_lineColor = color;
 }
+
+} // namespace ivf2d

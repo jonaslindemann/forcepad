@@ -34,7 +34,9 @@
 #include <GL/gl.h>
 #endif
 
-CScreenImage::CScreenImage()
+namespace ivf2d {
+
+ScreenImage::ScreenImage()
 {
 	setUseRasterPosition(true);
 	m_subImagePos[0] = 0;
@@ -49,17 +51,17 @@ CScreenImage::CScreenImage()
 	m_devicePixelRatio = 1;
 }
 
-void CScreenImage::setDevicePixelRatio(int dpr)
+void ScreenImage::setDevicePixelRatio(int dpr)
 {
     m_devicePixelRatio = dpr > 0 ? dpr : 1;
 }
 
-CScreenImage::~CScreenImage()
+ScreenImage::~ScreenImage()
 {
 
 }
 
-void CScreenImage::doGeometry()
+void ScreenImage::doGeometry()
 {
 	if (m_image!=nullptr)
 	{
@@ -101,7 +103,7 @@ void CScreenImage::doGeometry()
 	}
 }
 
-void CScreenImage::setImage(CImagePtr image)
+void ScreenImage::setImage(ImagePtr image)
 {
 	m_image = image;
 	m_subImageSize[0] = m_image->getWidth();
@@ -110,19 +112,19 @@ void CScreenImage::setImage(CImagePtr image)
 	m_tileSpacing[1] = m_image->getHeight() / m_rows;
 }
 
-void CScreenImage::setSubImageSize(int width, int height)
+void ScreenImage::setSubImageSize(int width, int height)
 {
 	m_subImageSize[0] = width;
 	m_subImageSize[1] = height;
 }
 
-void CScreenImage::getSubImageSize(int &width, int &height)
+void ScreenImage::getSubImageSize(int &width, int &height)
 {
 	width = m_subImageSize[0];
 	height = m_subImageSize[1];
 }
 
-void CScreenImage::reset()
+void ScreenImage::reset()
 {
 	if (m_image!=nullptr)
 	{
@@ -134,17 +136,17 @@ void CScreenImage::reset()
 }
 
 
-void CScreenImage::setRenderMode(TRenderMode mode)
+void ScreenImage::setRenderMode(TRenderMode mode)
 {
 	m_renderMode = mode;
 }
 
-CScreenImage::TRenderMode CScreenImage::getRenderMode()
+ScreenImage::TRenderMode ScreenImage::getRenderMode()
 {
 	return m_renderMode;
 }
 
-void CScreenImage::setTiles(int rows, int cols)
+void ScreenImage::setTiles(int rows, int cols)
 {
 	m_rows = rows;
 	m_cols = cols;
@@ -156,23 +158,23 @@ void CScreenImage::setTiles(int rows, int cols)
 	}
 }
 
-void CScreenImage::getTiles(int &rows, int &cols)
+void ScreenImage::getTiles(int &rows, int &cols)
 {
 	rows = m_rows;
 	cols = m_cols;
 }
 
-int CScreenImage::getRows()
+int ScreenImage::getRows()
 {
 	return m_rows;
 }
 
-int CScreenImage::getCols()
+int ScreenImage::getCols()
 {
 	return m_cols;
 }
 
-void CScreenImage::update(int x1, int y1, int x2, int y2)
+void ScreenImage::update(int x1, int y1, int x2, int y2)
 {
 	if (m_image!=nullptr)
 	{
@@ -258,3 +260,4 @@ void CScreenImage::update(int x1, int y1, int x2, int y2)
 	}
 }
 
+} // namespace ivf2d

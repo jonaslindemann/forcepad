@@ -69,3 +69,5 @@
 #include <cstring>
 #include <cstdio>
 #include <cstdlib>
+
+namespace ivf2d {

@@ -38,7 +38,7 @@ using namespace std;
 
 // ------------------------------------------------------------
 CConstraint::CConstraint ()
-		:CShape()
+		:ivf2d::Shape()
 {
 	m_size = 9.0;
 	m_constraintType = CT_XY;

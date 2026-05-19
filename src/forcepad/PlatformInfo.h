@@ -6,10 +6,10 @@
 
 IvfStdPointer(CPlatformInfo);
 
-class CPlatformInfo: public CBase {
+class CPlatformInfo: public ivf2d::Base {
 private:
 	static CPlatformInfo* m_instance;
-	static CSingletonDestroyer<CPlatformInfo> m_destroyer;
+	static ivf2d::SingletonDestroyer<CPlatformInfo> m_destroyer;
 
 	bool m_fakeTabletPC;
     std::string m_applicationExecutable;
@@ -17,7 +17,7 @@ public:
 	/** Returns the PlatformInfo singleton */
 	static CPlatformInfo* getInstance();
 
-	IvfClassInfo("CPlatformInfo", CBase);
+	IvfClassInfo("CPlatformInfo", ivf2d::Base);
 
 	bool isTabletPC();
 	bool isVista();
@@ -28,6 +28,6 @@ public:
 protected:
 	/** Protected constructor (do not use) */
 	CPlatformInfo();
-	friend class CSingletonDestroyer<CPlatformInfo>;
+	friend class ivf2d::SingletonDestroyer<CPlatformInfo>;
 };
 #endif

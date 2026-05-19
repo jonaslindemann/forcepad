@@ -12,7 +12,7 @@
 #include "Vec3d.h"
 
 CRuler::CRuler ()
-		:CShape()
+		:ivf2d::Shape()
 {
 	m_startPos[0] = 0;
 	m_startPos[1] = 0;
@@ -80,9 +80,9 @@ double CRuler::getActualLength()
 
 double CRuler::getPixelLength()
 {
-	CVec3d p1;
-	CVec3d p2;
-	CVec3d v;
+	ivf2d::Vec3d p1;
+	ivf2d::Vec3d p2;
+	ivf2d::Vec3d v;
 
 	p1.setComponents(m_startPos);
 	p2.setComponents(m_endPos);

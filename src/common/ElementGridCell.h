@@ -29,7 +29,7 @@
 
 IvfSmartPointer(CElementGridCell);
 
-class CElementGridCell : public CPoint {
+class CElementGridCell : public ivf2d::Point {
 private:
 	double m_value;
 	std::vector<CElementPtr> m_elements;
@@ -39,7 +39,7 @@ public:
 
 	static CElementGridCellPtr create() { return std::make_shared<CElementGridCell>(); }
 
-	IvfClassInfo("CElementGridCell",CBase);
+	IvfClassInfo("CElementGridCell",ivf2d::Base);
 };
 
 #endif 

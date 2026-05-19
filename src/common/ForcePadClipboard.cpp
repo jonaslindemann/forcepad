@@ -41,7 +41,7 @@ CForcePadClipboard::~CForcePadClipboard()
 
 void CForcePadClipboard::copy(int x1, int y1, int x2, int y2)
 {
-	CClipboard::copy(x1, y1, x2, y2);
+	ivf2d::Clipboard::copy(x1, y1, x2, y2);
 
 	if (m_grid!=nullptr)
 	{
@@ -55,7 +55,7 @@ void CForcePadClipboard::copy(int x1, int y1, int x2, int y2)
 
 void CForcePadClipboard::cut(int x1, int y1, int x2, int y2)
 {
-	CClipboard::cut(x1, y1, x2, y2);
+	ivf2d::Clipboard::cut(x1, y1, x2, y2);
 
 	if (m_grid!=nullptr)
 	{
@@ -75,7 +75,7 @@ void CForcePadClipboard::cut(int x1, int y1, int x2, int y2)
 
 void CForcePadClipboard::paste(int x, int y)
 {
-	CClipboard::paste(x, y);
+	ivf2d::Clipboard::paste(x, y);
 
 	if (m_grid!=nullptr)
 	{

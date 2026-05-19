@@ -70,7 +70,7 @@ IvfSmartPointer(CFemGridSolver2);
  * This class is responsible for converting the FemModel class
  * into a finite element problem and then solving it.
  */
-class CFemGridSolver2 : public CBase {
+class CFemGridSolver2 : public ivf2d::Base {
 public:
 	enum TErrorType {
 		ET_NO_ERROR,

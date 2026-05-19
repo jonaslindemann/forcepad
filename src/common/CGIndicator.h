@@ -29,7 +29,7 @@
 
 IvfSmartPointer(CCGIndicator);
 
-class CCGIndicator : public CShape {
+class CCGIndicator : public ivf2d::Shape {
 private:
 	double m_arrowLength;
 	bool m_gravityArrow;
@@ -49,7 +49,7 @@ public:
 
 	static CCGIndicatorPtr create() { return std::make_shared<CCGIndicator>(); }
 
-	IvfClassInfo("CCGIndicator",CShape);
+	IvfClassInfo("CCGIndicator",ivf2d::Shape);
 
 	void setArrowLength(double length);
 	double getArrowLength();

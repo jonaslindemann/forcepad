@@ -37,7 +37,7 @@ IvfSmartPointer(CConstraint);
  * is visualised with vertical and horisontal lines for x and y 
  * constraints.
  */
-class CConstraint : public CShape {
+class CConstraint : public ivf2d::Shape {
 public:
 	/** Constraint type */
 	enum TConstraintType {
@@ -67,7 +67,7 @@ public:
 
 	static CConstraintPtr create() { return std::make_shared<CConstraint>(); }
 
-	IvfClassInfo("CConstraint",CShape);
+	IvfClassInfo("CConstraint",ivf2d::Shape);
 
 	// Methods
 

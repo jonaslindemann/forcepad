@@ -32,46 +32,50 @@
 #include <GL/gl.h>
 #endif
 
-CPoint::CPoint()
+namespace ivf2d {
+
+Point::Point()
 {
 	m_pos[0] = 0.0;
 	m_pos[1] = 0.0;
 }
 
-CPoint::~CPoint()
+Point::~Point()
 {
 
 }
 
-void CPoint::setPosition(double x, double y)
+void Point::setPosition(double x, double y)
 {
 	m_pos[0] = x;
 	m_pos[1] = y;
 }
 
-void CPoint::getPosition(double &x, double &y)
+void Point::getPosition(double &x, double &y)
 {
 	x = m_pos[0];
 	y = m_pos[1];
 }
 
-const double* CPoint::getPosition()
+const double* Point::getPosition()
 {
 	return m_pos;
 }
 
-void CPoint::setPosition(const double *pos)
+void Point::setPosition(const double *pos)
 {
 	m_pos[0] = pos[0];
 	m_pos[1] = pos[1];
 }
 
-double CPoint::x()
+double Point::x()
 {
 	return m_pos[0];
 }
 
-double CPoint::y()
+double Point::y()
 {
 	return m_pos[1];
 }
+
+} // namespace ivf2d

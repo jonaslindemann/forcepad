@@ -30,7 +30,7 @@
 
 IvfSmartPointer(CElement);
 
-class CElement : public CBase {
+class CElement : public ivf2d::Base {
 private:
 	std::vector<CNodePtr> m_nodes;
 public:
@@ -42,7 +42,7 @@ public:
 
 	static CElementPtr create() { return std::make_shared<CElement>(); }
 
-	IvfClassInfo("CElement",CBase);
+	IvfClassInfo("CElement",ivf2d::Base);
 
 	void setNodes(int number);
 	void setNode(int idx, CNode* node);

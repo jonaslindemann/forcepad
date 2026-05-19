@@ -22,27 +22,32 @@
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
 
-#ifndef _CArrow_h_
-#define _CArrow_h_
+#ifndef _Arrow_h_
+#define _Arrow_h_
 
 #include "Shape.h"
 #include "Line.h"
 #include "Vec3d.h"
 
-IvfSmartPointer(CArrow);
+namespace ivf2d {
 
-class CArrow : public CShape {
+IvfSmartPointer(Arrow);
+
+class Arrow : public Shape {
 private:
-	CLine* m_line;
-	CLine* m_head1;
-	CLine* m_head2;
+	Line* m_line;
+	Line* m_head1;
+	Line* m_head2;
 public:
-	CArrow();
-	virtual ~CArrow();
+	Arrow();
+	virtual ~Arrow();
 
-	static CArrowPtr create() { return std::make_shared<CArrow>(); }
+	static ArrowPtr create() { return std::make_shared<Arrow>(); }
 
-	IvfClassInfo("CArrow",CShape);
+	IvfClassInfo("Arrow",Shape);
 };
+
+
+} // namespace ivf2d
 
 #endif 

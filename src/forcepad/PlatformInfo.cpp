@@ -1,7 +1,7 @@
 #include "PlatformInfo.h"
 
 CPlatformInfo* CPlatformInfo::m_instance = 0;
-CSingletonDestroyer<CPlatformInfo> CPlatformInfo::m_destroyer;
+ivf2d::SingletonDestroyer<CPlatformInfo> CPlatformInfo::m_destroyer;
 
 #ifdef WIN32
 #include <windows.h>

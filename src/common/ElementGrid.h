@@ -31,7 +31,7 @@
 
 IvfSmartPointer(CElementGrid);
 
-class CElementGrid : public CBase {
+class CElementGrid : public ivf2d::Base {
 private:
 	std::vector< std::vector<CNodePtr> > m_nodes;
 	std::vector< std::vector<CElementGridCellPtr> > m_elementGrid;
@@ -50,7 +50,7 @@ public:
 	void setSize(int rows, int cols);
 	void setWidth(double width);
 
-	IvfClassInfo("CElementGrid",CBase);
+	IvfClassInfo("CElementGrid",ivf2d::Base);
 };
 
 #endif 

@@ -157,11 +157,11 @@ protected:
      *    Brush management
      */
 
-    std::vector<CSgiImagePtr> m_brushes;
-    std::vector<CSgiImagePtr> m_invertedBrushes;
+    std::vector<ivf2d::SgiImagePtr> m_brushes;
+    std::vector<ivf2d::SgiImagePtr> m_invertedBrushes;
 
-    CSgiImagePtr m_currentBrush;
-    CSgiImagePtr m_currentInvertedBrush;
+    ivf2d::SgiImagePtr m_currentBrush;
+    ivf2d::SgiImagePtr m_currentInvertedBrush;
 
     float m_brushColor[3];
     float m_optConstraintColor[3];
@@ -203,22 +203,22 @@ protected:
      *    Drawing tools
      */
 
-    CRectanglePtr m_rectangle;
-    CEllipsePtr m_ellipse;
-    CLinePtr m_line;
-    CArchPtr m_arch;
+    ivf2d::RectanglePtr m_rectangle;
+    ivf2d::EllipsePtr m_ellipse;
+    ivf2d::LinePtr m_line;
+    ivf2d::ArchPtr m_arch;
     CForcePtr m_newForce;
     CConstraintPtr m_newConstraint;
     CConstraint::TConstraintType m_constraintType;
 
-    CRectanglePtr m_selectionBox;
+    ivf2d::RectanglePtr m_selectionBox;
     CForcePadClipboardPtr m_clipboard;
-    CClipboardPtr m_undoClipboard;
+    ivf2d::ClipboardPtr m_undoClipboard;
 
-    CImagePtr m_drawing;
-    CImagePtr m_optConstraintImage;
-    CImagePtr m_buffer;
-    CScreenImagePtr m_screenImage;
+    ivf2d::ImagePtr m_drawing;
+    ivf2d::ImagePtr m_optConstraintImage;
+    ivf2d::ImagePtr m_buffer;
+    ivf2d::ScreenImagePtr m_screenImage;
 
     CFemGrid2Ptr m_femGrid;
 

@@ -32,7 +32,9 @@
 #include <GL/gl.h>
 #endif
 
-CRectangle::CRectangle()
+namespace ivf2d {
+
+Rectangle::Rectangle()
 {
 	m_size[0] = 1.0;
 	m_size[1] = 1.0;
@@ -45,16 +47,16 @@ CRectangle::CRectangle()
 	m_lineType = LT_SOLID;
 	m_rectType = RT_SOLID;
 	m_lineWidth = 1.0;
-	m_lineColor = CColor::create();
+	m_lineColor = Color::create();
 	m_lineColor->setColor(0.0f, 0.0f, 0.0f, 1.0f);
 }
 
-CRectangle::~CRectangle()
+Rectangle::~Rectangle()
 {
 
 }
 
-void CRectangle::setSize(double width, double height)
+void Rectangle::setSize(double width, double height)
 {
 	m_size[0] = width;
 	m_size[1] = height;
@@ -86,13 +88,13 @@ void CRectangle::setSize(double width, double height)
 	}
 }
 
-void CRectangle::getSize(double &width, double &height)
+void Rectangle::getSize(double &width, double &height)
 {
 	width = m_size[0];
 	height = m_size[1];
 }
 
-void CRectangle::doGeometry()
+void Rectangle::doGeometry()
 {
 	//glEnable(GL_BLEND);
 	//glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
@@ -172,7 +174,7 @@ void CRectangle::doGeometry()
 	*/
 }
 
-void CRectangle::setTexture(CTexturePtr texture)
+void Rectangle::setTexture(TexturePtr texture)
 {
 	//
 	// Let's snatch us some image info from the texture
@@ -180,28 +182,30 @@ void CRectangle::setTexture(CTexturePtr texture)
 
 	if (texture->getImage()!=nullptr)
 	{
-		CImage* image = texture->getImage();
+		Image* image = texture->getImage();
 		m_imageRatio = image->getRatio();				
 	}
-	CShape::setTexture(texture);
+	Shape::setTexture(texture);
 }
 
-void CRectangle::setRectangleType(TRectangleType type)
+void Rectangle::setRectangleType(TRectangleType type)
 {
 	m_rectType = type;
 }
 
-void CRectangle::setLineType(TLineType type)
+void Rectangle::setLineType(TLineType type)
 {
 	m_lineType = type;
 }
 
-void CRectangle::setLineWidth(double width)
+void Rectangle::setLineWidth(double width)
 {
 	m_lineWidth = width;
 }
 
-void CRectangle::setLineColor(CColorPtr color)
+void Rectangle::setLineColor(ColorPtr color)
 {
 	m_lineColor = color;
 }
+
+} // namespace ivf2d

@@ -22,10 +22,12 @@
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
 
-#ifndef _CDrawableBase_h_
-#define _CDrawableBase_h_
+#ifndef _DrawableBase_h_
+#define _DrawableBase_h_
 
 #include "Base.h"
+
+namespace ivf2d {
 
 /**
  * Drawable base class
@@ -33,15 +35,15 @@
  * Base class for all classes in ForcePAD which have
  * a visual representation. (Drawable in OpenGL).
  */
-class CDrawableBase : public CBase {
+class DrawableBase : public Base {
 private:
 
 public:
 	/** DrawableBase class constructor. */
-	CDrawableBase();
+	DrawableBase();
 
 	/** DrawableBase class destructor. */
-    virtual  ~CDrawableBase();
+    virtual  ~DrawableBase();
 
 	/** 
 	 * virtual render method
@@ -105,5 +107,8 @@ protected:
 	 */
 	virtual void doGeometry();
 };
+
+
+} // namespace ivf2d
 
 #endif 

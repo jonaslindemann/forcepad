@@ -22,14 +22,16 @@
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
 
-#ifndef _CShape_h_
-#define _CShape_h_
+#ifndef _Shape_h_
+#define _Shape_h_
 
 #include "DrawableBase.h"
 #include "Color.h"
 #include "Texture.h"
 
-IvfSmartPointer(CShape);
+namespace ivf2d {
+
+IvfSmartPointer(Shape);
 
 /**
  * Shape base class
@@ -38,25 +40,25 @@ IvfSmartPointer(CShape);
  * a visual representation with a position, rotation,
  * color and a texture. (Drawable in OpenGL).
  */
-class CShape : public CDrawableBase {
+class Shape : public DrawableBase {
 private:
 	double m_pos[2];
 	double m_rotation;
-	CColorPtr m_color;
-	CTexturePtr m_texture;
+	ColorPtr m_color;
+	TexturePtr m_texture;
 	bool m_useRasterPos;
 public:
 	bool getUseRasterPosition();
 	void setUseRasterPosition(bool flag);
 	/** Shape class constructor. */
-	CShape();
+	Shape();
 
 	/** Shape class destructor. */
-	virtual ~CShape();
+	virtual ~Shape();
 
-	static CShapePtr create() { return std::make_shared<CShape>(); }
+	static ShapePtr create() { return std::make_shared<Shape>(); }
 
-	IvfClassInfo("CShape",CDrawableBase);
+	IvfClassInfo("Shape",DrawableBase);
 
 	// Get/set methods 
 	
@@ -73,16 +75,16 @@ public:
 	double getRotation();
 
 	/** Set shape color. */
-	void setColor(CColorPtr color);
+	void setColor(ColorPtr color);
 
 	/** Return shape color. */
-	CColorPtr getColor();
+	ColorPtr getColor();
 
 	/** Set shape texture. */
-	void setTexture(CTexturePtr texture);
+	void setTexture(TexturePtr texture);
 
 	/** Get shape texture. */
-	CTexture* getTexture();
+	Texture* getTexture();
 
 	// Implemented virtual methods
 
@@ -95,5 +97,8 @@ public:
 	/** Ends transform in OpenGL. */
 	virtual void doEndTransform() override;
 };
+
+
+} // namespace ivf2d
 
 #endif 

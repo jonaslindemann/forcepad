@@ -173,43 +173,43 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 		
 	// Create drawing tools
 	
-	CColorPtr selectionColor = CColor::create();
+	ivf2d::ColorPtr selectionColor = ivf2d::Color::create();
 	selectionColor->setColor(1.0f, 0.0f, 0.0f, 1.0f);
 
-	m_selectionBox = CRectangle::create();
-	m_selectionBox->setRectangleType(CRectangle::RT_OUTLINE);
+	m_selectionBox = ivf2d::Rectangle::create();
+	m_selectionBox->setRectangleType(ivf2d::Rectangle::RT_OUTLINE);
 	m_selectionBox->setLineColor(selectionColor);
 	m_selectionBox->setLineWidth(1.0);
-	m_selectionBox->setLineType(CRectangle::LT_DASHED);
+	m_selectionBox->setLineType(ivf2d::Rectangle::LT_DASHED);
 	m_selectionBox->setSize(200.0,100.0);
 	m_selectionBox->setPosition(50.0, 50.0);
 
-	CColorPtr color = CColor::create();
+	ivf2d::ColorPtr color = ivf2d::Color::create();
 #ifdef USE_QT
 	color->setColor(0.0f, 0.0f, 0.0f, 1.0f);
 #else
 	color->setColor(0.0f, 0.0f, 0.0f, 0.5f);
 #endif
 	
-	m_rectangle = CRectangle::create();
+	m_rectangle = ivf2d::Rectangle::create();
 	m_rectangle->setColor(color);
 
-	m_ellipse = CEllipse::create();
+	m_ellipse = ivf2d::Ellipse::create();
 	m_ellipse->setColor(color);
 	m_ellipse->setSectors(36);
 
-	m_line = CLine::create();
+	m_line = ivf2d::Line::create();
 	m_line->setColor(color);
 	m_line->setWidth(4);
 
-    m_arch = CArch::create();
+    m_arch = ivf2d::Arch::create();
     m_arch->setColor(color);
     m_arch->setLineWidth(4);
 
-	color = CColor::create();
+	color = ivf2d::Color::create();
 	color->setColor(0.5f, 0.0f, 0.0f, 1.0f);
 
-	color = CColor::create();
+	color = ivf2d::Color::create();
 	color->setColor(0.0f, 0.5f, 0.0f, 1.0f);
 
 	// Rigid body variables
@@ -227,7 +227,7 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 	
 	// Create drawing area
 	
-	m_drawing = CImage::create(2);
+	m_drawing = ivf2d::Image::create(2);
 	m_drawing->setChannels(4);
 	m_drawing->setSize(640,480);
 	m_drawing->fillColor(255,255,255);
@@ -246,7 +246,7 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 
 	// Create a buffer for reading pixels back
 	
-	m_buffer = CImage::create();
+	m_buffer = ivf2d::Image::create();
 	m_buffer->setChannels(4);
 	m_buffer->setSize(64,64);
 
@@ -265,11 +265,11 @@ CPaintView::CPaintView(int x,int y,int w,int h,const char *l)
 
 	// Create clipboard used in undo operations
 
-	m_undoClipboard = CClipboard::create();
+	m_undoClipboard = ivf2d::Clipboard::create();
 	m_undoClipboard->setImage(m_drawing);
-	m_undoClipboard->setPasteMode(CClipboard::PM_REPLACE);
+	m_undoClipboard->setPasteMode(ivf2d::Clipboard::PM_REPLACE);
 
-	m_screenImage = CScreenImage::create();
+	m_screenImage = ivf2d::ScreenImage::create();
 	m_screenImage->setImage(m_drawing);
 	
 	resetUndoArea();
@@ -1381,8 +1381,8 @@ void CPaintView::loadBrushes()
 {
 	so_print("CPaintView","loadBrushes()");
 	
-	CSgiImagePtr brush;
-	CSgiImagePtr invertedBrush;
+	ivf2d::SgiImagePtr brush;
+	ivf2d::SgiImagePtr invertedBrush;
 	
 	// Test file locations
 	
@@ -1434,153 +1434,153 @@ void CPaintView::loadBrushes()
 
 	std::cout << "Loading brush: " << brushName << std::endl;
 	
-	brush = CSgiImage::create();
+	brush = ivf2d::SgiImage::create();
 	brush->setFileName(brushName.c_str());
 	brush->setAlphaChannel(true);
 	brush->read();
 	brush->createAlphaMask(0,m_blendFactor);
-	m_brushes.push_back(CSgiImagePtr(brush));
+	m_brushes.push_back(ivf2d::SgiImagePtr(brush));
 	
-	invertedBrush = CSgiImage::create();
+	invertedBrush = ivf2d::SgiImage::create();
 	invertedBrush->setFileName(brushName.c_str());
 	invertedBrush->read();
 	invertedBrush->invert();
-	m_invertedBrushes.push_back(CSgiImagePtr(invertedBrush));
+	m_invertedBrushes.push_back(ivf2d::SgiImagePtr(invertedBrush));
 	
 	brushName = brushPath+"rbrush8.rgb";	
 	
-	brush = CSgiImage::create();
+	brush = ivf2d::SgiImage::create();
 	brush->setFileName(brushName.c_str());
 	brush->setAlphaChannel(true);
 	brush->read();
 	brush->createAlphaMask(0,m_blendFactor);
-	m_brushes.push_back(CSgiImagePtr(brush));
+	m_brushes.push_back(ivf2d::SgiImagePtr(brush));
 	
-	invertedBrush = CSgiImage::create();
+	invertedBrush = ivf2d::SgiImage::create();
 	invertedBrush->setFileName(brushName.c_str());
 	invertedBrush->read();
 	invertedBrush->invert();
-	m_invertedBrushes.push_back(CSgiImagePtr(invertedBrush));
+	m_invertedBrushes.push_back(ivf2d::SgiImagePtr(invertedBrush));
 	
 	brushName = brushPath+"rbrush16.rgb";	
 	
-	brush = CSgiImage::create();
+	brush = ivf2d::SgiImage::create();
 	brush->setFileName(brushName.c_str());
 	brush->setAlphaChannel(true);
 	brush->read();
 	brush->createAlphaMask(0,m_blendFactor);
-	m_brushes.push_back(CSgiImagePtr(brush));
+	m_brushes.push_back(ivf2d::SgiImagePtr(brush));
 	
-	invertedBrush = CSgiImage::create();
+	invertedBrush = ivf2d::SgiImage::create();
 	invertedBrush->setFileName(brushName.c_str());
 	invertedBrush->read();
 	invertedBrush->invert();
-	m_invertedBrushes.push_back(CSgiImagePtr(invertedBrush));
+	m_invertedBrushes.push_back(ivf2d::SgiImagePtr(invertedBrush));
 	
 	brushName = brushPath+"rbrush32.rgb";
 	
-	brush = CSgiImage::create();
+	brush = ivf2d::SgiImage::create();
 	brush->setFileName(brushName.c_str());
 	brush->setAlphaChannel(true);
 	brush->read();
 	brush->createAlphaMask(0,m_blendFactor);
-	m_brushes.push_back(CSgiImagePtr(brush));
+	m_brushes.push_back(ivf2d::SgiImagePtr(brush));
 	
-	invertedBrush = CSgiImage::create();
+	invertedBrush = ivf2d::SgiImage::create();
 	invertedBrush->setFileName(brushName.c_str());
 	invertedBrush->read();
 	invertedBrush->invert();
-	m_invertedBrushes.push_back(CSgiImagePtr(invertedBrush));
+	m_invertedBrushes.push_back(ivf2d::SgiImagePtr(invertedBrush));
 	
 	brushName = brushPath+"rbrush64.rgb";	
 	
-	brush = CSgiImage::create();
+	brush = ivf2d::SgiImage::create();
 	brush->setFileName(brushName.c_str());
 	brush->setAlphaChannel(true);
 	brush->read();
 	brush->createAlphaMask(0,m_blendFactor);
-	m_brushes.push_back(CSgiImagePtr(brush));
+	m_brushes.push_back(ivf2d::SgiImagePtr(brush));
 	
-	invertedBrush = CSgiImage::create();
+	invertedBrush = ivf2d::SgiImage::create();
 	invertedBrush->setFileName(brushName.c_str());
 	invertedBrush->read();
 	invertedBrush->invert();
-	m_invertedBrushes.push_back(CSgiImagePtr(invertedBrush));
+	m_invertedBrushes.push_back(ivf2d::SgiImagePtr(invertedBrush));
 	
 	brushName = brushPath+"sbrush4.rgb";	
 	
-	brush = CSgiImage::create();
+	brush = ivf2d::SgiImage::create();
 	brush->setFileName(brushName.c_str());
 	brush->setAlphaChannel(true);
 	brush->read();
 	brush->createAlphaMask(0,m_blendFactor);
-	m_brushes.push_back(CSgiImagePtr(brush));
+	m_brushes.push_back(ivf2d::SgiImagePtr(brush));
 	
-	invertedBrush = CSgiImage::create();
+	invertedBrush = ivf2d::SgiImage::create();
 	invertedBrush->setFileName(brushName.c_str());
 	invertedBrush->read();
 	invertedBrush->invert();
-	m_invertedBrushes.push_back(CSgiImagePtr(invertedBrush));
+	m_invertedBrushes.push_back(ivf2d::SgiImagePtr(invertedBrush));
 	
 	brushName = brushPath+"sbrush8.rgb";	
 	
-	brush = CSgiImage::create();
+	brush = ivf2d::SgiImage::create();
 	brush->setFileName(brushName.c_str());
 	brush->setAlphaChannel(true);
 	brush->read();
 	brush->createAlphaMask(0,m_blendFactor);
-	m_brushes.push_back(CSgiImagePtr(brush));
+	m_brushes.push_back(ivf2d::SgiImagePtr(brush));
 	
-	invertedBrush = CSgiImage::create();
+	invertedBrush = ivf2d::SgiImage::create();
 	invertedBrush->setFileName(brushName.c_str());
 	invertedBrush->read();
 	invertedBrush->invert();
-	m_invertedBrushes.push_back(CSgiImagePtr(invertedBrush));
+	m_invertedBrushes.push_back(ivf2d::SgiImagePtr(invertedBrush));
 	
 	brushName = brushPath+"sbrush16.rgb";	
 	
-	brush = CSgiImage::create();
+	brush = ivf2d::SgiImage::create();
 	brush->setFileName(brushName.c_str());
 	brush->setAlphaChannel(true);
 	brush->read();
 	brush->createAlphaMask(0,m_blendFactor);
-	m_brushes.push_back(CSgiImagePtr(brush));
+	m_brushes.push_back(ivf2d::SgiImagePtr(brush));
 	
-	invertedBrush = CSgiImage::create();
+	invertedBrush = ivf2d::SgiImage::create();
 	invertedBrush->setFileName(brushName.c_str());
 	invertedBrush->read();
 	invertedBrush->invert();
-	m_invertedBrushes.push_back(CSgiImagePtr(invertedBrush));
+	m_invertedBrushes.push_back(ivf2d::SgiImagePtr(invertedBrush));
 	
 	brushName = brushPath+"sbrush32.rgb";	
 	
-	brush = CSgiImage::create();
+	brush = ivf2d::SgiImage::create();
 	brush->setFileName(brushName.c_str());
 	brush->setAlphaChannel(true);
 	brush->read();
 	brush->createAlphaMask(0,m_blendFactor);
-	m_brushes.push_back(CSgiImagePtr(brush));
+	m_brushes.push_back(ivf2d::SgiImagePtr(brush));
 	
-	invertedBrush = CSgiImage::create();
+	invertedBrush = ivf2d::SgiImage::create();
 	invertedBrush->setFileName(brushName.c_str());
 	invertedBrush->read();
 	invertedBrush->invert();
-	m_invertedBrushes.push_back(CSgiImagePtr(invertedBrush));
+	m_invertedBrushes.push_back(ivf2d::SgiImagePtr(invertedBrush));
 	
 	brushName = brushPath+"sbrush64.rgb";	
 	
-	brush = CSgiImage::create();
+	brush = ivf2d::SgiImage::create();
 	brush->setFileName(brushName.c_str());
 	brush->setAlphaChannel(true);
 	brush->read();
 	brush->createAlphaMask(0,m_blendFactor);
-	m_brushes.push_back(CSgiImagePtr(brush));
+	m_brushes.push_back(ivf2d::SgiImagePtr(brush));
 	
-	invertedBrush = CSgiImage::create();
+	invertedBrush = ivf2d::SgiImage::create();
 	invertedBrush->setFileName(brushName.c_str());
 	invertedBrush->read();
 	invertedBrush->invert();
-	m_invertedBrushes.push_back(CSgiImagePtr(invertedBrush));
+	m_invertedBrushes.push_back(ivf2d::SgiImagePtr(invertedBrush));
 	
 	m_currentBrush = m_brushes[0];
 	m_currentInvertedBrush = m_invertedBrushes[0];
@@ -1983,7 +1983,7 @@ void CPaintView::newModel()
 			}
 		}
 
-		m_drawing = CImage::create(2);
+		m_drawing = ivf2d::Image::create(2);
 		m_drawing->setChannels(4);
 		m_drawing->setSize(width, height);
 		m_drawing->fillColor(255-initialStiffness,255-initialStiffness,255-initialStiffness);
@@ -2058,14 +2058,14 @@ void CPaintView::openImage()
 		
 		this->setModelName("noname.fp2");
 		
-		CJpegImagePtr jpegImage;
-		CPngImagePtr pngImage;
-		CSgiImagePtr rgbImage;
-		CImagePtr image;
+		ivf2d::JpegImagePtr jpegImage;
+		ivf2d::PngImagePtr pngImage;
+		ivf2d::SgiImagePtr rgbImage;
+		ivf2d::ImagePtr image;
 		
 		if (jpegFile)
 		{
-			jpegImage = CJpegImage::create();
+			jpegImage = ivf2d::JpegImage::create();
             jpegImage->setFileName(fname.c_str());
 			jpegImage->read();
 			image = jpegImage;
@@ -2073,7 +2073,7 @@ void CPaintView::openImage()
 		
 		if (pngFile)
 		{
-			pngImage = CPngImage::create();
+			pngImage = ivf2d::PngImage::create();
             pngImage->setFileName(fname.c_str());
 			pngImage->read();
 			image = pngImage;
@@ -2081,7 +2081,7 @@ void CPaintView::openImage()
 		
 		if (rgbFile)
 		{
-			rgbImage = CSgiImage::create();
+			rgbImage = ivf2d::SgiImage::create();
             rgbImage->setFileName(fname.c_str());
 			rgbImage->read();
 			image = rgbImage;
@@ -2199,7 +2199,7 @@ void CPaintView::expandImage()
     width = (int)dWidth;
     height = (int)dHeight;
 
-    m_drawing = CImage::create(2);
+    m_drawing = ivf2d::Image::create(2);
     m_drawing->setChannels(4);
 
     for (i=width; i>0; i--)
@@ -2260,7 +2260,7 @@ void CPaintView::expandImageToWindow()
 {
 	disableDrawing();
 
-	m_drawing = CImage::create(2);
+	m_drawing = ivf2d::Image::create(2);
 	m_drawing->setChannels(4);
 
 	int i, width, height;
@@ -2328,7 +2328,7 @@ void CPaintView::openModel(const std::string filename)
 	
 	setModelName(filename);
 		
-	m_drawing = CImage::create(2);
+	m_drawing = ivf2d::Image::create(2);
 	m_drawing->setSize(640,480);
 	m_drawing->setChannels(4);
 	m_femGrid->setImage(m_drawing);
@@ -2379,7 +2379,7 @@ void CPaintView::openModel()
 	{
 		setModelName(fname);
 		
-		m_drawing = CImage::create(2);
+		m_drawing = ivf2d::Image::create(2);
 		m_drawing->setSize(640,480);
 		m_drawing->setChannels(4);
 		m_femGrid->setImage(m_drawing);
@@ -2824,7 +2824,7 @@ void CPaintView::pasteFromWindows()
 			
 			// Copy to clipboard
 						
-			m_clipboard->setCopyImageMode(CClipboard::IM_GRAYSCALE);
+			m_clipboard->setCopyImageMode(ivf2d::Clipboard::IM_GRAYSCALE);
 			m_clipboard->copyImage(header->biWidth, header->biHeight, pPixelData);
 			
 			// Delete image data

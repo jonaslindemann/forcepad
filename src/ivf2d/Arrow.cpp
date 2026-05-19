@@ -24,12 +24,16 @@
 
 #include "Arrow.h"
 
-CArrow::CArrow()
+namespace ivf2d {
+
+Arrow::Arrow()
 {
 
 }
 
-CArrow::~CArrow()
+Arrow::~Arrow()
 {
 
 }
+
+} // namespace ivf2d

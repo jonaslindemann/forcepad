@@ -24,10 +24,12 @@
 
 #include "Clipboard.h"
 
-CClipboard::CClipboard()
+namespace ivf2d {
+
+Clipboard::Clipboard()
 {
 	m_baseImage = nullptr;
-	m_clipboard = CImage::create();
+	m_clipboard = Image::create();
 
 	m_pasteMode = PM_NON_WHITE;
 	m_copyImageMode = IM_RGB;
@@ -38,11 +40,11 @@ CClipboard::CClipboard()
 	m_selectionY[1] = 0.0;
 }
 
-CClipboard::~CClipboard()
+Clipboard::~Clipboard()
 {
 }
 
-void CClipboard::copy(int x1, int y1, int x2, int y2)
+void Clipboard::copy(int x1, int y1, int x2, int y2)
 {
 	if (m_baseImage!=nullptr)
 	{
@@ -72,7 +74,7 @@ void CClipboard::copy(int x1, int y1, int x2, int y2)
 	}
 }
 
-void CClipboard::cut(int x1, int y1, int x2, int y2)
+void Clipboard::cut(int x1, int y1, int x2, int y2)
 {
 	if (m_baseImage!=nullptr)
 	{
@@ -103,7 +105,7 @@ void CClipboard::cut(int x1, int y1, int x2, int y2)
 	}
 }
 
-void CClipboard::paste(int x, int y)
+void Clipboard::paste(int x, int y)
 {
 	if (m_baseImage!=nullptr)
 	{
@@ -135,25 +137,25 @@ void CClipboard::paste(int x, int y)
 	}
 }
 
-CImage* CClipboard::getClipboard()
+Image* Clipboard::getClipboard()
 {
 	return m_clipboard.get();
 }
 
-void CClipboard::setImage(CImagePtr image)
+void Clipboard::setImage(ImagePtr image)
 {
 	m_baseImage = image;
 }
 
-void CClipboard::setPasteMode(TPasteMode mode)
+void Clipboard::setPasteMode(TPasteMode mode)
 {
 	m_pasteMode = mode;
 }
 
 
-void CClipboard::copyImage(int width, int height, unsigned char *imageMap)
+void Clipboard::copyImage(int width, int height, unsigned char *imageMap)
 {
-	auto image = CImage::create();
+	auto image = Image::create();
 	image->setImageMap(width, height, imageMap, false);
 	
 	//int w = x2 - x1 + 1;
@@ -211,12 +213,12 @@ void CClipboard::copyImage(int width, int height, unsigned char *imageMap)
 
 }
 
-void CClipboard::setCopyImageMode(TCopyImageMode mode)
+void Clipboard::setCopyImageMode(TCopyImageMode mode)
 {
 	m_copyImageMode = mode;
 }
 
-void CClipboard::getSelection(int &x1, int &y1, int &x2, int &y2)
+void Clipboard::getSelection(int &x1, int &y1, int &x2, int &y2)
 {
 	x1 = m_selectionX[0];
 	y1 = m_selectionY[0];
@@ -224,8 +226,9 @@ void CClipboard::getSelection(int &x1, int &y1, int &x2, int &y2)
 	y2 = m_selectionY[1];
 }
 
-CImage* CClipboard::getClipboardImage()
+Image* Clipboard::getClipboardImage()
 {
 	return m_clipboard.get();
 }
 
+} // namespace ivf2d

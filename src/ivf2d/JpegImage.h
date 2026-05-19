@@ -22,12 +22,14 @@
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
 
-#ifndef _CJpegImage_h_
-#define _CJpegImage_h_
+#ifndef _JpegImage_h_
+#define _JpegImage_h_
 
 #include "Image.h"
 
-IvfSmartPointer(CJpegImage);
+namespace ivf2d {
+
+IvfSmartPointer(JpegImage);
 
 /**
  * Jpeg file loader 
@@ -37,19 +39,19 @@ IvfSmartPointer(CJpegImage);
  *
  * @author Jonas Lindemann
  */
-class CJpegImage : public CImage {
+class JpegImage : public Image {
 private:
 	std::string m_fileName;
 public:
 	/** CIvfJpegImage constructor */
-	CJpegImage();
+	JpegImage();
 
 	/** CIvfJpegImage destructor */
-	virtual ~CJpegImage();
+	virtual ~JpegImage();
 
-	static CJpegImagePtr create() { return std::make_shared<CJpegImage>(); }
+	static JpegImagePtr create() { return std::make_shared<JpegImage>(); }
 
-	IvfClassInfo("CJpegImage",CImage);
+	IvfClassInfo("JpegImage",Image);
 
 	/** Reads jpeg image */
 	virtual bool read();
@@ -58,5 +60,8 @@ public:
 	const std::string& getFileName();
 
 };
+
+
+} // namespace ivf2d
 
 #endif 

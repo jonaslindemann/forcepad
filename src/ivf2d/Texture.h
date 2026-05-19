@@ -22,21 +22,23 @@
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
 
-#ifndef _CTexture_h_
-#define _CTexture_h_
+#ifndef _Texture_h_
+#define _Texture_h_
 
 #include "Base.h"
 #include "DrawableBase.h" // Get OpenGL stuff
 #include "Image.h"
 
-IvfSmartPointer(CTexture);
+namespace ivf2d {
+
+IvfSmartPointer(Texture);
 
 /**
  * Texture class.
  *
  * Implements an OpenGL texture.
  */
-class CTexture : public CBase {
+class Texture : public Base {
 private:
     unsigned int m_wrapT;
     unsigned int m_wrapS;
@@ -46,20 +48,20 @@ private:
     unsigned int m_textureName;
 	float m_textureEnvColor[4];
 	bool m_bound;
-	CImagePtr m_image;
+	ImagePtr m_image;
 	double m_texScaleX;
 	double m_texScaleY;
 	double m_texRotate;
 public:
 	/** Texture class constructor. */
-	CTexture();
+	Texture();
 
 	/** Texture class destructor. */
-	virtual ~CTexture();
+	virtual ~Texture();
 
-	static CTexturePtr create() { return std::make_shared<CTexture>(); }
+	static TexturePtr create() { return std::make_shared<Texture>(); }
 
-	IvfClassInfo("CTexture",CBase);
+	IvfClassInfo("Texture",Base);
 
 	/** Applies a bound texture. */
 	void apply();
@@ -73,7 +75,7 @@ public:
 	// Get/set methods
 
 	/** Returns current texture image. */
-	CImage* getImage();
+	Image* getImage();
 
 	/** 
 	 * Sets current texture image. 
@@ -81,7 +83,10 @@ public:
 	 * Replaces existing image. If existing image 
 	 * is unreferenced it will be deleted.
 	 */
-	void setImage(CImagePtr image);
+	void setImage(ImagePtr image);
 };
+
+
+} // namespace ivf2d
 
 #endif 

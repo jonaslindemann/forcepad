@@ -29,9 +29,9 @@
 
 IvfSmartPointer(CColorMap);
 
-class CColorMap : public CBase {
+class CColorMap : public ivf2d::Base {
 private:
-	std::vector<CColorPtr> m_colors;
+	std::vector<ivf2d::ColorPtr> m_colors;
 	bool m_invert;
 public:
 	CColorMap();

@@ -22,24 +22,26 @@
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
 
-#ifndef _CEllipse_h_
-#define _CEllipse_h_
+#ifndef _Ellipse_h_
+#define _Ellipse_h_
 
 #include "Shape.h"
 
-IvfSmartPointer(CEllipse);
+namespace ivf2d {
 
-class CEllipse : public CShape {
+IvfSmartPointer(Ellipse);
+
+class Ellipse : public Shape {
 private:
     double m_size[2];
 	int m_sectors;
 public:
-	CEllipse();
-	virtual ~CEllipse();
+	Ellipse();
+	virtual ~Ellipse();
 
-	static CEllipsePtr create() { return std::make_shared<CEllipse>(); }
+	static EllipsePtr create() { return std::make_shared<Ellipse>(); }
 
-	IvfClassInfo("CEllipse",CShape);
+	IvfClassInfo("Ellipse",Shape);
 
 	virtual void doGeometry();
 
@@ -47,5 +49,8 @@ public:
 	void setSize(int width, int height);
     void setSizeDouble(double width, double height);
 };
+
+
+} // namespace ivf2d
 
 #endif 

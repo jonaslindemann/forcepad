@@ -72,11 +72,11 @@ protected:
     virtual void doFlush() override;
     virtual void doInvalidate() override;
     virtual void doMakeCurrent() override;
-    virtual const std::string doSaveDialog(const string title, const string filter, const string defaultFilename) override;
+    virtual const std::string doSaveDialog(const std::string title, const std::string filter, const std::string defaultFilename) override;
     virtual bool doNewModel(int &width, int &height, int& initialStiffness) override;
-    virtual void doInfoMessage(const string message) override;
-    virtual bool doAskYesNo(const string question) override;
-    virtual const std::string doOpenDialog(const string title, const string filter) override;
+    virtual void doInfoMessage(const std::string message) override;
+    virtual bool doAskYesNo(const std::string question) override;
+    virtual const std::string doOpenDialog(const std::string title, const std::string filter) override;
     virtual void doCreateCursors() override;
     virtual void doUpdateCursor(TEditMode mode) override;
     virtual void doDeleteCursors() override;

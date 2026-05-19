@@ -71,8 +71,8 @@ private:
 	bool m_drawDisplacements;
 	bool m_drawForcesAndConstraints;
 	
-	CColorPtr m_forceColor;
-	CColorPtr m_constraintColor;
+	ivf2d::ColorPtr m_forceColor;
+	ivf2d::ColorPtr m_constraintColor;
 
 	CColorMapPtr m_colorMap;
 
@@ -278,7 +278,7 @@ public:
 	void setGridSpacing(int spacing);
 	int getGridSpacing();
 
-	virtual void setImage(CImagePtr image);
+	virtual void setImage(ivf2d::ImagePtr image);
 	virtual void initGrid();
 	virtual void doGeometry();
 };

@@ -22,21 +22,23 @@
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 //
 
-#ifndef _CRectangle_h_
-#define _CRectangle_h_
+#ifndef _Rectangle_h_
+#define _Rectangle_h_
 
 #include "Shape.h"
 #include "Texture.h"
 #include "Image.h"
 
-IvfSmartPointer(CRectangle);
+namespace ivf2d {
+
+IvfSmartPointer(Rectangle);
 
 /**
  * Rectangle class
  *
  * Implements a textured rectangle.
  */
-class CRectangle : public CShape {
+class Rectangle : public Shape {
 public:
 	enum TRectangleType {
 		RT_SOLID,
@@ -59,17 +61,17 @@ private:
 	double m_lineWidth;
     short m_lineStipple;
     int m_lineFactor;
-	CColorPtr m_lineColor;
+	ColorPtr m_lineColor;
 public:
 	/** Rectangle class constructor. */
-	CRectangle();
+	Rectangle();
 
 	/** Rectangle class destructor. */
-	virtual ~CRectangle();
+	virtual ~Rectangle();
 
-	static CRectanglePtr create() { return std::make_shared<CRectangle>(); }
+	static RectanglePtr create() { return std::make_shared<Rectangle>(); }
 
-	IvfClassInfo("CRectangle",CShape);
+	IvfClassInfo("Rectangle",Shape);
 
 	/** Set size of rectangle in world coordinates. */
 	void setSize(double width, double height);
@@ -78,7 +80,7 @@ public:
 	void getSize(double &width, double &height);
 
 	/** Set texture override. */
-	void setTexture(CTexturePtr texture); // Override
+	void setTexture(TexturePtr texture); // Override
 
 	/** Draw rectangle in OpenGL. */
 	virtual void doGeometry() override;
@@ -86,9 +88,12 @@ public:
 	/** Set type of rectangle */
 	void setRectangleType(TRectangleType type);
 
-	void setLineColor(CColorPtr color);
+	void setLineColor(ColorPtr color);
 	void setLineWidth(double width);
 	void setLineType(TLineType type);
 };
+
+
+} // namespace ivf2d
 
 #endif

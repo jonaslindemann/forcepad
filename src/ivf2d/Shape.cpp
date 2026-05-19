@@ -32,7 +32,9 @@
 #include <GL/gl.h>
 #endif
 
-CShape::CShape()
+namespace ivf2d {
+
+Shape::Shape()
 {
 	m_pos[0] = 0.0;
 	m_pos[1] = 0.0;
@@ -42,33 +44,33 @@ CShape::CShape()
 	m_useRasterPos = false;
 }
 
-CShape::~CShape()
+Shape::~Shape()
 {
 }
 
-void CShape::setPosition(double x, double y)
+void Shape::setPosition(double x, double y)
 {
 	m_pos[0] = x;
 	m_pos[1] = y;
 }
 
-void CShape::getPosition(double &x, double &y)
+void Shape::getPosition(double &x, double &y)
 {
 	x = m_pos[0];
 	y = m_pos[1];
 }
 
-void CShape::setRotation(double angle)
+void Shape::setRotation(double angle)
 {
 	m_rotation = angle;
 }
 
-double CShape::getRotation()
+double Shape::getRotation()
 {
 	return m_rotation;
 }
 
-void CShape::doBeginTransform()
+void Shape::doBeginTransform()
 {
 	if (!m_useRasterPos)
 	{
@@ -95,7 +97,7 @@ void CShape::doBeginTransform()
 	}
 }
 
-void CShape::doEndTransform()
+void Shape::doEndTransform()
 {
 	if (!m_useRasterPos)
 		glPopMatrix();
@@ -107,38 +109,40 @@ void CShape::doEndTransform()
 }
 
 
-void CShape::doMaterial()
+void Shape::doMaterial()
 {
 	if (m_color!=nullptr)
 		m_color->render();
 }
 
-void CShape::setColor(CColorPtr color)
+void Shape::setColor(ColorPtr color)
 {
 	m_color = color;
 }
 
-CColorPtr CShape::getColor()
+ColorPtr Shape::getColor()
 {
 	return m_color;
 }
 
-void CShape::setTexture(CTexturePtr texture)
+void Shape::setTexture(TexturePtr texture)
 {
 	m_texture = texture;
 }
 
-CTexture* CShape::getTexture()
+Texture* Shape::getTexture()
 {
 	return m_texture.get();
 }
 
-void CShape::setUseRasterPosition(bool flag)
+void Shape::setUseRasterPosition(bool flag)
 {
 	m_useRasterPos = flag;
 }
 
-bool CShape::getUseRasterPosition()
+bool Shape::getUseRasterPosition()
 {
 	return m_useRasterPos;
 }
+
+} // namespace ivf2d
