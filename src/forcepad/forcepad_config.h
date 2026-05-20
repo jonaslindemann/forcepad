@@ -26,11 +26,11 @@
 #define forcepad_config
 
 #define FORCEPAD_VERSION_MAJOR 2
-#define FORCEPAD_VERSION_MINOR 5
-#define FORCEPAD_VERSION_RELEASE 1
+#define FORCEPAD_VERSION_MINOR 6
+#define FORCEPAD_VERSION_RELEASE 0
 
-#define FORCEPAD_VERSION_STRING "ForcePAD version 2.5.1"
+#define FORCEPAD_VERSION_STRING "ForcePAD version 2.6.0 BETA"
 
-#define FORCEPAD_NAME "ForcePAD 2 - (2.5.1)"
+#define FORCEPAD_NAME "ForcePAD 2 - (2.6.0 BETA)"
 
 #endif

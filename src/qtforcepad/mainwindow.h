@@ -20,6 +20,7 @@ class QProgressBar;
 class MainWindow : public QMainWindow,
                    public fp::PVModeChangeEvent,
                    public fp::PVViewModeChangeEvent,
+                   public fp::PVViewModeErrorEvent,
                    public fp::PVModelLoadedEvent,
                    public fp::PVNewModelEvent,
                    public GSStatusMessageEvent,
@@ -37,6 +38,9 @@ public:
 
     // fp::PVViewModeChangeEvent
     void onViewModeChange(fp::PaintView::TViewMode oldMode, fp::PaintView::TViewMode newMode) override;
+
+    // fp::PVViewModeErrorEvent
+    void onViewModeError(fp::PaintView::TViewMode oldMode, fp::PaintView::TViewMode newMode) override;
 
     // fp::PVModelLoadedEvent
     void onModelLoaded() override;
@@ -100,7 +104,7 @@ private Q_SLOTS:
 
     // Right panel property controls
     void onStiffnessChanged(int value);
-    void onThicknessChanged(double value);
+    void onLineThicknessChanged(int value);
     void onForceMagnitudeChanged(double value);
     void onSizeChanged(int value);
     void onTransparencyChanged(int value);
@@ -134,6 +138,9 @@ private:
     QWidget* createPrincipalPropsWidget();
     QWidget* createMisesPropsWidget();
     QWidget* createDeflectionPropsWidget();
+    void syncViewModeUi(fp::PaintView::TViewMode mode);
+    void syncEditModeUi(fp::PaintView::TEditMode mode);
+    void restoreActionSubmodes();
     void setVisButton(QToolButton *active);
     void setActionModeButton(QToolButton *active);
 
@@ -194,7 +201,10 @@ private:
     // Sketch props
     QSlider        *m_stiffnessSlider{nullptr};
     QLabel         *m_stiffnessDisplay{nullptr};
-    QDoubleSpinBox *m_thicknessSpinBox{nullptr};
+    QSlider        *m_lineThicknessSlider{nullptr};
+    QLabel         *m_lineThicknessDisplay{nullptr};
+    fp::PaintView::TEditMode m_sketchEditMode{fp::PaintView::EM_DIRECT_BRUSH};
+    fp::PaintView::TEditMode m_physicsEditMode{fp::PaintView::EM_SELECT_BOX};
 
     // Physicks props
     QDoubleSpinBox *m_forceMagnitudeSpinBox{nullptr};

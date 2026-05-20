@@ -43,6 +43,19 @@ using namespace std;
 
 namespace fp {
 
+namespace {
+
+float stiffnessAlpha(double stiffness)
+{
+	if (stiffness < 0.0)
+		return 0.0f;
+	if (stiffness > 1.0)
+		return 1.0f;
+	return static_cast<float>(stiffness);
+}
+
+}
+
 FemGrid2::FemGrid2()
 {
 	m_showGrid = false;
@@ -1027,6 +1040,10 @@ void FemGrid2::drawMisesStress()
 
 	if ((m_displacements!=nullptr)&&(!m_results.empty()))
 	{
+		glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT | GL_CURRENT_BIT);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 		for (i=0; i<m_rows; i++)
 		{
 			for (j=0; j<m_cols; j++)
@@ -1038,8 +1055,9 @@ void FemGrid2::drawMisesStress()
 
 					this->getElement(i, j, value, ex, ey, topo);
 
+					const float alpha = stiffnessAlpha(m_grid(i, j));
 					glBegin(GL_QUADS);
-					glColor3f(r, g, b);
+					glColor4f(r, g, b, alpha);
 					for (l=0; l<4; l++)
 					{
 						dx = k*m_displacements[topo[l*2]];
@@ -1053,6 +1071,8 @@ void FemGrid2::drawMisesStress()
 				}
 			}
 		}
+
+		glPopAttrib();
 	}
 }
 
@@ -1068,8 +1088,9 @@ void FemGrid2::drawMisesStressSmooth()
 	double ey[4];
 	double value;
 
-	glPushAttrib(GL_ENABLE_BIT);
-	glDisable(GL_BLEND);
+	glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT | GL_CURRENT_BIT | GL_TEXTURE_BIT);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_TEXTURE_1D);
 	glBindTexture(GL_TEXTURE_1D, 13);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -1079,7 +1100,7 @@ void FemGrid2::drawMisesStressSmooth()
 	glTexParameteri (GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri (GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
 	glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 128, 0, GL_RGB, GL_UNSIGNED_BYTE, m_colorMapTex1D);
 
@@ -1096,7 +1117,9 @@ void FemGrid2::drawMisesStressSmooth()
 
 					this->getElement(i, j, value, ex, ey, topo);
 
+					const float alpha = stiffnessAlpha(m_grid(i, j));
 					glBegin(GL_QUADS);
+					glColor4f(1.0f, 1.0f, 1.0f, alpha);
 					for (l=0; l<4; l++)
 					{
 						switch (l) {
@@ -1117,7 +1140,7 @@ void FemGrid2::drawMisesStressSmooth()
 						if (false)
 						{
 							this->m_colorMap->getColor(sigm/this->m_maxMisesStressValue/m_upperMisesTreshold, r, g, b);
-							glColor3f(r, g, b);
+							glColor4f(r, g, b, alpha);
 						}
 						else
 						{

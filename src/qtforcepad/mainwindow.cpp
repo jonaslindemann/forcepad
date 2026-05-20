@@ -34,7 +34,32 @@
 #include <QSize>
 #include <QSvgRenderer>
 #include <QProgressBar>
+#include <QSignalBlocker>
 #include <QString>
+
+static QColor stiffnessColorForPercent(int percent)
+{
+    if (percent < 0)
+        percent = 0;
+    if (percent > 100)
+        percent = 100;
+
+    const int shade = 255 - (percent * 255 + 50) / 100;
+    return QColor(shade, shade, shade);
+}
+
+static QString textColorForBackground(const QColor &background)
+{
+    return background.lightness() < 128 ? "#fff" : "#111";
+}
+
+static QString stiffnessDisplayStyle(const QColor &background)
+{
+    return QString(
+        "font-size: 22px; font-weight: bold; color: %1;"
+        "background: %2; border: 1px solid #e5e5e5; border-radius: 4px;")
+        .arg(textColorForBackground(background), background.name());
+}
 
 // ---------------------------------------------------------------------------
 // Small helper: stiffness gradient widget shown at the bottom of sketch panel
@@ -52,8 +77,8 @@ protected:
     {
         QPainter p(this);
         QLinearGradient grad(0, 0, 0, height());
-        grad.setColorAt(0.0, Qt::white);
-        grad.setColorAt(1.0, QColor(0x1a, 0x1a, 0x1a));
+        grad.setColorAt(0.0, Qt::black);
+        grad.setColorAt(1.0, Qt::white);
         p.fillRect(rect(), grad);
         p.setPen(QColor(0x52, 0x52, 0x52));
         p.drawRect(rect().adjusted(0, 0, -1, -1));
@@ -207,6 +232,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     m_paintView->setModeChangeEvent(this);
     m_paintView->setViewModeChangeEvent(this);
+    m_paintView->setViewModeErrorEvent(this);
     m_paintView->setModelLoadedEvent(this);
     m_paintView->setNewModelEvent(this);
 
@@ -217,6 +243,7 @@ MainWindow::MainWindow(QWidget *parent)
     createCentralWidget();
     createStatusBar();
     applyStyleSheet();
+    m_paintView->setViewMode(fp::PaintView::VM_SKETCH);
 
     setWindowTitle("ForcePAD");
     resize(1280, 800);
@@ -239,6 +266,8 @@ void MainWindow::onModeChange(fp::PaintView::TEditMode /*oldMode*/, fp::PaintVie
     if (idx >= 0 && idx < static_cast<int>(sizeof(names) / sizeof(names[0])))
         m_statusMode->setText(QString("  Tool: %1").arg(names[idx]));
 
+    syncEditModeUi(newMode);
+
     // Leaving paste mode re-enables copy/cut; entering select mode does too
     if (newMode != fp::PaintView::EM_PASTE) {
         m_actCopy->setEnabled(true);
@@ -248,12 +277,32 @@ void MainWindow::onModeChange(fp::PaintView::TEditMode /*oldMode*/, fp::PaintVie
 
 void MainWindow::onViewModeChange(fp::PaintView::TViewMode /*oldMode*/, fp::PaintView::TViewMode newMode)
 {
+    syncViewModeUi(newMode);
+
     switch (newMode)
     {
-        case fp::PaintView::VM_SKETCH:  m_statusModel->setText("View: Sketch  ");  break;
-        case fp::PaintView::VM_PHYSICS: m_statusModel->setText("View: Physics  "); break;
-        case fp::PaintView::VM_ACTION:  m_statusModel->setText("View: Action  ");  break;
+        case fp::PaintView::VM_SKETCH:
+            m_statusModel->setText("View: Sketch  ");
+            m_paintView->setZoomResults(false);
+            if (m_btnZoom) m_btnZoom->setChecked(false);
+            m_paintView->setEditMode(m_sketchEditMode);
+            break;
+        case fp::PaintView::VM_PHYSICS:
+            m_statusModel->setText("View: Physics  ");
+            m_paintView->setZoomResults(false);
+            if (m_btnZoom) m_btnZoom->setChecked(false);
+            m_paintView->setEditMode(m_physicsEditMode);
+            break;
+        case fp::PaintView::VM_ACTION:
+            m_statusModel->setText("View: Action  ");
+            restoreActionSubmodes();
+            break;
     }
+}
+
+void MainWindow::onViewModeError(fp::PaintView::TViewMode oldMode, fp::PaintView::TViewMode /*newMode*/)
+{
+    syncViewModeUi(oldMode);
 }
 
 void MainWindow::onModelLoaded()
@@ -263,6 +312,66 @@ void MainWindow::onModelLoaded()
         m_btnSelfLoad->setChecked(m_paintView->getUseWeight());
 }
 void MainWindow::onNewModel()     { updateWindowTitle(); }
+
+void MainWindow::syncViewModeUi(fp::PaintView::TViewMode mode)
+{
+    const int index =
+        mode == fp::PaintView::VM_SKETCH  ? 0 :
+        mode == fp::PaintView::VM_PHYSICS ? 1 : 2;
+
+    if (m_modeTabBar && m_modeTabBar->currentIndex() != index)
+    {
+        QSignalBlocker blocker(m_modeTabBar);
+        m_modeTabBar->setCurrentIndex(index);
+    }
+
+    if (m_leftStack && m_leftStack->currentIndex() != index)
+        m_leftStack->setCurrentIndex(index);
+    if (m_rightStack && m_rightStack->currentIndex() != index)
+        m_rightStack->setCurrentIndex(index);
+}
+
+void MainWindow::syncEditModeUi(fp::PaintView::TEditMode mode)
+{
+    const int modeId = static_cast<int>(mode);
+    const int viewIndex = m_modeTabBar ? m_modeTabBar->currentIndex() : -1;
+
+    if (viewIndex == 0 && m_sketchBtnGroup)
+    {
+        if (auto *button = m_sketchBtnGroup->button(modeId))
+            button->setChecked(true);
+    }
+    else if (viewIndex == 1 && m_physicksBtnGroup)
+    {
+        if (auto *button = m_physicksBtnGroup->button(modeId))
+            button->setChecked(true);
+    }
+
+    if (viewIndex == 0 && m_sketchBtnGroup && m_sketchBtnGroup->button(modeId))
+        m_sketchEditMode = mode;
+    else if (viewIndex == 1 && m_physicksBtnGroup && m_physicksBtnGroup->button(modeId))
+        m_physicsEditMode = mode;
+}
+
+void MainWindow::restoreActionSubmodes()
+{
+    if (m_btnVisMises && m_btnVisMises->isChecked())
+        showStress();
+    else if (m_btnVisDisp && m_btnVisDisp->isChecked())
+        showDisplacement();
+    else if (m_btnVisStruct && m_btnVisStruct->isChecked())
+        showStructure();
+    else
+        showPrincipalStress();
+
+    if (m_btnMoveLoad && m_btnMoveLoad->isChecked())
+        setModeMoveLoad();
+    else
+        setModeRotateLoad();
+
+    if (m_btnZoom)
+        m_paintView->setZoomResults(m_btnZoom->isChecked());
+}
 
 void MainWindow::updateWindowTitle()
 {
@@ -361,27 +470,16 @@ bool MainWindow::onContinueCalc()
 
 void MainWindow::onModeTabChanged(int index)
 {
-    m_leftStack->setCurrentIndex(index);
-    m_rightStack->setCurrentIndex(index);
     switch (index)
     {
         case 0:
-            m_paintView->setZoomResults(false);
-            if (m_btnZoom) m_btnZoom->setChecked(false);
             m_paintView->setViewMode(fp::PaintView::VM_SKETCH);
-            m_paintView->setEditMode(fp::PaintView::EM_DIRECT_BRUSH);
             break;
         case 1:
-            m_paintView->setZoomResults(false);
-            if (m_btnZoom) m_btnZoom->setChecked(false);
             m_paintView->setViewMode(fp::PaintView::VM_PHYSICS);
-            m_paintView->setEditMode(fp::PaintView::EM_SELECT_BOX);
             break;
         case 2:
-            m_paintView->setViewMode(fp::PaintView::VM_PHYSICS);
-            m_paintView->execute();
-            showPrincipalStress();
-            setModeRotateLoad();
+            m_paintView->setViewMode(fp::PaintView::VM_ACTION);
             break;
     }
 }
@@ -519,9 +617,11 @@ void MainWindow::onStiffnessChanged(int value)
     m_paintView->setStiffness(value / 100.0);
 }
 
-void MainWindow::onThicknessChanged(double value)
+void MainWindow::onLineThicknessChanged(int value)
 {
-    m_paintView->setThickness(value);
+    m_paintView->setLineWidth(value);
+    if (m_lineThicknessDisplay)
+        m_lineThicknessDisplay->setText(QString("%1 px").arg(value));
 }
 
 void MainWindow::onForceMagnitudeChanged(double value)
@@ -807,8 +907,13 @@ QWidget* MainWindow::createSketchToolPanel()
     btnDraw->setChecked(true);
     btnExpand->setCheckable(false);
 
-    for (auto *b : {btnSelect, btnDraw, btnRect, btnEllipse, btnFill, btnLine, btnErase})
-        m_sketchBtnGroup->addButton(b);
+    m_sketchBtnGroup->addButton(btnSelect,  static_cast<int>(fp::PaintView::EM_SELECT_BOX));
+    m_sketchBtnGroup->addButton(btnDraw,    static_cast<int>(fp::PaintView::EM_DIRECT_BRUSH));
+    m_sketchBtnGroup->addButton(btnRect,    static_cast<int>(fp::PaintView::EM_RECTANGLE));
+    m_sketchBtnGroup->addButton(btnEllipse, static_cast<int>(fp::PaintView::EM_ELLIPSE));
+    m_sketchBtnGroup->addButton(btnFill,    static_cast<int>(fp::PaintView::EM_FLOODFILL));
+    m_sketchBtnGroup->addButton(btnLine,    static_cast<int>(fp::PaintView::EM_LINE));
+    m_sketchBtnGroup->addButton(btnErase,   static_cast<int>(fp::PaintView::EM_DIRECT_ERASE));
 
     connect(btnSelect,  &QToolButton::clicked, this, &MainWindow::setModeSelect);
     connect(btnDraw,    &QToolButton::clicked, this, &MainWindow::setModeDrawBeam);
@@ -852,8 +957,10 @@ QWidget* MainWindow::createPhysicksToolPanel()
     auto *btnRoller       = makeSvgToolBtn("icons/bc.svg", "Roller Support");
     auto *btnDeleteForceBc = makeSvgToolBtn("icons/delete_force_bc.svg", "Delete forces/bc");
 
-    for (auto *b : {btnSelect, btnForce, btnRoller, btnDeleteForceBc})
-        m_physicksBtnGroup->addButton(b);
+    m_physicksBtnGroup->addButton(btnSelect,        static_cast<int>(fp::PaintView::EM_SELECT_BOX));
+    m_physicksBtnGroup->addButton(btnForce,         static_cast<int>(fp::PaintView::EM_FORCE));
+    m_physicksBtnGroup->addButton(btnRoller,        static_cast<int>(fp::PaintView::EM_CONSTRAINT_VECTOR));
+    m_physicksBtnGroup->addButton(btnDeleteForceBc, static_cast<int>(fp::PaintView::EM_ERASE_CONSTRAINTS_FORCES));
 
     // Self-load toggle — not part of the exclusive mode group
     m_btnSelfLoad = makeSvgToolBtn("icons/dist_load.svg", "Self-loading (weight)");
@@ -948,18 +1055,14 @@ QWidget* MainWindow::createSketchPropsPanel()
     m_stiffnessDisplay = new QLabel("100%");
     m_stiffnessDisplay->setAlignment(Qt::AlignCenter);
     m_stiffnessDisplay->setFixedHeight(36);
-    m_stiffnessDisplay->setStyleSheet(
-        "font-size: 22px; font-weight: bold; color: #171717;"
-        "background: #f5f5f5; border: 1px solid #e5e5e5; border-radius: 4px;");
+    m_stiffnessDisplay->setStyleSheet(stiffnessDisplayStyle(stiffnessColorForPercent(100)));
     vbox->addWidget(m_stiffnessDisplay);
 
-    // Preset buttons: two rows of 5, 100→60 top, 50→10 bottom
-    struct Preset { int pct; QColor bg; };
+    // Preset buttons: two rows of 5, 100% black toward white for lower stiffness.
+    struct Preset { int pct; };
     static const Preset presets[] = {
-        {100, {0xff,0xff,0xff}}, { 90, {0xe0,0xe0,0xe0}}, { 80, {0xc0,0xc0,0xc0}},
-        { 70, {0xa0,0xa0,0xa0}}, { 60, {0x80,0x80,0x80}},
-        { 50, {0x60,0x60,0x60}}, { 40, {0x48,0x48,0x48}}, { 30, {0x33,0x33,0x33}},
-        { 20, {0x22,0x22,0x22}}, { 10, {0x1a,0x1a,0x1a}},
+        {100}, { 90}, { 80}, { 70}, { 60},
+        { 50}, { 40}, { 30}, { 20}, { 10},
     };
 
     auto *stiffGroup = new QButtonGroup(this);
@@ -971,16 +1074,16 @@ QWidget* MainWindow::createSketchPropsPanel()
         hbox->setContentsMargins(0, 0, 0, 0);
         for (int col = 0; col < 5; col++) {
             const auto &pr = presets[row * 5 + col];
+            const QColor bg = stiffnessColorForPercent(pr.pct);
             auto *btn = new QPushButton(QString::number(pr.pct) + "%");
             btn->setCheckable(true);
             btn->setFixedHeight(26);
-            const bool dark = pr.bg.lightness() < 128;
             btn->setStyleSheet(QString(
                 "QPushButton { background: %1; color: %2; border: 1px solid #bbb;"
                 "  border-radius: 3px; font-size: 9px; padding: 0; }"
                 "QPushButton:checked { border: 2px solid #2563eb; font-weight: bold; }"
                 "QPushButton:hover:!checked { border: 1px solid #6b9fe4; }"
-            ).arg(pr.bg.name(), dark ? "#fff" : "#111"));
+            ).arg(bg.name(), textColorForBackground(bg)));
             stiffGroup->addButton(btn);
             if (pr.pct == 100) btn->setChecked(true);
             const int pct = pr.pct;
@@ -989,6 +1092,7 @@ QWidget* MainWindow::createSketchPropsPanel()
                 m_stiffnessSlider->setValue(pct);
                 m_stiffnessSlider->blockSignals(false);
                 m_stiffnessDisplay->setText(QString::number(pct) + "%");
+                m_stiffnessDisplay->setStyleSheet(stiffnessDisplayStyle(stiffnessColorForPercent(pct)));
                 m_paintView->setStiffness(pct / 100.0);
             });
             hbox->addWidget(btn);
@@ -1002,6 +1106,7 @@ QWidget* MainWindow::createSketchPropsPanel()
     connect(m_stiffnessSlider, &QSlider::valueChanged, this, &MainWindow::onStiffnessChanged);
     connect(m_stiffnessSlider, &QSlider::valueChanged, this, [this](int v) {
         m_stiffnessDisplay->setText(QString::number(v) + "%");
+        m_stiffnessDisplay->setStyleSheet(stiffnessDisplayStyle(stiffnessColorForPercent(v)));
     });
     vbox->addWidget(m_stiffnessSlider);
 
@@ -1033,15 +1138,30 @@ QWidget* MainWindow::createSketchPropsPanel()
 
     vbox->addWidget(makeSeparator());
 
-    // --- Thickness ---
-    addSectionLabel("Thickness");
+    // --- Line Thickness ---
+    addSectionLabel("Line Thickness");
 
-    m_thicknessSpinBox = new QDoubleSpinBox;
-    m_thicknessSpinBox->setRange(0.1, 100.0);
-    m_thicknessSpinBox->setValue(1.0);
-    m_thicknessSpinBox->setSingleStep(0.5);
-    connect(m_thicknessSpinBox, &QDoubleSpinBox::valueChanged, this, &MainWindow::onThicknessChanged);
-    vbox->addWidget(m_thicknessSpinBox);
+    auto *lineThicknessRow = new QHBoxLayout;
+    lineThicknessRow->setSpacing(8);
+    lineThicknessRow->setContentsMargins(0, 0, 0, 0);
+
+    m_lineThicknessSlider = new QSlider(Qt::Horizontal);
+    m_lineThicknessSlider->setRange(1, 100);
+    m_lineThicknessSlider->setValue(m_paintView->getLineWidth());
+    m_lineThicknessSlider->setSingleStep(1);
+    m_lineThicknessSlider->setPageStep(10);
+
+    m_lineThicknessDisplay = new QLabel(QString("%1 px").arg(m_lineThicknessSlider->value()));
+    m_lineThicknessDisplay->setFixedWidth(44);
+    m_lineThicknessDisplay->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+
+    lineThicknessRow->addWidget(m_lineThicknessSlider, 1);
+    lineThicknessRow->addWidget(m_lineThicknessDisplay);
+    vbox->addLayout(lineThicknessRow);
+
+    connect(m_lineThicknessSlider, &QSlider::valueChanged,
+            this, &MainWindow::onLineThicknessChanged);
+    m_paintView->setLineWidth(m_lineThicknessSlider->value());
 
     vbox->addStretch();
     return panel;

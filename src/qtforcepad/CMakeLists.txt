@@ -25,9 +25,15 @@ set(HEADERS
 
 qt_add_executable(qtforcepad ${SOURCES} ${HEADERS})
 
+set(_about_logo "../../images/logo_1080.png")
+set_source_files_properties(${_about_logo}
+    PROPERTIES QT_RESOURCE_ALIAS "icons/logo_1080.png")
+
 qt_add_resources(qtforcepad "qtforcepad_resources"
     PREFIX "/"
-    FILES ../../images/splash.png
+    FILES
+        ../../images/splash.png
+        ${_about_logo}
 )
 
 set_target_properties(qtforcepad PROPERTIES DEBUG_POSTFIX d)

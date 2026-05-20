@@ -161,8 +161,8 @@ PaintView::PaintView(int x,int y,int w,int h,const char *l)
 	m_optVolfrac = 0.5;
 	m_optMinChange = 0.01;
 	m_optMaxLoops = 100;
-	m_optRmin = 2.75;
-	m_optFilterType = fp::FemGridSolver2::FT_SHARP_CONTOURING;
+	m_optRmin = 6.75;
+	m_optFilterType = fp::FemGridSolver2::FT_OLE_SIGMUND;
 
 	// Test OpenGL version
 
