@@ -1,7 +1,7 @@
 [Setup]
 AppName=ForcePAD
 AppVersion=2.6.0
-AppVerName=ForcePAD 2.6.0
+AppVerName=ForcePAD 2.6.0 BETA
 AppPublisher=Division of Structural Mechanics, LTH
 AppPublisherURL=https://www.byggmek.lth.se
 AppSupportURL=https://www.byggmek.lth.se
