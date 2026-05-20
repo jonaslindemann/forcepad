@@ -448,10 +448,10 @@ void QtPaintView::doDeleteCursors()
 
 void QtPaintView::doShowAbout()
 {
-    QDesktopServices::openUrl(QUrl("https://structarch.org/forcepad/documentation/"));
+    QDesktopServices::openUrl(QUrl("https://jonaslindemann.github.io/forcepad/"));
 }
 
 void QtPaintView::doShowHelp()
 {
-    QDesktopServices::openUrl(QUrl("https://structarch.org/forcepad/documentation/"));
+    QDesktopServices::openUrl(QUrl("https://jonaslindemann.github.io/forcepad/"));
 }
