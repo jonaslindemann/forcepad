@@ -1,7 +1,7 @@
 [Setup]
 AppName=ForcePAD
-AppVersion=2.6.b1
-AppVerName=ForcePAD 2.6.b1 BETA
+AppVersion=2.6.b2
+AppVerName=ForcePAD 2.6.b2 BETA
 AppPublisher=Division of Structural Mechanics, LTH
 AppPublisherURL=https://www.byggmek.lth.se
 AppSupportURL=https://www.byggmek.lth.se
@@ -13,7 +13,7 @@ UsePreviousGroup=no
 PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
 OutputDir=output
-OutputBaseFilename=ForcePAD-2.6.b1-setup
+OutputBaseFilename=ForcePAD-2.6.b2-setup
 Compression=lzma2/ultra64
 SolidCompression=yes
 WizardStyle=modern
@@ -25,6 +25,7 @@ ArchitecturesInstallIn64BitMode=x64compatible
 Name: desktopicon; Description: Create a &desktop icon; GroupDescription: Additional icons:
 
 [Files]
+Source: "vc_redist\VC_redist.x64.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall
 Source: "..\..\bin\release\qtforcepad.exe";  DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\bin\release\*.dll";           DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\bin\release\brushes\*";       DestDir: "{app}\brushes";   Flags: ignoreversion recursesubdirs createallsubdirs
@@ -39,4 +40,5 @@ Name: "{group}\ForcePAD 2";     Filename: "{app}\qtforcepad.exe"; WorkingDir: "{
 Name: "{userdesktop}\ForcePAD 2"; Filename: "{app}\qtforcepad.exe"; WorkingDir: "{app}"; Tasks: desktopicon
 
 [Run]
+Filename: "{tmp}\VC_redist.x64.exe"; Parameters: "/install /passive /quiet /norestart";
 Filename: "{app}\qtforcepad.exe"; WorkingDir: "{app}"; Description: "Launch ForcePAD"; Flags: nowait postinstall skipifsilent
