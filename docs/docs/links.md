@@ -8,7 +8,6 @@
 
 - [CALFEM](https://www.byggmek.lth.se/english/software/calfem/) — finite element toolbox used in ForcePAD's solver
 - [CALFEM for Python](https://github.com/CALFEM/calfem-python) — Python port of CALFEM
-- [FLTK — Fast Light Toolkit](https://www.fltk.org/) — UI framework for the `forcepad` target
 - [Qt](https://www.qt.io/) — UI framework for the `qtforcepad` target
 - [vcpkg](https://github.com/Microsoft/vcpkg) — C++ dependency manager used by the build
 

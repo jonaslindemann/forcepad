@@ -1,6 +1,6 @@
 //
 // ForcePAD - Educational Finite Element Software
-// Copyright (C) 2000-2014 Division of Structural Mecahnics, Lund University
+// Copyright (C) 2000-2026 Division of Structural Mecahnics, Lund University
 //
 // Written by Jonas Lindemann
 //
@@ -27,10 +27,10 @@
 
 #define FORCEPAD_VERSION_MAJOR 2
 #define FORCEPAD_VERSION_MINOR 6
-#define FORCEPAD_VERSION_RELEASE 0
+#define FORCEPAD_VERSION_RELEASE b3
 
-#define FORCEPAD_VERSION_STRING "ForcePAD version 2.6.0 BETA"
+#define FORCEPAD_VERSION_STRING "ForcePAD version 2.6.b3 BETA"
 
-#define FORCEPAD_NAME "ForcePAD 2 - (2.6.0 BETA)"
+#define FORCEPAD_NAME "ForcePAD 2 - (2.6.b3 BETA)"
 
 #endif

@@ -4,6 +4,9 @@
 #include "GeneralSettingsDialog.h"
 #include "AboutDialog.h"
 #include "OptimisationSettingsDialog.h"
+#include "QtLogSink.h"
+#include "../fplog/FPLog.h"
+#include <spdlog/spdlog.h>
 
 #include <QMenuBar>
 #include <QMenu>
@@ -36,6 +39,9 @@
 #include <QProgressBar>
 #include <QSignalBlocker>
 #include <QString>
+#include <QPlainTextEdit>
+#include <QSplitter>
+#include <QFont>
 
 static QColor stiffnessColorForPercent(int percent)
 {
@@ -243,6 +249,15 @@ MainWindow::MainWindow(QWidget *parent)
     createCentralWidget();
     createStatusBar();
     applyStyleSheet();
+
+    auto logSink = std::make_shared<QtLogSink>(m_logView);
+    logSink->set_level(spdlog::level::debug);
+    spdlog::default_logger()->sinks().push_back(logSink);
+    fp_info("MainWindow", "ForcePAD started");
+    fp_info("MainWindow", "Application version: {}", FORCEPAD_VERSION_STRING);
+    fp_info("MainWindow", "Compiled: {} {}", __TIME__, __DATE__);
+    fp_info("MainWindow", "Qt version: {}.{}.{}", QT_VERSION_MAJOR, QT_VERSION_MINOR, QT_VERSION_PATCH);
+
     m_paintView->setViewMode(fp::PaintView::VM_SKETCH);
 
     setWindowTitle("ForcePAD");
@@ -713,6 +728,21 @@ void MainWindow::helpAbout()
     dlg.exec();
 }
 
+void MainWindow::toggleLogPanel(bool checked)
+{
+    auto *logContainer = m_mainSplitter->widget(1);
+    if (checked) {
+        logContainer->show();
+        const int total = m_mainSplitter->height();
+        m_mainSplitter->setSizes({total - m_logPanelHeight, m_logPanelHeight});
+    } else {
+        const int h = m_mainSplitter->sizes().at(1);
+        if (h > 40)
+            m_logPanelHeight = h;
+        logContainer->hide();
+    }
+}
+
 // ---------------------------------------------------------------------------
 // UI setup — actions
 // ---------------------------------------------------------------------------
@@ -741,6 +771,9 @@ void MainWindow::createActions()
 
     m_actHelpDocumentation = new QAction("Documentation", this);
     m_actHelpAbout         = new QAction("About",         this);
+    m_actShowLog = new QAction("Show Log", this);
+    m_actShowLog->setCheckable(true);
+    m_actShowLog->setShortcut(Qt::CTRL | Qt::Key_L);
 
     connect(m_actNew,              &QAction::triggered, this, &MainWindow::fileNew);
     connect(m_actOpen,             &QAction::triggered, this, &MainWindow::fileOpen);
@@ -757,6 +790,7 @@ void MainWindow::createActions()
     connect(m_actSettingsGeneral,  &QAction::triggered, this, &MainWindow::settingsGeneral);
     connect(m_actHelpDocumentation,&QAction::triggered, this, &MainWindow::helpDocumentation);
     connect(m_actHelpAbout,        &QAction::triggered, this, &MainWindow::helpAbout);
+    connect(m_actShowLog,          &QAction::toggled,   this, &MainWindow::toggleLogPanel);
 }
 
 // ---------------------------------------------------------------------------
@@ -787,6 +821,9 @@ void MainWindow::createMenus()
 
     QMenu *helpMenu = menuBar()->addMenu("Help");
     helpMenu->addAction(m_actHelpDocumentation);
+    helpMenu->addSeparator();
+    helpMenu->addAction(m_actShowLog);
+    helpMenu->addSeparator();
     helpMenu->addAction(m_actHelpAbout);
 }
 
@@ -818,7 +855,16 @@ void MainWindow::createModeTabBar()
 void MainWindow::createCentralWidget()
 {
     auto *central = new QWidget(this);
-    auto *hbox = new QHBoxLayout(central);
+    auto *outerVBox = new QVBoxLayout(central);
+    outerVBox->setContentsMargins(0, 0, 0, 0);
+    outerVBox->setSpacing(0);
+
+    m_mainSplitter = new QSplitter(Qt::Vertical, central);
+    m_mainSplitter->setHandleWidth(3);
+
+    // ---- Top area: left panel + canvas + right panel ----
+    auto *topArea = new QWidget;
+    auto *hbox = new QHBoxLayout(topArea);
     hbox->setContentsMargins(0, 0, 0, 0);
     hbox->setSpacing(0);
 
@@ -876,6 +922,36 @@ void MainWindow::createCentralWidget()
 
     hbox->addWidget(splitter, 1);
 
+    m_mainSplitter->addWidget(topArea);
+
+    // ---- Log panel (hidden by default) ----
+    auto *logContainer = new QWidget;
+    logContainer->setObjectName("logPanel");
+    auto *logVBox = new QVBoxLayout(logContainer);
+    logVBox->setContentsMargins(0, 0, 0, 0);
+    logVBox->setSpacing(0);
+
+    auto *logTitle = new QLabel("  Log");
+    logTitle->setFixedHeight(26);
+    logTitle->setStyleSheet(
+        "font-weight: bold; font-size: 11px; color: #a3a3a3;"
+        "background: #1e1e1e; border-top: 1px solid #333; padding-left: 4px;");
+    logVBox->addWidget(logTitle);
+
+    m_logView = new QPlainTextEdit;
+    m_logView->setReadOnly(true);
+    m_logView->setFont(QFont("Consolas", 9));
+    m_logView->setStyleSheet(
+        "QPlainTextEdit { background: #111111; color: #d4d4d4; border: none; }");
+    m_logView->setMaximumBlockCount(4000);
+    logVBox->addWidget(m_logView);
+
+    m_mainSplitter->addWidget(logContainer);
+    m_mainSplitter->setCollapsible(0, false);
+    m_mainSplitter->setCollapsible(1, true);
+    logContainer->hide();
+
+    outerVBox->addWidget(m_mainSplitter);
     setCentralWidget(central);
 }
 

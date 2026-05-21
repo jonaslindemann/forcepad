@@ -4,19 +4,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-ForcePAD is an educational sketch-based finite element analysis tool. Users draw structural shapes with a brush, place forces and boundary conditions, and run a 2D FEM solver to see stress/displacement results. There are two UI code paths that must coexist: the original FLTK build and a Qt6 port in progress.
+ForcePAD is an educational sketch-based finite element analysis tool. Users draw structural shapes with a brush, place forces and boundary conditions, and run a 2D FEM solver to see stress/displacement results. The primary build is the Qt6 port (`qtforcepad`); the original FLTK build (`forcepad`) is kept but is not the default.
 
 ## Build
 
 The project uses CMake with vcpkg for dependency management. vcpkg is auto-detected at `E:/vcpkg`, `C:/vcpkg`, or `$VCPKG_ROOT`.
 
 ```bash
-# FLTK build (default)
+# Qt6 build (default)
 cmake -B build-debug
 cmake --build build-debug --config Debug
 
-# Qt6 build (opt-in)
-cmake -B build-debug -DBUILD_QT_APP=ON
+# FLTK build (legacy, opt-in)
+cmake -B build-debug -DBUILD_FLTK_APP=ON
 cmake --build build-debug --config Debug
 
 # Force rebuild of a single target (e.g. after CMakeLists changes)
@@ -38,11 +38,11 @@ The post-build step in `src/qtforcepad/CMakeLists.txt` copies Qt plugin director
 | `forcepad` | `src/forcepad/` | FLTK + OpenGL | *(none)* |
 | `qtforcepad` | `src/qtforcepad/` | Qt6 + QOpenGLWidget | `USE_QT`, `QT_NO_KEYWORDS` |
 
-Both targets share the same static libraries: `common`, `ivf2d`, `calfemcxx`, `newmat`.
+Both targets share the same static libraries: `common`, `ivf2d`, `calfem`, `fplog`.
 
-### The `CPaintView` bridge pattern
+### The `fp::PaintView` bridge pattern
 
-`CPaintView` (`src/forcepad/PaintView.h/cpp`) is the core logic class — ~3600 lines of framework-agnostic C++. It owns the FEM grid, brush/drawing state, OpenGL rendering, and event dispatch. It declares virtual methods for all UI interactions:
+`fp::PaintView` (`src/paintview/PaintView.h/cpp`) is the core logic class — ~3600 lines of framework-agnostic C++. It owns the FEM grid, brush/drawing state, OpenGL rendering, and event dispatch. It declares virtual methods for all UI interactions:
 
 ```cpp
 virtual int height(); virtual int width();
@@ -52,10 +52,10 @@ virtual bool doNewModel(int &w, int &h, int &initialStiffness);
 // etc.
 ```
 
-Each UI port provides a concrete subclass that inherits from both a framework widget and `CPaintView`:
+Each UI port provides a concrete subclass that inherits from both a framework widget and `fp::PaintView`:
 
-- **FLTK**: `CFlPaintView : public Fl_Gl_Window, public CPaintView` (`src/forcepad/FlPaintView.h/cpp`)
-- **Qt6**: `QtPaintView : public QOpenGLWidget, public CPaintView` (`src/qtforcepad/QtPaintView.h/cpp`)
+- **FLTK**: `FlPaintView : public Fl_Gl_Window, public fp::PaintView` (`src/forcepad/FlPaintView.h/cpp`)
+- **Qt6**: `QtPaintView : public QOpenGLWidget, public fp::PaintView` (`src/qtforcepad/QtPaintView.h/cpp`)
 
 When adding UI-specific behaviour to `PaintView.cpp`, guard it with `#ifndef USE_QT` / `#else`.
 
@@ -65,16 +65,34 @@ Contains the FEM data model and purely algorithmic code: `FemGrid2`, `Node`, `El
 
 **Important**: `FemGridSolver2.cpp` is excluded from the `common` library glob and compiled directly into each executable target. This is because it has framework-specific dependencies (`Fl::check()`/`QCoreApplication::processEvents()`) that differ between the FLTK and Qt builds. Do not add it back to the glob.
 
-`LogWindow.cpp` and other `Fl_*` files in `src/common/` are FLTK-specific and get pulled into `commond.lib`. They are harmless for the Qt build only so long as `FemGridSolver2.cpp` is excluded from `common` (otherwise `FemGridSolver2.obj` would reference `CLogWindow` and pull in FLTK symbols at Qt link time).
+`LogWindow.cpp` and other `Fl_*` files in `src/common/` are FLTK-specific and get pulled into `commond.lib`. They are harmless for the Qt build only so long as `FemGridSolver2.cpp` is excluded from `common` (otherwise `FemGridSolver2.obj` would reference `LogWindow` and pull in FLTK symbols at Qt link time).
 
 ### FEM solver
 
-`CFemGridSolver2` (`src/common/FemGridSolver2.h/cpp`) assembles and solves the 2D plane-stress FEM problem using `calfemcxx` (CALFEM C++ port) and `newmat` for matrix algebra. It also runs topology optimisation (Sigmund filter). It is compiled separately into each executable because of the `Fl::check()` / `QCoreApplication::processEvents()` difference.
+`fp::FemGridSolver2` (`src/common/FemGridSolver2.h/cpp`) assembles and solves the 2D plane-stress FEM problem using `calfem` (CALFEM C++ port) and Eigen for matrix algebra. It also runs topology optimisation (Sigmund filter). It is compiled separately into each executable because of the `Fl::check()` / `QCoreApplication::processEvents()` difference.
 
 ### FLTK dialogs
 
 All FLTK dialogs in `src/forcepad/` are generated by FLUID (Fast Light User Interface Designer) from `.fl` source files. **Edit the `.fl` file, not the generated `.h/.cpp`**. The generated pair has the same base name.
 
-### `so_print` logging
+### Logging: `fplog` library
 
-`so_print(context, message)` is a macro defined in `src/common/LogWindow.h` that routes to an FLTK log window. In Qt builds it is defined as a no-op in both `PaintView.cpp` and `FemGridSolver2.cpp` via `#ifdef USE_QT`. Do not add `#include "LogWindow.h"` to any file that is compiled into the Qt build without a corresponding `#ifndef USE_QT` guard.
+`src/fplog/` is a thin spdlog wrapper that works in both the FLTK and Qt builds.
+
+- **`FPLog.h`** exposes `fp_debug/fp_info/fp_warn/fp_error(ctx, fmt, ...)` macros (fmt-style) and a `FPLog::init()` function that wires up sinks.
+- **`FPLog.cpp`** sets up a console sink by default; callers can pass additional sinks (e.g. a Qt widget sink) to `FPLog::init()`.
+- **`so_print` compatibility**: `FPLog.h` defines `so_print(ctx, msg)` as `spdlog::info(...)` so legacy calls compile in both builds, but only when `LogWindow.h` hasn't already defined it. Include `FPLog.h` instead of `LogWindow.h` in any file shared between FLTK and Qt.
+
+**Qt log sink** (`src/qtforcepad/QtLogSink.h`): a `spdlog::sinks::base_sink` subclass that appends colour-coded messages to a `QPlainTextEdit` via `QMetaObject::invokeMethod(..., Qt::QueuedConnection)`, making it safe to call from the solver thread. It is instantiated in `MainWindow` and passed to `FPLog::init()` at startup.
+
+**Old pattern** (still present in `src/common/LogWindow.h` for the FLTK build): `so_print(context, message)` routes to an FLTK log window. Do not include `LogWindow.h` in files compiled into the Qt build without a `#ifndef USE_QT` guard.
+
+### FEM solver logging
+
+`FemGridSolver2.cpp` now includes `FPLog.h` and uses `fp_debug/fp_info/fp_warn` throughout instead of bare `so_print`. It also has a local `#define NOMINMAX` before `<windows.h>` on WIN32 to guard against the `min`/`max` macro conflict independently of the global CMake definition.
+
+### OpenMP and Eigen
+
+OpenMP is enabled via `find_package(OpenMP)` in the root `CMakeLists.txt` (optional — build succeeds without it). `OpenMP::OpenMP_CXX` is linked into `calfem`, `common`, and `qtforcepad`. Eigen detects the `-fopenmp` / `/openmp` flag via `_OPENMP` and parallelizes dense matrix products and some decompositions automatically — no source changes needed.
+
+**Windows/MSVC gotcha**: `<windows.h>` defines `min` and `max` as macros by default, which breaks `std::min`/`std::max` calls inside Eigen's `Parallelizer.h` when OpenMP is active. The root `CMakeLists.txt` defines `NOMINMAX` globally on Windows to prevent this. Do not remove it.

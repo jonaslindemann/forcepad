@@ -1,5 +1,6 @@
 [Setup]
 AppName=ForcePAD
+AppId={{26BA5D59-E5B8-4A71-BDA9-750E53EF5C0B}
 AppVersion=2.6.b2
 AppVerName=ForcePAD 2.6.b2 BETA
 AppPublisher=Division of Structural Mechanics, LTH
@@ -20,6 +21,8 @@ WizardStyle=modern
 MinVersion=10.0
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
+SignTool=signtool_lu
+SignedUninstaller=yes
 
 [Tasks]
 Name: desktopicon; Description: Create a &desktop icon; GroupDescription: Additional icons:

@@ -16,6 +16,8 @@ class QComboBox;
 class QPushButton;
 class QButtonGroup;
 class QProgressBar;
+class QPlainTextEdit;
+class QSplitter;
 
 class MainWindow : public QMainWindow,
                    public fp::PVModeChangeEvent,
@@ -70,6 +72,7 @@ private Q_SLOTS:
     void settingsGeneral();
     void helpDocumentation();
     void helpAbout();
+    void toggleLogPanel(bool checked);
 
     // Mode tab switching
     void onModeTabChanged(int index);
@@ -197,6 +200,7 @@ private:
     // Help actions
     QAction *m_actHelpDocumentation{nullptr};
     QAction *m_actHelpAbout{nullptr};
+    QAction *m_actShowLog{nullptr};
 
     // Sketch props
     QSlider        *m_stiffnessSlider{nullptr};
@@ -226,6 +230,11 @@ private:
 
     // Deflections page
     QSlider      *m_dispScaleSlider{nullptr};
+
+    // Log panel
+    QSplitter      *m_mainSplitter{nullptr};
+    QPlainTextEdit *m_logView{nullptr};
+    int             m_logPanelHeight{200};
 
     // Status bar labels
     QLabel *m_statusMode{nullptr};

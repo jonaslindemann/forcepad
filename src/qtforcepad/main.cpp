@@ -1,10 +1,19 @@
 #include <QApplication>
 #include <QStyleFactory>
 #include <QSurfaceFormat>
+
 #include "MainWindow.h"
+#include "FPLog.h"
 
 int main(int argc, char *argv[])
 {
+    FPLog::init();
+#ifdef NDEBUG
+    FPLog::setLevel(spdlog::level::info);
+#else
+    FPLog::setLevel(spdlog::level::debug);
+#endif
+
     // Must be set before QApplication is constructed
     QApplication::setHighDpiScaleFactorRoundingPolicy(
         Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);

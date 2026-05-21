@@ -15,5 +15,3 @@ ForcePAD operates in three main modes:
 - **Action mode** — visualize principal stresses, von Mises stresses, and displacements; run topology optimization.
 
 On this page you will find information on [downloading](download.md), [using](use.md), and [building](develop.md) ForcePAD.
-
-Test

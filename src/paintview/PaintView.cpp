@@ -1,6 +1,6 @@
 //
 // ForcePAD - Educational Finite Element Software
-// Copyright (C) 2000-2009 Division of Structural Mechanics, Lund University
+// Copyright (C) 2000-2026 Division of Structural Mechanics, Lund University
 //
 // Written by Jonas Lindemann
 //
@@ -27,13 +27,8 @@
 #include "FemGridSolver2.h"
 #ifndef USE_QT
 #include "MainFrame2.h"
-#include "LogWindow.h"
-#else
-#define so_print(a, b)  ((void)0)
-#define so_show()       ((void)0)
-#define so_println()    ((void)0)
-#define so_hide()       ((void)0)
 #endif
+#include "FPLog.h"
 #include "JpegImage.h"
 #include "PngImage.h"
 
@@ -44,9 +39,6 @@ using namespace std;
 #else
 #include <GL/glu.h>
 #endif
-
-//#include <FL/filename.H>
-//#include <FL/fl_draw.H>
 
 #include <fstream>
 #include <string>
@@ -104,7 +96,7 @@ class PaintView;
 
 PaintView::PaintView(int x,int y,int w,int h,const char *l)
 {
-	so_print("PaintView","PaintView(...)");
+	fp_debug("PaintView", "PaintView(...)");
 
 	m_lastSize[0] = 0;
 	m_lastSize[1] = 0;
@@ -303,7 +295,7 @@ PaintView::PaintView(int x,int y,int w,int h,const char *l)
 
 PaintView::~PaintView()
 {
-    so_print("PaintView","~CPaintViewidth()");
+    fp_debug("PaintView", "~CPaintViewidth()");
 	
 	// Do the usual cleanup
 	
@@ -557,19 +549,6 @@ void PaintView::onPush(int x, int y)
 	
 	if (m_editMode!=EM_RESULT)
         this->doRedraw();
-
-	/*
-	if (m_viewMode == VM_ACTION)
-	{
-		cout << "Zoom results:" << endl;
-		if (m_zoomResults)
-			m_zoomResults = false;
-		else
-			m_zoomResults = true;
-        this->flush();
-        this->doRedraw();
-	}
-	*/
 }
 
 
@@ -609,10 +588,6 @@ void PaintView::onDrag(int x, int y)
 #endif
 			{
 				// Update the position of the force
-
-				//m_femGrid->removePointForce(m_selectedForce);
-                //m_selectedForce->setPosition(x-m_drawingOffsetX, height()-y-m_drawingOffsetY);
-				//m_femGrid->addForce(m_selectedForce);
 
                 m_femGrid->moveForce(m_selectedForce, x-m_drawingOffsetX, height()-y-m_drawingOffsetY);
 
@@ -794,11 +769,6 @@ void PaintView::onDrag(int x, int y)
             height() - p2[1] - m_drawingOffsetY,
 			0
 			);
-		//updateUndoArea(
-		//	-m_current[0] - m_drawingOffsetX,
-        //	height() + m_current[1] - m_drawingOffsetY,
-		//	0
-		//	);
         this->doRedraw();
 		break;
 	case EM_LINE:
@@ -910,8 +880,7 @@ void PaintView::onDrag(int x, int y)
 		m_zoomPos[1] = m_zoomStart[1]-dy;
 
         this->doFlush();
-		//this->invalidate();
-        this->doRedraw();
+       this->doRedraw();
 	}
 }
 
@@ -988,7 +957,7 @@ void PaintView::onClear()
 
 void PaintView::onInitContext()
 {
-	so_print("PaintView", "onInitContext()");
+	fp_debug("PaintView", "onInitContext()");
 
 	if (m_checkOpenGL)
 	{
@@ -1277,10 +1246,6 @@ void PaintView::onDraw()
 		default:
 			if (m_zoomResults)
 			{
-				//m_femGrid->setPosition(m_drawingOffsetX+m_current[0]-m_drawingOffsetX, m_drawingOffsetY-m_current[1]+m_drawingOffsetY);
-				//glPushMatrix();
-				//glScalef(2.0f, 2.0f, 0.0f);
-
 				glMatrixMode(GL_PROJECTION);
 				glLoadIdentity();
                 glViewport(0,0,physicalWidth(),physicalHeight());
@@ -1309,10 +1274,6 @@ void PaintView::onDraw()
 
 		if (m_zoomResults)
 		{
-			//m_femGrid->setPosition(m_drawingOffsetX+m_current[0]-m_drawingOffsetX, m_drawingOffsetY-m_current[1]+m_drawingOffsetY);
-			//glPushMatrix();
-			//glScalef(2.0f, 2.0f, 0.0f);
-
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
             glViewport(0,0,physicalWidth(),physicalHeight());
@@ -1382,7 +1343,7 @@ void PaintView::onMove(int x, int y)
 
 void PaintView::loadBrushes()
 {
-	so_print("PaintView","loadBrushes()");
+	fp_debug("PaintView", "loadBrushes()");
 	
 	ivf2d::SgiImagePtr brush;
 	ivf2d::SgiImagePtr invertedBrush;
@@ -1433,9 +1394,8 @@ void PaintView::loadBrushes()
 	
 	brushName = brushPath+"rbrush4.rgb";	
 
-	std::cout << "Loading brushes from: " << brushPath << std::endl;
-
-	std::cout << "Loading brush: " << brushName << std::endl;
+	fp_info("PaintView", "Loading brushes from: {}", brushPath);
+	fp_info("PaintView", "Loading brush: {}", brushName);
 	
 	brush = ivf2d::SgiImage::create();
 	brush->setFileName(brushName.c_str());
@@ -1591,7 +1551,7 @@ void PaintView::loadBrushes()
 
 void PaintView::deleteBrushes()
 {
-	so_print("PaintView","deleteBrushes()");
+	fp_debug("PaintView", "deleteBrushes()");
 	
 	m_brushes.clear();
 	m_invertedBrushes.clear();
@@ -1602,28 +1562,28 @@ void PaintView::deleteBrushes()
 
 void PaintView::clearMesh()
 {
-    so_print("PaintView","clearMesh()");
+    fp_debug("PaintView", "clearMesh()");
 	m_femGrid->setShowGrid(false);
     this->doRedraw();
 }
 
 void PaintView::clearResults()
 {
-	so_print("PaintView", "clearResults()");
+	fp_debug("PaintView", "clearResults()");
 	m_femGrid->clearResults();
     this->doRedraw();
 }
 
 void PaintView::updateSelectionBox()
 {
-	so_print("PaintView", "updateSelectionBox()");
+	fp_debug("PaintView", "updateSelectionBox()");
 	m_selectionBox->setPosition(m_selectionStart[0]+m_drawingOffsetX, m_selectionStart[1]+m_drawingOffsetY);
 	m_selectionBox->setSize(m_selectionEnd[0]-m_selectionStart[0], m_selectionEnd[1]-m_selectionStart[1]);
 }
 
 void PaintView::resetUndoArea()
 {
-	so_print("PaintView", "resetUndoArea()");
+	fp_debug("PaintView", "resetUndoArea()");
 	m_undoStart[0] = 65000;
 	m_undoStart[1] = 65000;
 	m_undoEnd[0] = -65000;
@@ -1632,7 +1592,7 @@ void PaintView::resetUndoArea()
 
 void PaintView::updateUndo()
 {
-	so_print("PaintView", "updateUndo()");
+	fp_debug("PaintView", "updateUndo()");
 	int x1, y1, x2, y2;
 	
 	if (m_undoStart[0]==65000)
@@ -1675,7 +1635,7 @@ void PaintView::enableDrawing()
 
 void PaintView::updateModel()
 {
-	so_print("PaintView","updateModel()");
+	fp_debug("PaintView", "updateModel()");
 #ifndef USE_QT
 	if (m_mainFrame!=NULL)
 	{
@@ -1704,9 +1664,9 @@ void PaintView::deleteCursors()
 void PaintView::checkOpenGLVersion()
 {
 	m_checkOpenGL = false;
-	so_print("checkOpenGLVersion", (const char *)glGetString(GL_VENDOR));
-	so_print("checkOpenGLVersion", (const char *)glGetString(GL_RENDERER));
-	so_print("checkOpenGLVersion", (const char *)glGetString(GL_VERSION));
+	fp_debug("PaintView", "OpenGL vendor:   {}", (const char *)glGetString(GL_VENDOR));
+	fp_debug("PaintView", "OpenGL renderer: {}", (const char *)glGetString(GL_RENDERER));
+	fp_debug("PaintView", "OpenGL version:  {}", (const char *)glGetString(GL_VERSION));
 }
 
 /////////////////////////////////////////////////////////////
@@ -1735,7 +1695,7 @@ bool PaintView::execute()
 {
 	bool errors = true;
 	
-	so_print("PaintView","execute()");
+	fp_debug("PaintView", "execute()");
 	
 	//
 	// Initialize grid
@@ -1751,7 +1711,7 @@ bool PaintView::execute()
 	// Initiate solver
 	//
 
-	so_print("PaintView","\tInitiating solver.");
+	fp_info("PaintView", "starting FEM solve: {} elements", m_femGrid->getElementCount());
 
 	m_solver = fp::FemGridSolver2::create();
 	m_solver->setStatusMessageEvent(m_statusMessageEvent);
@@ -1773,43 +1733,44 @@ bool PaintView::execute()
 	// Execute calculation
 	//
 	
-	so_print("PaintView","\tExecuting solver.");
-	
+	fp_debug("PaintView", "solver running");
+
 	m_solver->execute();
-	
-	//
-	// Check for errors
-	//
-	
-	so_print("PaintView","\tChecking for errors.");
-	
+
 	switch (m_solver->getLastError()) {
 	case fp::FemGridSolver2::ET_NO_ERROR:
 		errors = false;
+		fp_info("PaintView", "solve complete");
 		break;
 	case fp::FemGridSolver2::ET_NO_ELEMENTS:
+		fp_warn("PaintView", "solve failed: no elements");
         doInfoMessage("No structure to solve.");
 		break;
 	case fp::FemGridSolver2::ET_NO_BCS:
+		fp_warn("PaintView", "solve failed: no boundary conditions");
         doInfoMessage("Add locks to structure.");
 		break;
 	case fp::FemGridSolver2::ET_NO_LOADS:
+		fp_warn("PaintView", "solve failed: no loads");
         doInfoMessage("No loads defined on structure.");
 		break;
 	case fp::FemGridSolver2::ET_UNSTABLE:
+		fp_warn("PaintView", "solve failed: structure unstable");
         doInfoMessage("Structure unstable. Try adding locks.");
 		break;
 	case fp::FemGridSolver2::ET_INVALID_MODEL:
+		fp_warn("PaintView", "solve failed: invalid model");
         doInfoMessage("Model invalid.");
 		break;
 	case fp::FemGridSolver2::ET_LOAD_OUTSIDE_AE:
+		fp_warn("PaintView", "solve failed: load outside structure");
         doInfoMessage("Loads defined outside structure.");
 		break;
 	case fp::FemGridSolver2::ET_BC_OUTSIDE_AE:
+		fp_warn("PaintView", "solve failed: boundary condition outside structure");
         doInfoMessage("Locks defined outside structure.");
 		break;
 	default:
-		
 		break;
 	}
 	
@@ -1817,10 +1778,10 @@ bool PaintView::execute()
 	// Clean up and redraw
 	//
 	
-	so_print("PaintView","\tDestroying solver.");
-	
+	fp_debug("PaintView", "solver done");
+
 	// delete solver;
-	
+
 	if (errors)
 	{
 		m_femGrid->setShowGrid(false);
@@ -1828,8 +1789,8 @@ bool PaintView::execute()
 	}
 	else
 		m_femGrid->setShowGrid(true);
-	
-	so_print("PaintView","\tRedraw.");
+
+	fp_debug("PaintView", "redraw");
 	
     this->doRedraw();
 
@@ -1840,7 +1801,7 @@ bool PaintView::executeOpt()
 {
 	bool errors = true;
 
-	so_print("PaintView","executeOpt()");
+	fp_debug("PaintView", "executeOpt()");
 
 	//
 	// Initialize grid
@@ -1868,7 +1829,7 @@ bool PaintView::executeOpt()
 	// Initiate solver
 	//
 
-	so_print("PaintView","\tInitiating solver.");
+	fp_info("PaintView", "starting topology optimisation: {} elements", m_femGrid->getElementCount());
 
 	m_solver = fp::FemGridSolver2::create();
 	m_solver->setStatusMessageEvent(m_statusMessageEvent);
@@ -1898,43 +1859,44 @@ bool PaintView::executeOpt()
 	// Execute calculation
 	//
 	
-	so_print("PaintView","\tExecuting solver.");
-	
+	fp_debug("PaintView", "optimiser running");
+
 	m_solver->executeOptimizer();
-	
-	//
-	// Check for errors
-	//
-	
-	so_print("PaintView","\tChecking for errors.");
-	
+
 	switch (m_solver->getLastError()) {
 	case fp::FemGridSolver2::ET_NO_ERROR:
 		errors = false;
+		fp_info("PaintView", "optimisation complete");
 		break;
 	case fp::FemGridSolver2::ET_NO_ELEMENTS:
+		fp_warn("PaintView", "optimisation failed: no elements");
         doInfoMessage("No structure to solve.");
 		break;
 	case fp::FemGridSolver2::ET_NO_BCS:
+		fp_warn("PaintView", "optimisation failed: no boundary conditions");
         doInfoMessage("Add locks to structure.");
 		break;
 	case fp::FemGridSolver2::ET_NO_LOADS:
+		fp_warn("PaintView", "optimisation failed: no loads");
         doInfoMessage("No loads defined on structure.");
 		break;
 	case fp::FemGridSolver2::ET_UNSTABLE:
+		fp_warn("PaintView", "optimisation failed: structure unstable");
         doInfoMessage("Structure unstable. Try adding locks.");
 		break;
 	case fp::FemGridSolver2::ET_INVALID_MODEL:
+		fp_warn("PaintView", "optimisation failed: invalid model");
         doInfoMessage("Model invalid.");
 		break;
 	case fp::FemGridSolver2::ET_LOAD_OUTSIDE_AE:
+		fp_warn("PaintView", "optimisation failed: load outside structure");
         doInfoMessage("Loads defined outside structure.");
 		break;
 	case fp::FemGridSolver2::ET_BC_OUTSIDE_AE:
+		fp_warn("PaintView", "optimisation failed: boundary condition outside structure");
         doInfoMessage("Locks defined outside structure.");
 		break;
 	default:
-		
 		break;
 	}
 	
@@ -1942,10 +1904,10 @@ bool PaintView::executeOpt()
 	// Clean up and redraw
 	//
 	
-	so_print("PaintView","\tDestroying solver.");
-	
+	fp_debug("PaintView", "solver done");
+
 	// delete solver;
-	
+
 	if (errors)
 	{
 		m_femGrid->setShowGrid(false);
@@ -1954,8 +1916,8 @@ bool PaintView::executeOpt()
 	}
 	else
 		m_femGrid->setShowDensity(false);
-	
-	so_print("PaintView","\tRedraw.");
+
+	fp_debug("PaintView", "redraw");
 	
     this->doRedraw();
 
@@ -1966,7 +1928,7 @@ void PaintView::newModel()
 {
 	disableDrawing();
 
-	so_print("PaintView","newModel()");
+	fp_debug("PaintView", "newModel()");
 	
     int width = 640;
     int height = 480;
@@ -2040,15 +2002,14 @@ void PaintView::executeCorba()
 void PaintView::openImage()
 {
 	disableDrawing();
-	
-	so_print("PaintView","openImage()");
-	
+
     std::string fname = this->doOpenDialog("Open image file", "*.*");
 
     m_danglingRelease = true;
-	
+
     if (fname!="")
 	{
+		fp_info("PaintView", "opening image: {}", fname);
 		bool jpegFile = false;
 		bool pngFile = false;
 		bool rgbFile = false;
@@ -2133,65 +2094,47 @@ void PaintView::openImage()
 
 void PaintView::saveModelAs()
 {
-	so_print("PaintView", "saveModelAs()");
-	
-	//
-	// Ask for file name
-	//
-
     std::string fname = this->doSaveDialog("Save forcepad model", "*.fp2", m_modelName);
 
     if (fname!="")
         this->setModelName(fname);
     else
         return;
-	
-	//
-	// Save file
-	//
-	
+
 	using namespace std;
 
 	m_femGrid->setUseWeight(m_useWeight);
-	
+
 	fstream f;
 	f.open(m_modelName.c_str(), ios::out);
 	m_femGrid->saveToStream(f);
 	f.close();
+
+	fp_info("PaintView", "saved model: {}", m_modelName);
 }
 
 void PaintView::saveModel()
 {
-	so_print("PaintView", "saveModel()");
-	
-	//
-	// Ask for file name
-	//
-
 	if (m_modelName=="noname.fp2")
 	{
         std::string fname = this->doSaveDialog("Save forcepad model", "*.fp2", m_modelName);
-		
+
         if (fname!="")
-		{
 			setModelName(fname);
-		}
 		else
 			return;
 	}
-	
-	//
-	// Save file
-	//
-	
+
 	using namespace std;
 
 	m_femGrid->setUseWeight(m_useWeight);
-	
+
 	fstream f;
 	f.open(m_modelName.c_str(), ios::out);
 	m_femGrid->saveToStream(f);
 	f.close();
+
+	fp_info("PaintView", "saved model: {}", m_modelName);
 }
 
 void PaintView::expandImage()
@@ -2336,8 +2279,7 @@ void PaintView::openModel(const std::string filename)
 	
 	disableDrawing();
 	
-	so_print("PaintView", "openModel()");
-	so_print("CPatinView", filename.c_str());
+	fp_info("PaintView", "opening model: {}", filename);
 	
 	m_danglingRelease = true;
 	
@@ -2385,15 +2327,14 @@ void PaintView::openModel()
 	
 	disableDrawing();
 	
-	so_print("PaintView", "openModel()");
-	
     std::string fname = doOpenDialog("Open forcepad model", "*.fp2");
 	m_danglingRelease = true;
-	
+
     if (fname!="")
 	{
 		setModelName(fname);
-		
+		fp_info("PaintView", "opening model: {}", fname);
+
 		m_drawing = ivf2d::Image::create(2);
 		m_drawing->setSize(640,480);
 		m_drawing->setChannels(4);
@@ -2433,7 +2374,7 @@ void PaintView::openModel()
 
 void PaintView::copy()
 {
-	so_print("PaintView", "copy()");
+	fp_debug("PaintView", "copy()");
 	int x1, y1, x2, y2;
 	
 	if (m_selectionStart[0]>m_selectionEnd[0])
@@ -2466,7 +2407,7 @@ void PaintView::copy()
 
 void PaintView::cut()
 {
-	so_print("PaintView", "cut()");
+	fp_debug("PaintView", "cut()");
 	int x1, y1, x2, y2;
 	
 	if (m_selectionStart[0]>m_selectionEnd[0])
@@ -2498,7 +2439,7 @@ void PaintView::cut()
 
 void PaintView::undo()
 {
-	so_print("PaintView", "undo()");
+	fp_debug("PaintView", "undo()");
 	
 	int x1, y1;
 	
@@ -2522,7 +2463,7 @@ void PaintView::undo()
 
 void PaintView::updateUndoArea(int x, int y, int brushSize)
 {
-	so_print("PaintView", "updateUndoArea()");
+	fp_debug("PaintView", "updateUndoArea()");
 
 	int xx, yy;
 
@@ -2594,7 +2535,7 @@ void PaintView::transferViewToImage()
 
 void PaintView::copyToWindows()
 {
-	so_print("PaintView", "copyToWindows()");
+	fp_debug("PaintView", "copyToWindows()");
 #ifdef WIN32
 	
 	// Extract copy area from selection 
@@ -2741,7 +2682,7 @@ void PaintView::copyToWindows()
 
 void PaintView::pasteFromWindows()
 {
-	so_print("PaintView", "pasteFromWindows()");
+	fp_debug("PaintView", "pasteFromWindows()");
 #ifdef WIN32
 	
 	HGLOBAL   hglb; 
@@ -3198,11 +3139,6 @@ void PaintView::setModelName(const std::string& modelName)
 	}
 }
 
-//const char* PaintView::getModelName()
-//{
-//	return m_modelName;
-//}
-
 void PaintView::setZoomResults(bool flag)
 {
 	m_zoomResults = flag;
@@ -3367,7 +3303,7 @@ void PaintView::setStressType(fp::FemGrid2::TStressType stressType)
 
 void PaintView::setColorMap(int index)
 {
-	so_print("PaintView", "setColorMap()");
+	fp_debug("PaintView", "setColorMap()");
 	if ((index>=1)&&(index<=17))
 	{
 		string filename = "";
@@ -3379,7 +3315,7 @@ void PaintView::setColorMap(int index)
 #else
 		string applicationExeLocation = this->m_argv[0];
 #endif
-		cout << "applicationExeLocation = " << applicationExeLocation << endl;
+		fp_debug("PaintView", "applicationExeLocation = {}", applicationExeLocation);
 #ifndef __APPLE__
 		int pos = applicationExeLocation.find_last_of("\\");
 		string applicationDir = applicationExeLocation.substr(0,pos);
@@ -3400,7 +3336,7 @@ void PaintView::setColorMap(int index)
 		else
 			filename = "colormaps/colormap" + filenameIndex + ".map";
 		
-		cout << "colormap filename = " << filename << endl;
+		fp_info("PaintView", "Colormap filename = {} loaded.", filename);
 		m_femGrid->getColorMap()->open(filename.c_str());
 		m_femGrid->updateColorMapTexture();
         this->doRedraw();

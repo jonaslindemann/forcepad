@@ -21,6 +21,7 @@
 // Comments and suggestions to jonas.lindemann@byggmek.lth.se
 
 #include "calfem.h"
+#include "FPLog.h"
 
 namespace calfem {
 
@@ -299,14 +300,10 @@ void spy(const SpMatrix &matrix)
 
     for (auto i = 0; i < rows; i++)
     {
+        std::string row;
         for (auto j = 0; j < cols; j++)
-        {
-            if (abs(matrix.coeff(i, j)) > 0.0)
-                std::cout << "o ";
-            else
-                std::cout << ". ";
-        }
-        std::cout << "\n";
+            row += (abs(matrix.coeff(i, j)) > 0.0) ? "o " : ". ";
+        fp_debug("calfem", "{}", row);
     }
 }
 
@@ -489,8 +486,8 @@ bool spsolveq(const SpMatrix &K, const ColVec &f, const IntColVec &bcDofs, const
     TripletList Ksyslist;
     TripletList Ksysflist;
 
-    std::cout << "K non zeros = " << K.nonZeros() << "\n";
-    std::cout << "K size = " << K.rows() << "\n";
+    fp_debug("spsolveq", "K non zeros = {}", K.nonZeros());
+    fp_debug("spsolveq", "K size = {}", K.rows());
 
     Ksyslist.reserve(K.nonZeros());
     Ksysflist.reserve(K.nonZeros());
@@ -535,15 +532,15 @@ bool spsolveq(const SpMatrix &K, const ColVec &f, const IntColVec &bcDofs, const
     Ksys.setFromTriplets(Ksyslist.begin(), Ksyslist.end());
     Ksysf.setFromTriplets(Ksysflist.begin(), Ksysflist.end());
 
-    std::cout << "Ksys non zeros = " << Ksys.nonZeros() << "\n";
-    std::cout << "Ksys size = " << Ksys.rows() << "\n";
+    fp_debug("spsolveq", "Ksys non zeros = {}", Ksys.nonZeros());
+    fp_debug("spsolveq", "Ksys size = {}", Ksys.rows());
 
     ColVec fsys(nFreeDofs);
 
     fsys = f(ind) - Ksysf * bcVals;
 
-    std::cout << fsys.maxCoeff() << "\n";
-    std::cout << f.maxCoeff() << "\n";
+    fp_debug("spsolveq", "fsys maxCoeff = {}", fsys.maxCoeff());
+    fp_debug("spsolveq", "f maxCoeff = {}", f.maxCoeff());
 
     // Eigen::SparseLU<SpMatrix> solver;
     Eigen::SimplicialLLT<SpMatrix> solver;
@@ -552,7 +549,7 @@ bool spsolveq(const SpMatrix &K, const ColVec &f, const IntColVec &bcDofs, const
 
     if (solver.info() != Eigen::Success)
     {
-        std::cout << "Solver failed.\n";
+        fp_error("spsolveq", "Solver failed.");
         return false;
     }
     Eigen::VectorXd asys = solver.solve(fsys);
@@ -605,8 +602,8 @@ bool SparseSolver::setup(const SpMatrix &K, const IntColVec &bcDofs, const ColVe
     m_Ksyslist.clear();
     m_Ksysflist.clear();
 
-    std::cout << "K non zeros = " << K.nonZeros() << "\n";
-    std::cout << "K size = " << K.rows() << "\n";
+    fp_debug("SparseSolver::setup", "K non zeros = {}", K.nonZeros());
+    fp_debug("SparseSolver::setup", "K size = {}", K.rows());
 
     m_Ksyslist.reserve(K.nonZeros());
     m_Ksysflist.reserve(K.nonZeros());
@@ -651,8 +648,8 @@ bool SparseSolver::setup(const SpMatrix &K, const IntColVec &bcDofs, const ColVe
     m_Ksys.setFromTriplets(m_Ksyslist.begin(), m_Ksyslist.end());
     m_Ksysf.setFromTriplets(m_Ksysflist.begin(), m_Ksysflist.end());
 
-    std::cout << "Ksys non zeros = " << m_Ksys.nonZeros() << "\n";
-    std::cout << "Ksys size = " << m_Ksys.rows() << "\n";
+    fp_debug("SparseSolver::setup", "Ksys non zeros = {}", m_Ksys.nonZeros());
+    fp_debug("SparseSolver::setup", "Ksys size = {}", m_Ksys.rows());
 
     return true;
 }
@@ -672,13 +669,13 @@ bool SparseSolver::solve(const ColVec &f, ColVec &a, ColVec &Q)
 
     m_fsys = f(m_ind) - m_Ksysf * (*m_bcVals);
 
-    std::cout << m_fsys.maxCoeff() << "\n";
-    std::cout << f.maxCoeff() << "\n";
+    fp_debug("SparseSolver::solve", "fsys maxCoeff = {}", m_fsys.maxCoeff());
+    fp_debug("SparseSolver::solve", "f maxCoeff = {}", f.maxCoeff());
 
     m_solver.compute(m_Ksys);
     if (m_solver.info() != Eigen::Success)
     {
-        std::cout << "Solver failed.\n";
+        fp_error("SparseSolver::solve", "Solver failed.");
         return false;
     }
     m_asys = m_solver.solve(m_fsys);
@@ -706,12 +703,11 @@ bool SparseSolver::recompute(const ColVec &f, ColVec &a, ColVec &Q)
 
     m_fsys = f(m_ind) - m_Ksysf * (*m_bcVals);
 
-    std::cout << m_fsys.maxCoeff() << "\n";
-    //std::cout << (*m_f).maxCoeff() << "\n";
+    fp_debug("SparseSolver::recompute", "fsys maxCoeff = {}", m_fsys.maxCoeff());
 
     if (m_solver.info() != Eigen::Success)
     {
-        std::cout << "Solver failed.\n";
+        fp_error("SparseSolver::recompute", "Solver failed.");
         return false;
     }
 

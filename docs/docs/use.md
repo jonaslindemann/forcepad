@@ -14,11 +14,13 @@ This page covers the overall interface, file handling, and calculation settings.
 
 When ForcePAD starts, the main workspace is displayed. The workspace is your drawing canvas where you build the structure by painting stiffness values. Black pixels represent full stiffness; white pixels represent no material.
 
-The interface is task-oriented: the **left toolbar** contains the main task categories (drawing tools, physics tools, result tools), and the **right toolbar** shows the tasks and properties for the currently selected category.
+The interface is task-oriented: the **left toolbar** contains the main task categories (drawing tools, physics tools, result tools), and the **right toolbar** shows the properties and settings for the currently selected category.
 
-Mode switching is done with the mode buttons in the **lower right corner** of the window:
+![ForcePAD](images/sketch-mode-1.png "ForcePAD main window")
 
-| Button | Mode |
+Mode switching is done using the tabs below the main menu bar. The three modes are Sketch, Physics, and Action.
+
+| Tab | Mode |
 | --- | --- |
 | Sketch | Draw/edit the structural shape |
 | Physics | Place forces and constraints |
@@ -27,6 +29,8 @@ Mode switching is done with the mode buttons in the **lower right corner** of th
 ## Creating a new model
 
 Select **File → New** to create a new model. A dialog appears where you can set the image size using sliders and provide an initial stiffness value for the canvas. Click **OK** to create the model or **Cancel** to abort.
+
+![ForcePAD](images/new-model-1.png "New model dialog")
 
 ## Saving and loading models
 

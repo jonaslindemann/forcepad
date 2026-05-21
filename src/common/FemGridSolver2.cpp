@@ -1,6 +1,6 @@
 //
 // ForcePAD - Educational Finite Element Software
-// Copyright (C) 2000-2008 Division of Structural Mecahnics, Lund University
+// Copyright (C) 2000-2026 Division of Structural Mecahnics, Lund University
 //
 // Written by Jonas Lindemann
 //
@@ -31,15 +31,11 @@
 #include "matlabgen.h"
 
 #ifndef USE_QT
-#include "LogWindow.h"
 #include <FL/Fl.h>
 #else
 #include <QCoreApplication>
-#define so_print(a, b)  ((void)0)
-#define so_show()       ((void)0)
-#define so_println()    ((void)0)
-#define so_hide()       ((void)0)
 #endif
+#include "FPLog.h"
 
 #include <set>
 #include <fstream>
@@ -54,7 +50,7 @@ namespace fp {
 
 FemGridSolver2::FemGridSolver2()
 {
-	so_print("FemGridSolver2","Constructed.");
+	fp_debug("FemGridSolver", "Constructor called.");
 	m_maxNodeValue = -1.0e300;
 	m_maxStressValue = -1.0e300;
 	m_maxMisesStressValue = -1.0e300;
@@ -93,7 +89,7 @@ FemGridSolver2::FemGridSolver2()
 
 FemGridSolver2::~FemGridSolver2()
 {
-	so_print("FemGridSolver2","Destroyed.");
+	fp_debug("FemGridSolver", "Destructor called.");
 }
 
 bool FemGridSolver2::continueCalc()
@@ -613,7 +609,7 @@ void FemGridSolver2::computeElementForces()
 
 	m_femGrid->averageNodeResults();
 
-	cout << "Max misses stress = " << m_maxMisesStressValue << endl;
+	fp_info("FemGridSolver", "Max mises stress = {}", m_maxMisesStressValue);
 }
 
 void FemGridSolver2::computeElementForcesOpt(calfem::Matrix& X, double penalty)
@@ -729,7 +725,7 @@ void FemGridSolver2::computeElementForcesOpt(calfem::Matrix& X, double penalty)
 
 	m_femGrid->averageNodeResults();
 
-	cout << "Max misses stress = " << m_maxMisesStressValue << endl;
+	fp_info("FemGridSolver (optimiser)", "Max mises stress = {}", m_maxMisesStressValue);
 }
 
 void FemGridSolver2::computeReactionForces(std::vector<Constraint*>& vectorConstraints)
@@ -997,7 +993,7 @@ void FemGridSolver2::executeOptimizer()
 	dC = calfem::Matrix::Zero(rows, cols);
 	L  = calfem::Matrix::Ones(rows, cols);
 
-	cout << "Sum L = " << L.sum() << endl;
+	fp_debug("FemGridSolver (optimiser)", "Sum L = {}", L.sum());
 
 	m_femGrid->copyGrid(X, volfrac);
 	m_femGrid->assignFieldFromImage(1, 1);
@@ -1017,7 +1013,7 @@ void FemGridSolver2::executeOptimizer()
 		clock_t t0 = clock();
 		nElements = this->assembleSystemOpt(Ktriplets, X, L, penalty);
 		clock_t t1 = clock();
-		std::cout << "Assemble system = " << t1-t0 << std::endl;
+		fp_debug("FemGridSolver (optimiser)", "Assemble system = {} ticks", t1 - t0);
 
 		if (nElements==0)
 		{
@@ -1074,22 +1070,22 @@ void FemGridSolver2::executeOptimizer()
 			return;
 		}
 		t1 = clock();
-		cout << "Equation system = " << t1-t0 << endl;
+		fp_debug("FemGridSolver (optimiser)", "Equation system = {} ticks", t1 - t0);
 
 		t0 = clock();
 		c = 0.0;
 		dC.setZero();
 
-		cout << "objectiveFunctionAndSensitivity()" << endl;
+		fp_debug("FemGridSolver (optimiser)", "Objective function and sensitivity.");
 		this->progressMessage("Objective function and sensitivity.", 60);
 		this->objectiveFunctionAndSensitivity(X, dC, L, m_optPenalty, c);
 		t1 = clock();
-		cout << "Objective function = " << t1-t0 << endl;
+		fp_debug("FemGridSolver (optimiser)", "Objective function = {} ticks", t1 - t0);
 
 		if (!this->continueCalc())
 			break;
 
-		cout << "sensitivityFilter1()" << endl;
+		fp_debug("FemGridSolver (optimiser)", "Applying sensitivity filter.");
 		this->progressMessage("Applying sensitivity filter.", 70);
 
 		calfem::Matrix dCnew;
@@ -1107,7 +1103,7 @@ void FemGridSolver2::executeOptimizer()
 				break;
 		}
 
-		cout << "optimalityCriteriaUpdate()" << endl;
+		fp_debug("FemGridSolver (optimiser)", "Design update.");
 		this->progressMessage("Design update.", 100);
 		calfem::Matrix Xnew = this->optimalityCriteriaUpdate(X, dC, L, volfrac, nElements);
 		calfem::Matrix Diff = Xnew - Xold;
@@ -1116,7 +1112,7 @@ void FemGridSolver2::executeOptimizer()
 
 		m_femGrid->assignField(0, X);
 
-		cout << "loop = " << loop << ", change = " << change << ", c = " << c << endl;
+		fp_info("FemGridSolver (optimiser)", "loop = {}, change = {}, c = {}", loop, change, c);
 	}
 
 	m_femGrid->assignGrid(X);
@@ -1125,7 +1121,7 @@ void FemGridSolver2::executeOptimizer()
 
 #ifdef WIN32
 	DWORD endTime = timeGetTime();
-	cout << "Total execution time (ms) = " << endTime - startTime << endl;
+	fp_info("FemGridSolver (optimiser)", "Total execution time = {} ms", endTime - startTime);
 #endif
 }
 
@@ -1407,7 +1403,7 @@ void FemGridSolver2::execute()
 
 #ifdef WIN32
 	DWORD endTime = timeGetTime();
-	cout << "Total execution time (ms) = " << endTime - startTime << endl;
+	fp_info("FemGridSolver", "Total execution time = {} ms", endTime - startTime);
 #endif
 
 	progressMessage("Finished.", 99);

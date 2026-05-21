@@ -6,25 +6,12 @@ The conceptual design is based on the same model as consumer image-editing appli
 
 ## Academic background
 
-ForcePAD has been used in structural mechanics education and research at Lund University. The application implements a plane-stress finite element solver built on the [CALFEM](https://www.byggmek.lth.se/english/software/calfem/) framework and the `newmat` matrix library.
+ForcePAD has been used in structural mechanics education and research at Lund University. The application implements a plane-stress finite element solver built on a C++ version of the CALFEM  framework and the `eigen` matrix library.
 
 As of version 2.4, ForcePAD also includes a topology optimizer based on the Sigmund filter, allowing automatic derivation of efficient structural shapes from an initial design domain.
 
 ## Implementation
 
-ForcePAD is a C++ application using OpenGL for hardware-accelerated rendering. The codebase supports two UI targets:
-
-| Target | Framework | Status |
-| --- | --- | --- |
-| `forcepad` | FLTK + OpenGL | Production |
-| `qtforcepad` | Qt6 + QOpenGLWidget | In development |
-
-Both targets share the same FEM solver and core libraries (`calfemcxx`, `newmat`, `ivf2d`).
-
-## Future development
-
-- Qt6 UI port — a fully cross-platform Qt6 build is in progress alongside the existing FLTK build.
-- Improved result visualization and export options.
-- Deeper integration with CALFEM for Python as a pre-processing tool for student workflows.
+ForcePAD is a C++ application using OpenGL for hardware-accelerated rendering. The user interface is built with the Qt framework, and the application is cross-platform, running on Windows, macOS, and Linux. The source code is available on GitHub under the GPL-2 License.
 
 Jonas Lindemann, 2026

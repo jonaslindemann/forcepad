@@ -8,7 +8,24 @@
       "Bash(cd /d c:/Users/Jonas/Development/forcepad)",
       "Bash(cmake -B build-debug -DBUILD_QT_APP=ON)",
       "Bash(cmake -B build-debug -DBUILD_QT_APP=ON -S c:/Users/Jonas/Development/forcepad)",
-      "Bash(cmake --build c:/Users/Jonas/Development/forcepad/build-debug --config Debug --target qtforcepad)"
+      "Bash(cmake --build c:/Users/Jonas/Development/forcepad/build-debug --config Debug --target qtforcepad)",
+      "Bash(ls -la \"e:\\\\\\\\Users\\\\\\\\Jonas\\\\\\\\Development\\\\\\\\forcepad\")",
+      "Bash(ls -la \"e:\\\\\\\\Users\\\\\\\\Jonas\\\\\\\\Development\\\\\\\\forcepad\\\\\\\\src\")",
+      "Bash(ls -la \"e:\\\\\\\\Users\\\\\\\\Jonas\\\\\\\\Development\\\\\\\\forcepad\\\\\\\\src\\\\\\\\common\")",
+      "Bash(ls -la \"e:\\\\\\\\Users\\\\\\\\Jonas\\\\\\\\Development\\\\\\\\forcepad\\\\\\\\src\\\\\\\\forcepad\")",
+      "Bash(ls -la \"e:\\\\\\\\Users\\\\\\\\Jonas\\\\\\\\Development\\\\\\\\forcepad\\\\\\\\src\\\\\\\\qtforcepad\")",
+      "Bash(ls -la \"e:\\\\\\\\Users\\\\\\\\Jonas\\\\\\\\Development\\\\\\\\forcepad\\\\\\\\src\\\\\\\\ivf2d\")",
+      "Bash(find \"e:\\\\\\\\Users\\\\\\\\Jonas\\\\\\\\Development\\\\\\\\forcepad\\\\\\\\src\" -name \"CMakeLists.txt\" -type f)",
+      "Bash(ls -la \"e:\\\\\\\\Users\\\\\\\\Jonas\\\\\\\\Development\\\\\\\\forcepad\\\\\\\\src\\\\\\\\calfem\")",
+      "Bash(grep -r \"spdlog\\\\|fmt\\\\|logging\\\\|LOG_\" \"e:\\\\\\\\Users\\\\\\\\Jonas\\\\\\\\Development\\\\\\\\forcepad\\\\\\\\src\" --include=\"*.h\" --include=\"*.cpp\")",
+      "Bash(grep -r \"USE_QT\\\\|QT_NO_KEYWORDS\" \"e:\\\\\\\\Users\\\\\\\\Jonas\\\\\\\\Development\\\\\\\\forcepad\\\\\\\\src\" --include=\"*.h\" --include=\"*.cpp\")",
+      "Bash(grep -r \"cout\\\\|stderr\\\\|printf\\\\|std::cerr\\\\|SPDLOG\\\\|std::fmt\" \"e:\\\\\\\\Users\\\\\\\\Jonas\\\\\\\\Development\\\\\\\\forcepad\\\\\\\\src\" --include=\"*.h\")",
+      "Bash(ls -la \"e:\\\\\\\\Users\\\\\\\\Jonas\\\\\\\\Development\\\\\\\\forcepad\\\\\\\\src\\\\\\\\paintview\")",
+      "Bash(find \"e:\\\\\\\\Users\\\\\\\\Jonas\\\\\\\\Development\\\\\\\\forcepad\" -name \"*config.h\" -o -name \"*Config.h\")",
+      "Bash(cmake -B build-debug)",
+      "Bash(cmake --build build-debug --config Debug --target qtforcepad)",
+      "Bash(cmake --build build-debug --config Debug --target calfem)",
+      "Bash(cmake --build build-debug --config Debug --target forcepad)"
     ]
   }
 }

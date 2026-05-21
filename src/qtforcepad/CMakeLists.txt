@@ -1,4 +1,4 @@
-include_directories(../paintview ../forcepad ../common ../ivf2d ../calfem ../defs)
+include_directories(../paintview ../forcepad ../common ../ivf2d ../calfem ../defs ../fplog)
 
 add_definitions(-DQT_NO_KEYWORDS -DUSE_QT)
 
@@ -13,6 +13,10 @@ set(SOURCES
     ../paintview/PaintView.cpp
     ../common/FemGridSolver2.cpp
 )
+
+if(WIN32)
+    list(APPEND SOURCES app.rc)
+endif()
 
 set(HEADERS
     MainWindow.h
@@ -36,7 +40,10 @@ qt_add_resources(qtforcepad "qtforcepad_resources"
         ${_about_logo}
 )
 
-set_target_properties(qtforcepad PROPERTIES DEBUG_POSTFIX d)
+set_target_properties(qtforcepad PROPERTIES
+    DEBUG_POSTFIX d
+    WIN32_EXECUTABLE $<NOT:$<CONFIG:Debug>>
+)
 
 target_link_libraries(qtforcepad PRIVATE
     Qt6::Core
@@ -48,12 +55,17 @@ target_link_libraries(qtforcepad PRIVATE
     common
     ivf2d
     calfem
+    fplog
     Eigen3::Eigen
     JPEG::JPEG
     PNG::PNG
     ZLIB::ZLIB
     OpenGL::GL
 )
+
+if(OpenMP_FOUND)
+    target_link_libraries(qtforcepad PRIVATE OpenMP::OpenMP_CXX)
+endif()
 
 if(WIN32)
     target_link_libraries(qtforcepad PRIVATE winmm comctl32 gdiplus)
