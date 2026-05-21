@@ -1,8 +1,8 @@
 [Setup]
 AppName=ForcePAD
 AppId={{26BA5D59-E5B8-4A71-BDA9-750E53EF5C0B}
-AppVersion=2.6.b2
-AppVerName=ForcePAD 2.6.b2 BETA
+AppVersion=2.6.b3
+AppVerName=ForcePAD 2.6.b3 BETA
 AppPublisher=Division of Structural Mechanics, LTH
 AppPublisherURL=https://www.byggmek.lth.se
 AppSupportURL=https://www.byggmek.lth.se
@@ -14,7 +14,7 @@ UsePreviousGroup=no
 PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
 OutputDir=output
-OutputBaseFilename=ForcePAD-2.6.b2-setup
+OutputBaseFilename=ForcePAD-2.6.b3-setup
 Compression=lzma2/ultra64
 SolidCompression=yes
 WizardStyle=modern
