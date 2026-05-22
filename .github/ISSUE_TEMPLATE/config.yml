@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: ForcePAD documentation
+    url: https://jonaslindemann.github.io/forcepad/
+    about: Read the user guide, examples, and build instructions.
+  - name: Latest release
+    url: https://github.com/jonaslindemann/forcepad/releases/latest
+    about: Download the newest published ForcePAD release.

@@ -1,6 +1,6 @@
 # About ForcePAD
 
-ForcePAD is a sketch-based finite element analysis tool developed at the Division of Structural Mechanics, Lund University, by Jonas Lindemann. The application is designed to make 2D structural analysis immediately accessible: users draw shapes with a pen tool, place forces and constraints with mouse clicks, and results are shown without delay.
+ForcePAD is a sketch-based finite element analysis tool developed at the Division of Structural Mechanics, Lund University, by Jonas Lindemann. The application is designed to make 2D structural analysis immediately accessible: users draw shapes with a pen tool, place forces and constraints with mouse clicks, and results are shown interactively.
 
 The conceptual design is based on the same model as consumer image-editing applications. This lowers the entry barrier for students and engineers exploring structural form and topology.
 
@@ -15,3 +15,15 @@ As of version 2.4, ForcePAD also includes a topology optimizer based on the Sigm
 ForcePAD is a C++ application using OpenGL for hardware-accelerated rendering. The user interface is built with the Qt framework, and the application is cross-platform, running on Windows, macOS, and Linux. The source code is available on GitHub under the GPL-2 License.
 
 Jonas Lindemann, 2026
+
+## Positioning
+
+ForcePAD is not intended to replace large general-purpose finite element packages. Its strength is interactive structural understanding: sketch a structure, change it quickly, and immediately see how the finite element result changes.
+
+Typical use cases include:
+
+- teaching finite element analysis and structural mechanics
+- exploring stress flow and deformation behaviour
+- demonstrating topology optimisation concepts
+- comparing support conditions and load paths
+- creating quick visual experiments before using heavier analysis tools

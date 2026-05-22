@@ -1,0 +1,25 @@
+name: Teaching or example request
+description: Request a sample model, lesson idea, or educational walkthrough.
+title: "[Example]: "
+labels: ["documentation", "examples"]
+body:
+  - type: textarea
+    id: topic
+    attributes:
+      label: Topic
+      description: What structural mechanics or FEM concept should the example explain?
+      placeholder: "Beam bending, stress concentration, topology optimisation, support conditions..."
+    validations:
+      required: true
+  - type: textarea
+    id: audience
+    attributes:
+      label: Audience
+      description: Who is this for?
+      placeholder: "Undergraduate students, classroom demo, self-study, research presentation..."
+  - type: textarea
+    id: assets
+    attributes:
+      label: Desired assets
+      description: What would make the example useful?
+      placeholder: "FP2 model, screenshots, worksheet, short video, expected result..."

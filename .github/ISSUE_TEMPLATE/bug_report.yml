@@ -1,0 +1,57 @@
+name: Bug report
+description: Report a reproducible problem in ForcePAD.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve ForcePAD. Please include enough detail for someone else to reproduce the issue.
+  - type: input
+    id: version
+    attributes:
+      label: ForcePAD version
+      description: Include the release version or commit hash.
+      placeholder: "2.6.b3, latest release, or commit hash"
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - Windows
+        - macOS
+        - Linux
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened?
+      description: Describe the problem clearly.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: List the exact steps needed to trigger the issue.
+      placeholder: |
+        1. Open ForcePAD
+        2. Create a new model
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: attachments
+    attributes:
+      label: Screenshots, model files, or logs
+      description: Attach `.fp2` files, screenshots, or relevant log output if possible.

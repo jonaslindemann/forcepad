@@ -1,6 +1,6 @@
 [project]
-site_name = "ForcePAD - A sketch-based finite element analysis tool"
-site_description = "ForcePAD is an educational sketch-based 2D finite element analysis application developed at Structural Mechanics at Lund University."
+site_name = "ForcePAD - Sketch-based finite element analysis"
+site_description = "ForcePAD is an open-source sketch-based finite element analysis tool for structural mechanics education, interactive FEA, stress visualization, deformation analysis, and topology optimisation."
 site_author = "Jonas Lindemann"
 site_url = "https://jonaslindemann.github.io/forcepad/"
 repo_url = "https://github.com/jonaslindemann/forcepad"
@@ -9,16 +9,22 @@ copyright = "Copyright &copy; 2026 Jonas Lindemann"
 nav = [
   { "Home" = "index.md" },
   { "Get Started" = [
+    { "Quick Start" = "quick-start.md" },
     { "About" = "about.md" },
     { "Download" = "download.md" },
+    { "Examples" = "examples.md" },
   ] },
   { "User Guide" = [
     { "Introduction" = "use.md" },
     { "Sketch Mode" = "sketch-mode.md" },
     { "Physics Mode" = "physics-mode.md" },
     { "Action Mode" = "action-mode.md" },
+    { "For Students" = "students.md" },
   ] },
   { "Project" = [
+    { "Videos" = "videos.md" },
+    { "Cite" = "cite.md" },
+    { "Roadmap" = "roadmap.md" },
     { "Develop" = "develop.md" },
     { "Links" = "links.md" },
     { "Contact" = "contact.md" },

@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use ForcePAD in teaching, research, or publications, please cite it using this metadata."
+title: "ForcePAD: Sketch-Based Finite Element Analysis Software"
+authors:
+  - family-names: Lindemann
+    given-names: Jonas
+    affiliation: "Division of Structural Mechanics, Lund University"
+abstract: "ForcePAD is an open-source sketch-based 2D finite element analysis tool for structural mechanics education and experimentation."
+license: GPL-2.0-or-later
+repository-code: "https://github.com/jonaslindemann/forcepad"
+url: "https://jonaslindemann.github.io/forcepad/"
+version: "2.6.b3"
+keywords:
+  - finite element analysis
+  - FEA
+  - structural analysis
+  - structural mechanics
+  - educational FEM
+  - topology optimisation
+  - open-source software
