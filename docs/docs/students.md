@@ -68,8 +68,3 @@ What to look for:
 - Which regions are removed?
 - Which material paths remain?
 - How does the result change when the volume fraction changes?
-
-## Teacher Notes to Add
-
-!!! note "Teaching material placeholder"
-    Add downloadable worksheets, expected screenshots, and short explanation notes for each experiment. A useful first set would be a 30 minute lab exercise and a 90 minute classroom activity.
