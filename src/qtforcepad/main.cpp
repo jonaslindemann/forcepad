@@ -1,9 +1,29 @@
 #include <QApplication>
+#include <QFileInfo>
 #include <QStyleFactory>
 #include <QSurfaceFormat>
 
 #include "MainWindow.h"
 #include "FPLog.h"
+
+static QString startupModelPath(const QStringList &arguments)
+{
+    for (int i = 1; i < arguments.size(); ++i)
+    {
+        const QString &argument = arguments.at(i);
+        if (argument.startsWith('-'))
+            continue;
+
+        QFileInfo fileInfo(argument);
+        if (fileInfo.exists() && fileInfo.isFile())
+            return fileInfo.absoluteFilePath();
+
+        fp_warn("main", "Ignoring missing command-line model: {}", argument.toStdString());
+        break;
+    }
+
+    return {};
+}
 
 int main(int argc, char *argv[])
 {
@@ -43,6 +63,10 @@ int main(int argc, char *argv[])
     MainWindow w;
     w.paintView()->setCommandLine(argc, argv);
     w.show();
+
+    const QString modelPath = startupModelPath(app.arguments());
+    if (!modelPath.isEmpty())
+        w.paintView()->openModel(modelPath.toStdString());
 
     return app.exec();
 }
