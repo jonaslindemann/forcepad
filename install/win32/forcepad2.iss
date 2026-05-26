@@ -1,5 +1,5 @@
 #define MyAppName "ForcePAD2"
-#define MyAppVersion "2.6.b4"
+#define MyAppVersion "2.6.0"
 #define MyAppPublisher "Division of Structural Mechanics"
 #define MyAppURL "https://jonaslindemann.github.io/forcepad/"
 #define MyAppExeName "qtforcepad.exe"
@@ -11,7 +11,7 @@
 AppName={#MyAppName}
 AppId={{26BA5D59-E5B8-4A71-BDA9-750E53EF5C0B}
 AppVersion={#MyAppVersion}
-;AppVerName=ForcePAD 2.6.b3 BETA
+;AppVerName=ForcePAD 2.6.0 BETA
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
@@ -55,8 +55,8 @@ Root: HKA; Subkey: "Software\Classes\{#MyAppAssocKey}\shell\open\command"; Value
 Root: HKA; Subkey: "Software\Classes\Applications\{#MyAppExeName}\SupportedTypes"; ValueType: string; ValueName: ".myp"; ValueData: ""
 
 [Icons]
-Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
-Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+Name: "{autoprograms}\ForcePAD 2"; Filename: "{app}\{#MyAppExeName}"
+Name: "{autodesktop}\ForcePAD 2"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
 Filename: "{tmp}\VC_redist.x64.exe"; Parameters: "/install /passive /quiet /norestart";

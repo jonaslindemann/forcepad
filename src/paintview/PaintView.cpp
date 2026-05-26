@@ -272,6 +272,7 @@ PaintView::PaintView(int x,int y,int w,int h,const char *l)
 	// Create dialogs
 	
 	m_selectedForce = nullptr;
+	m_selectedConstraint = nullptr;
 	m_newConstraint = nullptr;
 
 	m_modeChangeEvent = NULL;
@@ -451,10 +452,19 @@ void PaintView::onPush(int x, int y)
 	switch (m_editMode) {
 	case EM_DYNAMIC_FORCE_UPDATE:
 		
-		// Rotate existing force
+		// Select existing force or constraint.
 
 		if (!m_zoomResults)
-            m_selectedForce = m_femGrid->getNearestForce(x-m_drawingOffsetX, height()-y-m_drawingOffsetY);
+		{
+			m_selectedForce = m_femGrid->getNearestForce(x-m_drawingOffsetX, height()-y-m_drawingOffsetY);
+			m_selectedConstraint = nullptr;
+			if (m_selectedForce==NULL)
+				m_selectedConstraint = m_femGrid->getNearestConstraint(
+					x-m_drawingOffsetX,
+					height()-y-m_drawingOffsetY,
+					!m_moveLoad
+				);
+		}
 		break;
 	case EM_CONSTRAINT:
 		
@@ -602,6 +612,27 @@ void PaintView::onDrag(int x, int y)
 			m_solver->executeUpdate();
             this->doFlush();
             this->doRedraw();
+		}
+		else if (m_selectedConstraint!=NULL && m_moveLoad)
+		{
+			m_femGrid->moveConstraint(m_selectedConstraint, x-m_drawingOffsetX, height()-y-m_drawingOffsetY);
+			this->execute();
+            this->doFlush();
+            this->doRedraw();
+		}
+		else if (m_selectedConstraint!=NULL)
+		{
+			double cx, cy;
+			m_selectedConstraint->getPosition(cx, cy);
+			double ex = cx - (x-m_drawingOffsetX);
+			double ey = cy - (height()-y-m_drawingOffsetY);
+			if (sqrt(pow(ex, 2) + pow(ey, 2)) > 0.0)
+			{
+				m_selectedConstraint->setDirection(ex, ey);
+				this->execute();
+                this->doFlush();
+                this->doRedraw();
+			}
 		}
 
 		break;
@@ -895,6 +926,7 @@ void PaintView::onRelease(int x, int y)
 	m_leftMouseDown = false;
 	//m_zoomResults = false;
 	m_selectedForce = nullptr;
+	m_selectedConstraint = nullptr;
 	
 	updateCursor();
 	
@@ -3252,6 +3284,11 @@ void PaintView::setViewMode(TViewMode mode)
 
 		break;
 	}
+}
+
+PaintView::TViewMode PaintView::getViewMode() const
+{
+	return m_viewMode;
 }
 
 void PaintView::setDrawStress(bool flag)

@@ -176,9 +176,11 @@ public:
 	void removePointConstraint(Constraint* constraint);
 	void removePointForce(Force* force);
 	void moveForce(Force* force, int x, int y);
+	void moveConstraint(Constraint* constraint, int x, int y);
 	void getConstraints(int x1, int y1, int x2, int y2, ConstraintSelection* selection);
 	void getForces(int x1, int y1, int x2, int y2, ForceSelection* selection);
 	Force* getNearestForce(int x, int y);
+	Constraint* getNearestConstraint(int x, int y, bool directionalOnly = false);
 	void calcCenterOfGravity(int &x, int &y);
 	void setMaxNegStressValue(double value);
 	void setMaxPosStressValue(double value);

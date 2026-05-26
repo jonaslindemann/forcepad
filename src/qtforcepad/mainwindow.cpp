@@ -739,7 +739,11 @@ void MainWindow::setViewAction()  { m_paintView->setViewMode(fp::PaintView::VM_A
 void MainWindow::settingsCalc()
 {
     CalcSettingsDialog dlg(m_paintView, this);
-    dlg.exec();
+    if (dlg.exec() == QDialog::Accepted &&
+        m_paintView->getViewMode() == fp::PaintView::VM_ACTION)
+    {
+        m_paintView->execute();
+    }
 }
 
 void MainWindow::settingsGeneral()

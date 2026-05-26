@@ -227,10 +227,11 @@ protected:
     fp::RulerPtr m_ruler;
 
     /*
-     *    Dynamic force update variables
+     *    Dynamic action update variables
      */
 
     fp::Force* m_selectedForce;
+    fp::Constraint* m_selectedConstraint;
 
     /*
      *    Rigid body tools
@@ -411,6 +412,7 @@ public:
     // Application modes
 
     void setViewMode(TViewMode mode);
+    TViewMode getViewMode() const;
     void setEditMode(TEditMode mode);
     TEditMode getEditMode();
     void setImportMode(TImportMode mode);

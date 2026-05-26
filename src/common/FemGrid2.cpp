@@ -1907,6 +1907,40 @@ Force* FemGrid2::getNearestForce(int x, int y)
 	return nearestForce;
 }
 
+Constraint* FemGrid2::getNearestConstraint(int x, int y, bool directionalOnly)
+{
+	auto selection = ConstraintSelection::create();
+	this->getConstraints(x-20, y-20, x+20, y+20, selection.get());
+
+	if (selection->getSize()==0)
+		return nullptr;
+
+	double minDist = 1e300;
+	double xc, yc;
+	Constraint* nearestConstraint = nullptr;
+
+	for (int i=0; i<selection->getSize(); i++)
+	{
+		Constraint* constraint = selection->getConstraint(i);
+		if (directionalOnly &&
+			constraint->getConstraintType()!=Constraint::CT_VECTOR &&
+			constraint->getConstraintType()!=Constraint::CT_HINGE)
+		{
+			continue;
+		}
+
+		constraint->getPosition(xc, yc);
+		double dist = sqrt(pow(xc - (double)x, 2) + pow(yc - (double)y, 2));
+		if (dist<minDist)
+		{
+			nearestConstraint = constraint;
+			minDist = dist;
+		}
+	}
+
+	return nearestConstraint;
+}
+
 void FemGrid2::getForces(int x1, int y1, int x2, int y2, ForceSelection *selection)
 {
 	int i;
@@ -2022,6 +2056,44 @@ void FemGrid2::moveForce(Force* force, int x, int y)
 	{
 		holdForce->setPosition((double)x, (double)y);
 		m_pointForces[(int)y].push_back(holdForce);
+	}
+}
+
+void FemGrid2::moveConstraint(Constraint* constraint, int x, int y)
+{
+	double cx, cy;
+	int cys;
+
+	constraint->getPosition(cx, cy);
+	cys = (int)cy;
+
+	ConstraintPtr holdConstraint;
+	CConstraintQueIter eraseIt = m_pointConstraints[cys].end();
+
+	for (auto ci = m_pointConstraints[cys].begin(); ci != m_pointConstraints[cys].end(); ++ci)
+	{
+		if ((*ci).get() == constraint)
+		{
+			holdConstraint = *ci;
+			eraseIt = ci;
+			break;
+		}
+	}
+
+	if (!holdConstraint || eraseIt == m_pointConstraints[cys].end())
+		return;
+
+	m_pointConstraints[cys].erase(eraseIt);
+
+	if ((int)y>=(int)m_pointConstraints.size())
+	{
+		holdConstraint->setPosition((double)x, (double)(m_pointConstraints.size()-1));
+		m_pointConstraints.back().push_back(holdConstraint);
+	}
+	else
+	{
+		holdConstraint->setPosition((double)x, (double)y);
+		m_pointConstraints[(int)y].push_back(holdConstraint);
 	}
 }
 
