@@ -1,20 +1,29 @@
+#define MyAppName "ForcePAD2"
+#define MyAppVersion "2.6.b4"
+#define MyAppPublisher "Division of Structural Mechanics"
+#define MyAppURL "https://jonaslindemann.github.io/forcepad/"
+#define MyAppExeName "qtforcepad.exe"
+#define MyAppAssocName MyAppName + " File"
+#define MyAppAssocExt ".fp2"
+#define MyAppAssocKey StringChange(MyAppAssocName, " ", "") + MyAppAssocExt
+
 [Setup]
-AppName=ForcePAD
+AppName={#MyAppName}
 AppId={{26BA5D59-E5B8-4A71-BDA9-750E53EF5C0B}
-AppVersion=2.6.b3
-AppVerName=ForcePAD 2.6.b3 BETA
-AppPublisher=Division of Structural Mechanics, LTH
-AppPublisherURL=https://www.byggmek.lth.se
-AppSupportURL=https://www.byggmek.lth.se
-AppUpdatesURL=https://www.byggmek.lth.se
-DefaultDirName={autopf}\Structural Mechanics\ForcePAD2
+AppVersion={#MyAppVersion}
+;AppVerName=ForcePAD 2.6.b3 BETA
+AppPublisher={#MyAppPublisher}
+AppPublisherURL={#MyAppURL}
+AppSupportURL={#MyAppURL}
+AppUpdatesURL={#MyAppURL}
+DefaultDirName={autopf}\Structural Mechanics\{#MyAppName}
 DefaultGroupName=Structural Mechanics
 UsePreviousAppDir=no
 UsePreviousGroup=no
 PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
 OutputDir=output
-OutputBaseFilename=ForcePAD-2.6.b3-setup
+OutputBaseFilename={#MyAppName}-{#MyAppVersion}-setup-signed
 Compression=lzma2/ultra64
 SolidCompression=yes
 WizardStyle=modern
@@ -29,8 +38,8 @@ Name: desktopicon; Description: Create a &desktop icon; GroupDescription: Additi
 
 [Files]
 Source: "vc_redist\VC_redist.x64.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall
-Source: "..\..\bin\release\qtforcepad.exe";  DestDir: "{app}"; Flags: ignoreversion
-Source: "..\..\bin\release\*.dll";           DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\bin\release\{#MyAppExeName}";  DestDir: "{app}"; Flags: ignoreversion signonce
+Source: "..\..\bin\release\*.dll";           DestDir: "{app}"; Flags: ignoreversion signonce
 Source: "..\..\bin\release\brushes\*";       DestDir: "{app}\brushes";   Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\..\bin\release\samples\*";       DestDir: "{app}\samples";   Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\..\bin\release\colormaps\*";     DestDir: "{app}\colormaps"; Flags: ignoreversion recursesubdirs createallsubdirs
@@ -38,10 +47,17 @@ Source: "..\..\bin\release\icons\*";         DestDir: "{app}\icons";     Flags: 
 Source: "..\..\bin\release\platforms\*";     DestDir: "{app}\platforms"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\..\bin\release\styles\*";        DestDir: "{app}\styles";    Flags: ignoreversion recursesubdirs createallsubdirs
 
+[Registry]
+Root: HKA; Subkey: "Software\Classes\{#MyAppAssocExt}\OpenWithProgids"; ValueType: string; ValueName: "{#MyAppAssocKey}"; ValueData: ""; Flags: uninsdeletevalue
+Root: HKA; Subkey: "Software\Classes\{#MyAppAssocKey}"; ValueType: string; ValueName: ""; ValueData: "{#MyAppAssocName}"; Flags: uninsdeletekey
+Root: HKA; Subkey: "Software\Classes\{#MyAppAssocKey}\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\{#MyAppExeName},0"
+Root: HKA; Subkey: "Software\Classes\{#MyAppAssocKey}\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""
+Root: HKA; Subkey: "Software\Classes\Applications\{#MyAppExeName}\SupportedTypes"; ValueType: string; ValueName: ".myp"; ValueData: ""
+
 [Icons]
-Name: "{group}\ForcePAD 2";     Filename: "{app}\qtforcepad.exe"; WorkingDir: "{app}"
-Name: "{userdesktop}\ForcePAD 2"; Filename: "{app}\qtforcepad.exe"; WorkingDir: "{app}"; Tasks: desktopicon
+Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
+Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
 Filename: "{tmp}\VC_redist.x64.exe"; Parameters: "/install /passive /quiet /norestart";
-Filename: "{app}\qtforcepad.exe"; WorkingDir: "{app}"; Description: "Launch ForcePAD"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent

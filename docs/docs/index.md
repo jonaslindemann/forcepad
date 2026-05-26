@@ -1,17 +1,18 @@
 # ForcePAD
 
+<div style="position: relative; width: 100%; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+  <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed/bcC5_eQfDg8?si=cxadCPT6DIysu257&amp;autoplay=1&amp;mute=1&amp;playsinline=1&amp;controls=0&amp;modestbranding=1&amp;rel=0&amp;iv_load_policy=3&amp;vq=hd1080" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</div>
+
 Sketch structures and instantly explore how they deform, carry forces, and develop stresses.
 
 ForcePAD is an open-source, sketch-based 2D finite element analysis tool for structural mechanics education. Draw a shape like in a paint program, add loads and supports, and see stresses and displacements update interactively.
 
 [Download ForcePAD](download.md){ .md-button .md-button--primary }
 [Quick start](quick-start.md){ .md-button }
+[Videos](videos.md){ .md-button }
 [Examples](examples.md){ .md-button }
 
-![ForcePAD main window](images/screenshot.png "ForcePAD main window")
-
-!!! note "Animation placeholder"
-    Add a short animated GIF or MP4 here showing the core ForcePAD workflow: sketch material, place supports, apply a force, switch to Action mode, and move the force while stresses update.
 
 ## Why ForcePAD?
 
@@ -27,12 +28,17 @@ ForcePAD is an open-source, sketch-based 2D finite element analysis tool for str
 1. [Download](download.md) the latest release.
 2. Create a new model or open a bundled example.
 3. Draw a structure in [Sketch mode](sketch-mode.md).
+
+![ForcePAD sketch mode](images/sketch-mode-beam.png "Sketch mode")
+
 4. Add constraints and forces in [Physics mode](physics-mode.md).
+
+![ForcePAD physics mode](images/physics-mode-beam.png "Physics mode")
+
 5. Inspect stresses, deformations, and optimisation results in [Action mode](action-mode.md).
 
-![ForcePAD sketch mode](images/sketch-mode-1.png "Sketch mode")
-![ForcePAD physics mode](images/physics-mode-1.png "Physics mode")
-![ForcePAD action mode](images/action-mode-1.png "Action mode")
+![ForcePAD action mode](images/action-mode-beam-princ.png "Action mode")
+![ForcePAD action mode](images/action-mode-beam-mises.png "Action mode")
 
 ## What You Can Explore
 

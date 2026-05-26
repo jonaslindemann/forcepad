@@ -1,40 +1,23 @@
 # Videos
 
-Short visual demonstrations are one of the best ways to explain ForcePAD. This page is ready for embedded clips as soon as they are recorded.
+## Short demonstration on the workflow of ForcePAD
 
-!!! note "Video placeholder"
-    Record and embed a 2 minute introduction: sketch a structure, add constraints and forces, inspect stress and displacement, then run a small topology optimisation.
+<div style="position: relative; width: 100%; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+  <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed/bcC5_eQfDg8?si=cxadCPT6DIysu257&amp;autoplay=0&amp;mute=1&amp;playsinline=1&amp;controls=0&amp;modestbranding=1&amp;rel=0&amp;iv_load_policy=3&amp;vq=hd1080" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</div>
 
-## Planned Short Demos
+## Multiple beam analysis example
 
-| Video | Length | Purpose | Status |
-| --- | --- | --- | --- |
-| ForcePAD in 2 minutes | 2:00 | High-level overview for new visitors | Placeholder |
-| Sketch to stress result | 0:45 | Show the core workflow from blank canvas to result | Placeholder |
-| Moving forces in real time | 0:30 | Show the interactive differentiator | Placeholder |
-| Topology optimisation | 1:00 | Show iterative optimisation and final shape | Placeholder |
-| Teaching beam bending | 2:00 | Student-friendly beam deformation walkthrough | Placeholder |
+<div style="position: relative; width: 100%; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+  <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed/1l2MDJp6CD4?si=qnhcBDGI5mYxZ4NF&amp;autoplay=0&amp;mute=1&amp;playsinline=1&amp;controls=0&amp;modestbranding=1&amp;rel=0&amp;iv_load_policy=3&amp;vq=hd1080" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</div>
 
-## Embed Template
+## Cantilever optimisation example
 
-When a video is available, replace the placeholder below with the final YouTube or hosted video link.
+<div style="position: relative; width: 100%; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+  <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed/e4XrUVyC8jc?si=VNGHLdz1_BseaE88&amp;autoplay=0&amp;mute=1&amp;playsinline=1&amp;controls=0&amp;modestbranding=1&amp;rel=0&amp;iv_load_policy=3&amp;vq=hd1080" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</div>
 
-```markdown
-<iframe
-  width="100%"
-  height="420"
-  src="https://www.youtube.com/embed/VIDEO_ID"
-  title="ForcePAD demo"
-  frameborder="0"
-  allowfullscreen>
-</iframe>
-```
 
-## GIFs to Create
 
-These GIFs should also be reused on the README and home page:
 
-- `forcepad-quick-workflow.gif`: sketch, constrain, load, inspect result.
-- `forcepad-move-force.gif`: drag a force while the stress field updates.
-- `forcepad-topology-optimisation.gif`: show optimisation iterations.
-- `forcepad-visualization-modes.gif`: switch between principal stress, von Mises stress, and displacement.

@@ -67,6 +67,13 @@ if(OpenMP_FOUND)
     target_link_libraries(qtforcepad PRIVATE OpenMP::OpenMP_CXX)
 endif()
 
+add_custom_command(TARGET qtforcepad POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_SOURCE_DIR}/images/svg"
+        "$<TARGET_FILE_DIR:qtforcepad>/icons"
+    COMMENT "Copying ForcePAD icons..."
+)
+
 if(WIN32)
     target_link_libraries(qtforcepad PRIVATE winmm comctl32 gdiplus)
 

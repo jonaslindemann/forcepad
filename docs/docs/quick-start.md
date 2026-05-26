@@ -16,26 +16,23 @@ Choose **File -> New** to create a blank model, or open one of the bundled `.fp2
 
 ![New model dialog](images/new-model-1.png "New model dialog")
 
-!!! note "Screenshot placeholder"
-    Add a screenshot of the file-open dialog showing one of the bundled example models.
-
 ## 3. Sketch the Structure
 
 Use [Sketch mode](sketch-mode.md) to paint the structural domain. Black pixels represent full stiffness, white pixels represent empty space, and grey values represent intermediate stiffness.
 
-![Sketch mode](images/sketch-mode-1.png "Sketch mode")
+![Sketch mode](images//sketch-mode-beam.png "Sketch mode")
 
 ## 4. Add Supports and Forces
 
 Switch to [Physics mode](physics-mode.md). Place constraints where the structure is supported, then place forces where loads should act.
 
-![Physics mode](images/physics-mode-1.png "Physics mode")
+![Physics mode](images/physics-mode-beam.png "Physics mode")
 
 ## 5. Inspect Results
 
 Switch to [Action mode](action-mode.md). ForcePAD calculates the response and visualizes principal stresses, von Mises stress, or displacement.
 
-![Action mode](images/action-mode-1.png "Action mode")
+![Action mode](images/action-mode-beam-princ.png "Action mode")
 
 ## 6. Try Real-Time Interaction
 

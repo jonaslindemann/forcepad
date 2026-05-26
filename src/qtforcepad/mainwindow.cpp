@@ -27,6 +27,8 @@
 #include <QDoubleSpinBox>
 #include <QSpinBox>
 #include <QComboBox>
+#include <QCoreApplication>
+#include <QFileInfo>
 #include <QPushButton>
 #include <QFormLayout>
 #include <QSizePolicy>
@@ -39,6 +41,7 @@
 #include <QProgressBar>
 #include <QSignalBlocker>
 #include <QString>
+#include <QStringList>
 #include <QPlainTextEdit>
 #include <QSplitter>
 #include <QFont>
@@ -65,6 +68,45 @@ static QString stiffnessDisplayStyle(const QColor &background)
         "font-size: 22px; font-weight: bold; color: %1;"
         "background: %2; border: 1px solid #e5e5e5; border-radius: 4px;")
         .arg(textColorForBackground(background), background.name());
+}
+
+static QString resolveIconPath(const QString &path)
+{
+    const QStringList candidates = {
+        QCoreApplication::applicationDirPath() + "/" + path,
+        path,
+        ":/" + path
+    };
+
+    for (const QString &candidate : candidates)
+    {
+        QFileInfo fileInfo(candidate);
+        if (candidate.startsWith(":/") || (fileInfo.exists() && fileInfo.isFile()))
+            return candidate;
+    }
+
+    fp_warn("MainWindow", "Could not resolve icon path: {}", path.toStdString());
+    return path;
+}
+
+static QPixmap renderSvgPixmap(const QString &svgPath, const QSize &size)
+{
+    QPixmap px(size);
+    px.fill(Qt::transparent);
+
+    const QString resolvedPath = resolveIconPath(svgPath);
+    QSvgRenderer renderer(resolvedPath);
+    if (renderer.isValid())
+    {
+        QPainter p(&px);
+        renderer.render(&p);
+    }
+    else
+    {
+        fp_warn("MainWindow", "Could not load SVG icon: {}", resolvedPath.toStdString());
+    }
+
+    return px;
 }
 
 // ---------------------------------------------------------------------------
@@ -197,14 +239,7 @@ static QToolButton* makeToolBtn(const QString &text, const QString &tooltip)
 static QToolButton* makeSvgToolBtn(const QString &svgPath, const QString &tooltip)
 {
     auto renderSvg = [&]() {
-        QPixmap px(40, 40);
-        px.fill(Qt::transparent);
-        QSvgRenderer renderer(svgPath);
-        if (renderer.isValid()) {
-            QPainter p(&px);
-            renderer.render(&p);
-        }
-        return px;
+        return renderSvgPixmap(svgPath, QSize(40, 40));
     };
 
     QPixmap normalPx = renderSvg();
@@ -1299,10 +1334,7 @@ QWidget* MainWindow::createPrincipalPropsWidget()
 
     // Helper: SVG icon button styled for the light right-panel background
     auto makePanelIconBtn = [](const QString &svgPath, const QString &tip) -> QToolButton* {
-        QPixmap px(44, 44);
-        px.fill(Qt::transparent);
-        QSvgRenderer renderer(svgPath);
-        if (renderer.isValid()) { QPainter p(&px); renderer.render(&p); }
+        QPixmap px = renderSvgPixmap(svgPath, QSize(44, 44));
 
         QPixmap tinted = px.copy();
         QPainter t(&tinted);
@@ -1411,10 +1443,7 @@ QWidget* MainWindow::createMisesPropsWidget()
     m_colorScaleGroup->setExclusive(true);
 
     auto makePanelIconBtn2 = [](const QString &svgPath, const QString &tip) -> QToolButton* {
-        QPixmap px(44, 44);
-        px.fill(Qt::transparent);
-        QSvgRenderer renderer(svgPath);
-        if (renderer.isValid()) { QPainter p(&px); renderer.render(&p); }
+        QPixmap px = renderSvgPixmap(svgPath, QSize(44, 44));
 
         QPixmap tinted = px.copy();
         QPainter t(&tinted);
