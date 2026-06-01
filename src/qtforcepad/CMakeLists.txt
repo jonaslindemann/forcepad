@@ -18,6 +18,13 @@ if(WIN32)
     list(APPEND SOURCES app.rc)
 endif()
 
+if(APPLE)
+    set(_icns "${CMAKE_SOURCE_DIR}/images/forcepad.icns")
+    set_source_files_properties("${_icns}"
+        PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+    list(APPEND SOURCES "${_icns}")
+endif()
+
 set(HEADERS
     MainWindow.h
     QtPaintView.h
@@ -45,6 +52,18 @@ set_target_properties(qtforcepad PROPERTIES
     WIN32_EXECUTABLE $<NOT:$<CONFIG:Debug>>
 )
 
+if(APPLE)
+    set_target_properties(qtforcepad PROPERTIES
+        MACOSX_BUNDLE               TRUE
+        MACOSX_BUNDLE_GUI_IDENTIFIER "se.lth.byggmek.forcepad"
+        MACOSX_BUNDLE_BUNDLE_NAME   "ForcePAD"
+        MACOSX_BUNDLE_BUNDLE_VERSION "3.0"
+        MACOSX_BUNDLE_SHORT_VERSION_STRING "3.0"
+        MACOSX_BUNDLE_ICON_FILE     "forcepad"
+        MACOSX_BUNDLE_INFO_PLIST    "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in"
+    )
+endif()
+
 target_link_libraries(qtforcepad PRIVATE
     Qt6::Core
     Qt6::Gui
@@ -67,6 +86,10 @@ if(OpenMP_FOUND)
     target_link_libraries(qtforcepad PRIVATE OpenMP::OpenMP_CXX)
 endif()
 
+# Copy SVG icons next to the executable.
+# On macOS the bundle puts the executable in Contents/MacOS/, and
+# resolveIconPath() searches relative to applicationDirPath(), so this
+# lands them at Contents/MacOS/icons/ — exactly where the app looks.
 add_custom_command(TARGET qtforcepad POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${CMAKE_SOURCE_DIR}/images/svg"
@@ -96,5 +119,21 @@ if(WIN32)
             "${_vcpkg}/bin/$<IF:$<CONFIG:Debug>,Qt6Svgd.dll,Qt6Svg.dll>"
             "$<TARGET_FILE_DIR:qtforcepad>/"
         COMMENT "Copying Qt plugins and missing DLLs..."
+    )
+endif()
+
+if(APPLE)
+    # Bundle Qt frameworks and plugins into the .app so it runs standalone.
+    find_program(MACDEPLOYQT_EXECUTABLE macdeployqt
+        HINTS "${Qt6_DIR}/../../../tools/Qt6/bin"
+        REQUIRED
+    )
+    add_custom_command(TARGET qtforcepad POST_BUILD
+        COMMAND "${MACDEPLOYQT_EXECUTABLE}"
+            "$<TARGET_BUNDLE_DIR:qtforcepad>"
+            -always-overwrite
+        COMMAND codesign --deep --force --sign -
+            "$<TARGET_BUNDLE_DIR:qtforcepad>"
+        COMMENT "Running macdeployqt and ad-hoc signing..."
     )
 endif()

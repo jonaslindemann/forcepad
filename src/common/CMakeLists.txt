@@ -11,6 +11,20 @@ file(GLOB INCLUDE_FILES2 CONFIGURE_DEPENDS *.H)
 file(GLOB _remove_femgrid "FemGridSolver2.cpp")
 list(REMOVE_ITEM SOURCE_FILES1 ${_remove_femgrid})
 
+# When building without FLTK, exclude all FLTK-specific sources so their
+# headers (FL/*.H) are never pulled in during the Qt-only build.
+if(NOT BUILD_FLTK_APP)
+    file(GLOB _remove_fltk
+        "Fl_*.cpp"
+        "fl_*.cpp"
+        "LogWindow.cpp"
+        "NewModelDlg.cpp"
+    )
+    file(GLOB _remove_fltk_cxx "Fl_*.cxx" "fl_*.cxx")
+    list(REMOVE_ITEM SOURCE_FILES1 ${_remove_fltk})
+    list(REMOVE_ITEM SOURCE_FILES2 ${_remove_fltk_cxx})
+endif()
+
 add_library(common ${INCLUDE_FILES1} ${INCLUDE_FILES2} ${SOURCE_FILES1} ${SOURCE_FILES2})
 set_target_properties(common PROPERTIES DEBUG_POSTFIX d)
 target_include_directories(common PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
