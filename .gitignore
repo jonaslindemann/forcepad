@@ -17,3 +17,9 @@ win32_build_debug/
 vcpkg_installed/
 *.ps1
 /docs/site
+bin/release/qtforcepad
+/bin/release/qtforcepad.app
+bin/.DS_Store
+bin/release/.DS_Store
+bin/release/qtforcepadd
+/lib

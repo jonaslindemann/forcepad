@@ -13,6 +13,7 @@ class QSlider;
 class QDoubleSpinBox;
 class QSpinBox;
 class QComboBox;
+class QToolButton;
 class QPushButton;
 class QButtonGroup;
 class QProgressBar;

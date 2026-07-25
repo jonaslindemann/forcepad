@@ -1,6 +1,9 @@
 file(GLOB SOURCE_FILES CONFIGURE_DEPENDS *.cpp)
 file(GLOB INCLUDE_FILES CONFIGURE_DEPENDS *.h)
 
+find_package(JPEG REQUIRED)
+
 add_library(ivf2d ${INCLUDE_FILES} ${SOURCE_FILES})
 set_target_properties(ivf2d PROPERTIES DEBUG_POSTFIX d)
 target_include_directories(ivf2d PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(ivf2d PUBLIC JPEG::JPEG)

@@ -25,7 +25,11 @@
       "Bash(cmake -B build-debug)",
       "Bash(cmake --build build-debug --config Debug --target qtforcepad)",
       "Bash(cmake --build build-debug --config Debug --target calfem)",
-      "Bash(cmake --build build-debug --config Debug --target forcepad)"
+      "Bash(cmake --build build-debug --config Debug --target forcepad)",
+      "Bash(ls /Users/lindemann/Development/forcepad/bin/ 2>/dev/null && echo \"---\" && ls /Users/lindemann/vcpkg/ 2>/dev/null | head -5)",
+      "Read(//Users/lindemann/vcpkg/**)",
+      "Bash(iconutil -c icns /Users/lindemann/Development/forcepad/images/forcepad.iconset -o /Users/lindemann/Development/forcepad/images/forcepad.icns)",
+      "Bash(cmake -B build-release -DCMAKE_BUILD_TYPE=Release)"
     ]
   }
 }
