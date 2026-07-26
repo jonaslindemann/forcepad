@@ -8,10 +8,13 @@ Sketch structures and instantly explore how they deform, carry forces, and devel
 
 ForcePAD is an open-source, sketch-based 2D finite element analysis tool for structural mechanics education. Draw a shape like in a paint program, add loads and supports, and see stresses and displacements update interactively.
 
-[Download ForcePAD](download.md){ .md-button .md-button--primary }
+[▶ Run in browser](app/){ .md-button .md-button--primary }
+[Download ForcePAD](download.md){ .md-button }
 [Quick start](quick-start.md){ .md-button }
 [Videos](videos.md){ .md-button }
 [Examples](examples.md){ .md-button }
+
+*Runs directly in your browser — no installation. Best on a desktop browser with WebGL 2.*
 
 
 ## Why ForcePAD?
