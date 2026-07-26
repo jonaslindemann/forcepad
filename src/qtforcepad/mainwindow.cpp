@@ -10,6 +10,7 @@
 
 #include <QMenuBar>
 #include <QMenu>
+#include <QMessageBox>
 #include <QToolBar>
 #include <QStatusBar>
 #include <QLabel>
@@ -465,51 +466,54 @@ void MainWindow::runCalculate()
 
 void MainWindow::runOptimise()
 {
-    // The work to run once the settings dialog is accepted. (NOTE: executeOpt()
-    // is a long iterative loop that blocks on wasm's single thread until the
-    // threaded-solver phase lands; the dialog itself, however, now works.)
-    auto runIt = [this]() {
-        m_paintView->setViewMode(fp::PaintView::VM_ACTION);
-        m_paintView->setStatusMessageEvent(this);
-        m_paintView->setContinueCalcEvent(this);
-
-        m_continueCalc = true;
-        m_optStatusLabel->setVisible(true);
-        m_optProgressBar->setValue(0);
-        m_optProgressBar->setVisible(true);
-        m_btnStopOpt->setVisible(true);
-
-        bool ok = m_paintView->executeOpt();
-
-        m_btnStopOpt->setVisible(false);
-        m_optProgressBar->setVisible(false);
-        m_optStatusLabel->setText("");
-        m_optStatusLabel->setVisible(false);
-
-        m_paintView->setStatusMessageEvent(nullptr);
-        m_paintView->setContinueCalcEvent(nullptr);
-
-        if (!ok)
-        {
-            m_paintView->setViewMode(fp::PaintView::VM_PHYSICS);
-            m_paintView->execute();
-            showPrincipalStress();
-        }
-    };
-
 #ifdef Q_OS_WASM
-    // Non-blocking on the browser thread (blocking exec() renders grey/hangs).
-    auto *dlg = new OptimisationSettingsDialog(m_paintView, this);
-    dlg->setAttribute(Qt::WA_DeleteOnClose);
-    connect(dlg, &QDialog::finished, this, [runIt](int result) {
-        if (result == QDialog::Accepted)
-            runIt();
-    });
-    dlg->open();
+    // Topology optimisation runs a long iterative solver loop (many FEM solves).
+    // On wasm's single browser thread that loop blocks the page - it freezes,
+    // the progress bar can't update and Stop can't be clicked - so it is not
+    // usable until the solver runs on a worker thread (wasm_multithread). Until
+    // then, tell the user rather than freezing. Shown non-modally (open()); a
+    // blocking dialog can't run on the browser thread either.
+    auto *box = new QMessageBox(
+        QMessageBox::Information,
+        "Topology optimisation",
+        "Topology optimisation is not yet available in the browser version of "
+        "ForcePAD.\n\nIt runs a long iterative solver that would freeze the page "
+        "on the browser's single thread. Please use the desktop application to "
+        "run optimisation.",
+        QMessageBox::Ok, this);
+    box->setAttribute(Qt::WA_DeleteOnClose);
+    box->open();
 #else
     OptimisationSettingsDialog dlg(m_paintView, this);
-    if (dlg.exec() == QDialog::Accepted)
-        runIt();
+    if (dlg.exec() != QDialog::Accepted)
+        return;
+
+    m_paintView->setViewMode(fp::PaintView::VM_ACTION);
+    m_paintView->setStatusMessageEvent(this);
+    m_paintView->setContinueCalcEvent(this);
+
+    m_continueCalc = true;
+    m_optStatusLabel->setVisible(true);
+    m_optProgressBar->setValue(0);
+    m_optProgressBar->setVisible(true);
+    m_btnStopOpt->setVisible(true);
+
+    bool ok = m_paintView->executeOpt();
+
+    m_btnStopOpt->setVisible(false);
+    m_optProgressBar->setVisible(false);
+    m_optStatusLabel->setText("");
+    m_optStatusLabel->setVisible(false);
+
+    m_paintView->setStatusMessageEvent(nullptr);
+    m_paintView->setContinueCalcEvent(nullptr);
+
+    if (!ok)
+    {
+        m_paintView->setViewMode(fp::PaintView::VM_PHYSICS);
+        m_paintView->execute();
+        showPrincipalStress();
+    }
 #endif
 }
 
