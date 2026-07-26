@@ -24,13 +24,7 @@
 
 #include "Line.h"
 
-#ifdef __APPLE__
-#include <OpenGL/glu.h>
-#include <OpenGL/gl.h>
-#else
-#include <GL/glu.h>
-#include <GL/gl.h>
-#endif
+#include "Renderer2D.h"
 
 namespace ivf2d {
 
@@ -70,12 +64,13 @@ void Line::setEndPos(int x, int y)
 
 void Line::doGeometry()
 {
-	glBegin(GL_QUADS);
-		glVertex2d(m_p1.getX(), m_p1.getY());
-		glVertex2d(m_p2.getX(), m_p2.getY());
-		glVertex2d(m_p3.getX(), m_p3.getY());
-		glVertex2d(m_p4.getX(), m_p4.getY());
-	glEnd();
+	Renderer2D &r = Renderer2D::instance();
+	r.beginQuads();
+		r.vertex((float)m_p1.getX(), (float)m_p1.getY());
+		r.vertex((float)m_p2.getX(), (float)m_p2.getY());
+		r.vertex((float)m_p3.getX(), (float)m_p3.getY());
+		r.vertex((float)m_p4.getX(), (float)m_p4.getY());
+	r.end();
 }
 
 void Line::initLine()

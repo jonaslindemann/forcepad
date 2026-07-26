@@ -124,3 +124,15 @@ else()
 endif()
 
 add_subdirectory(src)
+
+# Opt-in guard target: fails if legacy / fixed-function OpenGL reappears in the
+# migrated (Qt6 + WebGL-targeted) render path. Run with:
+#   cmake --build <dir> --target check_legacy_gl
+# Suitable for CI. Not part of the default build (and skipped if bash is absent).
+find_program(BASH_PROGRAM bash)
+if(BASH_PROGRAM)
+    add_custom_target(check_legacy_gl
+        COMMAND ${BASH_PROGRAM} ${CMAKE_SOURCE_DIR}/scripts/check-legacy-gl.sh
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        COMMENT "Checking for legacy/fixed-function OpenGL in the migrated render path")
+endif()

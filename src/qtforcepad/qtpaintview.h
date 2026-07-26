@@ -63,5 +63,15 @@ protected:
     void doShowHelp() override;
 
 private:
+    // Lazily-created single-sample FBO used to commit shape geometry to the
+    // drawing image. The widget's own FBO is multisampled (MSAA), and
+    // glReadPixels is invalid on a multisample framebuffer, so the release-time
+    // capture (onRelease -> glReadPixels) must render into this resolvable FBO.
+    unsigned int ensureCaptureFramebuffer(int width, int height);
+
     InfoOverlay *m_infoOverlay{nullptr};
+    unsigned int m_captureFbo{0};
+    unsigned int m_captureTex{0};
+    int m_captureW{0};
+    int m_captureH{0};
 };

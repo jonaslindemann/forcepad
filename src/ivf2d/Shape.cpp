@@ -24,13 +24,7 @@
 
 #include "Shape.h"
 
-#ifdef __APPLE__
-#include <OpenGL/glu.h>
-#include <OpenGL/gl.h>
-#else
-#include <GL/glu.h>
-#include <GL/gl.h>
-#endif
+#include "Renderer2D.h"
 
 namespace ivf2d {
 
@@ -72,40 +66,20 @@ double Shape::getRotation()
 
 void Shape::doBeginTransform()
 {
-	if (!m_useRasterPos)
-	{
-		glPushMatrix();
-		glTranslated(m_pos[0], m_pos[1], 0.0);
-		glRotatef(m_rotation, 0.0, 0.0, 1.0);
-	}
-	else
-	{
-		glRasterPos2i((int)m_pos[0], (int)m_pos[1]);
-	}
-
-	//
-	// Apply texture, if any.
-	//
-
-	if (m_texture!=nullptr)
-	{
-		glEnable(GL_TEXTURE_2D);
-		if (!m_texture->isBound())
-			m_texture->bind();
-		else
-			m_texture->apply();
-	}
+	// Push this object's transform onto Renderer2D's stack. The caller
+	// (PaintView) establishes the projection and identity base transform each
+	// frame; nested shape renders compose on the parent. The old
+	// raster-position branch is gone; ScreenImage (the only raster-position
+	// user) positions its quad itself.
+	Renderer2D &r = Renderer2D::instance();
+	r.pushTransform();
+	r.translate((float)m_pos[0], (float)m_pos[1]);
+	r.rotateZ((float)m_rotation);
 }
 
 void Shape::doEndTransform()
 {
-	if (!m_useRasterPos)
-		glPopMatrix();
-
-	if (m_texture!=nullptr)
-	{
-		glDisable(GL_TEXTURE_2D);
-	}
+	Renderer2D::instance().popTransform();
 }
 
 

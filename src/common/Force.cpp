@@ -24,14 +24,7 @@
 
 #include "Force.h"
 
-#ifdef __APPLE__
-#include <OpenGL/glu.h>
-#include <OpenGL/gl.h>
-#else
-#include <GL/glu.h>
-#include <GL/gl.h>
-#endif
-
+#include "Renderer2D.h"
 #include "UiSettings.h"
 
 using namespace std;
@@ -115,36 +108,36 @@ void Force::doGeometry()
 	case FT_VECTOR:
 		{
             float dpr = (float)UiSettings::getInstance()->getDevicePixelRatio();
+            float lineWidth;
             if (UiSettings::getInstance()->getLineThickness()>0.0)
-                glLineWidth((GLfloat)(UiSettings::getInstance()->getLineThickness() * dpr));
+                lineWidth = (float)(UiSettings::getInstance()->getLineThickness() * dpr);
             else
-                glLineWidth(2.0f * dpr);
-		}
+                lineWidth = 2.0f * dpr;
 
-		if (UiSettings::getInstance()->getSymbolLength()>0.0)
-		{
-			length = UiSettings::getInstance()->getSymbolLength();
-			arrowLength = 0.25*length;
+            if (UiSettings::getInstance()->getSymbolLength()>0.0)
+            {
+                length = UiSettings::getInstance()->getSymbolLength();
+                arrowLength = 0.25*length;
 
+                this->setLength(length);
+                this->setArrowSize(arrowLength);
+            }
 
-			this->setLength(length);
-			this->setArrowSize(arrowLength);
-		}
+            ivf2d::Renderer2D &r = ivf2d::Renderer2D::instance();
+            r.beginLines(lineWidth);
+            r.vertex((float)(0 + m_direction[0]*m_length*0.02), (float)(0 + m_direction[1]*m_length*0.02));
+            r.vertex((float)(0 - m_direction[0]*m_length), (float)(0 - m_direction[1]*m_length));
+            r.vertex(0.0f, 0.0f);
+            r.vertex((float)(0 - m_leftPos[0]), (float)(0 - m_leftPos[1]));
+            r.vertex(0.0f, 0.0f);
+            r.vertex((float)(0 - m_rightPos[0]), (float)(0 - m_rightPos[1]));
+            r.end();
 
-		glBegin(GL_LINES);
-		//glVertex2d(0, 0);
-		glVertex2d(0 + m_direction[0]*m_length*0.02, 0 + m_direction[1]*m_length*0.02);
-		glVertex2d(0 - m_direction[0]*m_length, 0 - m_direction[1]*m_length);
-		glVertex2d(0, 0);
-		glVertex2d(0 - m_leftPos[0], 0 - m_leftPos[1]);
-		glVertex2d(0, 0);
-		glVertex2d(0 - m_rightPos[0], 0 - m_rightPos[1]);
-		glEnd();
-
-		if (UiSettings::getInstance()->getSymbolLength()>0.0)
-		{
-			this->setLength(oldLength);
-			this->setArrowSize(oldArrowLength);
+            if (UiSettings::getInstance()->getSymbolLength()>0.0)
+            {
+                this->setLength(oldLength);
+                this->setArrowSize(oldArrowLength);
+            }
 		}
 		break;
 	case FT_SCALAR:

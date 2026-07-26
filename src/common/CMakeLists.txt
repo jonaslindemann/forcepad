@@ -19,6 +19,11 @@ if(NOT BUILD_FLTK_APP)
         "fl_*.cpp"
         "LogWindow.cpp"
         "NewModelDlg.cpp"
+        # v1 FemGrid/ImageGrid are used only by the legacy FLTK app; the Qt build
+        # uses FemGrid2/ImageGrid2. Excluding them keeps the (fixed-function)
+        # legacy OpenGL they contain out of the modern Qt/WebGL build.
+        "FemGrid.cpp"
+        "ImageGrid.cpp"
     )
     file(GLOB _remove_fltk_cxx "Fl_*.cxx" "fl_*.cxx")
     list(REMOVE_ITEM SOURCE_FILES1 ${_remove_fltk})

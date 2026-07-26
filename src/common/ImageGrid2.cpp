@@ -24,13 +24,7 @@
 
 #include "ImageGrid2.h"
 
-#ifdef __APPLE__
-#include <OpenGL/glu.h>
-#include <OpenGL/gl.h>
-#else
-#include <GL/glu.h>
-#include <GL/gl.h>
-#endif
+#include "Renderer2D.h"
 
 namespace fp {
 
@@ -73,32 +67,23 @@ void ImageGrid2::doGeometry()
 
 	if (m_grid.size() > 0)
 	{
-		/*
-		glBegin(GL_LINES);
-		glColor3f(1.0, 0.0, 0.0);
-		glVertex2i(0,0);
-		glVertex2i(50,50);
-		glEnd();
-		*/
+		ivf2d::Renderer2D &r = ivf2d::Renderer2D::instance();
 		for (i=0; i<m_rows; i++)
 		{
 			for (j=0; j<m_cols; j++)
 			{
 				if (m_grid(i,j)>0.0)
 				{
-					glBegin(GL_TRIANGLES);
-					glColor3f((1.0-m_grid(i,j))*m_maxIntensity, (1.0-m_grid(i,j))*m_maxIntensity, (1.0-m_grid(i,j))*m_maxIntensity);
-					glVertex2i(j*m_stride, i*m_stride);
-					glVertex2i((j+1)*m_stride, i*m_stride);
-					glVertex2i((j+1)*m_stride, (i+1)*m_stride);
-					glEnd();
-
-					glBegin(GL_TRIANGLES);
-					glColor3f((1.0-m_grid(i,j))*m_maxIntensity, (1.0-m_grid(i,j))*m_maxIntensity, (1.0-m_grid(i,j))*m_maxIntensity);
-					glVertex2i(j*m_stride, i*m_stride);
-					glVertex2i((j+1)*m_stride, (i+1)*m_stride);
-					glVertex2i(j*m_stride, (i+1)*m_stride);
-					glEnd();
+					const float c = (float)((1.0-m_grid(i,j))*m_maxIntensity);
+					r.beginTriangles();
+					r.color(c, c, c, 1.0f);
+					r.vertex((float)(j*m_stride), (float)(i*m_stride));
+					r.vertex((float)((j+1)*m_stride), (float)(i*m_stride));
+					r.vertex((float)((j+1)*m_stride), (float)((i+1)*m_stride));
+					r.vertex((float)(j*m_stride), (float)(i*m_stride));
+					r.vertex((float)((j+1)*m_stride), (float)((i+1)*m_stride));
+					r.vertex((float)(j*m_stride), (float)((i+1)*m_stride));
+					r.end();
 				}
 			}
 		}
@@ -114,7 +99,7 @@ void ImageGrid2::initGrid()
 {
 	int i, j, k, l;
 	double gridSum1;
-	GLubyte gridValue;
+	unsigned char gridValue;
 	int nGridValues1;
 	int nNonZeroValues;
 
@@ -297,7 +282,7 @@ void ImageGrid2::assignFieldFromImage(int imageLayer, int toFieldLayer)
 		int i, j, k, l;
 		double gridSum1;
 		double nGridValues1;
-		GLubyte red, green, blue;
+		unsigned char red, green, blue;
 
 		int nNonZeroValues = 0;
 

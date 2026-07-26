@@ -25,13 +25,7 @@
 #include "CGIndicator.h"
 #include "UiSettings.h"
 
-#ifdef __APPLE__
-#include <OpenGL/glu.h>
-#include <OpenGL/gl.h>
-#else
-#include <GL/glu.h>
-#include <GL/gl.h>
-#endif
+#include "Renderer2D.h"
 
 namespace fp {
 
@@ -58,31 +52,31 @@ CGIndicator::~CGIndicator()
 void CGIndicator::doGeometry()
 {
 	float dpr = (float)UiSettings::getInstance()->getDevicePixelRatio();
-	glLineWidth(2.0f * dpr);
-	glBegin(GL_LINES);
-	glVertex2d(0.0 - m_indicatorSize/2.0, 0.0);
-	glVertex2d(0.0 + m_indicatorSize/2.0, 0.0);
-	glVertex2d(0.0, 0.0 - m_indicatorSize/2.0);
-	glVertex2d(0.0, 0.0 + m_indicatorSize/2.0);
-	glEnd();
+	ivf2d::Renderer2D &r = ivf2d::Renderer2D::instance();
+
+	r.beginLines(2.0f * dpr);
+	r.vertex((float)(0.0 - m_indicatorSize/2.0), 0.0f);
+	r.vertex((float)(0.0 + m_indicatorSize/2.0), 0.0f);
+	r.vertex(0.0f, (float)(0.0 - m_indicatorSize/2.0));
+	r.vertex(0.0f, (float)(0.0 + m_indicatorSize/2.0));
+	r.end();
 
 	if (m_gravityArrow)
 	{
-		glPushMatrix();
-		glTranslated(m_direction[0]*(m_indicatorSize+m_arrowLength), m_direction[1]*(m_indicatorSize+m_arrowLength), 0.0);
+		r.pushTransform();
+		r.translate((float)(m_direction[0]*(m_indicatorSize+m_arrowLength)),
+		            (float)(m_direction[1]*(m_indicatorSize+m_arrowLength)));
 
-		glLineWidth(2.0f * dpr);
-		glBegin(GL_LINES);
-		glVertex2d(0, 0);
-		glVertex2d(0 - m_direction[0]*m_arrowLength, 0 - m_direction[1]*m_arrowLength);
-		glVertex2d(0, 0);
-		glVertex2d(0 - m_leftPos[0], 0 - m_leftPos[1]);
-		glVertex2d(0, 0);
-		glVertex2d(0 - m_rightPos[0], 0 - m_rightPos[1]);
-		glEnd();
-		glLineWidth(1.0f * dpr);
+		r.beginLines(2.0f * dpr);
+		r.vertex(0.0f, 0.0f);
+		r.vertex((float)(0 - m_direction[0]*m_arrowLength), (float)(0 - m_direction[1]*m_arrowLength));
+		r.vertex(0.0f, 0.0f);
+		r.vertex((float)(0 - m_leftPos[0]), (float)(0 - m_leftPos[1]));
+		r.vertex(0.0f, 0.0f);
+		r.vertex((float)(0 - m_rightPos[0]), (float)(0 - m_rightPos[1]));
+		r.end();
 
-		glPopMatrix();
+		r.popTransform();
 	}
 }
 

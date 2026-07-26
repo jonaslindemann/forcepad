@@ -24,14 +24,7 @@
 
 #include "ReactionForce.h"
 
-#ifdef __APPLE__
-#include <OpenGL/glu.h>
-#include <OpenGL/gl.h>
-#else
-#include <GL/glu.h>
-#include <GL/gl.h>
-#endif
-
+#include "Renderer2D.h"
 #include "UiSettings.h"
 
 namespace fp {
@@ -107,54 +100,56 @@ void ReactionForce::doGeometry()
 	
 	this->getPosition(x, y);
 
+	float lineWidth;
 	{
         float dpr = (float)UiSettings::getInstance()->getDevicePixelRatio();
         if (UiSettings::getInstance()->getLineThickness()>0.0)
-            glLineWidth((GLfloat)(UiSettings::getInstance()->getLineThickness() * dpr));
+            lineWidth = (float)(UiSettings::getInstance()->getLineThickness() * dpr);
         else
-            glLineWidth(2.0f * dpr);
+            lineWidth = 2.0f * dpr;
 	}
 
 	if (UiSettings::getInstance()->getSymbolLength()>0.0)
 	{
 		this->setArrowSize(UiSettings::getInstance()->getSymbolLength() * 0.25);
 	}
-	
-	glColor3f(1.0f, 0.5f, 0.0f);
+
+	ivf2d::Renderer2D &r = ivf2d::Renderer2D::instance();
+	r.color(1.0f, 0.5f, 0.0f, 1.0f);
 
 	if (m_length>=0.0)
 	{
-		glBegin(GL_LINES);
-		glVertex2d(-m_direction[0]*m_offset, -m_direction[1]*m_offset);
-		glVertex2d(0 -m_direction[0]*m_offset - m_direction[0]*m_length, 0 -m_direction[1]*m_offset - m_direction[1]*m_length);
-		glEnd();
+		r.beginLines(lineWidth);
+		r.vertex((float)(-m_direction[0]*m_offset), (float)(-m_direction[1]*m_offset));
+		r.vertex((float)(0 -m_direction[0]*m_offset - m_direction[0]*m_length), (float)(0 -m_direction[1]*m_offset - m_direction[1]*m_length));
+		r.end();
 
-		glPushMatrix();
-		glTranslatef(0 -m_direction[0]*m_offset, 0 -m_direction[1]*m_offset, 0.0);
-		glBegin(GL_LINES);
-		glVertex2d(0, 0);
-		glVertex2d(0 - m_leftPos[0], 0 - m_leftPos[1]);
-		glVertex2d(0, 0);
-		glVertex2d(0 - m_rightPos[0], 0 - m_rightPos[1]);
-		glEnd();
-		glPopMatrix();
+		r.pushTransform();
+		r.translate((float)(0 -m_direction[0]*m_offset), (float)(0 -m_direction[1]*m_offset));
+		r.beginLines(lineWidth);
+		r.vertex(0.0f, 0.0f);
+		r.vertex((float)(0 - m_leftPos[0]), (float)(0 - m_leftPos[1]));
+		r.vertex(0.0f, 0.0f);
+		r.vertex((float)(0 - m_rightPos[0]), (float)(0 - m_rightPos[1]));
+		r.end();
+		r.popTransform();
 	}
 	else
 	{
-		glBegin(GL_LINES);
-		glVertex2d(-m_direction[0]*m_offset, -m_direction[1]*m_offset);
-		glVertex2d(-m_direction[0]*m_offset + m_direction[0]*m_length, -m_direction[1]*m_offset + m_direction[1]*m_length);
-		glEnd();
+		r.beginLines(lineWidth);
+		r.vertex((float)(-m_direction[0]*m_offset), (float)(-m_direction[1]*m_offset));
+		r.vertex((float)(-m_direction[0]*m_offset + m_direction[0]*m_length), (float)(-m_direction[1]*m_offset + m_direction[1]*m_length));
+		r.end();
 
-		glPushMatrix();
-		glTranslatef(-m_direction[0]*m_offset + m_direction[0]*m_length, -m_direction[1]*m_offset + m_direction[1]*m_length, 0.0);
-		glBegin(GL_LINES);
-		glVertex2d(0, 0);
-		glVertex2d(0 + m_leftPos[0], 0 + m_leftPos[1]);
-		glVertex2d(0, 0);
-		glVertex2d(0 + m_rightPos[0], 0 + m_rightPos[1]);
-		glEnd();
-		glPopMatrix();
+		r.pushTransform();
+		r.translate((float)(-m_direction[0]*m_offset + m_direction[0]*m_length), (float)(-m_direction[1]*m_offset + m_direction[1]*m_length));
+		r.beginLines(lineWidth);
+		r.vertex(0.0f, 0.0f);
+		r.vertex((float)(0 + m_leftPos[0]), (float)(0 + m_leftPos[1]));
+		r.vertex(0.0f, 0.0f);
+		r.vertex((float)(0 + m_rightPos[0]), (float)(0 + m_rightPos[1]));
+		r.end();
+		r.popTransform();
 	}
 
 	if (UiSettings::getInstance()->getSymbolLength()>0.0)

@@ -24,12 +24,18 @@
 
 #pragma once
 
+#include <memory>
+
 #include "Shape.h"
 #include "Image.h"
 
 namespace ivf2d {
 
 IvfSmartPointer(ScreenImage);
+
+// Forward-declared so the modern-GL header (and its Qt include) stays out of
+// ScreenImage.h, which is pulled into framework-agnostic consumers.
+class StreamTexture;
 
 class ScreenImage : public Shape {
 public:
@@ -47,6 +53,7 @@ private:
 	int m_cols;
 	int m_tileSpacing[2];
 	double m_devicePixelRatio;
+	std::unique_ptr<StreamTexture> m_streamTexture;
 public:
 	ScreenImage();
 	virtual ~ScreenImage();
@@ -74,6 +81,13 @@ public:
 	void setDevicePixelRatio(double dpr);
 
 	virtual void doGeometry();
+
+protected:
+	// The image is positioned and drawn entirely by doGeometry() via Renderer2D,
+	// so the legacy raster-position / matrix-stack transforms in Shape are
+	// bypassed (they do not exist in a core / WebGL profile).
+	virtual void doBeginTransform() override {}
+	virtual void doEndTransform() override {}
 
 };
 

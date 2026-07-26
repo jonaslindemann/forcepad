@@ -24,13 +24,7 @@
 
 #include "Color.h"
 
-#ifdef __APPLE__
-#include <OpenGL/glu.h>
-#include <OpenGL/gl.h>
-#else
-#include <GL/glu.h>
-#include <GL/gl.h>
-#endif
+#include "Renderer2D.h"
 
 namespace ivf2d {
 
@@ -57,7 +51,7 @@ void Color::setColor(float red, float green, float blue, float alpha)
 
 void Color::doMaterial()
 {
-	glColor4fv(m_color);
+	Renderer2D::instance().color(m_color[0], m_color[1], m_color[2], m_color[3]);
 }
 
 void Color::setAlpha(float alpha)

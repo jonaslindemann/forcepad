@@ -1,14 +1,7 @@
 #include "Ruler.h"
 #include "UiSettings.h"
 
-#ifdef __APPLE__
-#include <OpenGL/glu.h>
-#include <OpenGL/gl.h>
-#else
-#include <GL/glu.h>
-#include <GL/gl.h>
-#endif
-
+#include "Renderer2D.h"
 #include "Vec3d.h"
 
 namespace fp {
@@ -34,28 +27,26 @@ void Ruler::initRuler()
 
 void Ruler::doGeometry()
 {
-	glPushAttrib(GL_ALL_ATTRIB_BITS);
+	const float lineWidth = 2.0f * (float)UiSettings::getInstance()->getDevicePixelRatio();
+	ivf2d::Renderer2D &r = ivf2d::Renderer2D::instance();
 
-	glLineWidth(2.0f * (float)UiSettings::getInstance()->getDevicePixelRatio());
+	// End cross-hairs (solid).
+	r.beginLines(lineWidth);
+	r.vertex((float)m_startPos[0], (float)(m_startPos[1]-10));
+	r.vertex((float)m_startPos[0], (float)(m_startPos[1]+10));
+	r.vertex((float)(m_startPos[0]-10), (float)m_startPos[1]);
+	r.vertex((float)(m_startPos[0]+10), (float)m_startPos[1]);
+	r.vertex((float)m_endPos[0], (float)(m_endPos[1]-10));
+	r.vertex((float)m_endPos[0], (float)(m_endPos[1]+10));
+	r.vertex((float)(m_endPos[0]-10), (float)m_endPos[1]);
+	r.vertex((float)(m_endPos[0]+10), (float)m_endPos[1]);
+	r.end();
 
-	glBegin(GL_LINES);
-	glVertex2i(m_startPos[0], m_startPos[1]-10);
-	glVertex2i(m_startPos[0], m_startPos[1]+10);
-	glVertex2i(m_startPos[0]-10, m_startPos[1]);
-	glVertex2i(m_startPos[0]+10, m_startPos[1]);
-	glVertex2i(m_endPos[0], m_endPos[1]-10);
-	glVertex2i(m_endPos[0], m_endPos[1]+10);
-	glVertex2i(m_endPos[0]-10, m_endPos[1]);
-	glVertex2i(m_endPos[0]+10, m_endPos[1]);
-	glEnd();
-
-	glLineStipple(1, 0x3333);
-	glEnable(GL_LINE_STIPPLE);
-	glBegin(GL_LINES);
-		glVertex2iv((GLint*)m_startPos);
-		glVertex2iv((GLint*)m_endPos);
-	glEnd();
-	glPopAttrib();
+	// Measuring line (was glLineStipple(1, 0x3333) -> 2 px on / 2 px off).
+	r.beginDashedLines(lineWidth, 4.0f);
+	r.vertex((float)m_startPos[0], (float)m_startPos[1]);
+	r.vertex((float)m_endPos[0], (float)m_endPos[1]);
+	r.end();
 }
 
 void Ruler::setEndPos(int x, int y)

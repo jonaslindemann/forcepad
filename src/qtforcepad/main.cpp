@@ -41,8 +41,17 @@ int main(int argc, char *argv[])
     QSurfaceFormat fmt;
     fmt.setDepthBufferSize(24);
     fmt.setStencilBufferSize(8);
-    fmt.setVersion(2, 1);
-    fmt.setProfile(QSurfaceFormat::CompatibilityProfile);
+    // Multisample antialiasing. This is the core-profile / WebGL-compatible
+    // replacement for the old glEnable(GL_LINE_SMOOTH)/GL_POLYGON_SMOOTH, which
+    // the rendering migration removed. QOpenGLWidget honours this by creating a
+    // multisampled FBO and resolving it, so force/line/BC overlays stay smooth.
+    fmt.setSamples(4);
+    // 3.3 Core profile on all platforms. The rendering migration removed every
+    // fixed-function / immediate-mode call, so the app now runs on a core
+    // profile - the same feature level as WebGL 2 / OpenGL ES 3.0, which is the
+    // target for the Qt-for-WebAssembly build. (macOS supports 3.3-4.1 Core.)
+    fmt.setVersion(3, 3);
+    fmt.setProfile(QSurfaceFormat::CoreProfile);
     QSurfaceFormat::setDefaultFormat(fmt);
 
     QApplication app(argc, argv);

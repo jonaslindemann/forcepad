@@ -15,14 +15,80 @@
 #include <QApplication>
 #include <QOpenGLContext>
 #include <QOpenGLFunctions>
+#include <QOpenGLExtraFunctions>
 
 #include "UiSettings.h"
+#include "Renderer2D.h"
+#include "StreamTexture.h"
 
 #ifdef __APPLE__
 #include <OpenGL/glu.h>
 #else
 #include <GL/glu.h>
 #endif
+
+// ---------------------------------------------------------------------------
+// Phase 0 smoke test for the modern-GL abstraction (Renderer2D / StreamTexture).
+// Enabled by setting the environment variable FORCEPAD_R2D_SMOKETEST; when set,
+// paintGL() draws this test scene instead of the normal view. It exercises the
+// shader program, the batched VBO path (gradient quad + lines) and the
+// streaming-texture path (a checkerboard), proving the abstraction works on the
+// live GL context before any real renderer is ported to it.
+// ---------------------------------------------------------------------------
+static void renderR2DSmokeTest(int w, int h, int pw, int ph)
+{
+    QOpenGLContext *ctx = QOpenGLContext::currentContext();
+    if (ctx == nullptr)
+        return;
+    QOpenGLExtraFunctions *f = ctx->extraFunctions();
+
+    f->glViewport(0, 0, pw, ph);
+    f->glDisable(GL_SCISSOR_TEST);
+    f->glClearColor(0.12f, 0.12f, 0.15f, 1.0f);
+    f->glClear(GL_COLOR_BUFFER_BIT);
+
+    ivf2d::Renderer2D &r = ivf2d::Renderer2D::instance();
+    r.setOrtho(0.0f, (float)w, 0.0f, (float)h);
+    r.loadIdentity();
+
+    // Gradient quad (batched VBO + flat shader, GL_QUADS emulation).
+    r.beginQuads();
+    r.color(0.90f, 0.20f, 0.20f); r.vertex(w * 0.08f, h * 0.10f);
+    r.color(0.20f, 0.90f, 0.20f); r.vertex(w * 0.48f, h * 0.10f);
+    r.color(0.20f, 0.20f, 0.90f); r.vertex(w * 0.48f, h * 0.52f);
+    r.color(0.90f, 0.90f, 0.20f); r.vertex(w * 0.08f, h * 0.52f);
+    r.end();
+
+    // Streaming texture: a 16x16 RGBA checkerboard uploaded once.
+    static ivf2d::StreamTexture s_checker;
+    static bool s_built = false;
+    if (!s_built)
+    {
+        const int n = 16;
+        unsigned char pixels[16 * 16 * 4];
+        for (int y = 0; y < n; ++y)
+            for (int x = 0; x < n; ++x)
+            {
+                const bool on = ((x / 2) + (y / 2)) % 2 == 0;
+                unsigned char *p = &pixels[(y * n + x) * 4];
+                p[0] = on ? 230 : 40;
+                p[1] = on ? 180 : 40;
+                p[2] = on ? 60  : 90;
+                p[3] = 255;
+            }
+        s_checker.update(pixels, n, n, GL_RGBA);
+        s_built = true;
+    }
+    r.setBlend(false);
+    s_checker.draw(w * 0.55f, h * 0.10f, w * 0.37f, h * 0.42f);
+
+    // Batched lines.
+    r.beginLines(2.0f);
+    r.color(1.0f, 1.0f, 1.0f);
+    r.vertex(w * 0.08f, h * 0.62f); r.vertex(w * 0.92f, h * 0.62f);
+    r.vertex(w * 0.08f, h * 0.70f); r.vertex(w * 0.92f, h * 0.70f);
+    r.end();
+}
 
 // ---------------------------------------------------------------------------
 // Semi-transparent toast overlay shown on top of the GL canvas
@@ -128,21 +194,24 @@ void QtPaintView::paintGL()
 {
     fp::UiSettings::getInstance()->setDevicePixelRatio(doDevicePixelRatio());
 
+    static const bool s_smokeTest = qEnvironmentVariableIsSet("FORCEPAD_R2D_SMOKETEST");
+    if (s_smokeTest)
+    {
+        renderR2DSmokeTest(width(), height(), physicalWidth(), physicalHeight());
+        return;
+    }
+
+    // The drawing image's alpha channel encodes layer markers, not opacity.
+    // Renderer2D forces opaque output for the canvas blit (setForceOpaque), so
+    // no alpha bleeds into the composited FBO and the old glPixelTransfer
+    // alpha-forcing hack is no longer needed.
     onClear();
-
-    // m_drawing layer 0 stores alpha as a layer marker (0 = background,
-    // 128 = undo region), not as opacity.  Qt composites the QOpenGLWidget
-    // FBO over the window background using the FBO alpha channel, so any
-    // pixel with alpha < 255 would bleed through and look gray.
-    // glPixelTransfer forces every glDrawPixels call inside onDraw() to
-    // emit alpha=1.0 regardless of the stored value.
-    glPixelTransferf(GL_ALPHA_SCALE, 0.0f);
-    glPixelTransferf(GL_ALPHA_BIAS,  1.0f);
-
     onDraw();
 
-    glPixelTransferf(GL_ALPHA_SCALE, 1.0f);
-    glPixelTransferf(GL_ALPHA_BIAS,  0.0f);
+    // Leave the scissor test disabled so Qt's multisample-FBO resolve blit
+    // (glBlitFramebuffer, which honours GL_SCISSOR_TEST) copies the whole widget
+    // and not just the drawing area - otherwise the surround renders black.
+    ivf2d::Renderer2D::instance().setScissorEnabled(false);
 }
 
 void QtPaintView::resizeGL(int w, int h)
@@ -218,6 +287,40 @@ void QtPaintView::mouseMoveEvent(QMouseEvent *event)
         onMove(x, y);
 }
 
+unsigned int QtPaintView::ensureCaptureFramebuffer(int width, int height)
+{
+    QOpenGLExtraFunctions *f = QOpenGLContext::currentContext()->extraFunctions();
+    if (width <= 0 || height <= 0)
+        return 0;
+
+    if (m_captureFbo != 0 && (width != m_captureW || height != m_captureH))
+    {
+        f->glDeleteFramebuffers(1, &m_captureFbo);
+        f->glDeleteTextures(1, &m_captureTex);
+        m_captureFbo = 0;
+        m_captureTex = 0;
+    }
+
+    if (m_captureFbo == 0)
+    {
+        f->glGenTextures(1, &m_captureTex);
+        f->glBindTexture(GL_TEXTURE_2D, m_captureTex);
+        f->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+        f->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        f->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        f->glBindTexture(GL_TEXTURE_2D, 0);
+
+        f->glGenFramebuffers(1, &m_captureFbo);
+        f->glBindFramebuffer(GL_FRAMEBUFFER, m_captureFbo);
+        f->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_captureTex, 0);
+        f->glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebufferObject());
+
+        m_captureW = width;
+        m_captureH = height;
+    }
+    return m_captureFbo;
+}
+
 void QtPaintView::mouseReleaseEvent(QMouseEvent *event)
 {
     int x = event->pos().x();
@@ -227,29 +330,27 @@ void QtPaintView::mouseReleaseEvent(QMouseEvent *event)
     {
         if (!m_danglingRelease)
         {
-            // Ensure the GL context is current and the FBO holds the final
-            // draw state before onRelease() calls glReadPixels to commit the
-            // geometry to the canvas image.  Qt does NOT make the context
-            // current in mouse-event handlers, so we must do it explicitly.
+            // Ensure the GL context is current before committing geometry.  Qt
+            // does NOT make the context current in mouse-event handlers.
             makeCurrent();
-            // Qt 6 does NOT automatically re-bind the widget FBO when
-            // makeCurrent() is called outside of paintGL().  Without this
-            // explicit bind, onClear()/onDraw() render to framebuffer 0
-            // (meaningless in an offscreen-surface context) and glReadPixels
-            // inside onRelease() reads back zeros instead of the drawn shape.
-            QOpenGLContext::currentContext()->functions()->glBindFramebuffer(
-                GL_FRAMEBUFFER, defaultFramebufferObject());
+            QOpenGLExtraFunctions *f = QOpenGLContext::currentContext()->extraFunctions();
+
+            // The shape (line/rect/ellipse/arch) is committed to the drawing
+            // image by rendering it and reading it back with glReadPixels
+            // (onRelease). glReadPixels is invalid on the widget's *multisample*
+            // FBO, so render this capture pass into a single-sample FBO instead
+            // (MSAA is irrelevant for the captured pixel raster). Fall back to
+            // the widget FBO if the capture FBO can't be created.
+            unsigned int captureFbo = ensureCaptureFramebuffer(physicalWidth(), physicalHeight());
+            f->glBindFramebuffer(GL_FRAMEBUFFER, captureFbo != 0 ? captureFbo : defaultFramebufferObject());
+
             onClear();
-            // Mirror the glPixelTransfer state from paintGL() so glDrawPixels
-            // inside onDraw() emits alpha=1.0 into the FBO.
-            glPixelTransferf(GL_ALPHA_SCALE, 0.0f);
-            glPixelTransferf(GL_ALPHA_BIAS,  1.0f);
             onDraw();   // m_leftMouseDown still true → line/rect/ellipse rendered
-            glPixelTransferf(GL_ALPHA_SCALE, 1.0f);
-            glPixelTransferf(GL_ALPHA_BIAS,  0.0f);
-            glFinish(); // ensure GPU rendering is complete before glReadPixels
+            f->glFinish(); // ensure GPU work is complete before glReadPixels
             m_leftMouseDown = false;
             onRelease(x, y);
+
+            f->glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebufferObject());
         }
         else
         {

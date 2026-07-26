@@ -25,21 +25,10 @@
 #include "FemGrid2.h"
 #include "UiSettings.h"
 
-#ifdef __APPLE__
-#include <OpenGL/glu.h>
-#include <OpenGL/gl.h>
-#else
-#include <GL/glu.h>
-#include <GL/gl.h>
-#endif
-
+#include "Renderer2D.h"
 #include "Vec3d.h"
 
 using namespace std;
-
-#ifdef WIN32
-#define GL_CLAMP_TO_EDGE 0x812F
-#endif
 
 namespace fp {
 
@@ -775,6 +764,8 @@ void FemGrid2::drawGrid()
 	double ey[4];
 	double value;
 
+	ivf2d::Renderer2D &r = ivf2d::Renderer2D::instance();
+
 	if (m_displacements!=nullptr)
 	{
 		for (i=0; i<m_rows; i++)
@@ -785,18 +776,18 @@ void FemGrid2::drawGrid()
 
 				if (m_grid(i, j)>m_elementTreshold)
 				{
-					glBegin(GL_QUADS);
-					glColor4f(1.0f-m_grid(i, j)*m_maxIntensity, 1.0f-m_grid(i, j)*m_maxIntensity, 1.0f-m_grid(i, j)*m_maxIntensity, alpha);
+					r.beginQuads();
+					r.color(1.0f-m_grid(i, j)*m_maxIntensity, 1.0f-m_grid(i, j)*m_maxIntensity, 1.0f-m_grid(i, j)*m_maxIntensity, (float)alpha);
 					for (l=0; l<4; l++)
 					{
 						dx = k*m_displacements[topo[l*2]];
 						dy = k*m_displacements[topo[l*2+1]];
 						if (m_drawDisplacements)
-							glVertex2d(ex[l]/m_elementScaleFactor + dx, ey[l]/m_elementScaleFactor + dy);
+							r.vertex((float)(ex[l]/m_elementScaleFactor + dx), (float)(ey[l]/m_elementScaleFactor + dy));
 						else
-							glVertex2d(ex[l]/m_elementScaleFactor, ey[l]/m_elementScaleFactor);
+							r.vertex((float)(ex[l]/m_elementScaleFactor), (float)(ey[l]/m_elementScaleFactor));
 					}
-					glEnd();
+					r.end();
 				}
 			}
 		}
@@ -812,6 +803,8 @@ void FemGrid2::drawDensity()
 	double ey[4];
 	double value;
 
+	ivf2d::Renderer2D &r = ivf2d::Renderer2D::instance();
+
 	for (i=0; i<m_rows; i++)
 	{
 		for (j=0; j<m_cols; j++)
@@ -820,11 +813,11 @@ void FemGrid2::drawDensity()
 
 			if (m_grid(i, j)>m_elementTreshold)
 			{
-				glBegin(GL_QUADS);
-				glColor4f(1.0f-this->getFieldValue(0,i,j), 1.0f-this->getFieldValue(0,i,j), 1.0f-this->getFieldValue(0,i,j), 1.0);
+				r.beginQuads();
+				r.color(1.0f-this->getFieldValue(0,i,j), 1.0f-this->getFieldValue(0,i,j), 1.0f-this->getFieldValue(0,i,j), 1.0f);
 				for (l=0; l<4; l++)
-						glVertex2d(ex[l]/m_elementScaleFactor, ey[l]/m_elementScaleFactor);
-				glEnd();
+						r.vertex((float)(ex[l]/m_elementScaleFactor), (float)(ey[l]/m_elementScaleFactor));
+				r.end();
 			}
 		}
 	}
@@ -840,6 +833,8 @@ void FemGrid2::drawUndeformedGrid()
 	double ey[4];
 	double value;
 
+	ivf2d::Renderer2D &r = ivf2d::Renderer2D::instance();
+
 	if (m_displacements!=nullptr)
 	{
 		for (i=0; i<m_rows; i++)
@@ -850,11 +845,11 @@ void FemGrid2::drawUndeformedGrid()
 
 				if (m_grid(i, j)>m_elementTreshold)
 				{
-					glBegin(GL_QUADS);
-					glColor4f(1.0f-m_grid(i, j)*m_maxIntensity, 1.0f-m_grid(i, j)*m_maxIntensity, 1.0f-m_grid(i, j)*m_maxIntensity, alpha);
+					r.beginQuads();
+					r.color(1.0f-m_grid(i, j)*m_maxIntensity, 1.0f-m_grid(i, j)*m_maxIntensity, 1.0f-m_grid(i, j)*m_maxIntensity, (float)alpha);
 					for (l=0; l<4; l++)
-						glVertex2d(ex[l]/m_elementScaleFactor, ey[l]/m_elementScaleFactor);
-					glEnd();
+						r.vertex((float)(ex[l]/m_elementScaleFactor), (float)(ey[l]/m_elementScaleFactor));
+					r.end();
 				}
 			}
 		}
@@ -870,6 +865,8 @@ void FemGrid2::drawStructure()
 	double ey[4];
 	double value;
 
+	ivf2d::Renderer2D &r = ivf2d::Renderer2D::instance();
+
 	if (m_displacements!=nullptr)
 	{
 		for (i=0; i<m_rows; i++)
@@ -880,11 +877,11 @@ void FemGrid2::drawStructure()
 
 				if (m_grid(i, j)>m_elementTreshold)
 				{
-					glBegin(GL_QUADS);
-					glColor4f(1.0f-m_grid(i, j), 1.0f-m_grid(i, j), 1.0f-m_grid(i, j), alpha);
+					r.beginQuads();
+					r.color(1.0f-m_grid(i, j), 1.0f-m_grid(i, j), 1.0f-m_grid(i, j), (float)alpha);
 					for (l=0; l<4; l++)
-						glVertex2d(ex[l]/m_elementScaleFactor, ey[l]/m_elementScaleFactor);
-					glEnd();
+						r.vertex((float)(ex[l]/m_elementScaleFactor), (float)(ey[l]/m_elementScaleFactor));
+					r.end();
 				}
 			}
 		}
@@ -1038,12 +1035,11 @@ void FemGrid2::drawMisesStress()
 	double value;
 
 
+	ivf2d::Renderer2D &ren = ivf2d::Renderer2D::instance();
+
 	if ((m_displacements!=nullptr)&&(!m_results.empty()))
 	{
-		glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT | GL_CURRENT_BIT);
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
+		// Blend is enabled ambiently by PaintView for the whole overlay pass.
 		for (i=0; i<m_rows; i++)
 		{
 			for (j=0; j<m_cols; j++)
@@ -1056,23 +1052,21 @@ void FemGrid2::drawMisesStress()
 					this->getElement(i, j, value, ex, ey, topo);
 
 					const float alpha = stiffnessAlpha(m_grid(i, j));
-					glBegin(GL_QUADS);
-					glColor4f(r, g, b, alpha);
+					ren.beginQuads();
+					ren.color(r, g, b, alpha);
 					for (l=0; l<4; l++)
 					{
 						dx = k*m_displacements[topo[l*2]];
 						dy = k*m_displacements[topo[l*2+1]];
 						if (m_drawDisplacements)
-							glVertex2d(ex[l]/m_elementScaleFactor + dx, ey[l]/m_elementScaleFactor + dy);
+							ren.vertex((float)(ex[l]/m_elementScaleFactor + dx), (float)(ey[l]/m_elementScaleFactor + dy));
 						else
-							glVertex2d(ex[l]/m_elementScaleFactor, ey[l]/m_elementScaleFactor);
+							ren.vertex((float)(ex[l]/m_elementScaleFactor), (float)(ey[l]/m_elementScaleFactor));
 					}
-					glEnd();
+					ren.end();
 				}
 			}
 		}
-
-		glPopAttrib();
 	}
 }
 
@@ -1088,24 +1082,13 @@ void FemGrid2::drawMisesStressSmooth()
 	double ey[4];
 	double value;
 
-	glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT | GL_CURRENT_BIT | GL_TEXTURE_BIT);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable(GL_TEXTURE_1D);
-	glBindTexture(GL_TEXTURE_1D, 13);
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	ivf2d::Renderer2D &ren = ivf2d::Renderer2D::instance();
 
-	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri (GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri (GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri (GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-	glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 128, 0, GL_RGB, GL_UNSIGNED_BYTE, m_colorMapTex1D);
-
-	glBindTexture(GL_TEXTURE_1D, 13);
-
+	// This previously used a 1D colormap texture (GL_TEXTURE_1D + glTexCoord1f),
+	// neither of which exists in a core profile or WebGL. The colormap is now
+	// sampled on the CPU per node; the element quad interpolates the resulting
+	// vertex colors (visually equivalent for ForcePAD's smooth colormap).
+	// Blend is enabled ambiently by PaintView for the whole overlay pass.
 	if ((m_displacements!=nullptr)&&(m_nodeResults.size() > 0))
 	{
 		for (i=0; i<m_rows; i++)
@@ -1114,12 +1097,10 @@ void FemGrid2::drawMisesStressSmooth()
 			{
 				if (m_grid(i, j)>m_elementTreshold)
 				{
-
 					this->getElement(i, j, value, ex, ey, topo);
 
 					const float alpha = stiffnessAlpha(m_grid(i, j));
-					glBegin(GL_QUADS);
-					glColor4f(1.0f, 1.0f, 1.0f, alpha);
+					ren.beginQuads();
 					for (l=0; l<4; l++)
 					{
 						switch (l) {
@@ -1137,33 +1118,21 @@ void FemGrid2::drawMisesStressSmooth()
 								break;
 						}
 
-						if (false)
-						{
-							this->m_colorMap->getColor(sigm/this->m_maxMisesStressValue/m_upperMisesTreshold, r, g, b);
-							glColor4f(r, g, b, alpha);
-						}
-						else
-						{
-							float s = sigm/this->m_maxMisesStressValue/m_upperMisesTreshold;
-							glTexCoord1f(s);
-						}
+						this->m_colorMap->getColor(sigm/this->m_maxMisesStressValue/m_upperMisesTreshold, r, g, b);
+						ren.color(r, g, b, alpha);
 
 						dx = k*m_displacements[topo[l*2]];
 						dy = k*m_displacements[topo[l*2+1]];
 						if (m_drawDisplacements)
-							glVertex2d(ex[l]/m_elementScaleFactor + dx, ey[l]/m_elementScaleFactor + dy);
+							ren.vertex((float)(ex[l]/m_elementScaleFactor + dx), (float)(ey[l]/m_elementScaleFactor + dy));
 						else
-							glVertex2d(ex[l]/m_elementScaleFactor, ey[l]/m_elementScaleFactor);
+							ren.vertex((float)(ex[l]/m_elementScaleFactor), (float)(ey[l]/m_elementScaleFactor));
 					}
-					glEnd();
+					ren.end();
 				}
 			}
 		}
 	}
-
-	glDisable(GL_TEXTURE_1D);
-
-	glPopAttrib();
 }
 
 void FemGrid2::drawStressArrow(double x, double y, const double *values)
@@ -1212,20 +1181,20 @@ void FemGrid2::drawStressArrow(double x, double y, const double *values)
 	if ( (maxSig>m_lowerStressTreshold)&&(maxSig<m_upperStressTreshold) )
 	{
 
-		glLineWidth((GLfloat)(m_stressWidth * UiSettings::getInstance()->getDevicePixelRatio()));
-		glBegin(GL_LINES);
+		ivf2d::Renderer2D &ren = ivf2d::Renderer2D::instance();
+		ren.beginLines((float)(m_stressWidth * UiSettings::getInstance()->getDevicePixelRatio()));
 
 		if  (((m_stressMode==FemGrid2::SM_POSITIVE)&&(sig1>0.0))||
 			((m_stressMode==FemGrid2::SM_NEGATIVE)&&(sig1<0.0))||
 			(m_stressMode==FemGrid2::SM_ALL))
 		{
 			if (sig1>0)
-				glColor4f(1.0f, 0.0f, 0.0f, (double)m_stressAlpha);
+				ren.color(1.0f, 0.0f, 0.0f, (float)m_stressAlpha);
 			else
-				glColor4f(0.0f, 0.0f, 1.0f, (double)m_stressAlpha);
+				ren.color(0.0f, 0.0f, 1.0f, (float)m_stressAlpha);
 
-			glVertex2d(x - 0.5*sig1*m_stressSize*cos(alpha), y - 0.5*sig1*m_stressSize*sin(alpha));
-			glVertex2d(x + 0.5*sig1*m_stressSize*cos(alpha), y + 0.5*sig1*m_stressSize*sin(alpha));
+			ren.vertex((float)(x - 0.5*sig1*m_stressSize*cos(alpha)), (float)(y - 0.5*sig1*m_stressSize*sin(alpha)));
+			ren.vertex((float)(x + 0.5*sig1*m_stressSize*cos(alpha)), (float)(y + 0.5*sig1*m_stressSize*sin(alpha)));
 		}
 
 		if  (((m_stressMode==FemGrid2::SM_POSITIVE)&&(sig2>0.0))||
@@ -1233,15 +1202,15 @@ void FemGrid2::drawStressArrow(double x, double y, const double *values)
 			(m_stressMode==FemGrid2::SM_ALL))
 		{
 			if (sig2>0)
-				glColor4f(1.0f, 0.0f, 0.0f, (double)m_stressAlpha);
+				ren.color(1.0f, 0.0f, 0.0f, (float)m_stressAlpha);
 			else
-				glColor4f(0.0f, 0.0f, 1.0f, (double)m_stressAlpha);
+				ren.color(0.0f, 0.0f, 1.0f, (float)m_stressAlpha);
 
-			glVertex2d(x - 0.5*sig2*m_stressSize*cos(alpha+M_PI/2.0), y - 0.5*sig2*m_stressSize*sin(alpha+M_PI/2.0));
-			glVertex2d(x + 0.5*sig2*m_stressSize*cos(alpha+M_PI/2.0), y + 0.5*sig2*m_stressSize*sin(alpha+M_PI/2.0));
+			ren.vertex((float)(x - 0.5*sig2*m_stressSize*cos(alpha+M_PI/2.0)), (float)(y - 0.5*sig2*m_stressSize*sin(alpha+M_PI/2.0)));
+			ren.vertex((float)(x + 0.5*sig2*m_stressSize*cos(alpha+M_PI/2.0)), (float)(y + 0.5*sig2*m_stressSize*sin(alpha+M_PI/2.0)));
 		}
 
-		glEnd();
+		ren.end();
 	}
 }
 
@@ -1254,10 +1223,7 @@ void FemGrid2::drawStress()
 
 	if (!m_results.empty())
 	{
-		glPushAttrib(GL_COLOR_BUFFER_BIT);
-		glEnable(GL_BLEND);
-		glEnable(GL_LINE_SMOOTH);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		// Blend is enabled ambiently by PaintView for the whole overlay pass.
 		for (i=0; i<m_rows; i+=m_stressStep)
 		{
 			for (j=0; j<m_cols; j+=m_stressStep)
@@ -1273,7 +1239,6 @@ void FemGrid2::drawStress()
 				}
 			}
 		}
-		glPopAttrib();
 	}
 }
 
@@ -1282,12 +1247,7 @@ void FemGrid2::drawForces()
 	int i;
 	int height = getImage()->getHeight();
 
-	glPushAttrib(GL_COLOR_BUFFER_BIT);
-	glEnable(GL_BLEND);
-	glEnable(GL_LINE_SMOOTH);
-	glEnable(GL_POLYGON_SMOOTH);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
+	// Blend is enabled ambiently by PaintView; forces render via Renderer2D.
 	CForceQueIter fi;
 
 	for (i=0; i<height; i++)
@@ -1295,7 +1255,6 @@ void FemGrid2::drawForces()
 		for (fi=m_pointForces[i].begin(); (!m_pointForces[i].empty())&&(fi!=m_pointForces[i].end()); fi++)
 			(*fi)->render();
 	}
-	glPopAttrib();
 }
 
 void FemGrid2::drawConstraints()
@@ -1305,12 +1264,7 @@ void FemGrid2::drawConstraints()
 	int i;
 	int height = getImage()->getHeight();
 
-	glPushAttrib(GL_COLOR_BUFFER_BIT);
-	glEnable(GL_BLEND);
-	glEnable(GL_LINE_SMOOTH);
-	glEnable(GL_POLYGON_SMOOTH);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
+	// Blend is enabled ambiently by PaintView; constraints render via Renderer2D.
 	CConstraintQueIter ci;
 
 	for (i=0; i<height; i++)
@@ -1318,7 +1272,6 @@ void FemGrid2::drawConstraints()
 		for (ci=m_pointConstraints[i].begin(); (!m_pointConstraints[i].empty())&&(ci!=m_pointConstraints[i].end()); ci++)
 			(*ci)->render();
 	}
-	glPopAttrib();
 }
 
 void FemGrid2::drawDebugPoints()
@@ -1328,17 +1281,17 @@ void FemGrid2::drawDebugPoints()
 
 	// Draw test points
 
-	glLineWidth(2.0f * dpr);
-	glBegin(GL_LINES);
-	glColor3f(1.0f, 0.0f, 1.0f);
+	ivf2d::Renderer2D &r = ivf2d::Renderer2D::instance();
+	r.beginLines(2.0f * dpr);
+	r.color(1.0f, 0.0f, 1.0f, 1.0f);
 	for (i=0; i<m_xpoints.size(); i++)
 	{
-		glVertex2i(m_xpoints[i]-2, m_ypoints[i]);
-		glVertex2i(m_xpoints[i]+2, m_ypoints[i]);
-		glVertex2i(m_xpoints[i], m_ypoints[i]-2);
-		glVertex2i(m_xpoints[i], m_ypoints[i]+2);
+		r.vertex((float)(m_xpoints[i]-2), (float)m_ypoints[i]);
+		r.vertex((float)(m_xpoints[i]+2), (float)m_ypoints[i]);
+		r.vertex((float)m_xpoints[i], (float)(m_ypoints[i]-2));
+		r.vertex((float)m_xpoints[i], (float)(m_ypoints[i]+2));
 	}
-	glEnd();
+	r.end();
 }
 
 void FemGrid2::drawGridPoints()
@@ -1347,20 +1300,21 @@ void FemGrid2::drawGridPoints()
 	double ex[4];
 	double ey[4];
 
+	ivf2d::Renderer2D &r = ivf2d::Renderer2D::instance();
+	const float lineWidth = 1.0f * (float)UiSettings::getInstance()->getDevicePixelRatio();
+
 	for (i=0; i<m_rows; i++)
 	{
 		for (j=0; j<m_cols; j++)
 		{
 			this->getElementCoords(i, j, ex, ey);
 
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			glLineWidth(1.0f * (float)UiSettings::getInstance()->getDevicePixelRatio());
-			glBegin(GL_QUADS);
-			glColor4f(0.2f, 0.2f, 0.2f, 0.5f);
+			// Was glPolygonMode(GL_LINE) wireframe; now an explicit line loop.
+			r.beginLineLoop(lineWidth);
+			r.color(0.2f, 0.2f, 0.2f, 0.5f);
 			for (l=0; l<4; l++)
-				glVertex2d(ex[l], ey[l]);
-			glEnd();
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+				r.vertex((float)ex[l], (float)ey[l]);
+			r.end();
 		}
 	}
 }
@@ -1468,7 +1422,7 @@ void FemGrid2::saveToStream(ostream &out)
 	ivf2d::Image* image = this->getImage();
 	int i, j;
 	int width, height;
-	GLubyte uivalue;
+	unsigned char uivalue;
 	int lastValue;
 	int value;
 	int valueCount = 0;
@@ -1604,9 +1558,9 @@ void FemGrid2::readFromStream(istream &in)
 
 			for (i=0; i<valueCount; i++)
 			{
-				image->setValue(col, row, 0, (GLubyte)value);
-				image->setValue(col, row, 1, (GLubyte)value);
-				image->setValue(col, row, 2, (GLubyte)value);
+				image->setValue(col, row, 0, (unsigned char)value);
+				image->setValue(col, row, 1, (unsigned char)value);
+				image->setValue(col, row, 2, (unsigned char)value);
 
 				col++;
 
@@ -1733,7 +1687,7 @@ void FemGrid2::calcCenterOfGravity(int &x, int &y)
 	int i, j;
 
 	double sumFx, sumFy, sumF;
-	GLubyte red, green, blue;
+	unsigned char red, green, blue;
 	double value;
 	int width, height;
 
@@ -2135,7 +2089,7 @@ void FemGrid2::calcCenterOfStiffness(int &cgx, int &cgy)
 	int i, j;
 
 	double sumFx, sumFy, sumF;
-	GLubyte red, green, blue;
+	unsigned char red, green, blue;
 	double value;
 	int width, height;
 
@@ -2318,7 +2272,7 @@ void FemGrid2::updatePixelArea()
 	int i, j;
 
 	double sumF;
-	GLubyte red, green, blue;
+	unsigned char red, green, blue;
 	double value;
 	int width, height;
 
@@ -2505,9 +2459,9 @@ void FemGrid2::updateColorMapTexture()
 	{
 		m_colorMap->getColor((double)i/383.0, r, g, b);
 
-		m_colorMapTex1D[i]=(GLubyte)(r*255.0f);
-		m_colorMapTex1D[i+1]=(GLubyte)(g*255.0f);
-		m_colorMapTex1D[i+2]=(GLubyte)(b*255.0f);
+		m_colorMapTex1D[i]=(unsigned char)(r*255.0f);
+		m_colorMapTex1D[i+1]=(unsigned char)(g*255.0f);
+		m_colorMapTex1D[i+2]=(unsigned char)(b*255.0f);
 	}
 }
 

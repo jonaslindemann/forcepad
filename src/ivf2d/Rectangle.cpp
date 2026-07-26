@@ -24,13 +24,7 @@
 
 #include "Rectangle.h"
 
-#ifdef __APPLE__
-#include <OpenGL/glu.h>
-#include <OpenGL/gl.h>
-#else
-#include <GL/glu.h>
-#include <GL/gl.h>
-#endif
+#include "Renderer2D.h"
 
 namespace ivf2d {
 
@@ -96,82 +90,52 @@ void Rectangle::getSize(double &width, double &height)
 
 void Rectangle::doGeometry()
 {
-	//glEnable(GL_BLEND);
-	//glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+	Renderer2D &r = Renderer2D::instance();
 
 	if ((m_rectType==RT_SOLID)||(m_rectType==RT_SOLID_OUTLINE))
 	{
-		glBegin(GL_QUADS);
-		glTexCoord2d(0.0, 0.0);
-		glVertex2d(0.0, 0.0);
-		
-		glTexCoord2d(1.0, 0.0);
-		glVertex2d(m_size[0], 0.0);
-		
-		glTexCoord2d(1.0, 1.0);
-		glVertex2d(m_size[0], m_size[1]);
-		
-		glTexCoord2d(0.0, 1.0);
-		glVertex2d(0.0, m_size[1]);
-		
-		glEnd();
+		r.beginQuads();
+		r.texCoord(0.0f, 0.0f);
+		r.vertex(0.0f, 0.0f);
+
+		r.texCoord(1.0f, 0.0f);
+		r.vertex((float)m_size[0], 0.0f);
+
+		r.texCoord(1.0f, 1.0f);
+		r.vertex((float)m_size[0], (float)m_size[1]);
+
+		r.texCoord(0.0f, 1.0f);
+		r.vertex(0.0f, (float)m_size[1]);
+
+		r.end();
 	}
 
 	if ((m_rectType==RT_OUTLINE)||(m_rectType==RT_SOLID_OUTLINE))
 	{
-		glPushAttrib(GL_LINE_BIT);
-		if (m_lineType!=LT_SOLID)
-		{
-			if (m_lineType==LT_DASHED)
-				m_lineStipple = 0x00FF;
-
-			if (m_lineType==LT_DOTTED)
-				m_lineStipple = 0x0101;
-
-			glLineWidth((GLfloat)m_lineWidth);
-			glLineStipple(m_lineFactor, m_lineStipple);
-			glEnable(GL_LINE_STIPPLE);
-		}
 		m_lineColor->render();
-		glBegin(GL_LINE_LOOP);		
-		glVertex2d(0.0, 0.0);
-		glVertex2d(m_size[0], 0.0);
-		glVertex2d(m_size[0], m_size[1]);
-		glVertex2d(0.0, m_size[1]);
-		glEnd();
-		glPopAttrib();
+
+		// The outline is drawn as four explicit segments (rather than a line
+		// loop) so dashed rendering gets continuous per-segment distances.
+		const float w = (float)m_size[0];
+		const float h = (float)m_size[1];
+		if (m_lineType != LT_SOLID)
+		{
+			// glLineStipple periods, mapped to shader dash periods (px):
+			//   LT_DASHED 0x00FF -> 16 (8 on / 8 off)
+			//   LT_DOTTED 0x0101 ->  4 (dotted approximation)
+			const float period = (m_lineType == LT_DOTTED) ? 4.0f : 16.0f;
+			r.beginDashedLines((float)m_lineWidth, period * (float)m_lineFactor);
+		}
+		else
+		{
+			r.beginLines((float)m_lineWidth);
+		}
+		r.vertex(0.0f, 0.0f); r.vertex(w, 0.0f);
+		r.vertex(w, 0.0f);    r.vertex(w, h);
+		r.vertex(w, h);       r.vertex(0.0f, h);
+		r.vertex(0.0f, h);    r.vertex(0.0f, 0.0f);
+		r.end();
 	}
-	/*
-
-	switch (m_textureSetup) {
-	case 1:
-		glTexCoord2d(0.0, 0.0);
-		glVertex2d(0.0, 0.0);
-
-		glTexCoord2d(1.0, 0.0);
-		glVertex2d(m_size[0], 0.0);
-
-		glTexCoord2d(1.0, 1.0*m_ratioX);
-		glVertex2d(m_size[0], m_size[1]);
-
-		glTexCoord2d(0.0, 1.0*m_ratioX);
-		glVertex2d(0.0, m_size[1]);
-		break;
-	case 2:
-
-		break;
-	case 3:
-
-		break;
-	case 4:
-
-		break;
-	default:
-
-		break;
-	}
-
-	*/
 }
 
 void Rectangle::setTexture(TexturePtr texture)

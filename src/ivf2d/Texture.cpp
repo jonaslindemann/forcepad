@@ -25,10 +25,8 @@
 #include "Texture.h"
 
 #ifdef __APPLE__
-#include <OpenGL/glu.h>
 #include <OpenGL/gl.h>
 #else
-#include <GL/glu.h>
 #include <GL/gl.h>
 #endif
 
@@ -74,34 +72,26 @@ void Texture::bind()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, m_magFilter);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, m_wrapS);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, m_wrapT);
-	
-	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, m_textureMode);
-	glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, m_textureEnvColor);
 
 	if (m_image!=nullptr)
 	{
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, (GLsizei)m_image->getWidth(), (GLsizei)m_image->getHeight(),
 			0, GL_RGBA, GL_UNSIGNED_BYTE, m_image->getImageMap());
 	}
-	
+
 	m_bound = true;
 }
 
 void Texture::apply()
 {
+	// Modern texturing is done through shaders (Renderer2D); the old
+	// fixed-function texture-env and texture-matrix setup (glTexEnv/glMatrixMode)
+	// has been removed as it does not exist in a core profile / WebGL.
 	glBindTexture(GL_TEXTURE_2D, m_textureName);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, m_minFilter);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, m_magFilter);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, m_wrapS);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, m_wrapT);
-	
-	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, m_textureMode);
-	glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, m_textureEnvColor);
-    glMatrixMode (GL_TEXTURE); 
-	glLoadIdentity ();
-	glRotated(m_texRotate, 0.0, 0.0, 1.0);
-    glScaled (m_texScaleX, m_texScaleY, 1.0); 
-	glMatrixMode (GL_MODELVIEW);
 }
 
 void Texture::setImage(ImagePtr image)

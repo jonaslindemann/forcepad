@@ -26,13 +26,7 @@
 
 #include <cmath>
 
-#ifdef __APPLE__
-#include <OpenGL/glu.h>
-#include <OpenGL/gl.h>
-#else
-#include <GL/glu.h>
-#include <GL/gl.h>
-#endif
+#include "Renderer2D.h"
 
 namespace ivf2d {
 
@@ -69,15 +63,16 @@ void Ellipse::doGeometry()
 
 	dr = 2.0*M_PI/(double)m_sectors;
 
-	glBegin(GL_TRIANGLE_FAN);
-		glVertex2i(0,0);
+	Renderer2D &r = Renderer2D::instance();
+	r.beginTriangleFan();
+		r.vertex(0.0f, 0.0f);
 		for (i=0; i<=m_sectors; i++)
 		{
 			x = (int)((float)m_size[0]*cos(i*dr));
 			y = (int)((float)m_size[1]*sin(i*dr));
-			glVertex2i(x, y);
+			r.vertex((float)x, (float)y);
 		}
-	glEnd();
+	r.end();
 }
 
 void Ellipse::setSectors(int sectors)

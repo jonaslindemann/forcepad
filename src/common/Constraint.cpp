@@ -24,14 +24,7 @@
 
 #include "Constraint.h"
 
-#ifdef __APPLE__
-#include <OpenGL/glu.h>
-#include <OpenGL/gl.h>
-#else
-#include <GL/glu.h>
-#include <GL/gl.h>
-#endif
-
+#include "Renderer2D.h"
 #include "UiSettings.h"
 
 using namespace std;
@@ -62,12 +55,13 @@ void Constraint::doGeometry()
     double oldVectorRadius = m_vectorRadius;
     double oldVectorSize = this->getVectorSize();
 
+	float lineWidth;
 	{
         float dpr = (float)UiSettings::getInstance()->getDevicePixelRatio();
         if (UiSettings::getInstance()->getLineThickness()>0.0)
-            glLineWidth((GLfloat)(UiSettings::getInstance()->getLineThickness() * dpr));
+            lineWidth = (float)(UiSettings::getInstance()->getLineThickness() * dpr);
         else
-            glLineWidth(2.0f * dpr);
+            lineWidth = 2.0f * dpr;
 	}
 
 	if (UiSettings::getInstance()->getSymbolLength()>0.0)
@@ -76,55 +70,51 @@ void Constraint::doGeometry()
 		m_vectorRadius = 0.125*UiSettings::getInstance()->getSymbolLength();
 	}
 
+	ivf2d::Renderer2D &r = ivf2d::Renderer2D::instance();
+
+	// glLineStipple(3, 0xAAAA) -> 3 px on / 3 px off, period 6.
 	if (m_constraintType==CT_HINGE)
-	{
-		glEnable(GL_LINE_STIPPLE);
-		glLineStipple(3, 0xAAAA);
-	}
-	glBegin(GL_LINES);
-	
+		r.beginDashedLines(lineWidth, 6.0f);
+	else
+		r.beginLines(lineWidth);
+
 	switch (m_constraintType) {
 	case CT_X:
-		glVertex2d(0, 0-m_size/2.0);
-		glVertex2d(0, 0+m_size/2.0);
+		r.vertex(0.0f, (float)(0-m_size/2.0));
+		r.vertex(0.0f, (float)(0+m_size/2.0));
 		break;
 	case CT_Y:
-		glVertex2d(0-m_size/2.0, 0);
-		glVertex2d(0+m_size/2.0, 0);
+		r.vertex((float)(0-m_size/2.0), 0.0f);
+		r.vertex((float)(0+m_size/2.0), 0.0f);
 		break;
 	case CT_XY:
-		glVertex2d(0, 0-m_size/2.0);
-		glVertex2d(0, 0+m_size/2.0);
-		glVertex2d(0-m_size/2.0, 0);
-		glVertex2d(0+m_size/2.0, 0);
+		r.vertex(0.0f, (float)(0-m_size/2.0));
+		r.vertex(0.0f, (float)(0+m_size/2.0));
+		r.vertex((float)(0-m_size/2.0), 0.0f);
+		r.vertex((float)(0+m_size/2.0), 0.0f);
 		break;
 	case CT_SCALAR:
-		glVertex2d(0, 0-m_size/2.0);
-		glVertex2d(0, 0+m_size/2.0);
-		glVertex2d(0-m_size/2.0, 0);
-		glVertex2d(0+m_size/2.0, 0);
+		r.vertex(0.0f, (float)(0-m_size/2.0));
+		r.vertex(0.0f, (float)(0+m_size/2.0));
+		r.vertex((float)(0-m_size/2.0), 0.0f);
+		r.vertex((float)(0+m_size/2.0), 0.0f);
 		break;
 	case CT_VECTOR:
-		glVertex2d(-m_vectorRadius*2*m_direction[0], -m_vectorRadius*2*m_direction[1]);
-		glVertex2d(-m_vectorSize*m_direction[0], -m_vectorSize*m_direction[1]);
+		r.vertex((float)(-m_vectorRadius*2*m_direction[0]), (float)(-m_vectorRadius*2*m_direction[1]));
+		r.vertex((float)(-m_vectorSize*m_direction[0]), (float)(-m_vectorSize*m_direction[1]));
 		break;
 	case CT_HINGE:
-		glVertex2d(-m_vectorRadius*m_direction[0], -m_vectorRadius*m_direction[1]);
-		glVertex2d(-m_hingeLength*m_direction[0], -m_hingeLength*m_direction[1]);
-		glVertex2d(m_vectorRadius*m_direction[0], m_vectorRadius*m_direction[1]);
-		glVertex2d(m_hingeLength*m_direction[0], m_hingeLength*m_direction[1]);
+		r.vertex((float)(-m_vectorRadius*m_direction[0]), (float)(-m_vectorRadius*m_direction[1]));
+		r.vertex((float)(-m_hingeLength*m_direction[0]), (float)(-m_hingeLength*m_direction[1]));
+		r.vertex((float)(m_vectorRadius*m_direction[0]), (float)(m_vectorRadius*m_direction[1]));
+		r.vertex((float)(m_hingeLength*m_direction[0]), (float)(m_hingeLength*m_direction[1]));
 		break;
 	default:
-		
+
 		break;
 	}
 
-	glEnd();
-
-	if (m_constraintType==CT_HINGE)
-	{
-		glDisable(GL_LINE_STIPPLE);
-	}
+	r.end();
 
 	if (m_constraintType==CT_VECTOR)
 	{
@@ -133,34 +123,35 @@ void Constraint::doGeometry()
 		ox = -m_vectorRadius*m_direction[0];
 		oy = -m_vectorRadius*m_direction[1];
 
-		glColor3f(1.0f, 1.0f, 1.0f);
-		glBegin(GL_POLYGON);
+		// Filled disc (was GL_POLYGON -> triangle fan).
+		r.color(1.0f, 1.0f, 1.0f, 1.0f);
+		r.beginTriangleFan();
 		for (angle = 0.0; angle<2*M_PI; angle+=2*M_PI/20.0)
 		{
 			x = ox + (m_vectorRadius-1.0)*cos(angle);
 			y = oy + (m_vectorRadius-1.0)*sin(angle);
-			glVertex2d(x, y);
+			r.vertex((float)x, (float)y);
 		}
-		glEnd();
-		
+		r.end();
+
 		this->getColor()->render();
-		glBegin(GL_LINE_LOOP);
+		r.beginLineLoop(lineWidth);
 		for (angle = 0.0; angle<2*M_PI; angle+=2*M_PI/20.0)
 		{
 			x = ox + m_vectorRadius*cos(angle);
 			y = oy + m_vectorRadius*sin(angle);
-			glVertex2d(x, y);
+			r.vertex((float)x, (float)y);
 		}
-		glEnd();
+		r.end();
 
-		glBegin(GL_LINE_LOOP);
+		r.beginLineLoop(lineWidth);
 		for (angle = 2*M_PI/40.0; angle<2*M_PI+2*M_PI/40.0; angle+=2*M_PI/20.0)
 		{
 			x = ox + m_vectorRadius*cos(angle);
 			y = oy + m_vectorRadius*sin(angle);
-			glVertex2d(x, y);
+			r.vertex((float)x, (float)y);
 		}
-		glEnd();
+		r.end();
 
 		if (m_visibleReaction)
 			m_reactionForce->render();
@@ -173,25 +164,25 @@ void Constraint::doGeometry()
 		ox = 0.0;
 		oy = 0.0;
 
-		glColor3f(1.0f, 1.0f, 1.0f);
-		glBegin(GL_POLYGON);
+		r.color(1.0f, 1.0f, 1.0f, 1.0f);
+		r.beginTriangleFan();
 		for (angle = 0.0; angle<2*M_PI; angle+=2*M_PI/20.0)
 		{
 			x = ox + (m_vectorRadius-1.0)*cos(angle);
 			y = oy + (m_vectorRadius-1.0)*sin(angle);
-			glVertex2d(x, y);
+			r.vertex((float)x, (float)y);
 		}
-		glEnd();
-		
+		r.end();
+
 		this->getColor()->render();
-		glBegin(GL_LINE_LOOP);
+		r.beginLineLoop(lineWidth);
 		for (angle = 0.0; angle<2*M_PI; angle+=2*M_PI/20.0)
 		{
 			x = ox + m_vectorRadius*cos(angle);
 			y = oy + m_vectorRadius*sin(angle);
-			glVertex2d(x, y);
+			r.vertex((float)x, (float)y);
 		}
-		glEnd();
+		r.end();
 	}
 
 	if (UiSettings::getInstance()->getSymbolLength()>0.0)

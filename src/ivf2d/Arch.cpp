@@ -24,14 +24,7 @@
 
 #include "Arch.h"
 
-#ifdef __APPLE__
-#include <OpenGL/glu.h>
-#include <OpenGL/gl.h>
-#else
-#include <GL/glu.h>
-#include <GL/gl.h>
-#endif
-
+#include "Renderer2D.h"
 #include "Vec3d.h"
 
 namespace ivf2d {
@@ -111,27 +104,18 @@ void Arch::doGeometry()
         qp3 = p2 - static_cast<double>(m_lineWidth)*0.5*right;
         qp4 = p2 + static_cast<double>(m_lineWidth)*0.5*right;
 
-        glBegin(GL_QUADS);
-        glVertex2d(qp1.getX(), qp1.getY());
-        glVertex2d(qp2.getX(), qp2.getY());
-        glVertex2d(qp3.getX(), qp3.getY());
-        glVertex2d(qp4.getX(), qp4.getY());
-        glEnd();
+        Renderer2D &r = Renderer2D::instance();
+        r.beginQuads();
+        r.vertex((float)qp1.getX(), (float)qp1.getY());
+        r.vertex((float)qp2.getX(), (float)qp2.getY());
+        r.vertex((float)qp3.getX(), (float)qp3.getY());
+        r.vertex((float)qp4.getX(), (float)qp4.getY());
+        r.end();
 
 
         x += dX;
 
     }
-
-    /*
-    glBegin(GL_LINE_STRIP);
-    for (x=-m_size[0]/2.0; x<m_size[0]/2.0; x+=1.0)
-    {
-        y = m_size[1]-(4*m_size[1])*pow(x,2.0)/pow(m_size[0],2.0);
-        glVertex2d(x+m_size[0]/2.0, y);
-    }
-    glEnd();
-    */
 }
 
 void Arch::setLineWidth(double width)

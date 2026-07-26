@@ -28,15 +28,19 @@
 #include <cmath>
 #include <vector>
 
-#ifdef __APPLE__
-#include <OpenGL/glu.h>
-#include <OpenGL/gl.h>
-#else
-#include <GL/glu.h>
-#include <GL/gl.h>
-#endif
+#include <QOpenGLContext>
+#include <QOpenGLExtraFunctions>
+
+#include "Renderer2D.h"
+#include "StreamTexture.h"
 
 namespace ivf2d {
+
+static QOpenGLExtraFunctions *screenImageGL()
+{
+	QOpenGLContext *ctx = QOpenGLContext::currentContext();
+	return ctx ? ctx->extraFunctions() : nullptr;
+}
 
 ScreenImage::ScreenImage()
 {
@@ -65,44 +69,70 @@ ScreenImage::~ScreenImage()
 
 void ScreenImage::doGeometry()
 {
-	if (m_image!=nullptr)
-	{
-		int i, j;
+	if (m_image == nullptr)
+		return;
 
-		switch (m_renderMode) {
-		case RM_SUBIMAGE:
-			glPixelStorei(GL_UNPACK_ROW_LENGTH, m_image->getWidth());
-			glPixelStorei(GL_UNPACK_SKIP_PIXELS, m_subImagePos[0]);
-			glPixelStorei(GL_UNPACK_SKIP_ROWS, m_subImagePos[1]);
-			glDrawPixels(m_subImageSize[0], m_subImageSize[1], GL_RGBA, GL_UNSIGNED_BYTE, m_image->getImageMap());
-			glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-			glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
-			glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
-			break;
-		case RM_NORMAL:
-			glDrawPixels(m_image->getWidth(), m_image->getHeight(), GL_RGBA, GL_UNSIGNED_BYTE, m_image->getImageMap());
-			break;
-		case RM_TILED:
-			double x, y;
-			this->getPosition(x, y);
-			for (i=0; i<m_rows; i++)
-			{
-				for (j=0; j<m_cols; j++)
-				{
-					glPixelStorei(GL_UNPACK_ROW_LENGTH, m_image->getWidth());
-					glPixelStorei(GL_UNPACK_SKIP_PIXELS, j*m_tileSpacing[0]);
-					glPixelStorei(GL_UNPACK_SKIP_ROWS, i*m_tileSpacing[1]);
-					glRasterPos2i((int)x + j*m_tileSpacing[0], (int)y + i*m_tileSpacing[1]);
-					glDrawPixels(m_tileSpacing[0], m_tileSpacing[1], GL_RGBA, GL_UNSIGNED_BYTE, m_image->getImageMap());
-					glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-					glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
-					glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
-				}
-			}
-			this->setPosition(x, y);
-			break;
-		}
+	const int imgW = m_image->getWidth();
+	const int imgH = m_image->getHeight();
+	if (imgW <= 0 || imgH <= 0)
+		return;
+
+	if (!m_streamTexture)
+		m_streamTexture = std::make_unique<StreamTexture>();
+
+	double x, y;
+	this->getPosition(x, y);
+
+	Renderer2D &r = Renderer2D::instance();
+	r.loadIdentity();
+	// The image alpha channel encodes layer markers, not opacity, so the blit
+	// must be forced opaque - see Renderer2D::setForceOpaque().
+	r.setForceOpaque(true);
+
+	// A single texture holds the whole image; sub-region and tiled modes select
+	// portions of it through texture coordinates instead of glDrawPixels
+	// unpack-skip state. The quad is drawn with row 0 of the image at the bottom,
+	// matching the previous glDrawPixels/glRasterPos orientation.
+	m_streamTexture->update(m_image->getImageMap(), imgW, imgH, GL_RGBA);
+
+	switch (m_renderMode) {
+	case RM_NORMAL:
+		m_streamTexture->draw((float)x, (float)y, (float)imgW, (float)imgH);
+		break;
+
+	case RM_SUBIMAGE:
+	{
+		const float u0 = (float)m_subImagePos[0] / (float)imgW;
+		const float v0 = (float)m_subImagePos[1] / (float)imgH;
+		const float u1 = (float)(m_subImagePos[0] + m_subImageSize[0]) / (float)imgW;
+		const float v1 = (float)(m_subImagePos[1] + m_subImageSize[1]) / (float)imgH;
+		r.drawTexturedQuad(m_streamTexture->id(), (float)x, (float)y,
+		                   (float)m_subImageSize[0], (float)m_subImageSize[1],
+		                   u0, v0, u1, v1);
+		break;
 	}
+
+	case RM_TILED:
+		for (int i = 0; i < m_rows; i++)
+		{
+			for (int j = 0; j < m_cols; j++)
+			{
+				const int sx = j * m_tileSpacing[0];
+				const int sy = i * m_tileSpacing[1];
+				const float u0 = (float)sx / (float)imgW;
+				const float v0 = (float)sy / (float)imgH;
+				const float u1 = (float)(sx + m_tileSpacing[0]) / (float)imgW;
+				const float v1 = (float)(sy + m_tileSpacing[1]) / (float)imgH;
+				r.drawTexturedQuad(m_streamTexture->id(),
+				                   (float)(x + sx), (float)(y + sy),
+				                   (float)m_tileSpacing[0], (float)m_tileSpacing[1],
+				                   u0, v0, u1, v1);
+			}
+		}
+		break;
+	}
+
+	r.setForceOpaque(false);
 }
 
 void ScreenImage::setImage(ImagePtr image)
@@ -219,15 +249,19 @@ void ScreenImage::update(int x1, int y1, int x2, int y2)
 		int logW = xmax - xmin;
 		int logH = ymax - ymin;
 
+		QOpenGLExtraFunctions *f = screenImageGL();
+		if (f == nullptr)
+			return;
+
 		if (std::abs(m_devicePixelRatio - 1.0) < 0.001)
 		{
-			glPixelStorei(GL_PACK_ROW_LENGTH, m_image->getWidth());
-			glPixelStorei(GL_PACK_SKIP_PIXELS, xmin);
-			glPixelStorei(GL_PACK_SKIP_ROWS, ymin);
-			glReadPixels((int)x + xmin, (int)y + ymin, logW, logH, GL_RGBA, GL_UNSIGNED_BYTE, m_image->getImageMap());
-			glPixelStorei(GL_PACK_ROW_LENGTH, 0);
-			glPixelStorei(GL_PACK_SKIP_PIXELS, 0);
-			glPixelStorei(GL_PACK_SKIP_ROWS, 0);
+			f->glPixelStorei(GL_PACK_ROW_LENGTH, m_image->getWidth());
+			f->glPixelStorei(GL_PACK_SKIP_PIXELS, xmin);
+			f->glPixelStorei(GL_PACK_SKIP_ROWS, ymin);
+			f->glReadPixels((int)x + xmin, (int)y + ymin, logW, logH, GL_RGBA, GL_UNSIGNED_BYTE, m_image->getImageMap());
+			f->glPixelStorei(GL_PACK_ROW_LENGTH, 0);
+			f->glPixelStorei(GL_PACK_SKIP_PIXELS, 0);
+			f->glPixelStorei(GL_PACK_SKIP_ROWS, 0);
 		}
 		else
 		{
@@ -239,11 +273,11 @@ void ScreenImage::update(int x1, int y1, int x2, int y2)
 			int physH = (std::max)(1, (int)std::lround(logH * dpr));
 
 			std::vector<unsigned char> temp(physW * physH * 4);
-			glPixelStorei(GL_PACK_ALIGNMENT, 1);
-			glPixelStorei(GL_PACK_ROW_LENGTH, 0);
-			glPixelStorei(GL_PACK_SKIP_PIXELS, 0);
-			glPixelStorei(GL_PACK_SKIP_ROWS, 0);
-			glReadPixels(physX, physY, physW, physH, GL_RGBA, GL_UNSIGNED_BYTE, temp.data());
+			f->glPixelStorei(GL_PACK_ALIGNMENT, 1);
+			f->glPixelStorei(GL_PACK_ROW_LENGTH, 0);
+			f->glPixelStorei(GL_PACK_SKIP_PIXELS, 0);
+			f->glPixelStorei(GL_PACK_SKIP_ROWS, 0);
+			f->glReadPixels(physX, physY, physW, physH, GL_RGBA, GL_UNSIGNED_BYTE, temp.data());
 
 			for (int row = 0; row < logH; row++)
 			{

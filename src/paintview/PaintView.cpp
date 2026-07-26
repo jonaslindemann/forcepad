@@ -31,13 +31,17 @@
 #include "FPLog.h"
 #include "JpegImage.h"
 #include "PngImage.h"
+#include "Renderer2D.h"
+#include "StreamTexture.h"
 
 using namespace std;
 
+// Only core-safe reads remain here (glReadPixels / glGetString / glPixelStorei);
+// GLU is no longer used after the rendering migration.
 #ifdef __APPLE__
-#include <OpenGL/glu.h>
+#include <OpenGL/gl.h>
 #else
-#include <GL/glu.h>
+#include <GL/gl.h>
 #endif
 
 #include <fstream>
@@ -984,7 +988,7 @@ void PaintView::onRelease(int x, int y)
 
 void PaintView::onClear()
 {
-	glClear(GL_COLOR_BUFFER_BIT);
+	ivf2d::Renderer2D::instance().clear(1.0f, 1.0f, 1.0f, 1.0f);
 }
 
 void PaintView::onInitContext()
@@ -1027,31 +1031,11 @@ void PaintView::onInitContext()
 	this->updateModel();
 	
 	m_femGrid->resetStressDrawing();
-	
-	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_BLEND);
-	glDisable(GL_DITHER);
-	glHint(GL_LINE_SMOOTH_HINT, GL_DONT_CARE);
-	glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
-	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
-	
-	// Setup projection: viewport in physical pixels, ortho in logical pixels.
 
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-    glViewport(0, 0, physicalWidth(), physicalHeight());
-    gluOrtho2D(0, width(), 0, height());
-	glMatrixMode(GL_MODELVIEW);
-
-
-	// Define drawing area using the scissor function (physical pixels).
-
-	{
-        float dpr = doDevicePixelRatio();
-        glScissor((int)(m_drawingOffsetX * dpr), (int)(m_drawingOffsetY * dpr),
-                  (int)(m_drawing->getWidth() * dpr), (int)(m_drawing->getHeight() * dpr));
-	}
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	// Projection, viewport, scissor and blend are (re)established every frame in
+	// onDraw() through Renderer2D; no persistent fixed-function GL state is set
+	// here anymore. Depth test is off by default, which is what the 2D renderer
+	// wants.
 
 	// Implement a resize method
 
@@ -1072,142 +1056,121 @@ void PaintView::onResize(int w, int h)
 
 void PaintView::onDraw()
 {
-	glEnable(GL_LINE_SMOOTH);
-	//glEnable(GL_POLYGON_SMOOTH);
+	ivf2d::Renderer2D &r = ivf2d::Renderer2D::instance();
 
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-    glViewport(0, 0, physicalWidth(), physicalHeight());
-    gluOrtho2D(0, width(), 0, height());
-	glMatrixMode(GL_MODELVIEW);
+	// Viewport in physical pixels, ortho in logical pixels.
+	r.setViewport(0, 0, physicalWidth(), physicalHeight());
+	r.setOrtho(0.0f, (float)width(), 0.0f, (float)height());
+	r.resetTransform();
 
 	// Background properties
 
-	int shadowWidth = 6;
-	int shadowWidth2 = 3;
+	const float shadowWidth = 6.0f;
+	const float shadowWidth2 = 3.0f;
+	const float w = (float)width();
+	const float h = (float)height();
 
 	float tColor[] = {0.6f, 0.6f, 0.6f};
 	float bColor[] = {0.7f, 0.7f, 0.7f};
 	float sColor[] = {0.3f, 0.3f, 0.3f};
 
 
-	// Draw background
-	
-	glDisable(GL_SCISSOR_TEST);
-	glBegin(GL_QUADS);
-	glColor3fv(tColor);
-    glVertex2i(0,height());
-    glVertex2i(width(),height());
-	glColor3fv(bColor);
-    glVertex2i(width(),0);
-	glVertex2i(0,0);
-	glEnd();
+	// Draw background (opaque, full window, no scissor).
+
+	r.setScissorEnabled(false);
+	r.setBlend(false);
+
+	r.beginQuads();
+	r.color3fv(tColor); r.vertex(0.0f, h); r.vertex(w, h);
+	r.color3fv(bColor); r.vertex(w, 0.0f); r.vertex(0.0f, 0.0f);
+	r.end();
 
 	// Top frame shadow
-
-	glBegin(GL_QUADS);
-	glColor3fv(sColor);
-    glVertex2i(0,height());
-    glVertex2i(width(),height());
-	glColor3fv(tColor);
-    glVertex2i(width()-shadowWidth2,height()-shadowWidth);
-    glVertex2i(shadowWidth,height()-shadowWidth);
-	glEnd();
+	r.beginQuads();
+	r.color3fv(sColor); r.vertex(0.0f, h); r.vertex(w, h);
+	r.color3fv(tColor); r.vertex(w-shadowWidth2, h-shadowWidth); r.vertex(shadowWidth, h-shadowWidth);
+	r.end();
 
 	// Left frame shadow
-
-	glBegin(GL_QUADS);
-	glColor3fv(sColor);
-    glVertex2i(0,height());
-	glVertex2i(0,0);
-	glColor3fv(bColor);
-	glVertex2i(shadowWidth,0);
-	glColor3fv(tColor);
-    glVertex2i(shadowWidth,height()-shadowWidth);
-	glEnd();
+	r.beginQuads();
+	r.color3fv(sColor); r.vertex(0.0f, h); r.vertex(0.0f, 0.0f);
+	r.color3fv(bColor); r.vertex(shadowWidth, 0.0f);
+	r.color3fv(tColor); r.vertex(shadowWidth, h-shadowWidth);
+	r.end();
 
 	// Right frame shadow
-
-	glBegin(GL_QUADS);
-	glColor3fv(sColor);
-    glVertex2i(width(),height());
-    glVertex2i(width(),0);
-	glColor3fv(bColor);
-    glVertex2i(width()-shadowWidth2,0);
-	glColor3fv(tColor);
-    glVertex2i(width()-shadowWidth2,height()-shadowWidth);
-	glEnd();
+	r.beginQuads();
+	r.color3fv(sColor); r.vertex(w, h); r.vertex(w, 0.0f);
+	r.color3fv(bColor); r.vertex(w-shadowWidth2, 0.0f);
+	r.color3fv(tColor); r.vertex(w-shadowWidth2, h-shadowWidth);
+	r.end();
 
 	// Bottom frame shadow
+	r.beginQuads();
+	r.color3fv(sColor); r.vertex(0.0f, 0.0f); r.vertex(w, 0.0f);
+	r.color3fv(bColor); r.vertex(w-shadowWidth2, shadowWidth2); r.vertex(shadowWidth, shadowWidth2);
+	r.end();
 
-	glBegin(GL_QUADS);
-	glColor3fv(sColor);
-	glVertex2i(0,0);
-    glVertex2i(width(),0);
-	glColor3fv(bColor);
-    glVertex2i(width()-shadowWidth2,shadowWidth2);
-	glVertex2i(shadowWidth,shadowWidth2);
-	glEnd();
+	// Restrict drawing to the image area (scissor, physical pixels).
 
-	// Disable drawing outside the image.
-
-	glEnable(GL_SCISSOR_TEST);
-
+	r.setScissorEnabled(true);
 	{
         float dpr = doDevicePixelRatio();
         if (m_zoomResults)
-            glScissor((int)(15 * dpr), (int)(15 * dpr), (int)((width() - 30) * dpr), (int)((height() - 30) * dpr));
+            r.setScissor((int)(15 * dpr), (int)(15 * dpr), (int)((width() - 30) * dpr), (int)((height() - 30) * dpr));
         else
-            glScissor((int)(m_drawingOffsetX * dpr), (int)(m_drawingOffsetY * dpr),
-                      (int)(m_drawing->getWidth() * dpr), (int)(m_drawing->getHeight() * dpr));
+            r.setScissor((int)(m_drawingOffsetX * dpr), (int)(m_drawingOffsetY * dpr),
+                         (int)(m_drawing->getWidth() * dpr), (int)(m_drawing->getHeight() * dpr));
 	}
 
 	
 	if (m_lockDrawing)
 		return;
 	
-	glPushAttrib(GL_COLOR_BUFFER_BIT);
+	// (fixed-function attribute stack removed; Renderer2D manages GL state)
 	
 	if (!m_femGrid->getShowGrid())
 	{
+		r.setOrtho(0.0f, w, 0.0f, h);
+		r.resetTransform();
 		m_screenImage->setPosition((double)m_drawingOffsetX, (double)m_drawingOffsetY);
+
+		if (m_optLayerActive)
 		{
-            float dpr = doDevicePixelRatio();
-            glPixelZoom(dpr, dpr);
-            if (m_optLayerActive)
-            {
-                m_drawing->setLayer(0);
-                m_screenImage->render();
-                m_drawing->setLayer(1);
-                glEnable(GL_BLEND);
-                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-                m_screenImage->render();
-                glDisable(GL_BLEND);
-            }
-            else
-            {
-                m_drawing->setLayer(0);
-                m_screenImage->render();
-            }
-            glPixelZoom(1.0f, 1.0f);
+			m_drawing->setLayer(0);
+			m_screenImage->render();
+			m_drawing->setLayer(1);
+			r.setBlend(true);
+			m_screenImage->render();
+			r.setBlend(false);
+		}
+		else
+		{
+			m_drawing->setLayer(0);
+			m_screenImage->render();
 		}
 		
 		switch (m_editMode) {
 		case EM_PASTE:
-
-			// Xor clipboard
-
 			{
-                float dpr = doDevicePixelRatio();
-                float pasteScale = m_brushScale * dpr;
-                glEnable(GL_COLOR_LOGIC_OP);
-                glPixelZoom(pasteScale, pasteScale);
-                glLogicOp(GL_AND);
-                glRasterPos2i(m_current[0]-m_clipboard->getClipboard()->getWidth()*m_brushScale/2, height()-m_current[1]-m_clipboard->getClipboard()->getHeight()*m_brushScale/2);
-                glDrawPixels(m_clipboard->getClipboard()->getWidth(), m_clipboard->getClipboard()->getHeight(), GL_RGB, GL_UNSIGNED_BYTE, m_clipboard->getClipboard()->getImageMap());
-                glDisable(GL_COLOR_LOGIC_OP);
-                m_clipboard->render(m_current[0]-m_clipboard->getClipboard()->getWidth()*m_brushScale/2, height()-m_current[1]-m_clipboard->getClipboard()->getHeight()*m_brushScale/2);
-                glPixelZoom(1.0f, 1.0f);
+				// Paste preview: an alpha-blended ghost of the clipboard image
+				// (was an XOR/AND logic-op blit, unavailable in core/WebGL).
+				auto clip = m_clipboard->getClipboard();
+				const int cw = clip->getWidth();
+				const int ch = clip->getHeight();
+				const float bs = (float)m_brushScale;
+				const float px = (float)(m_current[0] - cw * m_brushScale / 2);
+				const float py = (float)(height() - m_current[1] - ch * m_brushScale / 2);
+
+				static ivf2d::StreamTexture s_pasteTexture;
+				s_pasteTexture.update(clip->getImageMap(), cw, ch, ivf2d::ST_RGB);
+
+				r.setBlend(true);
+				r.drawTexturedQuad(s_pasteTexture.id(), px, py, cw * bs, ch * bs,
+				                   0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.5f);
+				r.setBlend(false);
+
+				m_clipboard->render((int)px, (int)py);
 			}
 			break;
 		case EM_RECTANGLE:
@@ -1239,33 +1202,24 @@ void PaintView::onDraw()
 		case EM_CONSTRAINT:
 		case EM_CONSTRAINT_VECTOR:
 		case EM_ERASE_CONSTRAINTS_FORCES:
-			{
-                float dpr = doDevicePixelRatio();
-                glEnable(GL_BLEND);
-                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-                glPixelZoom(dpr, dpr);
-                glRasterPos2i(m_drawingOffsetX, m_drawingOffsetY);
-                glDrawPixels(m_drawing->getWidth(), m_drawing->getHeight(), GL_RGBA, GL_UNSIGNED_BYTE, m_drawing->getImageMap());
-                glPixelZoom(1.0f, 1.0f);
-                glDisable(GL_BLEND);
-			}
+			// Re-blit the drawing over the base (matches the previous overlay
+			// glDrawPixels of m_drawing in these edit modes).
+			m_drawing->setLayer(0);
+			m_screenImage->render();
 			break;
 		default:
-			
 			break;
 		}
 	}
 	else
 	{
-		glClear(GL_COLOR_BUFFER_BIT);
+		r.clear(1.0f, 1.0f, 1.0f, 1.0f);
 	}
-	
-	glPopAttrib();
-	
-	glPushAttrib(GL_LINE_BIT);
-	glEnable (GL_BLEND);
-	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
+
+	// Overlays: forces / constraints / mesh / selection, blended over the canvas.
+
+	r.setBlend(true);
+
 	if (m_leftMouseDown)
 	{
 		m_femGrid->resetStressDrawing();
@@ -1277,22 +1231,11 @@ void PaintView::onDraw()
 			break;
 		default:
 			if (m_zoomResults)
-			{
-				glMatrixMode(GL_PROJECTION);
-				glLoadIdentity();
-                glViewport(0,0,physicalWidth(),physicalHeight());
-                gluOrtho2D(m_zoomPos[0]-width()*m_zoomFactor,m_zoomPos[0]+width()*m_zoomFactor,(height()-m_zoomPos[1])-height()*m_zoomFactor,(height()-m_zoomPos[1])+height()*m_zoomFactor);
-				glMatrixMode(GL_MODELVIEW);
-			}
+				r.setOrtho(m_zoomPos[0]-w*m_zoomFactor, m_zoomPos[0]+w*m_zoomFactor,
+				           (h-m_zoomPos[1])-h*m_zoomFactor, (h-m_zoomPos[1])+h*m_zoomFactor);
 			else
-			{
-				glMatrixMode(GL_PROJECTION);
-				glLoadIdentity();
-                glViewport(0,0,physicalWidth(),physicalHeight());
-                gluOrtho2D(0,width(),0,height());
-				glMatrixMode(GL_MODELVIEW);
-			}
-
+				r.setOrtho(0.0f, w, 0.0f, h);
+			r.resetTransform();
 			m_femGrid->render();
 			break;
 		}
@@ -1301,43 +1244,40 @@ void PaintView::onDraw()
 	{
 		m_femGrid->setPosition(m_drawingOffsetX, m_drawingOffsetY);
 
+		r.setOrtho(0.0f, w, 0.0f, h);
+		r.resetTransform();
+
 		if (m_calcCG)
 			m_cgIndicator->render();
 
 		if (m_zoomResults)
 		{
-			glMatrixMode(GL_PROJECTION);
-			glLoadIdentity();
-            glViewport(0,0,physicalWidth(),physicalHeight());
-            gluOrtho2D(m_zoomPos[0]-width()*m_zoomFactor,m_zoomPos[0]+width()*m_zoomFactor,(height()-m_zoomPos[1])-height()*m_zoomFactor,(height()-m_zoomPos[1])+height()*m_zoomFactor);
-			glMatrixMode(GL_MODELVIEW);
-		}
-		else
-		{
-			glMatrixMode(GL_PROJECTION);
-			glLoadIdentity();
-            glViewport(0,0,physicalWidth(),physicalHeight());
-            gluOrtho2D(0,width(),0,height());
-			glMatrixMode(GL_MODELVIEW);
+			r.setOrtho(m_zoomPos[0]-w*m_zoomFactor, m_zoomPos[0]+w*m_zoomFactor,
+			           (h-m_zoomPos[1])-h*m_zoomFactor, (h-m_zoomPos[1])+h*m_zoomFactor);
+			r.resetTransform();
 		}
 
 		m_femGrid->render();
 	}
+
 	if (m_editMode==EM_SELECT_BOX)
 	{
+		r.setOrtho(0.0f, w, 0.0f, h);
+		r.resetTransform();
 		m_selectionBox->render();
 	}
 
 	if (m_editMode==EM_RULER)
 	{
-		glPushMatrix();
-		glTranslated((double)m_drawingOffsetX, (double)m_drawingOffsetY, 0.0);
+		r.setOrtho(0.0f, w, 0.0f, h);
+		r.resetTransform();
+		r.pushTransform();
+		r.translate((float)m_drawingOffsetX, (float)m_drawingOffsetY);
 		m_ruler->render();
-		glPopMatrix();
+		r.popTransform();
 	}
 
-	glDisable(GL_BLEND);
-	glPopAttrib();
+	r.setBlend(false);
 }
 
 void PaintView::onMove(int x, int y)
