@@ -1,6 +1,8 @@
 #include "QtPaintView.h"
 
 #include <QFileDialog>
+#include <QFileInfo>
+#include <QByteArray>
 #include <QMessageBox>
 #include <QPainter>
 #include <QTimer>
@@ -20,6 +22,8 @@
 #include "UiSettings.h"
 #include "Renderer2D.h"
 #include "StreamTexture.h"
+
+#include <fstream>
 
 #ifdef __APPLE__
 #include <OpenGL/glu.h>
@@ -440,43 +444,56 @@ const std::string QtPaintView::doSaveDialog(const std::string title, const std::
     return fname.toStdString();
 }
 
-bool QtPaintView::doNewModel(int &w, int &h, int &initialStiffness)
+void QtPaintView::doNewModel(std::function<void(bool, int, int, int)> onDone)
 {
-    QDialog dlg(this);
-    dlg.setWindowTitle("New Model");
+    // Heap-allocated so the dialog can outlive this call on WebAssembly (where it
+    // is shown non-modally and the result arrives later via the finished signal).
+    QDialog *dlg = new QDialog(this);
+    dlg->setWindowTitle("New Model");
 
-    QFormLayout *form = new QFormLayout(&dlg);
+    QFormLayout *form = new QFormLayout(dlg);
 
-    QSpinBox *wSpin = new QSpinBox(&dlg);
+    QSpinBox *wSpin = new QSpinBox(dlg);
     wSpin->setRange(64, 4096);
     wSpin->setValue(640);
     form->addRow("Width:", wSpin);
 
-    QSpinBox *hSpin = new QSpinBox(&dlg);
+    QSpinBox *hSpin = new QSpinBox(dlg);
     hSpin->setRange(64, 4096);
     hSpin->setValue(480);
     form->addRow("Height:", hSpin);
 
-    QSpinBox *stiffSpin = new QSpinBox(&dlg);
+    QSpinBox *stiffSpin = new QSpinBox(dlg);
     stiffSpin->setRange(0, 255);
     stiffSpin->setValue(0);
     form->addRow("Initial stiffness:", stiffSpin);
 
     QDialogButtonBox *buttons = new QDialogButtonBox(
-        QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dlg);
+        QDialogButtonBox::Ok | QDialogButtonBox::Cancel, dlg);
     form->addRow(buttons);
 
-    QObject::connect(buttons, &QDialogButtonBox::accepted, &dlg, &QDialog::accept);
-    QObject::connect(buttons, &QDialogButtonBox::rejected, &dlg, &QDialog::reject);
+    QObject::connect(buttons, &QDialogButtonBox::accepted, dlg, &QDialog::accept);
+    QObject::connect(buttons, &QDialogButtonBox::rejected, dlg, &QDialog::reject);
 
-    if (dlg.exec() == QDialog::Accepted)
-    {
-        w = wSpin->value();
-        h = hSpin->value();
-        initialStiffness = stiffSpin->value();
-        return true;
-    }
-    return false;
+    auto deliver = [onDone, wSpin, hSpin, stiffSpin](int result) {
+        if (result == QDialog::Accepted)
+            onDone(true, wSpin->value(), hSpin->value(), stiffSpin->value());
+        else
+            onDone(false, 640, 480, 0);
+    };
+
+#ifdef Q_OS_WASM
+    // Browser thread cannot block: show non-modally and deliver on finish.
+    QObject::connect(dlg, &QDialog::finished, dlg, [deliver, dlg](int result) {
+        deliver(result);
+        dlg->deleteLater();
+    });
+    dlg->open();
+#else
+    int result = dlg->exec();
+    deliver(result);
+    dlg->deleteLater();
+#endif
 }
 
 void QtPaintView::doInfoMessage(const std::string message)
@@ -509,6 +526,69 @@ const std::string QtPaintView::doOpenDialog(const std::string title, const std::
         qfilter
     );
     return fname.toStdString();
+}
+
+void QtPaintView::doPickFile(const std::string title, const std::string filter,
+                             std::function<void(const std::string, const std::string)> onPicked)
+{
+    QString qfilter = QString::fromStdString(filter);
+
+#ifdef Q_OS_WASM
+    // Browser file access is asynchronous. getOpenFileContent hands us the bytes;
+    // we stage them in a temporary MEMFS file so the existing path/fstream-based
+    // loaders (openModel(path), JpegImage::read(), ...) work unchanged. The
+    // callback runs later, on the browser event loop.
+    QFileDialog::getOpenFileContent(
+        qfilter,
+        [onPicked](const QString &fileName, const QByteArray &fileContent) {
+            if (fileName.isEmpty()) {           // user cancelled
+                onPicked("", "");
+                return;
+            }
+            const std::string name = QFileInfo(fileName).fileName().toStdString();
+            const std::string tmp  = std::string("/tmp/") + name; // keeps the extension
+            {
+                std::ofstream out(tmp, std::ios::binary);
+                out.write(fileContent.constData(), fileContent.size());
+            }
+            onPicked(tmp, name);
+        });
+#else
+    if (qfilter.isEmpty())
+        qfilter = "ForcePAD Files (*.fp2);;All Files (*)";
+    QString fname = QFileDialog::getOpenFileName(
+        this, QString::fromStdString(title), QString(), qfilter);
+    if (fname.isEmpty())
+        onPicked("", "");
+    else
+        onPicked(fname.toStdString(), fname.toStdString());
+#endif
+}
+
+const std::string QtPaintView::doSaveModelFile(const std::string defaultName,
+                                               const std::string &bytes)
+{
+#ifdef Q_OS_WASM
+    // Browser: trigger a download. saveFileContent is fire-and-forget, so there
+    // is no cancel signal - report the suggested name as "saved".
+    QString suggested = QFileInfo(QString::fromStdString(defaultName)).fileName();
+    if (suggested.isEmpty() || suggested == "noname.fp2")
+        suggested = "model.fp2";
+    QByteArray data(bytes.data(), static_cast<qsizetype>(bytes.size()));
+    QFileDialog::saveFileContent(data, suggested);
+    return suggested.toStdString();
+#else
+    QString fname = QFileDialog::getSaveFileName(
+        this, "Save forcepad model",
+        QString::fromStdString(defaultName),
+        "ForcePAD Files (*.fp2);;All Files (*)");
+    if (fname.isEmpty())
+        return "";
+    std::ofstream out(fname.toStdString());   // text mode (matches legacy .fp2 write)
+    out << bytes;
+    out.close();
+    return fname.toStdString();
+#endif
 }
 
 void QtPaintView::doCreateCursors()

@@ -465,36 +465,52 @@ void MainWindow::runCalculate()
 
 void MainWindow::runOptimise()
 {
+    // The work to run once the settings dialog is accepted. (NOTE: executeOpt()
+    // is a long iterative loop that blocks on wasm's single thread until the
+    // threaded-solver phase lands; the dialog itself, however, now works.)
+    auto runIt = [this]() {
+        m_paintView->setViewMode(fp::PaintView::VM_ACTION);
+        m_paintView->setStatusMessageEvent(this);
+        m_paintView->setContinueCalcEvent(this);
+
+        m_continueCalc = true;
+        m_optStatusLabel->setVisible(true);
+        m_optProgressBar->setValue(0);
+        m_optProgressBar->setVisible(true);
+        m_btnStopOpt->setVisible(true);
+
+        bool ok = m_paintView->executeOpt();
+
+        m_btnStopOpt->setVisible(false);
+        m_optProgressBar->setVisible(false);
+        m_optStatusLabel->setText("");
+        m_optStatusLabel->setVisible(false);
+
+        m_paintView->setStatusMessageEvent(nullptr);
+        m_paintView->setContinueCalcEvent(nullptr);
+
+        if (!ok)
+        {
+            m_paintView->setViewMode(fp::PaintView::VM_PHYSICS);
+            m_paintView->execute();
+            showPrincipalStress();
+        }
+    };
+
+#ifdef Q_OS_WASM
+    // Non-blocking on the browser thread (blocking exec() renders grey/hangs).
+    auto *dlg = new OptimisationSettingsDialog(m_paintView, this);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    connect(dlg, &QDialog::finished, this, [runIt](int result) {
+        if (result == QDialog::Accepted)
+            runIt();
+    });
+    dlg->open();
+#else
     OptimisationSettingsDialog dlg(m_paintView, this);
-    if (dlg.exec() != QDialog::Accepted)
-        return;
-
-    m_paintView->setViewMode(fp::PaintView::VM_ACTION);
-    m_paintView->setStatusMessageEvent(this);
-    m_paintView->setContinueCalcEvent(this);
-
-    m_continueCalc = true;
-    m_optStatusLabel->setVisible(true);
-    m_optProgressBar->setValue(0);
-    m_optProgressBar->setVisible(true);
-    m_btnStopOpt->setVisible(true);
-
-    bool ok = m_paintView->executeOpt();
-
-    m_btnStopOpt->setVisible(false);
-    m_optProgressBar->setVisible(false);
-    m_optStatusLabel->setText("");
-    m_optStatusLabel->setVisible(false);
-
-    m_paintView->setStatusMessageEvent(nullptr);
-    m_paintView->setContinueCalcEvent(nullptr);
-
-    if (!ok)
-    {
-        m_paintView->setViewMode(fp::PaintView::VM_PHYSICS);
-        m_paintView->execute();
-        showPrincipalStress();
-    }
+    if (dlg.exec() == QDialog::Accepted)
+        runIt();
+#endif
 }
 
 void MainWindow::stopOptimise()
@@ -738,18 +754,37 @@ void MainWindow::setViewAction()  { m_paintView->setViewMode(fp::PaintView::VM_A
 
 void MainWindow::settingsCalc()
 {
+#ifdef Q_OS_WASM
+    // The browser thread cannot block on exec(); show non-modally and act on the
+    // finished signal. WA_DeleteOnClose cleans the heap-allocated dialog up.
+    auto *dlg = new CalcSettingsDialog(m_paintView, this);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    connect(dlg, &QDialog::finished, this, [this](int result) {
+        if (result == QDialog::Accepted &&
+            m_paintView->getViewMode() == fp::PaintView::VM_ACTION)
+            m_paintView->execute();
+    });
+    dlg->open();
+#else
     CalcSettingsDialog dlg(m_paintView, this);
     if (dlg.exec() == QDialog::Accepted &&
         m_paintView->getViewMode() == fp::PaintView::VM_ACTION)
     {
         m_paintView->execute();
     }
+#endif
 }
 
 void MainWindow::settingsGeneral()
 {
+#ifdef Q_OS_WASM
+    auto *dlg = new GeneralSettingsDialog(m_paintView, this);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    dlg->open();
+#else
     GeneralSettingsDialog dlg(m_paintView, this);
     dlg.exec();
+#endif
 }
 
 // ---------------------------------------------------------------------------
@@ -763,8 +798,14 @@ void MainWindow::helpDocumentation()
 
 void MainWindow::helpAbout()
 {
+#ifdef Q_OS_WASM
+    auto *dlg = new AboutDialog(this);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    dlg->open();
+#else
     AboutDialog dlg(this);
     dlg.exec();
+#endif
 }
 
 void MainWindow::toggleLogPanel(bool checked)

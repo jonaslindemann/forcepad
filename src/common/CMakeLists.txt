@@ -1,4 +1,6 @@
-find_package(Eigen3 REQUIRED)
+if(NOT TARGET Eigen3::Eigen)
+    find_package(Eigen3 REQUIRED)
+endif()
 
 include_directories(../ivf2d)
 file(GLOB SOURCE_FILES1 CONFIGURE_DEPENDS *.cpp)

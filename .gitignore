@@ -9,6 +9,8 @@
 build/
 build-release/
 build-debug/
+build-wasm/
+bin/wasm/
 *.lib
 /Win32
 /Win32/Debug
@@ -16,6 +18,9 @@ win32_build_release/
 win32_build_debug/
 vcpkg_installed/
 *.ps1
+# ...but keep the wasm build/serve helper scripts (tooling referenced by docs)
+!scripts/wasm-build.ps1
+!scripts/wasm-serve.ps1
 /docs/site
 bin/release/qtforcepad
 /bin/release/qtforcepad.app
@@ -23,3 +28,4 @@ bin/.DS_Store
 bin/release/.DS_Store
 bin/release/qtforcepadd
 /lib
+/build-wasm-rel

@@ -1,0 +1,120 @@
+# ForcePAD WebAssembly — setup & build
+
+**Step 2** of the web port. Step 1 (the fixed-function → modern-GL rendering
+migration) is complete; Step 2 stands up the Qt-for-WebAssembly toolchain and a
+wasm build target.
+
+**Status (2026-07-26): builds and renders in the browser.** ForcePAD compiles to
+WebAssembly and runs in Chrome/Edge on a **WebGL 2 (OpenGL ES 3.0)** context —
+full UI (menus, tool palette, Properties panel), the drawing canvas, and the
+`Renderer2D` shader pipeline all render. Target kit: **`wasm_singlethread`**
+(hosts on any static server; the solver blocks the UI as on desktop). Remaining
+work: async file open/save (browser sandbox), then the multi-threaded/worker
+solver.
+
+---
+
+## Toolchain (installed & verified)
+
+| Component | Version | Notes |
+|---|---|---|
+| Qt (wasm kit) | **6.9.3 `wasm_singlethread`** | `E:\Qt\6.9.3\wasm_singlethread` — installed via the Qt Maintenance Tool |
+| Emscripten | **3.1.70** | Qt 6.9 hard-pins this; `E:\Users\Jonas\Development\emsdk` |
+| Ninja | 1.13.2 | on PATH |
+| Desktop Qt (unchanged) | vcpkg Qt | wasm uses the official kit; the two coexist |
+
+Qt ↔ Emscripten pin (re-check at `https://doc.qt.io/qt-6/wasm.html` if Qt is
+upgraded): 6.8 → 3.1.56 · **6.9 → 3.1.70** · 6.10/6.11 → 4.0.7.
+
+### If setting this up on a fresh machine
+
+1. **Qt WebAssembly kit** — run `E:\Qt\MaintenanceTool.exe` → *Add or remove
+   components* → under **Qt 6.9.x** tick **WebAssembly (single-threaded)**. (It's
+   a sibling of the MSVC/MinGW kits in the tree, easy to miss; sign in first, and
+   the CLI `MaintenanceTool.exe install qt.qt6.<ver>.wasm_singlethread` works too.)
+2. **Emscripten 3.1.70:**
+   ```
+   cd E:\Users\Jonas\Development\emsdk
+   git pull                                    # refresh release tags if old
+   python emsdk.py install 3.1.70              # needs Python >= 3.10
+   python emsdk.py activate 3.1.70
+   ```
+   Gotchas learned the hard way: the bundled emsdk Python may be too old
+   (< 3.10) — drive `emsdk.py` with a system Python 3.12; and an old emsdk
+   checkout won't know 3.1.70 until `git pull`.
+3. Verify: `emcc --version` → `3.1.70`;
+   `Test-Path E:\Qt\6.9.3\wasm_singlethread\bin\qt-cmake.bat` → True.
+
+---
+
+## Build & run
+
+Two convenience scripts wrap the emsdk env + Qt `qt-cmake`:
+
+```powershell
+pwsh scripts/wasm-build.ps1        # configure (first run) + build -> bin/wasm/
+pwsh scripts/wasm-serve.ps1        # static server on :8137 + open browser
+# then browse to http://localhost:8137/qtforcepad.html
+```
+
+`wasm-build.ps1 -Clean` forces a fresh configure. Under the hood it runs
+`E:\Qt\6.9.3\wasm_singlethread\bin\qt-cmake.bat -G Ninja` after sourcing
+`emsdk_env.ps1`. The build tree is `build-wasm/`; the servable app (html + js +
+wasm + data + `qtloader.js` + `qtlogo.svg`) lands in `bin/wasm/`.
+
+> The Debug wasm is ~66 MB (`-g`); it instantiates in a few seconds. Build a
+> `Release`/`MinSizeRel` config for a much smaller artifact when deploying.
+
+---
+
+## How the wasm build differs (what the CMake does)
+
+No vcpkg on wasm. The `EMSCRIPTEN` branch in the top-level `CMakeLists.txt`
+includes `cmake/WasmDeps.cmake`, which provides:
+
+- **Eigen3** — header-only, FetchContent (pinned 3.4.0).
+- **spdlog** — FetchContent + compiled for wasm (pinned 1.17.0).
+- **zlib / libpng / libjpeg** — **Emscripten ports** (`-sUSE_ZLIB/USE_LIBPNG/
+  USE_LIBJPEG`), exposed as `ZLIB::ZLIB` / `PNG::PNG` / `JPEG::JPEG` INTERFACE
+  targets so the rest of the build links them by their usual names. (`ivf2d`
+  links all three because `PngImage.cpp`/`JpegImage.cpp` need the headers.)
+
+Other wasm-specific bits:
+
+- The per-library `find_package()` calls are guarded `if(NOT TARGET …)` so the
+  WasmDeps targets satisfy them.
+- `qtforcepad` (wasm): no system `OpenGL::GL`, no OpenMP; link options
+  `-sMAX_WEBGL_VERSION=2` (WebGL 2 for the `#version 300 es` shaders),
+  `-sALLOW_MEMORY_GROWTH=1`, and `--preload-file images/svg@/icons` (bakes the
+  toolbar SVGs into MEMFS at `/icons`, where the app looks). `DEBUG_POSTFIX` is
+  cleared and output is unified into `bin/wasm/` so Qt's generated
+  `qtforcepad.html` and `qtforcepad.js/.wasm` names match.
+- **`main.cpp`**: on `Q_OS_WASM` the `QSurfaceFormat` requests **OpenGL ES 3.0 /
+  NoProfile** (not desktop 3.3 Core). A Core-profile request makes
+  `QOpenGLWidget` fail to create a WebGL context → blank canvas. This was the
+  key runtime fix.
+
+---
+
+## Working in the browser
+
+- Rendering, tool palette, **drawing (brush)**, forces/constraints, running the
+  solver.
+- **Dialogs** — New Model, Settings (Calc/General), About. They use non-blocking
+  `open()`+signals on wasm (blocking `exec()` stays on desktop); Emscripten
+  Asyncify was tried for this and rejected (it conflicts with Qt's wasm event
+  loop). See the note in `src/qtforcepad/CMakeLists.txt`.
+- **File open/save** — models load via `QFileDialog::getOpenFileContent` (bytes
+  staged to a `/tmp` MEMFS file, then the normal path-based loader runs); save
+  triggers a browser download via `saveFileContent`. Implemented as continuation-
+  passing `doNewModel`/`doPickFile`/`doSaveModelFile` hooks so desktop stays
+  synchronous.
+
+## Still to do
+
+1. **Threaded solver** — move to `wasm_multithread`, run the solver on a worker
+   thread (OpenMP/pthreads), and serve with COOP/COEP cross-origin-isolation
+   headers so `SharedArrayBuffer` is available. This also unblocks the
+   optimisation dialog (`runOptimise`), which still blocks because it gates a
+   long solver loop.
+2. **Release build** to shrink the ~66 MB debug wasm, and a deployment host.

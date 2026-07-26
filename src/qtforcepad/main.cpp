@@ -46,12 +46,24 @@ int main(int argc, char *argv[])
     // the rendering migration removed. QOpenGLWidget honours this by creating a
     // multisampled FBO and resolving it, so force/line/BC overlays stay smooth.
     fmt.setSamples(4);
-    // 3.3 Core profile on all platforms. The rendering migration removed every
-    // fixed-function / immediate-mode call, so the app now runs on a core
-    // profile - the same feature level as WebGL 2 / OpenGL ES 3.0, which is the
-    // target for the Qt-for-WebAssembly build. (macOS supports 3.3-4.1 Core.)
+#ifdef Q_OS_WASM
+    // On WebAssembly the GL backend is WebGL 2, i.e. OpenGL ES 3.0. Qt cannot
+    // satisfy a desktop *Core* profile request here, so asking for 3.3 Core
+    // makes QOpenGLWidget fail to create a context (blank canvas). Request an
+    // OpenGL ES 3.0 context instead; the renderer's shaders already emit a
+    // "#version 300 es" header under a GLES context, so no shader changes are
+    // needed. GLES uses NoProfile (Core/Compatibility are desktop-only).
+    fmt.setRenderableType(QSurfaceFormat::OpenGLES);
+    fmt.setVersion(3, 0);
+    fmt.setProfile(QSurfaceFormat::NoProfile);
+#else
+    // 3.3 Core profile on desktop. The rendering migration removed every
+    // fixed-function / immediate-mode call, so the app runs on a core profile -
+    // the same feature level as WebGL 2 / OpenGL ES 3.0. (macOS supports
+    // 3.3-4.1 Core.)
     fmt.setVersion(3, 3);
     fmt.setProfile(QSurfaceFormat::CoreProfile);
+#endif
     QSurfaceFormat::setDefaultFormat(fmt);
 
     QApplication app(argc, argv);

@@ -354,9 +354,9 @@ const std::string PaintView::doSaveDialog(const string title, const string filte
     return "";
 }
 
-bool PaintView::doNewModel(int &width, int &height, int& initialStiffness)
+void PaintView::doNewModel(std::function<void(bool, int, int, int)> onDone)
 {
-    return false;
+    onDone(false, 640, 480, 0);
 }
 
 void PaintView::doInfoMessage(const string message)
@@ -370,6 +370,17 @@ bool PaintView::doAskYesNo(const string question)
 }
 
 const std::string PaintView::doOpenDialog(const string title, const string filter)
+{
+    return "";
+}
+
+void PaintView::doPickFile(const string title, const string filter,
+                           std::function<void(const string, const string)> onPicked)
+{
+    onPicked("", "");
+}
+
+const std::string PaintView::doSaveModelFile(const string defaultName, const std::string &bytes)
 {
     return "";
 }
@@ -1901,70 +1912,71 @@ void PaintView::newModel()
 	disableDrawing();
 
 	fp_debug("PaintView", "newModel()");
-	
-    int width = 640;
-    int height = 480;
-    int initialStiffness = 0;
-	
-    if (this->doNewModel(width, height, initialStiffness))
-	{		
-		this->setModelName("noname.fp2");
-		
-		// Create drawing area
 
-		int i;
+	// doNewModel is asynchronous: on desktop the handler runs immediately
+	// (blocking dialog), on WebAssembly it runs later from the dialog's
+	// finished signal. All post-dialog work therefore lives in the handler.
+    this->doNewModel([this](bool accepted, int width, int height, int initialStiffness) {
+        if (accepted)
+        {
+            this->setModelName("noname.fp2");
 
-		for (i=width; i>0; i--)
-		{
-			if (i % 8 == 0)
-			{
-				width = i;
-				break;
-			}
-		}
+            // Create drawing area
 
-		for (i=height; i>0; i--)
-		{
-			if (i % 8 == 0)
-			{
-				height = i;
-				break;
-			}
-		}
+            int i;
 
-		m_drawing = ivf2d::Image::create(2);
-		m_drawing->setChannels(4);
-		m_drawing->setSize(width, height);
-		m_drawing->fillColor(255-initialStiffness,255-initialStiffness,255-initialStiffness);
+            for (i=width; i>0; i--)
+            {
+                if (i % 8 == 0)
+                {
+                    width = i;
+                    break;
+                }
+            }
 
-		m_drawing->setLayer(1);
-		m_drawing->fillColor(255,255,255);
-		m_drawing->fillAlpha(128);
-		m_drawing->setAlpha(128);
-		m_drawing->setLayer(0);
+            for (i=height; i>0; i--)
+            {
+                if (i % 8 == 0)
+                {
+                    height = i;
+                    break;
+                }
+            }
 
-		// Create image grid
-		
-		m_femGrid->setImage(m_drawing);
-		m_femGrid->setShowGrid(false);
-		m_clipboard->setImage(m_drawing);
-		m_undoClipboard->setImage(m_drawing);
-		m_screenImage->setImage(m_drawing);
-		
-		m_showMesh = false;
+            m_drawing = ivf2d::Image::create(2);
+            m_drawing->setChannels(4);
+            m_drawing->setSize(width, height);
+            m_drawing->fillColor(255-initialStiffness,255-initialStiffness,255-initialStiffness);
 
-		m_useWeight = false;
-		m_femGrid->setUseWeight(m_useWeight);
-		
-        this->doInvalidate();
-        this->doRedraw();
+            m_drawing->setLayer(1);
+            m_drawing->fillColor(255,255,255);
+            m_drawing->fillAlpha(128);
+            m_drawing->setAlpha(128);
+            m_drawing->setLayer(0);
 
-		if (m_newModelEvent!=NULL)
-			m_newModelEvent->onNewModel();
-	}
+            // Create image grid
 
-	this->setViewMode(PaintView::VM_SKETCH);	
-	enableDrawing();
+            m_femGrid->setImage(m_drawing);
+            m_femGrid->setShowGrid(false);
+            m_clipboard->setImage(m_drawing);
+            m_undoClipboard->setImage(m_drawing);
+            m_screenImage->setImage(m_drawing);
+
+            m_showMesh = false;
+
+            m_useWeight = false;
+            m_femGrid->setUseWeight(m_useWeight);
+
+            this->doInvalidate();
+            this->doRedraw();
+
+            if (m_newModelEvent!=NULL)
+                m_newModelEvent->onNewModel();
+        }
+
+        this->setViewMode(PaintView::VM_SKETCH);
+        enableDrawing();
+    });
 }
 
 void PaintView::executeCorba()
@@ -1975,129 +1987,134 @@ void PaintView::openImage()
 {
 	disableDrawing();
 
-    std::string fname = this->doOpenDialog("Open image file", "*.*");
+	// doPickFile is asynchronous (see doNewModel); the load runs in the handler.
+	// It receives a locally readable path (the real file on desktop, a temporary
+	// MEMFS file on WebAssembly) plus the original file name for extension checks.
+    this->doPickFile("Open image file", "*.*", [this](const std::string path, const std::string displayName) {
+        m_danglingRelease = true;
 
-    m_danglingRelease = true;
+        if (!path.empty())
+        {
+            fp_info("PaintView", "opening image: {}", path);
+            bool jpegFile = false;
+            bool pngFile = false;
+            bool rgbFile = false;
 
-    if (fname!="")
-	{
-		fp_info("PaintView", "opening image: {}", fname);
-		bool jpegFile = false;
-		bool pngFile = false;
-		bool rgbFile = false;
+            int lastIndex = displayName.find_last_of(".");
+            std::string extension = displayName.substr(lastIndex+1);
 
-        int lastIndex = fname.find_last_of(".");
-        std::string extension = fname.substr(lastIndex+1);
+            if (extension == ".jpg")
+                jpegFile = true;
 
-        if (extension == ".jpg")
-			jpegFile = true;
-		
-        if (extension == ".jpeg")
-			jpegFile = true;
-		
-        if (extension == ".png")
-			pngFile = true;
-		
-        if (extension == ".rgb")
-			rgbFile = true;
-		
-		if ((!jpegFile)&&(!pngFile)&&(!rgbFile))
-			return;
-		
-		this->setModelName("noname.fp2");
-		
-		ivf2d::JpegImagePtr jpegImage;
-		ivf2d::PngImagePtr pngImage;
-		ivf2d::SgiImagePtr rgbImage;
-		ivf2d::ImagePtr image;
-		
-		if (jpegFile)
-		{
-			jpegImage = ivf2d::JpegImage::create();
-            jpegImage->setFileName(fname.c_str());
-			jpegImage->read();
-			image = jpegImage;
-		}
-		
-		if (pngFile)
-		{
-			pngImage = ivf2d::PngImage::create();
-            pngImage->setFileName(fname.c_str());
-			pngImage->read();
-			image = pngImage;
-		}
-		
-		if (rgbFile)
-		{
-			rgbImage = ivf2d::SgiImage::create();
-            rgbImage->setFileName(fname.c_str());
-			rgbImage->read();
-			image = rgbImage;
-		}
-		
-		image->grayscale();
-		
-		if (m_importMode==IM_NEW_MODEL)
-		{
-			m_drawing = image;
-			
-			// Create image grid
-			
-			m_femGrid->setImage(m_drawing);
-			m_femGrid->setShowGrid(false);
-			m_clipboard->setImage(m_drawing);
-			m_undoClipboard->setImage(m_drawing);
-			m_screenImage->setImage(m_drawing);
-			
-			m_showMesh = false;
-		}
-		else
-		{
-            m_clipboard->copyImage(image->getWidth(), image->getHeight(), image->getImageMap());
-			setEditMode(EM_PASTE);
-		}
-		
-        this->doInvalidate();
-        this->doRedraw();
-	}
-	
-	enableDrawing();
+            if (extension == ".jpeg")
+                jpegFile = true;
+
+            if (extension == ".png")
+                pngFile = true;
+
+            if (extension == ".rgb")
+                rgbFile = true;
+
+            if ((!jpegFile)&&(!pngFile)&&(!rgbFile))
+            {
+                enableDrawing();
+                return;
+            }
+
+            this->setModelName("noname.fp2");
+
+            ivf2d::JpegImagePtr jpegImage;
+            ivf2d::PngImagePtr pngImage;
+            ivf2d::SgiImagePtr rgbImage;
+            ivf2d::ImagePtr image;
+
+            if (jpegFile)
+            {
+                jpegImage = ivf2d::JpegImage::create();
+                jpegImage->setFileName(path.c_str());
+                jpegImage->read();
+                image = jpegImage;
+            }
+
+            if (pngFile)
+            {
+                pngImage = ivf2d::PngImage::create();
+                pngImage->setFileName(path.c_str());
+                pngImage->read();
+                image = pngImage;
+            }
+
+            if (rgbFile)
+            {
+                rgbImage = ivf2d::SgiImage::create();
+                rgbImage->setFileName(path.c_str());
+                rgbImage->read();
+                image = rgbImage;
+            }
+
+            image->grayscale();
+
+            if (m_importMode==IM_NEW_MODEL)
+            {
+                m_drawing = image;
+
+                // Create image grid
+
+                m_femGrid->setImage(m_drawing);
+                m_femGrid->setShowGrid(false);
+                m_clipboard->setImage(m_drawing);
+                m_undoClipboard->setImage(m_drawing);
+                m_screenImage->setImage(m_drawing);
+
+                m_showMesh = false;
+            }
+            else
+            {
+                m_clipboard->copyImage(image->getWidth(), image->getHeight(), image->getImageMap());
+                setEditMode(EM_PASTE);
+            }
+
+            this->doInvalidate();
+            this->doRedraw();
+        }
+
+        enableDrawing();
+    });
 }
 
 void PaintView::saveModelAs()
 {
-    std::string fname = this->doSaveDialog("Save forcepad model", "*.fp2", m_modelName);
-
-    if (fname!="")
-        this->setModelName(fname);
-    else
-        return;
-
 	using namespace std;
 
 	m_femGrid->setUseWeight(m_useWeight);
 
-	fstream f;
-	f.open(m_modelName.c_str(), ios::out);
-	m_femGrid->saveToStream(f);
-	f.close();
+	// Serialize into memory, then let the platform save it: desktop prompts for a
+	// path and writes; WebAssembly triggers a browser download (saveFileContent).
+	ostringstream oss;
+	m_femGrid->saveToStream(oss);
 
-	fp_info("PaintView", "saved model: {}", m_modelName);
+	std::string savedName = this->doSaveModelFile(m_modelName, oss.str());
+	if (savedName != "")
+	{
+		this->setModelName(savedName);
+		fp_info("PaintView", "saved model: {}", savedName);
+	}
 }
 
 void PaintView::saveModel()
 {
+	using namespace std;
+
+#ifdef __EMSCRIPTEN__
+	// In the browser there is no persistent in-place file to overwrite - every
+	// save is a download - so route through saveModelAs (saveFileContent).
+	saveModelAs();
+#else
 	if (m_modelName=="noname.fp2")
 	{
-        std::string fname = this->doSaveDialog("Save forcepad model", "*.fp2", m_modelName);
-
-        if (fname!="")
-			setModelName(fname);
-		else
-			return;
+		saveModelAs();
+		return;
 	}
-
-	using namespace std;
 
 	m_femGrid->setUseWeight(m_useWeight);
 
@@ -2107,6 +2124,7 @@ void PaintView::saveModel()
 	f.close();
 
 	fp_info("PaintView", "saved model: {}", m_modelName);
+#endif
 }
 
 void PaintView::expandImage()
@@ -2295,53 +2313,21 @@ void PaintView::openModel(const std::string filename)
 
 void PaintView::openModel()
 {
-	using namespace std;
-	
 	disableDrawing();
-	
-    std::string fname = doOpenDialog("Open forcepad model", "*.fp2");
-	m_danglingRelease = true;
 
-    if (fname!="")
-	{
-		setModelName(fname);
-		fp_info("PaintView", "opening model: {}", fname);
-
-		m_drawing = ivf2d::Image::create(2);
-		m_drawing->setSize(640,480);
-		m_drawing->setChannels(4);
-		m_femGrid->setImage(m_drawing);
-
-		fstream f;
-		f.open(m_modelName.c_str(), ios::in);
-		m_femGrid->readFromStream(f);
-		f.close();
-
-		m_useWeight = m_femGrid->getUseWeight();
-
-		m_drawing->setLayer(1);
-		m_drawing->fillColor(255,255,255);
-		m_drawing->fillAlpha(128);
-		m_drawing->setAlpha(128);
-		m_drawing->setLayer(0);
-		
-		m_clipboard->setImage(m_drawing);
-		m_undoClipboard->setImage(m_drawing);
-		m_screenImage->setImage(m_drawing);
-
-		m_femGrid->setShowGrid(false);
-		m_showMesh = false;
-		
-        this->doInvalidate();
-        this->doRedraw();
-
-		if (m_modelLoadedEvent!=NULL)
-			m_modelLoadedEvent->onModelLoaded();
-
-		this->setViewMode(PaintView::VM_SKETCH);	
-
-	}
-	enableDrawing();
+	// doPickFile is asynchronous (see doNewModel). It hands back a locally
+	// readable path (the real file on desktop, a temporary MEMFS file on
+	// WebAssembly), which the existing path-based loader openModel(path) reads.
+	this->doPickFile("Open forcepad model", "*.fp2", [this](const std::string path, const std::string displayName) {
+		m_danglingRelease = true;
+		if (!path.empty())
+		{
+			this->openModel(path);          // full synchronous loader (reads from path)
+			this->setModelName(displayName); // show the original name, not the temp path
+		}
+		else
+			enableDrawing();
+	});
 }
 
 void PaintView::copy()

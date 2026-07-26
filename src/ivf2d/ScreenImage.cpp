@@ -255,13 +255,30 @@ void ScreenImage::update(int x1, int y1, int x2, int y2)
 
 		if (std::abs(m_devicePixelRatio - 1.0) < 0.001)
 		{
-			f->glPixelStorei(GL_PACK_ROW_LENGTH, m_image->getWidth());
-			f->glPixelStorei(GL_PACK_SKIP_PIXELS, xmin);
-			f->glPixelStorei(GL_PACK_SKIP_ROWS, ymin);
-			f->glReadPixels((int)x + xmin, (int)y + ymin, logW, logH, GL_RGBA, GL_UNSIGNED_BYTE, m_image->getImageMap());
+			// Read the sub-region into a tightly-packed buffer, then copy it into
+			// the image. The GL_PACK_ROW_LENGTH/SKIP_PIXELS/SKIP_ROWS trick that
+			// lets glReadPixels write the sub-rect straight into the full image
+			// buffer works on desktop GL but WebGL 2 rejects it ("readPixels:
+			// buffer is not large enough for dimensions"), which silently dropped
+			// committed shapes (rect/ellipse/line/arch) on the wasm build.
+			std::vector<unsigned char> temp(logW * logH * 4);
+			f->glPixelStorei(GL_PACK_ALIGNMENT, 1);
 			f->glPixelStorei(GL_PACK_ROW_LENGTH, 0);
 			f->glPixelStorei(GL_PACK_SKIP_PIXELS, 0);
 			f->glPixelStorei(GL_PACK_SKIP_ROWS, 0);
+			f->glReadPixels((int)x + xmin, (int)y + ymin, logW, logH, GL_RGBA, GL_UNSIGNED_BYTE, temp.data());
+
+			for (int row = 0; row < logH; row++)
+			{
+				for (int col = 0; col < logW; col++)
+				{
+					int srcIdx = (row * logW + col) * 4;
+					int cx = xmin + col;
+					int cy = ymin + row;
+					m_image->setPixel(cx, cy, temp[srcIdx], temp[srcIdx+1], temp[srcIdx+2]);
+					m_image->setPixelAlpha(cx, cy, temp[srcIdx+3]);
+				}
+			}
 		}
 		else
 		{

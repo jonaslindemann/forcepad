@@ -1,4 +1,6 @@
-find_package(spdlog CONFIG REQUIRED)
+if(NOT TARGET spdlog::spdlog)
+    find_package(spdlog CONFIG REQUIRED)
+endif()
 
 add_library(fplog FPLog.cpp FPLog.h)
 target_link_libraries(fplog PUBLIC spdlog::spdlog)

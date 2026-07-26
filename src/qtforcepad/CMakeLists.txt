@@ -79,8 +79,12 @@ target_link_libraries(qtforcepad PRIVATE
     JPEG::JPEG
     PNG::PNG
     ZLIB::ZLIB
-    OpenGL::GL
 )
+
+# System OpenGL only on desktop; the wasm build gets WebGL through Qt.
+if(NOT EMSCRIPTEN)
+    target_link_libraries(qtforcepad PRIVATE OpenGL::GL)
+endif()
 
 if(OpenMP_FOUND)
     target_link_libraries(qtforcepad PRIVATE OpenMP::OpenMP_CXX)
@@ -90,12 +94,54 @@ endif()
 # On macOS the bundle puts the executable in Contents/MacOS/, and
 # resolveIconPath() searches relative to applicationDirPath(), so this
 # lands them at Contents/MacOS/icons/ — exactly where the app looks.
-add_custom_command(TARGET qtforcepad POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_SOURCE_DIR}/images/svg"
-        "$<TARGET_FILE_DIR:qtforcepad>/icons"
-    COMMENT "Copying ForcePAD icons..."
-)
+# On wasm there is no host filesystem; the icons are baked into the
+# Emscripten virtual FS via --preload-file instead (see the EMSCRIPTEN block).
+if(NOT EMSCRIPTEN)
+    add_custom_command(TARGET qtforcepad POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_SOURCE_DIR}/images/svg"
+            "$<TARGET_FILE_DIR:qtforcepad>/icons"
+        COMMENT "Copying ForcePAD icons..."
+    )
+endif()
+
+if(EMSCRIPTEN)
+    # Qt generates <target>.html / qtloader.js / qtlogo.svg that load
+    # "<target>.js"/"<target>.wasm" and call window.<target>_entry — all keyed
+    # to the bare target name. A DEBUG_POSTFIX would rename the .js/.wasm to
+    # qtforcepadd.* and break that contract, so drop it here. Also collect the
+    # whole app (html + js + wasm + data + loader) into one servable directory
+    # instead of the split the legacy EXECUTABLE_OUTPUT_PATH would cause.
+    set_target_properties(qtforcepad PROPERTIES
+        DEBUG_POSTFIX ""
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/wasm"
+    )
+
+    # Qt-for-WebAssembly link configuration.
+    #   * MAX_WEBGL_VERSION=2 — allow a WebGL 2 (GLES 3.0) context; the renderer's
+    #     shaders are #version 300 es, so WebGL 1 is not enough.
+    #   * ALLOW_MEMORY_GROWTH — the FEM solver / Eigen allocate a lot; don't cap.
+    #   * --preload-file — bake runtime assets into MEMFS:
+    #       images/svg -> /icons   (toolbar icons; resolveIconPath / "/icons")
+    #       brushes    -> /brushes (loadBrushes() opens the relative
+    #                               "brushes/*.rgb" fallback; CWD is "/")
+    #
+    # NOTE: blocking nested event loops (QDialog::exec(), QMessageBox, the
+    # solver's processEvents() loop) do NOT work on wasm's single browser thread
+    # and render modal dialogs grey/unclosable. Emscripten -sASYNCIFY was tried
+    # but conflicts with Qt's own wasm event loop ("Cannot have multiple async
+    # operations in flight at once" aborts) and bloats the module ~40 MB, so it
+    # is intentionally NOT used. The fix is to convert the dialogs to
+    # non-blocking open()/show()+signals (a dedicated task, alongside the async
+    # file open/save refactor).
+    target_link_options(qtforcepad PRIVATE
+        "SHELL:-s MAX_WEBGL_VERSION=2"
+        "SHELL:-s ALLOW_MEMORY_GROWTH=1"
+        "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/images/svg@/icons"
+        "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/bin/release/brushes@/brushes"
+        "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/bin/release/colormaps@/colormaps"
+    )
+endif()
 
 if(WIN32)
     target_link_libraries(qtforcepad PRIVATE winmm comctl32 gdiplus)

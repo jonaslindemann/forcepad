@@ -52,10 +52,16 @@ protected:
     void doMakeCurrent() override;
     const std::string doSaveDialog(const std::string title, const std::string filter,
                                    const std::string defaultFilename) override;
-    bool doNewModel(int &w, int &h, int &initialStiffness) override;
+    void doNewModel(std::function<void(bool accepted, int width, int height,
+                                       int initialStiffness)> onDone) override;
     void doInfoMessage(const std::string message) override;
     bool doAskYesNo(const std::string question) override;
     const std::string doOpenDialog(const std::string title, const std::string filter) override;
+    void doPickFile(const std::string title, const std::string filter,
+                    std::function<void(const std::string path,
+                                       const std::string displayName)> onPicked) override;
+    const std::string doSaveModelFile(const std::string defaultName,
+                                      const std::string &bytes) override;
     void doCreateCursors() override;
     void doUpdateCursor(TEditMode mode) override;
     void doDeleteCursors() override;

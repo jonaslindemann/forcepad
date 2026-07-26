@@ -1,4 +1,6 @@
-find_package(Eigen3 REQUIRED)
+if(NOT TARGET Eigen3::Eigen)
+    find_package(Eigen3 REQUIRED)
+endif()
 
 file(GLOB SOURCE_FILES CONFIGURE_DEPENDS *.cpp)
 file(GLOB INCLUDE_FILES CONFIGURE_DEPENDS *.h)

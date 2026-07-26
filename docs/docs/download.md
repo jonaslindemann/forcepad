@@ -1,5 +1,20 @@
 # Downloading ForcePAD
 
+## Run in your browser — no install
+
+ForcePAD now runs directly in the browser as a WebAssembly build, so you can
+try it without downloading anything.
+
+[▶ Launch ForcePAD in your browser](app/){ .md-button .md-button--primary }
+
+Best experienced on a desktop browser (Chrome, Edge, or Firefox) with WebGL 2.
+The application is a few megabytes and shows a loading indicator on first start.
+Models open and save through the browser's file dialogs, and drawings can be
+downloaded as `.fp2` files. (Topology optimisation is not yet available in the
+browser build.)
+
+## Download the desktop application
+
 [Latest release](https://github.com/jonaslindemann/forcepad/releases/latest){ .md-button .md-button--primary }
 
 All releases of ForcePAD can be downloaded from GitHub:

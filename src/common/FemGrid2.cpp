@@ -1040,6 +1040,12 @@ void FemGrid2::drawMisesStress()
 	if ((m_displacements!=nullptr)&&(!m_results.empty()))
 	{
 		// Blend is enabled ambiently by PaintView for the whole overlay pass.
+		// Batch every element quad into ONE Renderer2D draw call. Emitting a
+		// separate beginQuads()/end() per element issues thousands of
+		// glBufferData+glDrawArrays calls per frame; desktop GL tolerates that
+		// (just slow), but on WebGL it hits a hard cliff and the Mises field
+		// fails to render entirely.
+		ren.beginQuads();
 		for (i=0; i<m_rows; i++)
 		{
 			for (j=0; j<m_cols; j++)
@@ -1052,7 +1058,6 @@ void FemGrid2::drawMisesStress()
 					this->getElement(i, j, value, ex, ey, topo);
 
 					const float alpha = stiffnessAlpha(m_grid(i, j));
-					ren.beginQuads();
 					ren.color(r, g, b, alpha);
 					for (l=0; l<4; l++)
 					{
@@ -1063,10 +1068,10 @@ void FemGrid2::drawMisesStress()
 						else
 							ren.vertex((float)(ex[l]/m_elementScaleFactor), (float)(ey[l]/m_elementScaleFactor));
 					}
-					ren.end();
 				}
 			}
 		}
+		ren.end();
 	}
 }
 
@@ -1091,6 +1096,8 @@ void FemGrid2::drawMisesStressSmooth()
 	// Blend is enabled ambiently by PaintView for the whole overlay pass.
 	if ((m_displacements!=nullptr)&&(m_nodeResults.size() > 0))
 	{
+		// One batched draw call for the whole field - see drawMisesStress().
+		ren.beginQuads();
 		for (i=0; i<m_rows; i++)
 		{
 			for (j=0; j<m_cols; j++)
@@ -1100,7 +1107,6 @@ void FemGrid2::drawMisesStressSmooth()
 					this->getElement(i, j, value, ex, ey, topo);
 
 					const float alpha = stiffnessAlpha(m_grid(i, j));
-					ren.beginQuads();
 					for (l=0; l<4; l++)
 					{
 						switch (l) {
@@ -1128,10 +1134,10 @@ void FemGrid2::drawMisesStressSmooth()
 						else
 							ren.vertex((float)(ex[l]/m_elementScaleFactor), (float)(ey[l]/m_elementScaleFactor));
 					}
-					ren.end();
 				}
 			}
 		}
+		ren.end();
 	}
 }
 

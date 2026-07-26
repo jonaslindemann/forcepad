@@ -28,6 +28,8 @@
 #include "forcepad_config.h"
 
 #include <vector>
+#include <string>
+#include <functional>
 
 #include "Rectangle.h"
 #include "Ellipse.h"
@@ -343,10 +345,32 @@ protected:
     virtual void doMakeCurrent();
     virtual const std::string doSaveDialog(const std::string title, const std::string filter,
                                            const std::string defaultFilename);
-    virtual bool doNewModel(int &width, int &height, int &initialStiffness);
+    // New-model dialog. Asynchronous: the completion handler receives whether the
+    // user accepted plus the chosen dimensions/stiffness. On desktop it is called
+    // synchronously (blocking dialog); on WebAssembly it is called later, from the
+    // dialog's finished signal, because the browser thread cannot block.
+    virtual void doNewModel(std::function<void(bool accepted, int width, int height,
+                                               int initialStiffness)> onDone);
     virtual void doInfoMessage(const std::string message);
     virtual bool doAskYesNo(const std::string question);
     virtual const std::string doOpenDialog(const std::string title, const std::string filter);
+
+    // Let the user pick a file to open, then hand back a *locally readable path*
+    // to its contents. Desktop: a native open dialog, path = the chosen file.
+    // WebAssembly: QFileDialog::getOpenFileContent, whose bytes are written to a
+    // temporary MEMFS file whose path is returned - so all the existing path /
+    // fstream based loading code works unchanged. onPicked("","") if cancelled.
+    // Asynchronous (see doNewModel); the handler may run now or later.
+    virtual void doPickFile(const std::string title, const std::string filter,
+                            std::function<void(const std::string path,
+                                               const std::string displayName)> onPicked);
+
+    // Save the given bytes as a file. Desktop: a native save dialog + write to the
+    // chosen path. WebAssembly: QFileDialog::saveFileContent, which triggers a
+    // browser download. Returns the saved file name, or "" if cancelled. This is
+    // synchronous on both platforms (saveFileContent is fire-and-forget).
+    virtual const std::string doSaveModelFile(const std::string defaultName,
+                                              const std::string &bytes);
 
     virtual void doCreateCursors();
     virtual void doUpdateCursor(TEditMode mode);
