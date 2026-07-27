@@ -11,10 +11,20 @@
       * Qt 6.9.x WebAssembly (single-threaded) kit installed
       * emsdk with Emscripten 3.1.70 activated  (Qt 6.9 pins 3.1.70)
 
+.PARAMETER Config
+    CMake build type. Ninja is single-config, so each one gets its own build
+    tree - but they all write the app to bin/wasm, so the last build wins there.
+    Rebuild MinSizeRel before deploying, or bin/wasm still holds a Debug app.
+
+    Debug is ~66 MB (-g) and instantiates in a few seconds locally; MinSizeRel
+    (-Os) is ~15 MB and is what the site should serve.
+
 .PARAMETER Clean
-    Delete build-wasm first for a fresh configure.
+    Delete the build tree for this config first, for a fresh configure.
 #>
 param(
+    [ValidateSet('Debug', 'Release', 'RelWithDebInfo', 'MinSizeRel')]
+    [string]$Config  = 'Debug',
     [string]$QtWasm  = 'E:\Qt\6.9.3\wasm_singlethread',
     [string]$Emsdk   = 'E:\Users\Jonas\Development\emsdk',
     [string]$Python  = 'C:\Python312\python.exe',
@@ -23,7 +33,15 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $repo    = Split-Path -Parent $PSScriptRoot
-$build   = Join-Path $repo 'build-wasm'
+
+# Existing trees keep their established names (build-wasm is Debug,
+# build-wasm-rel is MinSizeRel) so switching to this parameter does not throw
+# away a configured tree and force a full rebuild.
+$build = switch ($Config) {
+    'Debug'      { Join-Path $repo 'build-wasm' }
+    'MinSizeRel' { Join-Path $repo 'build-wasm-rel' }
+    default      { Join-Path $repo "build-wasm-$($Config.ToLower())" }
+}
 $qtcmake = Join-Path $QtWasm 'bin\qt-cmake.bat'
 
 if (-not (Test-Path $qtcmake)) { throw "qt-cmake not found at $qtcmake - is the Qt WebAssembly kit installed?" }
@@ -36,13 +54,15 @@ if (Test-Path $Python) { $env:EMSDK_PYTHON = $Python }
 if ($Clean -and (Test-Path $build)) { Remove-Item -Recurse -Force $build }
 
 if (-not (Test-Path (Join-Path $build 'CMakeCache.txt'))) {
-    Write-Host "==> Configuring wasm build ($QtWasm)" -ForegroundColor Cyan
-    & $qtcmake -G Ninja -S $repo -B $build
+    Write-Host "==> Configuring wasm build, $Config ($QtWasm)" -ForegroundColor Cyan
+    & $qtcmake -G Ninja -S $repo -B $build -DCMAKE_BUILD_TYPE=$Config
     if ($LASTEXITCODE -ne 0) { throw "configure failed" }
 }
 
-Write-Host "==> Building qtforcepad (wasm)" -ForegroundColor Cyan
+Write-Host "==> Building qtforcepad (wasm, $Config)" -ForegroundColor Cyan
 cmake --build $build
 if ($LASTEXITCODE -ne 0) { throw "build failed" }
 
-Write-Host "==> Done. App in $(Join-Path $repo 'bin\wasm')  (serve with scripts/wasm-serve.ps1)" -ForegroundColor Green
+$wasm = Join-Path $repo 'bin\wasm\ForcePAD.wasm'
+$size = if (Test-Path $wasm) { " ($([math]::Round((Get-Item $wasm).Length / 1MB, 1)) MB)" } else { "" }
+Write-Host "==> Done. $Config app in $(Join-Path $repo 'bin\wasm')$size  (serve with scripts/wasm-serve.ps1)" -ForegroundColor Green

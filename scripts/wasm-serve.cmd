@@ -29,9 +29,9 @@ if not defined SERVE_PYTHON set "SERVE_PYTHON=python"
 
 for %%I in ("%~dp0..") do set "REPO=%%~fI"
 set "DIR=%REPO%\bin\wasm"
-set "URL=http://localhost:%PORT%/qtforcepad.html"
+set "URL=http://localhost:%PORT%/ForcePAD.html"
 
-if not exist "%DIR%\qtforcepad.html" (
+if not exist "%DIR%\ForcePAD.html" (
     echo ERROR: No wasm app in "%DIR%" - run scripts\wasm-build.cmd first.
     exit /b 1
 )

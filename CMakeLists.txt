@@ -55,6 +55,11 @@ endif()
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets OpenGL OpenGLWidgets Svg)
+# Desktop only: downloads a model given as an http(s) command-line argument.
+# The wasm build uses emscripten's XHR wrapper instead (see ModelUrlLoader.cpp).
+if(NOT EMSCRIPTEN)
+    find_package(Qt6 REQUIRED COMPONENTS Network)
+endif()
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)

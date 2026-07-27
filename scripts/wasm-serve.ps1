@@ -22,11 +22,11 @@ param(
 $ErrorActionPreference = 'Stop'
 $repo = Split-Path -Parent $PSScriptRoot
 $dir  = Join-Path $repo 'bin\wasm'
-if (-not (Test-Path (Join-Path $dir 'qtforcepad.html'))) {
+if (-not (Test-Path (Join-Path $dir 'ForcePAD.html'))) {
     throw "No wasm app in $dir - run scripts/wasm-build.ps1 first."
 }
 
-$url = "http://localhost:$Port/qtforcepad.html"
+$url = "http://localhost:$Port/ForcePAD.html"
 Write-Host "==> Serving $dir at $url  (Ctrl+C to stop)" -ForegroundColor Cyan
 if (-not $NoBrowser) {
     Start-Job { param($u) Start-Sleep 2; Start-Process $u } -ArgumentList $url | Out-Null

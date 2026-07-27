@@ -16,6 +16,22 @@ ForcePAD includes small `.fp2` models that can be used as starting points for te
 | Pantheon | [`pantheon.fp2`](https://github.com/jonaslindemann/forcepad/blob/master/bin/release/samples/pantheon.fp2) | Image-based geometry and architectural form exploration. |
 | Pantheon variants | [`pantheon2.fp2`](https://github.com/jonaslindemann/forcepad/blob/master/bin/release/samples/pantheon2.fp2), [`pantheon3.fp2`](https://github.com/jonaslindemann/forcepad/blob/master/bin/release/samples/pantheon3.fp2) | Variants for comparing edits and responses. |
 
+## Opening a Model From a Link
+
+The browser version can open a model straight from a link, so an assignment or a lecture slide can point students at a prepared starting point instead of asking them to download a file and open it by hand. Add a `model` parameter to the app URL:
+
+```text
+https://jonaslindemann.github.io/forcepad/app/?model=models/beam.fp2
+```
+
+The value may be a path relative to the app, as above, or a full `https://` address of a `.fp2` file hosted elsewhere. A file on another server has to be served with the `Access-Control-Allow-Origin` header, otherwise the browser blocks the download; a file placed next to the app always works. If the file cannot be fetched, ForcePAD starts with an empty model and reports the problem.
+
+The desktop version accepts the same thing on the command line, either as a local file or as an address:
+
+```text
+forcepad https://example.org/models/beam.fp2
+```
+
 ## Example Walkthroughs to Add
 
 These are placeholders for future example pages or downloadable teaching packs.

@@ -6,6 +6,7 @@ set(SOURCES
     main.cpp
     MainWindow.cpp
     QtPaintView.cpp
+    ModelUrlLoader.cpp
     CalcSettingsDialog.cpp
     GeneralSettingsDialog.cpp
     AboutDialog.cpp
@@ -28,6 +29,7 @@ endif()
 set(HEADERS
     MainWindow.h
     QtPaintView.h
+    ModelUrlLoader.h
     CalcSettingsDialog.h
     GeneralSettingsDialog.h
     AboutDialog.h
@@ -82,8 +84,10 @@ target_link_libraries(qtforcepad PRIVATE
 )
 
 # System OpenGL only on desktop; the wasm build gets WebGL through Qt.
+# Qt6::Network is desktop-only too: on wasm ModelUrlLoader uses emscripten's
+# own XHR wrapper, which keeps the module from growing by a whole Qt module.
 if(NOT EMSCRIPTEN)
-    target_link_libraries(qtforcepad PRIVATE OpenGL::GL)
+    target_link_libraries(qtforcepad PRIVATE OpenGL::GL Qt6::Network)
 endif()
 
 if(OpenMP_FOUND)
@@ -106,14 +110,27 @@ if(NOT EMSCRIPTEN)
 endif()
 
 if(EMSCRIPTEN)
-    # Qt generates <target>.html / qtloader.js / qtlogo.svg that load
-    # "<target>.js"/"<target>.wasm" and call window.<target>_entry — all keyed
-    # to the bare target name. A DEBUG_POSTFIX would rename the .js/.wasm to
-    # qtforcepadd.* and break that contract, so drop it here. Also collect the
-    # whole app (html + js + wasm + data + loader) into one servable directory
-    # instead of the split the legacy EXECUTABLE_OUTPUT_PATH would cause.
+    # Qt generates <name>.html / qtloader.js / qtlogo.svg that load
+    # "<name>.js"/"<name>.wasm" and call a JS entry function.
+    # Qt6WasmMacros.cmake builds that shell from wasm_shell.html, substituting
+    # @APPNAME@ from OUTPUT_NAME (falling back to the target name) and
+    # @APPEXPORTNAME@ from QT_WASM_EXPORT_NAME. Setting both renames the
+    # artifacts and the user-visible page title together, consistently.
+    #
+    # Note QT_WASM_EXPORT_NAME is used verbatim — the "_entry" suffix Qt appends
+    # by default only applies when the property is unset. It is also what goes to
+    # emscripten as -sEXPORT_NAME, so ForcePAD.js defines window.ForcePAD and the
+    # generated shell calls exactly that.
+    #
+    # DEBUG_POSTFIX, by contrast, is NOT seen by that macro: it would rename the
+    # .js/.wasm to ForcePADd.* while the generated html still asked for
+    # ForcePAD.js, so it must stay empty here. Also collect the whole app
+    # (html + js + wasm + data + loader) into one servable directory instead of
+    # the split the legacy EXECUTABLE_OUTPUT_PATH would cause.
     set_target_properties(qtforcepad PROPERTIES
         DEBUG_POSTFIX ""
+        OUTPUT_NAME "ForcePAD"
+        QT_WASM_EXPORT_NAME "ForcePAD"
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/wasm"
     )
 

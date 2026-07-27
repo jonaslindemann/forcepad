@@ -4,6 +4,7 @@
 #include <QSurfaceFormat>
 
 #include "MainWindow.h"
+#include "ModelUrlLoader.h"
 #include "FPLog.h"
 
 static QString startupModelPath(const QStringList &arguments)
@@ -85,9 +86,21 @@ int main(int argc, char *argv[])
     w.paintView()->setCommandLine(argc, argv);
     w.show();
 
-    const QString modelPath = startupModelPath(app.arguments());
-    if (!modelPath.isEmpty())
-        w.paintView()->openModel(modelPath.toStdString());
+    // A model can be requested by URL - "?model=..." in the page query string on
+    // WebAssembly, an http(s) argument on desktop - so a link can open a
+    // predefined model. The download is asynchronous; it completes once the
+    // event loop below is running.
+    const QUrl modelUrl = fp::startupModelUrl(app.arguments());
+    if (!modelUrl.isEmpty())
+    {
+        fp::openModelFromUrl(w.paintView(), modelUrl);
+    }
+    else
+    {
+        const QString modelPath = startupModelPath(app.arguments());
+        if (!modelPath.isEmpty())
+            w.paintView()->openModel(modelPath.toStdString());
+    }
 
     return app.exec();
 }

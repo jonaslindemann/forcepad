@@ -52,18 +52,43 @@ upgraded): 6.8 → 3.1.56 · **6.9 → 3.1.70** · 6.10/6.11 → 4.0.7.
 Two convenience scripts wrap the emsdk env + Qt `qt-cmake`:
 
 ```powershell
-pwsh scripts/wasm-build.ps1        # configure (first run) + build -> bin/wasm/
-pwsh scripts/wasm-serve.ps1        # static server on :8137 + open browser
-# then browse to http://localhost:8137/qtforcepad.html
+pwsh scripts/wasm-build.ps1                        # Debug -> bin/wasm/
+pwsh scripts/wasm-build.ps1 -Config MinSizeRel     # the one to deploy (~15 MB)
+pwsh scripts/wasm-serve.ps1                        # static server on :8137 + open browser
+# then browse to http://localhost:8137/ForcePAD.html
 ```
 
-`wasm-build.ps1 -Clean` forces a fresh configure. Under the hood it runs
-`E:\Qt\6.9.3\wasm_singlethread\bin\qt-cmake.bat -G Ninja` after sourcing
-`emsdk_env.ps1`. The build tree is `build-wasm/`; the servable app (html + js +
-wasm + data + `qtloader.js` + `qtlogo.svg`) lands in `bin/wasm/`.
+`-Config` takes `Debug` (default), `Release`, `RelWithDebInfo` or `MinSizeRel`.
+Ninja is single-config, so each build type gets its own tree — `build-wasm/` for
+Debug and `build-wasm-rel/` for MinSizeRel, the names those trees already had.
+**All of them write the app to `bin/wasm/`, so the last build wins there**: run
+the MinSizeRel build immediately before deploying, or `bin/wasm` still holds a
+Debug app. (`wasm-deploy.ps1` refuses to publish one, which is the backstop.)
 
-> The Debug wasm is ~66 MB (`-g`); it instantiates in a few seconds. Build a
-> `Release`/`MinSizeRel` config for a much smaller artifact when deploying.
+A third script publishes a build to the documentation site:
+
+```powershell
+pwsh scripts/wasm-deploy.ps1        # bin/wasm -> docs/docs/app (served at /forcepad/app/)
+```
+
+Each of the three scripts has a `.cmd` twin for plain `cmd.exe`
+(`wasm-deploy.cmd force prunelegacy <model.fp2> …` — same behaviour, positional
+arguments instead of named ones).
+
+It copies the payload and writes `index.html` from the generated `ForcePAD.html`
+in one step, so the page can never end up asking for a payload that is no longer
+there — the way a partial copy breaks the site. It refuses a Debug wasm (~66 MB
+against ~15 MB for Release) unless `-Force`, takes `-Models <*.fp2>` to publish
+models for `?model=` links, and leaves the previous release's `qtforcepad.*`
+files alone until `-PruneLegacy`.
+
+`wasm-build.ps1 -Clean` forces a fresh configure of that config's tree. Under
+the hood it runs `E:\Qt\6.9.3\wasm_singlethread\bin\qt-cmake.bat -G Ninja
+-DCMAKE_BUILD_TYPE=<config>` after sourcing `emsdk_env.ps1`. The servable app
+(html + js + wasm + data + `qtloader.js` + `qtlogo.svg`) lands in `bin/wasm/`.
+
+> Measured sizes: Debug **63 MB** (`-g`, instantiates in a few seconds locally),
+> MinSizeRel **14.8 MB** (`-Os`) — the one to serve.
 
 ---
 
@@ -86,9 +111,13 @@ Other wasm-specific bits:
 - `qtforcepad` (wasm): no system `OpenGL::GL`, no OpenMP; link options
   `-sMAX_WEBGL_VERSION=2` (WebGL 2 for the `#version 300 es` shaders),
   `-sALLOW_MEMORY_GROWTH=1`, and `--preload-file images/svg@/icons` (bakes the
-  toolbar SVGs into MEMFS at `/icons`, where the app looks). `DEBUG_POSTFIX` is
-  cleared and output is unified into `bin/wasm/` so Qt's generated
-  `qtforcepad.html` and `qtforcepad.js/.wasm` names match.
+  toolbar SVGs into MEMFS at `/icons`, where the app looks). `OUTPUT_NAME` and
+  `QT_WASM_EXPORT_NAME` are both set to `ForcePAD`, which is what
+  `Qt6WasmMacros.cmake` substitutes for `@APPNAME@` / `@APPEXPORTNAME@` when it
+  generates the shell from `wasm_shell.html` — so the page title, the artifact
+  names and the `window.ForcePAD_entry` call all agree. `DEBUG_POSTFIX` is
+  cleared (that macro does *not* see it, so a postfix would desync the generated
+  `ForcePAD.html` from a `ForcePADd.js`) and output is unified into `bin/wasm/`.
 - **`main.cpp`**: on `Q_OS_WASM` the `QSurfaceFormat` requests **OpenGL ES 3.0 /
   NoProfile** (not desktop 3.3 Core). A Core-profile request makes
   `QOpenGLWidget` fail to create a WebGL context → blank canvas. This was the
@@ -110,6 +139,35 @@ Other wasm-specific bits:
   passing `doNewModel`/`doPickFile`/`doSaveModelFile` hooks so desktop stays
   synchronous.
 
+### Opening a model from a link (`?model=`)
+
+A link can open a predefined model, so a course page can hand out one URL per
+exercise:
+
+```text
+https://jonaslindemann.github.io/forcepad/app/?model=models/beam.fp2
+https://jonaslindemann.github.io/forcepad/app/?model=https://example.org/beam.fp2
+```
+
+The value is resolved against the page URL, so a relative path is served from
+next to the app (`docs/docs/app/models/…` in this repo's published site). An
+absolute URL to another host only works if that host sends CORS headers
+(`Access-Control-Allow-Origin`) — the transfer is a plain XHR from the page.
+Only `http`/`https` are accepted; anything else is refused and logged.
+
+`src/qtforcepad/ModelUrlLoader.cpp` implements this. On wasm it reads
+`window.location.href` via `emscripten_run_script_string` (the browser's only
+"command line"), picks the `model` query parameter apart with `QUrlQuery`, and
+downloads with `emscripten_async_wget2` straight into `/tmp` — from there the
+normal path-based `openModel()` takes over, exactly like the file-dialog path.
+Using emscripten's XHR rather than `QNetworkAccessManager` keeps `Qt6::Network`
+out of the wasm module. Failures (404, CORS, unsupported scheme) leave the app
+on an empty model and report through the info overlay and the log.
+
+The same helper works on desktop, where it links `Qt6::Network` instead, so
+`qtforcepad https://example.org/beam.fp2` downloads and opens a model too. A
+plain path argument still takes the existing local-file route.
+
 ## Still to do
 
 1. **Threaded solver** — move to `wasm_multithread`, run the solver on a worker
@@ -117,4 +175,6 @@ Other wasm-specific bits:
    headers so `SharedArrayBuffer` is available. This also unblocks the
    optimisation dialog (`runOptimise`), which still blocks because it gates a
    long solver loop.
-2. **Release build** to shrink the ~66 MB debug wasm, and a deployment host.
+2. ~~**Release build** to shrink the ~66 MB debug wasm, and a deployment host.~~
+   Done: `wasm-build.ps1 -Config MinSizeRel` (14.8 MB) published to GitHub Pages
+   at `/forcepad/app/` by `wasm-deploy.ps1`.
