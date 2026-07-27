@@ -7,24 +7,24 @@ ForcePAD includes small `.fp2` models that can be used as starting points for te
 
 ## Bundled Sample Models
 
-| Example | File | Suggested use |
-| --- | --- | --- |
-| Symmetric beam | [`beam_sym.fp2`](https://github.com/jonaslindemann/forcepad/blob/master/bin/release/samples/beam_sym.fp2) | Basic bending, support conditions, and symmetry. |
-| Thick beam | [`thick_beam.fp2`](https://github.com/jonaslindemann/forcepad/blob/master/bin/release/samples/thick_beam.fp2) | Compare coarse and thick structural domains. |
-| Block | [`block.fp2`](https://github.com/jonaslindemann/forcepad/blob/master/bin/release/samples/block.fp2) | Simple design domain for stress and optimisation experiments. |
-| Demo example | [`demo_example.fp2`](https://github.com/jonaslindemann/forcepad/blob/master/bin/release/samples/demo_example.fp2) | General walkthrough model for demonstrations. |
-| Pantheon | [`pantheon.fp2`](https://github.com/jonaslindemann/forcepad/blob/master/bin/release/samples/pantheon.fp2) | Image-based geometry and architectural form exploration. |
-| Pantheon variants | [`pantheon2.fp2`](https://github.com/jonaslindemann/forcepad/blob/master/bin/release/samples/pantheon2.fp2), [`pantheon3.fp2`](https://github.com/jonaslindemann/forcepad/blob/master/bin/release/samples/pantheon3.fp2) | Variants for comparing edits and responses. |
+| Example | File | Open | Suggested use |
+| --- | --- | --- | --- |
+| Symmetric beam | [`beam_sym.fp2`](https://github.com/jonaslindemann/forcepad/blob/master/bin/release/samples/beam_sym.fp2) | [▶](https://jonaslindemann.github.io/forcepad/app/?model=models/beam_sym.fp2) | Basic bending, support conditions, and symmetry. |
+| Thick beam | [`thick_beam.fp2`](https://github.com/jonaslindemann/forcepad/blob/master/bin/release/samples/thick_beam.fp2) | [▶](https://jonaslindemann.github.io/forcepad/app/?model=models/thick_beam.fp2) | Compare coarse and thick structural domains. |
+| Block | [`block.fp2`](https://github.com/jonaslindemann/forcepad/blob/master/bin/release/samples/block.fp2) | [▶](https://jonaslindemann.github.io/forcepad/app/?model=models/block.fp2) | Simple design domain for stress and optimisation experiments. |
+| Demo example | [`demo_example.fp2`](https://github.com/jonaslindemann/forcepad/blob/master/bin/release/samples/demo_example.fp2) | [▶](https://jonaslindemann.github.io/forcepad/app/?model=models/demo_example.fp2) | General walkthrough model for demonstrations. |
+| Pantheon | [`pantheon.fp2`](https://github.com/jonaslindemann/forcepad/blob/master/bin/release/samples/pantheon.fp2) | [▶](https://jonaslindemann.github.io/forcepad/app/?model=models/pantheon.fp2) | Image-based geometry and architectural form exploration. |
+| Pantheon variants | [`pantheon2.fp2`](https://github.com/jonaslindemann/forcepad/blob/master/bin/release/samples/pantheon2.fp2), [`pantheon3.fp2`](https://github.com/jonaslindemann/forcepad/blob/master/bin/release/samples/pantheon3.fp2) | [▶](https://jonaslindemann.github.io/forcepad/app/?model=models/pantheon2.fp2) [▶](https://jonaslindemann.github.io/forcepad/app/?model=models/pantheon3.fp2) | Variants for comparing edits and responses. |
 
 ## Opening a Model From a Link
 
 The browser version can open a model straight from a link, so an assignment or a lecture slide can point students at a prepared starting point instead of asking them to download a file and open it by hand. Add a `model` parameter to the app URL:
 
 ```text
-https://jonaslindemann.github.io/forcepad/app/?model=models/beam.fp2
+https://jonaslindemann.github.io/forcepad/app/?model=models/beam_sym.fp2
 ```
 
-The value may be a path relative to the app, as above, or a full `https://` address of a `.fp2` file hosted elsewhere. A file on another server has to be served with the `Access-Control-Allow-Origin` header, otherwise the browser blocks the download; a file placed next to the app always works. If the file cannot be fetched, ForcePAD starts with an empty model and reports the problem.
+Every sample model listed above is published with the app, so `models/<file>.fp2` works for any of them — the ▶ Open links in the table are exactly these URLs. The value may also be a full `https://` address of a `.fp2` file hosted elsewhere. A file on another server has to be served with the `Access-Control-Allow-Origin` header, otherwise the browser blocks the download; a file placed next to the app always works. If the file cannot be fetched, ForcePAD starts with an empty model and reports the problem.
 
 The desktop version accepts the same thing on the command line, either as a local file or as an address:
 

@@ -77,9 +77,11 @@ arguments instead of named ones).
 
 It copies the payload and writes `index.html` from the generated `ForcePAD.html`
 in one step, so the page can never end up asking for a payload that is no longer
-there — the way a partial copy breaks the site. It refuses a Debug wasm (~66 MB
-against ~15 MB for Release) unless `-Force`, takes `-Models <*.fp2>` to publish
-models for `?model=` links, and leaves the previous release's `qtforcepad.*`
+there — the way a partial copy breaks the site. It also publishes
+`bin/release/samples/*.fp2` as `docs/docs/app/models/`, so every sample is
+reachable as `?model=models/<name>` (add one-offs with `-Models`, skip the lot
+with `-NoModels`). It refuses a Debug wasm (63 MB against 14.8 MB for
+MinSizeRel) unless `-Force`, and leaves the previous release's `qtforcepad.*`
 files alone until `-PruneLegacy`.
 
 `wasm-build.ps1 -Clean` forces a fresh configure of that config's tree. Under

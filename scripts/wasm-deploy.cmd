@@ -17,14 +17,18 @@ rem  ForcePAD rename) are left in place unless "prunelegacy" is given: they are
 rem  already committed, so keeping them costs nothing. (Git history is the real
 rem  backup: git checkout <sha> -- docs/docs/app.)
 rem
-rem  Usage:  wasm-deploy.cmd [force] [prunelegacy] [model.fp2 ...]
+rem  Every deploy also publishes bin\release\samples\*.fp2 as
+rem  docs\docs\app\models\, so ?model=models/<name> links work straight away.
+rem
+rem  Usage:  wasm-deploy.cmd [force] [prunelegacy] [nomodels] [model.fp2 ...]
 rem            force        deploy even if the wasm looks like a Debug build
 rem            prunelegacy  delete the superseded qtforcepad.* payload
-rem            model.fp2    publish next to the app, reachable as
-rem                         ?model=models/<name>
-rem  Override defaults via env vars DEPLOY_SOURCE / DEPLOY_DEST.
+rem            nomodels     publish only the app, no models
+rem            model.fp2    an extra model to publish alongside the samples
+rem  Override defaults via env vars DEPLOY_SOURCE / DEPLOY_DEST /
+rem  DEPLOY_MODELDIR.
 rem
-rem  Example:  wasm-deploy.cmd bin\release\samples\beam_sym.fp2
+rem  Example:  wasm-deploy.cmd tests\beam_example.fp2
 rem ===========================================================================
 
 rem Repo root = parent of this script's directory
@@ -32,8 +36,11 @@ for %%I in ("%~dp0..") do set "REPO=%%~fI"
 if not defined DEPLOY_SOURCE set "DEPLOY_SOURCE=%REPO%\bin\wasm"
 if not defined DEPLOY_DEST   set "DEPLOY_DEST=%REPO%\docs\docs\app"
 
+if not defined DEPLOY_MODELDIR set "DEPLOY_MODELDIR=%REPO%\bin\release\samples"
+
 set "FORCE=0"
 set "PRUNE=0"
+set "NOMODELS=0"
 set "MODELS="
 
 :parse
@@ -42,6 +49,8 @@ if /i "%~1"=="force" (
     set "FORCE=1"
 ) else if /i "%~1"=="prunelegacy" (
     set "PRUNE=1"
+) else if /i "%~1"=="nomodels" (
+    set "NOMODELS=1"
 ) else (
     set MODELS=!MODELS! "%~1"
 )
@@ -86,6 +95,26 @@ rem The site's entry point. Copied from the generated shell rather than edited
 rem by hand so it always references the payload that just shipped.
 copy /y "%DEPLOY_SOURCE%\ForcePAD.html" "%DEPLOY_DEST%\index.html" >nul
 if errorlevel 1 ( echo ERROR: failed to write index.html & exit /b 1 )
+
+rem Sample models ship with every deploy so ?model=models/<name> links work
+rem straight away. The .fp2 format embeds its image data, so a model is one
+rem self-contained file - the .rgb files next to the samples are not needed.
+if "%NOMODELS%"=="0" (
+    if not exist "%DEPLOY_MODELDIR%" (
+        echo WARNING: model directory not found, publishing app only: "%DEPLOY_MODELDIR%"
+    ) else (
+        if not exist "%DEPLOY_DEST%\models" mkdir "%DEPLOY_DEST%\models"
+        for %%M in ("%DEPLOY_MODELDIR%\*.fp2") do (
+            copy /y "%%~M" "%DEPLOY_DEST%\models\%%~nxM" >nul
+            if errorlevel 1 (
+                echo ERROR: failed to copy %%~nxM
+                set "FAILED=1"
+            ) else (
+                echo     model: %%~nxM  -^> ?model=models/%%~nxM
+            )
+        )
+    )
+)
 
 if defined MODELS (
     if not exist "%DEPLOY_DEST%\models" mkdir "%DEPLOY_DEST%\models"
