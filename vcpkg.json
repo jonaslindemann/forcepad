@@ -7,8 +7,14 @@
         "libpng",
         "zlib",
         "opengl",
-        "qtbase",
-        "qtsvg",
+        {
+            "name": "qtbase",
+            "platform": "!osx"
+        },
+        {
+            "name": "qtsvg",
+            "platform": "!osx"
+        },
         "eigen3",
         "spdlog"
     ]

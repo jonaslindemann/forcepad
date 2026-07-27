@@ -109,6 +109,25 @@ if(NOT EMSCRIPTEN)
     )
 endif()
 
+# Copy brushes/colormaps next to the executable, same reasoning as the icons
+# copy above: PaintView::loadBrushes()/setColorMap() resolve "brushes"/
+# "colormaps" relative to argv[0]'s directory, which on macOS is
+# Contents/MacOS/ inside the bundle — one level below the committed
+# bin/release/{brushes,colormaps} assets, so they're invisible unless copied
+# in. Windows/Linux already have the exe next to those directories, so this
+# is only needed on APPLE (wasm gets its own --preload-file copy below).
+if(APPLE)
+    add_custom_command(TARGET qtforcepad POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_SOURCE_DIR}/bin/release/brushes"
+            "$<TARGET_FILE_DIR:qtforcepad>/brushes"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_SOURCE_DIR}/bin/release/colormaps"
+            "$<TARGET_FILE_DIR:qtforcepad>/colormaps"
+        COMMENT "Copying ForcePAD brushes and colormaps..."
+    )
+endif()
+
 if(EMSCRIPTEN)
     # Qt generates <name>.html / qtloader.js / qtlogo.svg that load
     # "<name>.js"/"<name>.wasm" and call a JS entry function.

@@ -54,6 +54,49 @@ endif()
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+if(APPLE)
+    # vcpkg's qtbase port builds Qt from source on macOS, which is slow and, as
+    # of the current vcpkg baseline, broken against recent Xcode/libc++
+    # (harfbuzz's -D_LIBCPP_ENABLE_ASSERTIONS flag was removed from newer
+    # libc++ headers). qtbase/qtsvg are therefore excluded from vcpkg.json on
+    # macOS ("platform": "!osx") and Qt6 is expected from a prebuilt Homebrew
+    # install instead; the other dependencies still come from vcpkg.
+    foreach(_forcepad_brew_qt "/opt/homebrew/opt/qt" "/usr/local/opt/qt")
+        if(EXISTS "${_forcepad_brew_qt}/lib/cmake/Qt6")
+            list(APPEND CMAKE_PREFIX_PATH "${_forcepad_brew_qt}")
+        endif()
+    endforeach()
+
+    # CMake auto-adds /opt/homebrew to its default search prefixes on Apple
+    # Silicon. If mesa/mesa-glu/glew happen to be installed there (a common
+    # transitive pull-in, unrelated to this project), find_package(OpenGL)
+    # resolves OPENGL_gl_LIBRARY to Homebrew's Mesa libGL.dylib instead of the
+    # system OpenGL.framework — and since Qt6Gui's own CMake config
+    # (find_dependency(WrapOpenGL) inside Qt6GuiConfig.cmake) triggers the
+    # very first find_package(OpenGL) call as a side effect of find_package(Qt6)
+    # below, this must be forced BEFORE that call, not just before our own
+    # later find_package(OpenGL REQUIRED) — once the OpenGL::GL imported
+    # target exists, its IMPORTED_LOCATION is locked in and a later cache
+    # override has no effect. Mixing the two GL implementations in one
+    # process fails at launch (missing libgallium-*.dylib / X11 deps that
+    # never get bundled).
+    # The on-disk /System/Library/Frameworks/OpenGL.framework has no Headers
+    # subdirectory on modern macOS (headers only ship inside the SDK bundled
+    # with Xcode/CLT), so the framework path must be resolved through the
+    # active SDK rather than hardcoded.
+    execute_process(
+        COMMAND xcrun --sdk macosx --show-sdk-path
+        OUTPUT_VARIABLE _forcepad_macos_sdk
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+    )
+    set(_forcepad_opengl_framework "${_forcepad_macos_sdk}/System/Library/Frameworks/OpenGL.framework")
+    if(EXISTS "${_forcepad_opengl_framework}/Headers")
+        set(OPENGL_INCLUDE_DIR "${_forcepad_opengl_framework}/Headers" CACHE PATH "" FORCE)
+        set(OPENGL_gl_LIBRARY "${_forcepad_opengl_framework}" CACHE FILEPATH "" FORCE)
+    endif()
+endif()
+
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets OpenGL OpenGLWidgets Svg)
 # Desktop only: downloads a model given as an http(s) command-line argument.
 # The wasm build uses emscripten's XHR wrapper instead (see ModelUrlLoader.cpp).
@@ -72,7 +115,23 @@ if(EMSCRIPTEN)
     include(${CMAKE_SOURCE_DIR}/cmake/WasmDeps.cmake)
 else()
     find_package(Eigen3 REQUIRED)
-    find_package(OpenMP)
+    find_package(OpenMP COMPONENTS CXX)
+    if(APPLE AND NOT OpenMP_FOUND)
+        # AppleClang ships no OpenMP runtime, so plain find_package(OpenMP)
+        # always fails here even if libomp is installed — it needs to be
+        # pointed at the separate frontend flag/library explicitly. Hint it
+        # at Homebrew's libomp (`brew install libomp`) if present; otherwise
+        # this is a no-op and the build stays single-threaded, same as before.
+        foreach(_forcepad_brew_omp "/opt/homebrew/opt/libomp" "/usr/local/opt/libomp")
+            if(EXISTS "${_forcepad_brew_omp}/include/omp.h")
+                set(OpenMP_CXX_FLAGS "-Xclang -fopenmp -I${_forcepad_brew_omp}/include")
+                set(OpenMP_CXX_LIB_NAMES "omp")
+                set(OpenMP_omp_LIBRARY "${_forcepad_brew_omp}/lib/libomp.dylib")
+                find_package(OpenMP COMPONENTS CXX)
+                break()
+            endif()
+        endforeach()
+    endif()
     find_package(spdlog CONFIG REQUIRED)
     find_package(OpenGL REQUIRED)
     find_package(ZLIB REQUIRED)
