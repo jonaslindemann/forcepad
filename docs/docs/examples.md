@@ -24,7 +24,40 @@ The browser version can open a model straight from a link, so an assignment or a
 https://jonaslindemann.github.io/forcepad/app/?model=models/beam_sym.fp2
 ```
 
-Every sample model listed above is published with the app, so `models/<file>.fp2` works for any of them — the ▶ Open links in the table are exactly these URLs. The value may also be a full `https://` address of a `.fp2` file hosted elsewhere. A file on another server has to be served with the `Access-Control-Allow-Origin` header, otherwise the browser blocks the download; a file placed next to the app always works. If the file cannot be fetched, ForcePAD starts with an empty model and reports the problem.
+Every sample model listed above is published with the app, so `models/<file>.fp2` works for any of them — the ▶ Open links in the table are exactly these URLs. If the file cannot be fetched, ForcePAD starts with an empty model and reports the problem.
+
+### Linking to Your Own Models
+
+The `model` value can also be a full `https://` address, and it does not have to point at anything in this project. Teachers can prepare their own models and hand out links without needing access to the ForcePAD site — the app simply fetches whatever the link points at.
+
+The simplest route is a public GitHub repository:
+
+1. Commit your `.fp2` file to a public repository (a [gist](https://gist.github.com) works too).
+2. Open the file on GitHub and copy the **raw** address — `https://raw.githubusercontent.com/<user>/<repo>/<branch>/<path>`. The ordinary `github.com/.../blob/...` page address will not work: it serves a web page rather than the file.
+3. Append it to the app URL:
+
+```text
+https://jonaslindemann.github.io/forcepad/app/?model=https://raw.githubusercontent.com/your-name/your-repo/main/models/beam.fp2
+```
+
+Paste the address as it is — no escaping or encoding is needed.
+
+Two things make such a link durable:
+
+- **The repository has to be public.** Raw addresses for private repositories require an access token, and those expire.
+- **Point at a fixed branch or commit.** A link containing `/main/` follows the branch, so editing the model later changes what students open. Using a commit id instead of the branch name freezes it.
+
+### If a Model Will Not Load
+
+A model hosted somewhere else is downloaded by the browser, which enforces a few rules ForcePAD cannot work around:
+
+- The host must allow cross-site downloads by sending the `Access-Control-Allow-Origin` header. GitHub and GitHub Pages do this by default, which is why they are the easy option; an ordinary university or personal web server usually does not, and the model will silently fail to load. If in doubt, ask whoever administers the server for it, or host the file on GitHub instead.
+- The address must be `https://`. A plain `http://` address is blocked because the app itself is served over `https`.
+
+!!! note
+    A model that refuses to load in the browser will still open in the desktop version — these restrictions come from the browser, not from ForcePAD.
+
+### From the Desktop Version
 
 The desktop version accepts the same thing on the command line, either as a local file or as an address:
 
