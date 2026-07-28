@@ -117,7 +117,11 @@ Other wasm-specific bits:
   `QT_WASM_EXPORT_NAME` are both set to `ForcePAD`, which is what
   `Qt6WasmMacros.cmake` substitutes for `@APPNAME@` / `@APPEXPORTNAME@` when it
   generates the shell from `wasm_shell.html` — so the page title, the artifact
-  names and the `window.ForcePAD_entry` call all agree. `DEBUG_POSTFIX` is
+  names and the entry-point call all agree. Note the entry point is
+  `window.ForcePAD`, not `ForcePAD_entry`: `QT_WASM_EXPORT_NAME` is used verbatim
+  (Qt only appends `_entry` when the property is unset) and is also what goes to
+  emscripten as `-sEXPORT_NAME`, so `ForcePAD.js` defines exactly that symbol and
+  the shell calls exactly that. `DEBUG_POSTFIX` is
   cleared (that macro does *not* see it, so a postfix would desync the generated
   `ForcePAD.html` from a `ForcePADd.js`) and output is unified into `bin/wasm/`.
 - **`main.cpp`**: on `Q_OS_WASM` the `QSurfaceFormat` requests **OpenGL ES 3.0 /
