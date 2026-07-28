@@ -27,6 +27,10 @@ All releases of ForcePAD can be downloaded from GitHub:
 
 Download the installer (`.exe`) from the releases page and run it. After installation, ForcePAD can be started from the Start menu under **Structural Mechanics → ForcePAD**.
 
+### macOS
+
+Download the disk image (`.dmg`) from the releases page, open it, and drag the ForcePAD icon to your Applications folder. After installation, ForcePAD can be started from Launchpad or Spotlight.
+
 ### Building from source
 
 If you want the latest development version or need to build for a platform without a pre-built binary, see the [Develop](develop.md) page for full build instructions using CMake and vcpkg.

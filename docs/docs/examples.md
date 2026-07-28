@@ -65,7 +65,7 @@ The desktop version accepts the same thing on the command line, either as a loca
 forcepad https://example.org/models/beam.fp2
 ```
 
-## Example Walkthroughs to Add
+<!-- ## Example Walkthroughs to Add
 
 These are placeholders for future example pages or downloadable teaching packs.
 
@@ -116,4 +116,4 @@ Recommended assets to add:
 
 ## Suggested Top-Level Examples Directory
 
-For GitHub discoverability, a future cleanup could move curated examples into a top-level `examples/` directory and keep installer-specific copies under `bin/release/samples/`.
+For GitHub discoverability, a future cleanup could move curated examples into a top-level `examples/` directory and keep installer-specific copies under `bin/release/samples/`. -->
