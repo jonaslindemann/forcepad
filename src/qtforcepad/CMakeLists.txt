@@ -20,6 +20,9 @@ if(WIN32)
 endif()
 
 if(APPLE)
+    list(APPEND SOURCES
+        MacFileDialog.mm
+    )
     set(_icns "${CMAKE_SOURCE_DIR}/images/forcepad.icns")
     set_source_files_properties("${_icns}"
         PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
@@ -29,6 +32,7 @@ endif()
 set(HEADERS
     MainWindow.h
     QtPaintView.h
+    MacFileDialog.h
     ModelUrlLoader.h
     CalcSettingsDialog.h
     GeneralSettingsDialog.h
@@ -55,12 +59,20 @@ set_target_properties(qtforcepad PROPERTIES
 )
 
 if(APPLE)
+    target_link_libraries(qtforcepad PRIVATE
+        "-framework AppKit"
+        "-framework Foundation"
+        "-framework UniformTypeIdentifiers"
+    )
+
     set_target_properties(qtforcepad PROPERTIES
         MACOSX_BUNDLE               TRUE
+        OUTPUT_NAME                 "ForcePAD"
+        DEBUG_POSTFIX               ""
         MACOSX_BUNDLE_GUI_IDENTIFIER "se.lth.byggmek.forcepad"
         MACOSX_BUNDLE_BUNDLE_NAME   "ForcePAD"
-        MACOSX_BUNDLE_BUNDLE_VERSION "3.0"
-        MACOSX_BUNDLE_SHORT_VERSION_STRING "3.0"
+        MACOSX_BUNDLE_BUNDLE_VERSION "2.7"
+        MACOSX_BUNDLE_SHORT_VERSION_STRING "2.7"
         MACOSX_BUNDLE_ICON_FILE     "forcepad"
         MACOSX_BUNDLE_INFO_PLIST    "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in"
     )
@@ -210,12 +222,48 @@ if(APPLE)
         HINTS "${Qt6_DIR}/../../../tools/Qt6/bin"
         REQUIRED
     )
+
+    # Prefer a real "Apple Development" signing identity over ad-hoc ("-")
+    # when one is installed in the keychain: ad-hoc signing has no stable
+    # Team ID. Falls back to ad-hoc if no such identity is found (e.g. CI, or
+    # a machine without a certificate), so the build stays portable.
+    set(_forcepad_sign_identity "-")
+    execute_process(
+        COMMAND security find-identity -v -p codesigning
+        OUTPUT_VARIABLE _forcepad_codesign_identities
+        ERROR_QUIET
+    )
+    if(_forcepad_codesign_identities MATCHES "\"(Apple Development: [^\"]+)\"")
+        set(_forcepad_sign_identity "${CMAKE_MATCH_1}")
+    endif()
+    message(STATUS "qtforcepad codesign identity: ${_forcepad_sign_identity}")
+
+    # Sign in two passes, the Apple-documented order for complex bundles:
+    #   1. --deep signs every nested framework/plugin with a plain signature
+    #      (no entitlements — they're libraries, not launched processes).
+    #   2. A second, non-deep pass re-signs *only* the outer app bundle with
+    #      the sandbox entitlements, without touching the nested signatures
+    #      pass 1 already applied (a non-deep codesign just reads nested
+    #      frameworks as opaque resources for the outer CodeResources seal).
+    # Blanket-applying --entitlements under a single --deep pass (the
+    # previous approach here) signs every nested framework/plugin with the
+    # same app-sandbox entitlements too, which is incorrect and was
+    # confirmed to break the Open/Save panel's Powerbox grant even with a
+    # real (non-ad-hoc) signing identity: `log stream` showed
+    # com.apple.appkit.xpc.openAndSavePanelService and
+    # com.apple.scopedbookmarksagent.xpc both running normally, yet the
+    # kernel still logged "Sandbox: qtforcepad(...) deny(1) file-write-create"
+    # for the exact path just chosen in the native Save panel.
     add_custom_command(TARGET qtforcepad POST_BUILD
         COMMAND "${MACDEPLOYQT_EXECUTABLE}"
             "$<TARGET_BUNDLE_DIR:qtforcepad>"
             -always-overwrite
-        COMMAND codesign --deep --force --sign -
+        COMMAND codesign --deep --force --sign "${_forcepad_sign_identity}"
             "$<TARGET_BUNDLE_DIR:qtforcepad>"
-        COMMENT "Running macdeployqt and ad-hoc signing..."
+        COMMAND codesign --force --sign "${_forcepad_sign_identity}"
+            --entitlements "${CMAKE_CURRENT_SOURCE_DIR}/qtforcepad.entitlements"
+            "$<TARGET_BUNDLE_DIR:qtforcepad>"
+        COMMENT "Running macdeployqt and signing (${_forcepad_sign_identity}) with sandbox entitlements..."
+        VERBATIM
     )
 endif()

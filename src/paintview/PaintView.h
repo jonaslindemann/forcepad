@@ -371,6 +371,7 @@ protected:
     // synchronous on both platforms (saveFileContent is fire-and-forget).
     virtual const std::string doSaveModelFile(const std::string defaultName,
                                               const std::string &bytes);
+    virtual bool doWriteModelFile(const std::string &path, const std::string &bytes);
 
     virtual void doCreateCursors();
     virtual void doUpdateCursor(TEditMode mode);

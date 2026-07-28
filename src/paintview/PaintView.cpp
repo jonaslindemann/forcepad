@@ -48,6 +48,7 @@ using namespace std;
 #include <string>
 #include <sstream>
 #include <algorithm>
+#include <cctype>
 #include <cmath>
 
 #include "UiSettings.h"
@@ -383,6 +384,19 @@ void PaintView::doPickFile(const string title, const string filter,
 const std::string PaintView::doSaveModelFile(const string defaultName, const std::string &bytes)
 {
     return "";
+}
+
+bool PaintView::doWriteModelFile(const string &path, const std::string &bytes)
+{
+    using namespace std;
+
+    ofstream out(path);
+    if (!out.is_open())
+        return false;
+
+    out << bytes;
+    out.close();
+    return !out.fail();
 }
 
 void PaintView::doCreateCursors()
@@ -2000,19 +2014,23 @@ void PaintView::openImage()
             bool pngFile = false;
             bool rgbFile = false;
 
-            int lastIndex = displayName.find_last_of(".");
-            std::string extension = displayName.substr(lastIndex+1);
+            size_t lastIndex = displayName.find_last_of(".");
+            std::string extension = lastIndex == std::string::npos
+                ? std::string()
+                : displayName.substr(lastIndex + 1);
+            std::transform(extension.begin(), extension.end(), extension.begin(),
+                           [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
 
-            if (extension == ".jpg")
+            if (extension == "jpg")
                 jpegFile = true;
 
-            if (extension == ".jpeg")
+            if (extension == "jpeg")
                 jpegFile = true;
 
-            if (extension == ".png")
+            if (extension == "png")
                 pngFile = true;
 
-            if (extension == ".rgb")
+            if (extension == "rgb")
                 rgbFile = true;
 
             if ((!jpegFile)&&(!pngFile)&&(!rgbFile))
@@ -2118,10 +2136,14 @@ void PaintView::saveModel()
 
 	m_femGrid->setUseWeight(m_useWeight);
 
-	fstream f;
-	f.open(m_modelName.c_str(), ios::out);
-	m_femGrid->saveToStream(f);
-	f.close();
+	ostringstream oss;
+	m_femGrid->saveToStream(oss);
+	if (!this->doWriteModelFile(m_modelName, oss.str()))
+	{
+		fp_error("PaintView", "failed to save model file: {}", m_modelName);
+		doInfoMessage("Could not save " + m_modelName + " — check that the app has access to it.");
+		return;
+	}
 
 	fp_info("PaintView", "saved model: {}", m_modelName);
 #endif
@@ -2282,6 +2304,13 @@ void PaintView::openModel(const std::string filename)
 
 	fstream f;
 	f.open(m_modelName.c_str(), ios::in);
+	if (!f.is_open())
+	{
+		fp_error("PaintView", "failed to open model file: {}", m_modelName);
+		doInfoMessage("Could not open " + m_modelName + " — check that the app has access to it.");
+		enableDrawing();
+		return;
+	}
 	m_femGrid->readFromStream(f);
 	f.close();
 

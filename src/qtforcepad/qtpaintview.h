@@ -4,6 +4,9 @@
 #include <QMouseEvent>
 #include <QWheelEvent>
 #include <QKeyEvent>
+#include <QByteArray>
+#include <QHash>
+#include <QString>
 
 #include "PaintView.h"
 
@@ -62,6 +65,7 @@ protected:
                                        const std::string displayName)> onPicked) override;
     const std::string doSaveModelFile(const std::string defaultName,
                                       const std::string &bytes) override;
+    bool doWriteModelFile(const std::string &path, const std::string &bytes) override;
     void doCreateCursors() override;
     void doUpdateCursor(TEditMode mode) override;
     void doDeleteCursors() override;
@@ -80,4 +84,5 @@ private:
     unsigned int m_captureTex{0};
     int m_captureW{0};
     int m_captureH{0};
+    QHash<QString, QByteArray> m_securityScopedBookmarks;
 };

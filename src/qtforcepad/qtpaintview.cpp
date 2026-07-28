@@ -2,7 +2,10 @@
 
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QFile>
+#include <QDir>
 #include <QByteArray>
+#include <QTemporaryFile>
 #include <QMessageBox>
 #include <QPainter>
 #include <QTimer>
@@ -22,6 +25,10 @@
 #include "UiSettings.h"
 #include "Renderer2D.h"
 #include "StreamTexture.h"
+
+#if defined(Q_OS_MACOS) && !defined(Q_OS_WASM)
+#include "MacFileDialog.h"
+#endif
 
 #include <fstream>
 
@@ -554,6 +561,37 @@ void QtPaintView::doPickFile(const std::string title, const std::string filter,
             onPicked(tmp, name);
         });
 #else
+#if defined(Q_OS_MACOS)
+    fp::macos::PickedFile picked =
+        fp::macos::pickFile(this, QString::fromStdString(title), qfilter);
+    if (picked.cancelled)
+    {
+        onPicked("", "");
+        return;
+    }
+    if (!picked.error.isEmpty())
+    {
+        showInfoOverlay(QStringLiteral("Could not open %1 — %2")
+                         .arg(picked.path, picked.error));
+        onPicked("", "");
+        return;
+    }
+
+    if (!picked.bookmark.isEmpty())
+        m_securityScopedBookmarks.insert(picked.path, picked.bookmark);
+
+    QTemporaryFile staged(QDir::tempPath() + "/forcepad-XXXXXX-" +
+                          QFileInfo(picked.path).fileName());
+    if (!staged.open() || staged.write(picked.content) != picked.content.size())
+    {
+        showInfoOverlay(QStringLiteral("Could not stage %1 for reading.").arg(picked.path));
+        onPicked("", "");
+        return;
+    }
+    const QString stagedPath = staged.fileName();
+    staged.close();
+    onPicked(stagedPath.toStdString(), picked.displayName.toStdString());
+#else
     if (qfilter.isEmpty())
         qfilter = "ForcePAD Files (*.fp2);;All Files (*)";
     QString fname = QFileDialog::getOpenFileName(
@@ -562,6 +600,7 @@ void QtPaintView::doPickFile(const std::string title, const std::string filter,
         onPicked("", "");
     else
         onPicked(fname.toStdString(), fname.toStdString());
+#endif
 #endif
 }
 
@@ -578,16 +617,73 @@ const std::string QtPaintView::doSaveModelFile(const std::string defaultName,
     QFileDialog::saveFileContent(data, suggested);
     return suggested.toStdString();
 #else
+#if defined(Q_OS_MACOS)
+    QByteArray data(bytes.data(), static_cast<qsizetype>(bytes.size()));
+    fp::macos::SavedFile saved = fp::macos::saveFile(
+        this,
+        QStringLiteral("Save forcepad model"),
+        QString::fromStdString(defaultName),
+        QStringLiteral("ForcePAD Files (*.fp2);;All Files (*)"),
+        data);
+    if (saved.cancelled)
+        return "";
+    if (!saved.error.isEmpty())
+    {
+        showInfoOverlay(QStringLiteral("Could not save to %1 — %2")
+                         .arg(saved.path, saved.error));
+        return "";
+    }
+    if (!saved.bookmark.isEmpty())
+        m_securityScopedBookmarks.insert(saved.path, saved.bookmark);
+    return saved.path.toStdString();
+#else
     QString fname = QFileDialog::getSaveFileName(
         this, "Save forcepad model",
         QString::fromStdString(defaultName),
         "ForcePAD Files (*.fp2);;All Files (*)");
     if (fname.isEmpty())
         return "";
-    std::ofstream out(fname.toStdString());   // text mode (matches legacy .fp2 write)
-    out << bytes;
+    QFile out(fname);
+    if (!out.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text))
+    {
+        showInfoOverlay(QStringLiteral("Could not save to %1 — check that the app has access to it.")
+                         .arg(fname));
+        return "";
+    }
+    const QByteArray data(bytes.data(), static_cast<qsizetype>(bytes.size()));
+    if (out.write(data) != data.size())
+    {
+        showInfoOverlay(QStringLiteral("Could not save to %1 — write failed.").arg(fname));
+        return "";
+    }
     out.close();
     return fname.toStdString();
+#endif
+#endif
+}
+
+bool QtPaintView::doWriteModelFile(const std::string &path, const std::string &bytes)
+{
+    const QString qpath = QString::fromStdString(path);
+    const QByteArray data(bytes.data(), static_cast<qsizetype>(bytes.size()));
+
+#if defined(Q_OS_MACOS) && !defined(Q_OS_WASM)
+    QString error;
+    if (!fp::macos::writeFile(qpath, m_securityScopedBookmarks.value(qpath), data, &error))
+    {
+        if (!error.isEmpty())
+            showInfoOverlay(QStringLiteral("Could not save to %1 — %2").arg(qpath, error));
+        return false;
+    }
+    return true;
+#else
+    QFile out(qpath);
+    if (!out.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text))
+        return false;
+    if (out.write(data) != data.size())
+        return false;
+    out.close();
+    return true;
 #endif
 }
 
