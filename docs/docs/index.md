@@ -24,6 +24,7 @@ ForcePAD is an open-source, sketch-based 2D finite element analysis tool for str
 - **Interactive force exploration**: move or rotate forces in Action mode and see the response update.
 - **Topology optimisation**: experiment with efficient structural layouts directly from a sketched design domain.
 - **Educational FEM focus**: useful for teaching finite element analysis, structural mechanics, stress flow, and deformation behaviour.
+- **Available on all platforms**: runs in a web browser, or as a native desktop application on Windows and macOS.
 - **Open source**: GPL-2 licensed C++ code with Qt, OpenGL, Eigen, and a C++ CALFEM implementation.
 
 ## Quick Start in 60 Seconds

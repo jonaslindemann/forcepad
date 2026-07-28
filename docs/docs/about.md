@@ -14,8 +14,6 @@ As of version 2.4, ForcePAD also includes a topology optimizer based on the Sigm
 
 ForcePAD is a C++ application using OpenGL for hardware-accelerated rendering. The user interface is built with the Qt framework, and the application is cross-platform, running on Windows, macOS, and Linux. The source code is available on GitHub under the GPL-2 License.
 
-Jonas Lindemann, 2026
-
 ## Positioning
 
 ForcePAD is not intended to replace large general-purpose finite element packages. Its strength is interactive structural understanding: sketch a structure, change it quickly, and immediately see how the finite element result changes.
@@ -27,3 +25,5 @@ Typical use cases include:
 - demonstrating topology optimisation concepts
 - comparing support conditions and load paths
 - creating quick visual experiments before using heavier analysis tools
+
+Jonas Lindemann, 2026
