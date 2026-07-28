@@ -31,3 +31,4 @@ bin/release/qtforcepadd
 /build-wasm-rel
 .DS_Store
 /bin/release/ForcePAD.app
+*.dmg
