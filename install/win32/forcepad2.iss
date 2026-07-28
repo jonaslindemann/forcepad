@@ -1,5 +1,5 @@
 #define MyAppName "ForcePAD2"
-#define MyAppVersion "2.6.0"
+#define MyAppVersion "2.7.0"
 #define MyAppPublisher "Division of Structural Mechanics"
 #define MyAppURL "https://jonaslindemann.github.io/forcepad/"
 #define MyAppExeName "qtforcepad.exe"
