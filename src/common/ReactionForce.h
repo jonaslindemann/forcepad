@@ -26,10 +26,12 @@
 #define _ReactionForce_h_
 
 #include "Shape.h"
+#include <memory>
 
 namespace fp {
 
-IvfSmartPointer(ReactionForce);
+class ReactionForce;
+using ReactionForcePtr = std::shared_ptr<ReactionForce>;
 
 class ReactionForce : public ivf2d::Shape {
 private:
@@ -52,8 +54,6 @@ public:
 	virtual ~ReactionForce ();
 
 	static ReactionForcePtr create() { return std::make_shared<ReactionForce>(); }
-
-	IvfClassInfo("ReactionForce",ivf2d::Shape);
 
 	// Get/set methods
 
@@ -103,7 +103,7 @@ public:
 	// Virtual overrides
 
 	/** Draw force in OpenGL */
-	virtual void doGeometry();
+	void doGeometry() override;
 };
 
 } // namespace fp

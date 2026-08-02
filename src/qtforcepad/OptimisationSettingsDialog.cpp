@@ -1,5 +1,5 @@
 #include "OptimisationSettingsDialog.h"
-#include "QtPaintView.h"
+#include "qtpaintview.h"
 #include "../common/FemGridSolver2.h"
 
 #include <QDoubleSpinBox>

@@ -24,10 +24,21 @@
 
 #include "PaintView.h"
 
-#include "FemGridSolver2.h"
-#ifndef USE_QT
-#include "MainFrame2.h"
+// The Win32 clipboard code below (HGLOBAL, IsClipboardFormatAvailable, CF_DIB)
+// and GetModuleFileNameA need <windows.h>. This used to arrive implicitly via
+// ivf2d/CommonDefs.h; that header is gone, so the dependency is now explicit.
+// NOMINMAX keeps the min/max macros from breaking std::min/std::max.
+#ifdef WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
 #endif
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#include <windows.h>
+#endif
+
+#include "FemGridSolver2.h"
 #include "FPLog.h"
 #include "JpegImage.h"
 #include "PngImage.h"
@@ -52,6 +63,8 @@ using namespace std;
 #include <cmath>
 
 #include "UiSettings.h"
+#include <cstdio>
+#include <cstring>
 
 /////////////////////////////////////////////////////////////
 // Structures used for copy and paste in Windows
@@ -114,7 +127,6 @@ PaintView::PaintView(int x,int y,int w,int h,const char *l)
 	m_editMode = EM_DIRECT_BRUSH;
 	m_viewMode = VM_PHYSICS;
 	m_constraintType = fp::Constraint::CT_XY;
-	m_mainFrame = NULL;
 	
 	m_lockDrawing = false;
 	m_danglingRelease = false;
@@ -131,6 +143,11 @@ PaintView::PaintView(int x,int y,int w,int h,const char *l)
 	m_resized = true;
 	m_drawImage = false;
 	m_importMode = IM_NEW_MODEL;
+
+	// The brush images themselves are loaded in setCommandLine(); until then
+	// getCurrentBrushIdx() would otherwise report a garbage value.
+	m_currentBrushIdx = DEFAULT_BRUSH_IDX;
+	m_brushScale = 1;
 
 	// new Zoom mode
 
@@ -177,19 +194,15 @@ PaintView::PaintView(int x,int y,int w,int h,const char *l)
 	selectionColor->setColor(1.0f, 0.0f, 0.0f, 1.0f);
 
 	m_selectionBox = ivf2d::Rectangle::create();
-	m_selectionBox->setRectangleType(ivf2d::Rectangle::RT_OUTLINE);
+	m_selectionBox->setRectangleType(ivf2d::Rectangle::TRectangleType::RT_OUTLINE);
 	m_selectionBox->setLineColor(selectionColor);
 	m_selectionBox->setLineWidth(1.0);
-	m_selectionBox->setLineType(ivf2d::Rectangle::LT_DASHED);
+	m_selectionBox->setLineType(ivf2d::Rectangle::TLineType::LT_DASHED);
 	m_selectionBox->setSize(200.0,100.0);
 	m_selectionBox->setPosition(50.0, 50.0);
 
 	ivf2d::ColorPtr color = ivf2d::Color::create();
-#ifdef USE_QT
 	color->setColor(0.0f, 0.0f, 0.0f, 1.0f);
-#else
-	color->setColor(0.0f, 0.0f, 0.0f, 0.5f);
-#endif
 	
 	m_rectangle = ivf2d::Rectangle::create();
 	m_rectangle->setColor(color);
@@ -263,11 +276,16 @@ PaintView::PaintView(int x,int y,int w,int h,const char *l)
 	m_clipboard->setImage(m_drawing);
 	m_clipboard->setFemGrid(m_femGrid.get());
 
+	// Set directly rather than through setPasteIgnoreWhite() -- that calls the
+	// virtual doRedraw(), which must not be dispatched from the constructor.
+	m_pasteIgnoreWhite = true;
+	m_clipboard->setPasteMode(ivf2d::Clipboard::TPasteMode::PM_NON_WHITE);
+
 	// Create clipboard used in undo operations
 
 	m_undoClipboard = ivf2d::Clipboard::create();
 	m_undoClipboard->setImage(m_drawing);
-	m_undoClipboard->setPasteMode(ivf2d::Clipboard::PM_REPLACE);
+	m_undoClipboard->setPasteMode(ivf2d::Clipboard::TPasteMode::PM_REPLACE);
 
 	m_screenImage = ivf2d::ScreenImage::create();
 	m_screenImage->setImage(m_drawing);
@@ -430,12 +448,10 @@ void PaintView::doShowHelp()
 
 void PaintView::onMouseWheel(int dx, int dy)
 {
-#ifndef USE_QT
-	const bool inActionView = (m_viewMode == VM_ACTION);
-#else
-	const bool inActionView = true;
-#endif
-	if (m_zoomResults && inActionView)
+	// The FLTK build gated this on (m_viewMode == VM_ACTION); the Qt build has
+	// always allowed wheel zoom in every view, so the condition is just the
+	// zoom setting now.
+	if (m_zoomResults)
 	{
 		if (dy>0)
 		{
@@ -620,11 +636,7 @@ void PaintView::onDrag(int x, int y)
 
 		if (m_selectedForce!=NULL)
 		{	
-#ifndef USE_QT
-			if (Fl::event_key(FL_Alt_L)||m_moveLoad)
-#else
 			if (m_moveLoad)
-#endif
 			{
 				// Update the position of the force
 
@@ -1178,8 +1190,10 @@ void PaintView::onDraw()
 		switch (m_editMode) {
 		case EM_PASTE:
 			{
-				// Paste preview: an alpha-blended ghost of the clipboard image
-				// (was an XOR/AND logic-op blit, unavailable in core/WebGL).
+				// Paste preview: an opaque "stamp" of the clipboard image.
+				// White is colour-keyed out exactly when the commit will skip
+				// it, so the preview always matches the result. (Was an XOR/AND
+				// logic-op blit, unavailable in core/WebGL.)
 				auto clip = m_clipboard->getClipboard();
 				const int cw = clip->getWidth();
 				const int ch = clip->getHeight();
@@ -1190,10 +1204,11 @@ void PaintView::onDraw()
 				static ivf2d::StreamTexture s_pasteTexture;
 				s_pasteTexture.update(clip->getImageMap(), cw, ch, ivf2d::ST_RGB);
 
-				r.setBlend(true);
-				r.drawTexturedQuad(s_pasteTexture.id(), px, py, cw * bs, ch * bs,
-				                   0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.5f);
 				r.setBlend(false);
+				r.setDiscardWhite(m_pasteIgnoreWhite);
+				r.drawTexturedQuad(s_pasteTexture.id(), px, py, cw * bs, ch * bs,
+				                   0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
+				r.setDiscardWhite(false);
 
 				m_clipboard->render((int)px, (int)py);
 			}
@@ -1395,14 +1410,14 @@ void PaintView::loadBrushes()
 	fp_info("PaintView", "Loading brush: {}", brushName);
 	
 	brush = ivf2d::SgiImage::create();
-	brush->setFileName(brushName.c_str());
+	brush->setFileName(brushName);
 	brush->setAlphaChannel(true);
 	brush->read();
 	brush->createAlphaMask(0,m_blendFactor);
 	m_brushes.push_back(ivf2d::SgiImagePtr(brush));
 	
 	invertedBrush = ivf2d::SgiImage::create();
-	invertedBrush->setFileName(brushName.c_str());
+	invertedBrush->setFileName(brushName);
 	invertedBrush->read();
 	invertedBrush->invert();
 	m_invertedBrushes.push_back(ivf2d::SgiImagePtr(invertedBrush));
@@ -1410,14 +1425,14 @@ void PaintView::loadBrushes()
 	brushName = brushPath+"rbrush8.rgb";	
 	
 	brush = ivf2d::SgiImage::create();
-	brush->setFileName(brushName.c_str());
+	brush->setFileName(brushName);
 	brush->setAlphaChannel(true);
 	brush->read();
 	brush->createAlphaMask(0,m_blendFactor);
 	m_brushes.push_back(ivf2d::SgiImagePtr(brush));
 	
 	invertedBrush = ivf2d::SgiImage::create();
-	invertedBrush->setFileName(brushName.c_str());
+	invertedBrush->setFileName(brushName);
 	invertedBrush->read();
 	invertedBrush->invert();
 	m_invertedBrushes.push_back(ivf2d::SgiImagePtr(invertedBrush));
@@ -1425,14 +1440,14 @@ void PaintView::loadBrushes()
 	brushName = brushPath+"rbrush16.rgb";	
 	
 	brush = ivf2d::SgiImage::create();
-	brush->setFileName(brushName.c_str());
+	brush->setFileName(brushName);
 	brush->setAlphaChannel(true);
 	brush->read();
 	brush->createAlphaMask(0,m_blendFactor);
 	m_brushes.push_back(ivf2d::SgiImagePtr(brush));
 	
 	invertedBrush = ivf2d::SgiImage::create();
-	invertedBrush->setFileName(brushName.c_str());
+	invertedBrush->setFileName(brushName);
 	invertedBrush->read();
 	invertedBrush->invert();
 	m_invertedBrushes.push_back(ivf2d::SgiImagePtr(invertedBrush));
@@ -1440,14 +1455,14 @@ void PaintView::loadBrushes()
 	brushName = brushPath+"rbrush32.rgb";
 	
 	brush = ivf2d::SgiImage::create();
-	brush->setFileName(brushName.c_str());
+	brush->setFileName(brushName);
 	brush->setAlphaChannel(true);
 	brush->read();
 	brush->createAlphaMask(0,m_blendFactor);
 	m_brushes.push_back(ivf2d::SgiImagePtr(brush));
 	
 	invertedBrush = ivf2d::SgiImage::create();
-	invertedBrush->setFileName(brushName.c_str());
+	invertedBrush->setFileName(brushName);
 	invertedBrush->read();
 	invertedBrush->invert();
 	m_invertedBrushes.push_back(ivf2d::SgiImagePtr(invertedBrush));
@@ -1455,14 +1470,14 @@ void PaintView::loadBrushes()
 	brushName = brushPath+"rbrush64.rgb";	
 	
 	brush = ivf2d::SgiImage::create();
-	brush->setFileName(brushName.c_str());
+	brush->setFileName(brushName);
 	brush->setAlphaChannel(true);
 	brush->read();
 	brush->createAlphaMask(0,m_blendFactor);
 	m_brushes.push_back(ivf2d::SgiImagePtr(brush));
 	
 	invertedBrush = ivf2d::SgiImage::create();
-	invertedBrush->setFileName(brushName.c_str());
+	invertedBrush->setFileName(brushName);
 	invertedBrush->read();
 	invertedBrush->invert();
 	m_invertedBrushes.push_back(ivf2d::SgiImagePtr(invertedBrush));
@@ -1470,14 +1485,14 @@ void PaintView::loadBrushes()
 	brushName = brushPath+"sbrush4.rgb";	
 	
 	brush = ivf2d::SgiImage::create();
-	brush->setFileName(brushName.c_str());
+	brush->setFileName(brushName);
 	brush->setAlphaChannel(true);
 	brush->read();
 	brush->createAlphaMask(0,m_blendFactor);
 	m_brushes.push_back(ivf2d::SgiImagePtr(brush));
 	
 	invertedBrush = ivf2d::SgiImage::create();
-	invertedBrush->setFileName(brushName.c_str());
+	invertedBrush->setFileName(brushName);
 	invertedBrush->read();
 	invertedBrush->invert();
 	m_invertedBrushes.push_back(ivf2d::SgiImagePtr(invertedBrush));
@@ -1485,14 +1500,14 @@ void PaintView::loadBrushes()
 	brushName = brushPath+"sbrush8.rgb";	
 	
 	brush = ivf2d::SgiImage::create();
-	brush->setFileName(brushName.c_str());
+	brush->setFileName(brushName);
 	brush->setAlphaChannel(true);
 	brush->read();
 	brush->createAlphaMask(0,m_blendFactor);
 	m_brushes.push_back(ivf2d::SgiImagePtr(brush));
 	
 	invertedBrush = ivf2d::SgiImage::create();
-	invertedBrush->setFileName(brushName.c_str());
+	invertedBrush->setFileName(brushName);
 	invertedBrush->read();
 	invertedBrush->invert();
 	m_invertedBrushes.push_back(ivf2d::SgiImagePtr(invertedBrush));
@@ -1500,14 +1515,14 @@ void PaintView::loadBrushes()
 	brushName = brushPath+"sbrush16.rgb";	
 	
 	brush = ivf2d::SgiImage::create();
-	brush->setFileName(brushName.c_str());
+	brush->setFileName(brushName);
 	brush->setAlphaChannel(true);
 	brush->read();
 	brush->createAlphaMask(0,m_blendFactor);
 	m_brushes.push_back(ivf2d::SgiImagePtr(brush));
 	
 	invertedBrush = ivf2d::SgiImage::create();
-	invertedBrush->setFileName(brushName.c_str());
+	invertedBrush->setFileName(brushName);
 	invertedBrush->read();
 	invertedBrush->invert();
 	m_invertedBrushes.push_back(ivf2d::SgiImagePtr(invertedBrush));
@@ -1515,14 +1530,14 @@ void PaintView::loadBrushes()
 	brushName = brushPath+"sbrush32.rgb";	
 	
 	brush = ivf2d::SgiImage::create();
-	brush->setFileName(brushName.c_str());
+	brush->setFileName(brushName);
 	brush->setAlphaChannel(true);
 	brush->read();
 	brush->createAlphaMask(0,m_blendFactor);
 	m_brushes.push_back(ivf2d::SgiImagePtr(brush));
 	
 	invertedBrush = ivf2d::SgiImage::create();
-	invertedBrush->setFileName(brushName.c_str());
+	invertedBrush->setFileName(brushName);
 	invertedBrush->read();
 	invertedBrush->invert();
 	m_invertedBrushes.push_back(ivf2d::SgiImagePtr(invertedBrush));
@@ -1530,14 +1545,14 @@ void PaintView::loadBrushes()
 	brushName = brushPath+"sbrush64.rgb";	
 	
 	brush = ivf2d::SgiImage::create();
-	brush->setFileName(brushName.c_str());
+	brush->setFileName(brushName);
 	brush->setAlphaChannel(true);
 	brush->read();
 	brush->createAlphaMask(0,m_blendFactor);
 	m_brushes.push_back(ivf2d::SgiImagePtr(brush));
 	
 	invertedBrush = ivf2d::SgiImage::create();
-	invertedBrush->setFileName(brushName.c_str());
+	invertedBrush->setFileName(brushName);
 	invertedBrush->read();
 	invertedBrush->invert();
 	m_invertedBrushes.push_back(ivf2d::SgiImagePtr(invertedBrush));
@@ -1633,14 +1648,9 @@ void PaintView::enableDrawing()
 void PaintView::updateModel()
 {
 	fp_debug("PaintView", "updateModel()");
-#ifndef USE_QT
-	if (m_mainFrame!=NULL)
-	{
-		((MainFrame*)m_mainFrame)->setPixelWeight(m_femGrid->getPixelArea()*1e-3);
-		((MainFrame*)m_mainFrame)->setExternalForce(m_femGrid->getPixelArea()*m_relativeForceSize*1e-3);
-        this->doRedraw();
-	}
-#endif
+	// The body here pushed pixel-weight / external-force values into the FLTK
+	// MainFrame. The Qt UI reads those from the model itself, so nothing is
+	// left to do; the hook is kept because callers still invoke it.
 }
 
 void PaintView::updateCursor()
@@ -2049,7 +2059,7 @@ void PaintView::openImage()
             if (jpegFile)
             {
                 jpegImage = ivf2d::JpegImage::create();
-                jpegImage->setFileName(path.c_str());
+                jpegImage->setFileName(path);
                 jpegImage->read();
                 image = jpegImage;
             }
@@ -2057,7 +2067,7 @@ void PaintView::openImage()
             if (pngFile)
             {
                 pngImage = ivf2d::PngImage::create();
-                pngImage->setFileName(path.c_str());
+                pngImage->setFileName(path);
                 pngImage->read();
                 image = pngImage;
             }
@@ -2065,7 +2075,7 @@ void PaintView::openImage()
             if (rgbFile)
             {
                 rgbImage = ivf2d::SgiImage::create();
-                rgbImage->setFileName(path.c_str());
+                rgbImage->setFileName(path);
                 rgbImage->read();
                 image = rgbImage;
             }
@@ -2420,8 +2430,22 @@ void PaintView::cut()
 	}
 	
 	m_clipboard->cut(x1, y1, x2, y2);
-	
+
     this->doRedraw();
+}
+
+void PaintView::setPasteIgnoreWhite(bool ignore)
+{
+	fp_debug("PaintView", "setPasteIgnoreWhite({})", ignore);
+	m_pasteIgnoreWhite = ignore;
+	m_clipboard->setPasteMode(ignore ? ivf2d::Clipboard::TPasteMode::PM_NON_WHITE
+	                                 : ivf2d::Clipboard::TPasteMode::PM_REPLACE);
+	this->doRedraw();
+}
+
+bool PaintView::pasteIgnoreWhite() const
+{
+	return m_pasteIgnoreWhite;
 }
 
 void PaintView::undo()
@@ -2767,7 +2791,7 @@ void PaintView::pasteFromWindows()
 			
 			// Copy to clipboard
 						
-			m_clipboard->setCopyImageMode(ivf2d::Clipboard::IM_GRAYSCALE);
+			m_clipboard->setCopyImageMode(ivf2d::Clipboard::TCopyImageMode::IM_GRAYSCALE);
 			m_clipboard->copyImage(header->biWidth, header->biHeight, pPixelData);
 			
 			// Delete image data
@@ -2814,11 +2838,6 @@ void PaintView::setRelativeForceSize(double size)
 {
 	m_relativeForceSize = size;
 	updateModel();
-}
-
-void PaintView::setMainFrame(void *frame)
-{
-	m_mainFrame = frame;
 }
 
 void PaintView::setStressStep(int step)
@@ -3087,7 +3106,7 @@ void PaintView::setCommandLine(int argc, char **argv)
 	m_brushColor[2] = 0.0f;
 	m_blendFactor = 255;
 	
-	setCurrentBrush(3);
+	setCurrentBrush(DEFAULT_BRUSH_IDX);
 }
 
 const std::string PaintView::getApplicationPath()

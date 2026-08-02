@@ -35,14 +35,9 @@ namespace ivf2d {
  * a visual representation. (Drawable in OpenGL).
  */
 class DrawableBase : public Base {
-private:
-
 public:
-	/** DrawableBase class constructor. */
-	DrawableBase();
-
-	/** DrawableBase class destructor. */
-    virtual  ~DrawableBase();
+	DrawableBase() = default;
+	~DrawableBase() override = default;
 
 	/** 
 	 * virtual render method

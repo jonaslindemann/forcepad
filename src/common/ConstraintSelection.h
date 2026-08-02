@@ -27,10 +27,13 @@
 
 #include "Base.h"
 #include "Constraint.h"
+#include <memory>
+#include <vector>
 
 namespace fp {
 
-IvfSmartPointer(ConstraintSelection);
+class ConstraintSelection;
+using ConstraintSelectionPtr = std::shared_ptr<ConstraintSelection>;
 
 class ConstraintSelection : public ivf2d::Base {
 private:
@@ -40,8 +43,6 @@ public:
 	virtual ~ConstraintSelection();
 
 	static ConstraintSelectionPtr create() { return std::make_shared<ConstraintSelection>(); }
-
-	IvfClassInfo("ConstraintSelection",ivf2d::Base);
 
 	void add(ConstraintPtr constraint);
 	void clear();

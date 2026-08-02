@@ -51,10 +51,9 @@ void Arch::setSize(double width, double height)
     m_size[1] = height;
 }
 
-void Arch::getSize(double &width, double &height)
+Vec2d Arch::getSize() const
 {
-    width = m_size[0];
-    height = m_size[1];
+    return {m_size[0], m_size[1]};
 }
 
 double Arch::f1(double x)
@@ -80,11 +79,14 @@ void Arch::doGeometry()
 
     while (x<m_size[0]/2.0-dX*0.5)
     {
+        // The three-argument (double) overload: the two-argument one takes
+        // ints, so these curve coordinates were silently truncated to whole
+        // pixels before -- which /W4 surfaced as C4244.
         y = f1(x);
-        p1.setComponents(m_size[0]/2.0 + x, y);
+        p1.setComponents(m_size[0]/2.0 + x, y, 0.0);
 
         y = f1(x + dX);
-        p2.setComponents(m_size[0]/2.0 + x + dX, y);
+        p2.setComponents(m_size[0]/2.0 + x + dX, y, 0.0);
 
         if (x<m_size[0]/2.0-dX*1.5)
         {
@@ -123,7 +125,7 @@ void Arch::setLineWidth(double width)
     m_lineWidth = width;
 }
 
-double Arch::getLineWidth()
+double Arch::getLineWidth() const
 {
     return m_lineWidth;
 }

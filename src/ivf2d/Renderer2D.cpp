@@ -24,6 +24,8 @@
 
 #include "FPLog.h"
 #include "GLProgram.h"
+#include <memory>
+#include <vector>
 
 namespace ivf2d {
 
@@ -55,6 +57,7 @@ in vec2 vTex;
 
 uniform int uUseTexture;
 uniform int uForceOpaque;
+uniform int uDiscardWhite;
 uniform int uDashed;
 uniform float uDashPeriod;
 uniform sampler2D uTex;
@@ -69,7 +72,14 @@ void main()
 
     vec4 c = vColor;
     if (uUseTexture == 1)
-        c = c * texture(uTex, vTex);
+    {
+        vec4 texel = texture(uTex, vTex);
+        // Colour key: drop pure white (all channels 255) so the texture stamps
+        // as a cut-out. Half a quantisation step of slack covers filtering.
+        if (uDiscardWhite == 1 && all(greaterThanEqual(texel.rgb, vec3(254.5 / 255.0))))
+            discard;
+        c = c * texel;
+    }
     if (uForceOpaque == 1)
         c.a = 1.0;
     fragColor = c;
@@ -441,6 +451,7 @@ void Renderer2D::end()
     m_program->setMat4("uMVP", m_projection * currentTransform());
     m_program->setInt("uUseTexture", 0);
     m_program->setInt("uForceOpaque", m_forceOpaque ? 1 : 0);
+    m_program->setInt("uDiscardWhite", 0);
     m_program->setInt("uDashed", m_dashed ? 1 : 0);
     m_program->setFloat("uDashPeriod", m_dashPeriod);
 
@@ -491,6 +502,7 @@ void Renderer2D::drawTexturedQuad(unsigned int texture,
     m_program->setMat4("uMVP", m_projection * currentTransform());
     m_program->setInt("uUseTexture", 1);
     m_program->setInt("uForceOpaque", m_forceOpaque ? 1 : 0);
+    m_program->setInt("uDiscardWhite", m_discardWhite ? 1 : 0);
     m_program->setInt("uDashed", 0);
     m_program->setFloat("uDashPeriod", m_dashPeriod);
     m_program->setInt("uTex", 0);
@@ -513,6 +525,11 @@ void Renderer2D::drawTexturedQuad(unsigned int texture,
 void Renderer2D::setForceOpaque(bool enable)
 {
     m_forceOpaque = enable;
+}
+
+void Renderer2D::setDiscardWhite(bool enable)
+{
+    m_discardWhite = enable;
 }
 
 void Renderer2D::setBlend(bool enable)

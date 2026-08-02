@@ -31,13 +31,13 @@ Clipboard::Clipboard()
 	m_baseImage = nullptr;
 	m_clipboard = Image::create();
 
-	m_pasteMode = PM_NON_WHITE;
-	m_copyImageMode = IM_RGB;
+	m_pasteMode = TPasteMode::PM_NON_WHITE;
+	m_copyImageMode = TCopyImageMode::IM_RGB;
 
-	m_selectionX[0] = 0.0;
-	m_selectionX[1] = 0.0;
-	m_selectionY[0] = 0.0;
-	m_selectionY[1] = 0.0;
+	m_selectionX[0] = 0;
+	m_selectionX[1] = 0;
+	m_selectionY[0] = 0;
+	m_selectionY[1] = 0;
 }
 
 Clipboard::~Clipboard()
@@ -119,14 +119,16 @@ void Clipboard::paste(int x, int y)
             unsigned char red, green, blue;
 
 			for (j=0; j<h; j++)
-				for (i=0; i<=w; i++)
+				for (i=0; i<w; i++)
 				{
 					if ((x+i<m_baseImage->getWidth())&&(y+j<m_baseImage->getHeight()))
 					{
 						m_clipboard->getPixel(i, j, red, green, blue);
-						if (m_pasteMode==PM_NON_WHITE)
+						if (m_pasteMode==TPasteMode::PM_NON_WHITE)
 						{
-							if ((red!=255)&&(green!=255)&&(blue!=255))
+							// Skip only fully white pixels -- they are the
+							// transparent background of the stamp.
+							if (!((red==255)&&(green==255)&&(blue==255)))
 								m_baseImage->setPixel(x+i, y+j, red, green, blue);
 						}
 						else
@@ -174,25 +176,25 @@ void Clipboard::copyImage(int width, int height, unsigned char *imageMap)
 			for (i=0; i<width; i++)
 			{
 				switch (m_copyImageMode) {
-				case IM_RGB:
+				case TCopyImageMode::IM_RGB:
 					image->getPixel(i, j, red, green, blue);
 					break;
-				case IM_RBG:
+				case TCopyImageMode::IM_RBG:
 					image->getPixel(i, j, red, blue, green);
 					break;
-				case IM_BGR:
+				case TCopyImageMode::IM_BGR:
 					image->getPixel(i, j, blue, green, red);
 					break;
-				case IM_BRG:
+				case TCopyImageMode::IM_BRG:
 					image->getPixel(i, j, blue, red, green);
 					break;
-				case IM_GRB:
+				case TCopyImageMode::IM_GRB:
 					image->getPixel(i, j, green, red, blue);
 					break;
-				case IM_GBR:
+				case TCopyImageMode::IM_GBR:
 					image->getPixel(i, j, green, blue, red);
 					break;
-				case IM_GRAYSCALE:
+				case TCopyImageMode::IM_GRAYSCALE:
 					image->getPixel(i, j, red, green, blue);
 
 					median = ((double)red + (double)green + (double)blue) / 3.0;
@@ -218,12 +220,9 @@ void Clipboard::setCopyImageMode(TCopyImageMode mode)
 	m_copyImageMode = mode;
 }
 
-void Clipboard::getSelection(int &x1, int &y1, int &x2, int &y2)
+Rect2i Clipboard::getSelection() const
 {
-	x1 = m_selectionX[0];
-	y1 = m_selectionY[0];
-	x2 = m_selectionX[1];
-	y2 = m_selectionY[1];
+	return {m_selectionX[0], m_selectionY[0], m_selectionX[1], m_selectionY[1]};
 }
 
 Image* Clipboard::getClipboardImage()

@@ -24,43 +24,18 @@
 
 #include "Base.h"
 
-using namespace std;
-
 namespace ivf2d {
 
-// ------------------------------------------------------------
-Base::Base ()
-{
-	m_parent = nullptr;
-}
+// These two stubs are deliberately kept out of line: they are the class's key
+// function, which anchors the vtable to this single translation unit instead of
+// emitting it in every TU that includes Base.h.
 
-// ------------------------------------------------------------
-Base::~Base ()
+void Base::saveToStream(std::ostream & /*out*/)
 {
 }
 
-// ------------------------------------------------------------
-Base* Base::getParent()
+void Base::readFromStream(std::istream & /*in*/)
 {
-	return m_parent;
-}
-
-// ------------------------------------------------------------
-void Base::setParent(Base *parent)
-{
-	m_parent = parent;
-}
-
-// ------------------------------------------------------------
-void Base::saveToStream(ostream &out)
-{
-
-}
-
-// ------------------------------------------------------------
-void Base::readFromStream(istream &in)
-{
-
 }
 
 } // namespace ivf2d

@@ -1,6 +1,6 @@
 //
 // CALFEM C++ libray
-// Copyright (C) 1999-2023 Division of Structural Mecahnics, Lund University
+// Copyright (C) 1999-2026 Division of Structural Mecahnics, Lund University
 //
 // Written by Jonas Lindemann
 //

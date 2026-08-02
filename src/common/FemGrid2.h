@@ -32,6 +32,9 @@
 #include "ForceSelection.h"
 #include "ConstraintSelection.h"
 #include "ColorMap.h"
+#include <memory>
+#include <deque>
+#include <vector>
 
 namespace fp {
 
@@ -47,7 +50,8 @@ typedef std::vector< std::vector<int> >::iterator CElementListIter;
 #define ED_LEFT_RIGHT 0
 #define ED_BOTTOM_TOP 1
 
-IvfSmartPointer(FemGrid2);
+class FemGrid2;
+using FemGrid2Ptr = std::shared_ptr<FemGrid2>;
 
 class FemGrid2 : public ImageGrid2 {
 public:
@@ -187,8 +191,8 @@ public:
 	double getMaxNegStressValue();
 	double getMaxPosStressValue();
 	void setStressMode(TStressMode mode);
-	void readFromStream(std::istream &in);
-	void saveToStream(std::ostream &out);
+	void readFromStream(std::istream &in) override;
+	void saveToStream(std::ostream &out) override;
 	void setDrawStressOnce(bool flag);
 	void resetStressDrawing();
 	void getElements(int x1, int y1, int x2, int y2, CElementList& list);
@@ -200,8 +204,6 @@ public:
 	void setStiffness(double x, double y, double value);
 	void setStiffness(double x, double y, double value, int offsetElements, bool special);
 	void setStiffnessLine(double x1, double y1, double x2, double y2, double value, double width);
-
-	IvfClassInfo("FemGrid2",ImageGrid2);
 
 	int enumerateDofs(int direction);
 	void resetDofs();

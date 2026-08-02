@@ -26,10 +26,12 @@
 #define _Node_h_
 
 #include "Point.h"
+#include <memory>
 
 namespace fp {
 
-IvfSmartPointer(Node);
+class Node;
+using NodePtr = std::shared_ptr<Node>;
 
 class Node : public ivf2d::Point {
 private:
@@ -42,8 +44,6 @@ public:
 	virtual ~Node();
 
 	static NodePtr create() { return std::make_shared<Node>(); }
-
-	IvfClassInfo("Node",ivf2d::Base);
 	int enumerate(int start);
 	void setDof(int idx, int value);
 	int getDof(int idx);

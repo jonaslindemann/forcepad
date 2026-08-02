@@ -13,6 +13,16 @@ find_package(Qt6 REQUIRED COMPONENTS Core Gui OpenGL)
 add_library(ivf2d ${INCLUDE_FILES} ${SOURCE_FILES})
 set_target_properties(ivf2d PROPERTIES DEBUG_POSTFIX d)
 target_include_directories(ivf2d PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+# Raised warning level, scoped to this target only (the modernisation cleared
+# ivf2d's backlog; the other libraries have not been through it yet). The old
+# CommonDefs.h used to blanket-disable C4244/C4305/C4800 for the whole project,
+# which is exactly the class of narrowing bug this is meant to surface.
+if(MSVC)
+    target_compile_options(ivf2d PRIVATE /W4)
+else()
+    target_compile_options(ivf2d PRIVATE -Wall -Wextra)
+endif()
 target_link_libraries(ivf2d
     PUBLIC
         # Image loaders live here: JpegImage.cpp / PngImage.cpp need the jpeg,

@@ -27,15 +27,18 @@
 #include "Image.h"
 
 #include <cstdio>
+#include <memory>
+#include <string>
 
 namespace ivf2d {
 
-IvfSmartPointer(SgiImage);
+class SgiImage;
+using SgiImagePtr = std::shared_ptr<SgiImage>;
 
 class SgiImage : public Image {
 private:
-	char* m_fileName;
-	bool m_alphaChannel;
+	std::string m_fileName;
+	bool m_alphaChannel{false};
 
 	unsigned short getshort(FILE *inf);
 	unsigned long getlong(FILE *inf);
@@ -43,17 +46,15 @@ private:
 	void expandrow(unsigned char *optr, unsigned char *iptr, int z);
     void convertLong(unsigned int *array, unsigned int length);
 public:
-	SgiImage();
-	virtual ~SgiImage();
+	SgiImage() = default;
+	~SgiImage() override = default;
 
 	static SgiImagePtr create() { return std::make_shared<SgiImage>(); }
 
-	IvfClassInfo("SgiImage",Image);
-
 	bool read();
 
-	void setFileName(const char* name);
-	const char* getFileName();
+	void setFileName(const std::string& name);
+	const std::string& getFileName() const;
 
 	void setAlphaChannel(bool flag);
 };

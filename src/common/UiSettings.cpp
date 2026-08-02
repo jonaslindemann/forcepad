@@ -2,24 +2,12 @@
 
 namespace fp {
 
-UiSettings* UiSettings::m_instance = 0;
-ivf2d::SingletonDestroyer<UiSettings> UiSettings::m_destroyer;
-
-UiSettings* UiSettings::getInstance () 
+UiSettings* UiSettings::getInstance()
 {
-    if (m_instance == 0)  
-    {  
-		m_instance = new UiSettings(); 
-		m_destroyer.setSingleton(m_instance);
-    }
-    return m_instance; 
-}
-
-UiSettings::UiSettings()
-{
-	m_symbolLength = 50.0;
-	m_lineThickness = 3.0;
-	m_devicePixelRatio = 1.0;
+	// Meyers singleton: initialised on first use, destroyed at exit, and
+	// thread-safe since C++11 without any explicit teardown helper.
+	static UiSettings instance;
+	return &instance;
 }
 
 void UiSettings::setDevicePixelRatio(double dpr)

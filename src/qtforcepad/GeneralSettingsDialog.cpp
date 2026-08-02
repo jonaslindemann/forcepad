@@ -1,5 +1,5 @@
 #include "GeneralSettingsDialog.h"
-#include "QtPaintView.h"
+#include "qtpaintview.h"
 
 #include <QSlider>
 #include <QLabel>

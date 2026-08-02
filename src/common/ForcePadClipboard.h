@@ -29,10 +29,12 @@
 #include "ForceSelection.h"
 #include "ConstraintSelection.h"
 #include "FemGrid2.h"
+#include <memory>
 
 namespace fp {
 
-IvfSmartPointer(ForcePadClipboard);
+class ForcePadClipboard;
+using ForcePadClipboardPtr = std::shared_ptr<ForcePadClipboard>;
 
 class ForcePadClipboard : public ivf2d::Clipboard {
 private:
@@ -46,8 +48,6 @@ public:
 	virtual ~ForcePadClipboard();
 
 	static ForcePadClipboardPtr create() { return std::make_shared<ForcePadClipboard>(); }
-
-	IvfClassInfo("ForcePadClipboard",ivf2d::Clipboard);
 
 	void render(int x, int y);
 

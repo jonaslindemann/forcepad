@@ -23,18 +23,19 @@
 //
 
 #ifdef WIN32
+// Kept as a local guard so this file is safe even if the global -DNOMINMAX in
+// CMakeLists.txt ever goes away; the #ifndef avoids the C4005 redefinition
+// warning it otherwise triggers against that global definition.
+#ifndef NOMINMAX
 #define NOMINMAX
+#endif
 #include <windows.h>
 #endif
 
 #include "FemGridSolver2.h"
 #include "matlabgen.h"
 
-#ifndef USE_QT
-#include <FL/Fl.h>
-#else
 #include <QCoreApplication>
-#endif
 #include "FPLog.h"
 
 #include <set>
@@ -43,6 +44,9 @@
 #include <cmath>
 #include <climits>
 #include <ctime>
+#include <algorithm>
+#include <string>
+#include <vector>
 
 using namespace std;
 
@@ -94,12 +98,7 @@ FemGridSolver2::~FemGridSolver2()
 
 bool FemGridSolver2::continueCalc()
 {
-#ifndef USE_QT
-	Fl::check();
-	Fl::flush();
-#else
 	QCoreApplication::processEvents();
-#endif
 	if (m_continueCalcEvent!=nullptr)
 		return m_continueCalcEvent->onContinueCalc();
 	else

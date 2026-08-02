@@ -25,20 +25,23 @@
 #pragma once
 
 #include "Base.h"
+#include "Vec2d.h"
 #include "Image.h"
+#include <memory>
 
 namespace ivf2d {
 
-IvfSmartPointer(Clipboard);
+class Clipboard;
+using ClipboardPtr = std::shared_ptr<Clipboard>;
 
 class Clipboard : public Base {
 public:
-	enum TPasteMode {
+	enum class TPasteMode {
 		PM_REPLACE,
 		PM_NON_WHITE
 	};
 
-	enum TCopyImageMode {
+	enum class TCopyImageMode {
 		IM_RGB,
 		IM_RBG,
 		IM_BGR,
@@ -60,8 +63,6 @@ public:
 
 	static ClipboardPtr create() { return std::make_shared<Clipboard>(); }
 
-	IvfClassInfo("Clipboard",Base);
-
 	virtual void copy(int x1, int y1, int x2, int y2);
 	virtual void cut(int x1, int y1, int x2, int y2);
 	virtual void paste(int x, int y);
@@ -70,10 +71,18 @@ public:
 
 	void setPasteMode(TPasteMode mode);
 	void setImage(ImagePtr image);
-	Image* getClipboardImage();
-	void setCopyImageMode(TCopyImageMode mode);
-	void getSelection(int &x1, int &y1, int &x2, int &y2);
 
+	/**
+	 * Non-owning observer of the clipboard image. The Clipboard keeps the
+	 * shared_ptr; callers must not delete the result or hold it past the next
+	 * copy()/cut()/setImage() call.
+	 */
+	Image* getClipboardImage();
+
+	void setCopyImageMode(TCopyImageMode mode);
+	Rect2i getSelection() const;
+
+	/** Non-owning observer -- same contract as getClipboardImage(). */
 	Image* getClipboard();
 };
 

@@ -1,6 +1,6 @@
 #include "ModelUrlLoader.h"
 
-#include "QtPaintView.h"
+#include "qtpaintview.h"
 #include "FPLog.h"
 
 #include <QFileInfo>
@@ -14,6 +14,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <string>
 #endif
 
 namespace {

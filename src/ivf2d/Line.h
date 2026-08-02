@@ -26,10 +26,12 @@
 
 #include "Vec3d.h"
 #include "Shape.h"
+#include <memory>
 
 namespace ivf2d {
 
-IvfSmartPointer(Line);
+class Line;
+using LinePtr = std::shared_ptr<Line>;
 
 class Line : public Shape {
 private:
@@ -47,11 +49,9 @@ public:
 
 	static LinePtr create() { return std::make_shared<Line>(); }
 
-	IvfClassInfo("Line",Shape);
+	void doGeometry() override;
 
-	void doGeometry();
-
-	int getWidth();
+	int getWidth() const;
 	void setEndPos(int x, int y);
 	void setStartPos(int x, int y);
 	void setWidth(int width);

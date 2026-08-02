@@ -1,4 +1,4 @@
-#include "QtPaintView.h"
+#include "qtpaintview.h"
 
 #include <QFileDialog>
 #include <QFileInfo>
@@ -31,12 +31,12 @@
 #endif
 
 #include <fstream>
+#include <string>
 
-#ifdef __APPLE__
-#include <OpenGL/glu.h>
-#else
-#include <GL/glu.h>
-#endif
+// No GLU is used (the rendering migration removed it) and every GL entry point
+// here is resolved through QOpenGLExtraFunctions, so no platform GL header is
+// needed. The old <GL/glu.h> also relied on CommonDefs.h having included
+// <windows.h> first to supply APIENTRY/WINGDIAPI.
 
 // ---------------------------------------------------------------------------
 // Phase 0 smoke test for the modern-GL abstraction (Renderer2D / StreamTexture).

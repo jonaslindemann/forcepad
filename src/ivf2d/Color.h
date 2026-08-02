@@ -25,10 +25,12 @@
 #pragma once
 
 #include "DrawableBase.h"
+#include <memory>
 
 namespace ivf2d {
 
-IvfSmartPointer(Color);
+class Color;
+using ColorPtr = std::shared_ptr<Color>;
 
 /**
  * Color class
@@ -48,8 +50,6 @@ public:
 
 	static ColorPtr create() { return std::make_shared<Color>(); }
 
-	IvfClassInfo("Color",DrawableBase);
-
 	// Get/set methods
 
 	/** Sets color value. */
@@ -62,10 +62,10 @@ public:
 	void setAlpha(float alpha);
 
 	/** Assigns array the current color value. */
-	void getColor(float* array);
+	void getColor(float* array) const;
 
 	/** Returns color */
-	void getColor(float &r, float &g, float &b, float &a);
+	void getColor(float &r, float &g, float &b, float &a) const;
 
 
 	// Virtual overrides

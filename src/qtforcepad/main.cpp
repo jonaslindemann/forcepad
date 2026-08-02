@@ -3,7 +3,7 @@
 #include <QStyleFactory>
 #include <QSurfaceFormat>
 
-#include "MainWindow.h"
+#include "mainwindow.h"
 #include "ModelUrlLoader.h"
 #include "FPLog.h"
 

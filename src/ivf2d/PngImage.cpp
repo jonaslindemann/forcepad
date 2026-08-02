@@ -25,6 +25,8 @@
 #include "PngImage.h"
 
 #include "png.h"
+#include <cstdio>
+#include <string>
 
 namespace ivf2d {
 

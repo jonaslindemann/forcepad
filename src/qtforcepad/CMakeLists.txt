@@ -1,4 +1,4 @@
-include_directories(../paintview ../forcepad ../common ../ivf2d ../calfem ../defs ../fplog)
+include_directories(../paintview ../common ../ivf2d ../calfem ../defs ../fplog)
 
 add_definitions(-DQT_NO_KEYWORDS -DUSE_QT)
 

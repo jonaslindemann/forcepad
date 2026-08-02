@@ -25,10 +25,13 @@
 #pragma once
 
 #include "Image.h"
+#include <memory>
+#include <string>
 
 namespace ivf2d {
 
-IvfSmartPointer(JpegImage);
+class JpegImage;
+using JpegImagePtr = std::shared_ptr<JpegImage>;
 
 /**
  * Jpeg file loader 
@@ -49,8 +52,6 @@ public:
 	virtual ~JpegImage();
 
 	static JpegImagePtr create() { return std::make_shared<JpegImage>(); }
-
-	IvfClassInfo("JpegImage",Image);
 
 	/** Reads jpeg image */
 	virtual bool read();

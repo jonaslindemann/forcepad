@@ -30,12 +30,14 @@
 
 #include <Eigen/Dense>
 #include <vector>
+#include <memory>
 
 namespace fp {
 
 using EigenGridMatrix = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
 
-IvfSmartPointer(ImageGrid2);
+class ImageGrid2;
+using ImageGrid2Ptr = std::shared_ptr<ImageGrid2>;
 
 class ImageGrid2 : public ivf2d::Shape {
 private:
@@ -61,8 +63,6 @@ public:
 	static ImageGrid2Ptr create() { return std::make_shared<ImageGrid2>(); }
 
 	void clearGrid();
-
-	IvfClassInfo("ImageGrid",ivf2d::Shape);
 
 	virtual void initGrid();
 
@@ -109,7 +109,7 @@ public:
 
 	void setElementScaleFactor(double factor);
 
-	virtual void doGeometry();
+	void doGeometry() override;
 };
 
 

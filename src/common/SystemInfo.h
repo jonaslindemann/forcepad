@@ -12,7 +12,9 @@
 #ifdef WIN32
 #include <Windows.h>
 
-typedef enum WindowsVersion
+// C++ makes the enum tag a type name on its own; the C-style `typedef enum`
+// with no typedef name declared nothing and warned (C4091).
+enum WindowsVersion
 {
 	Win_Unknown = 0,
 	Win95,

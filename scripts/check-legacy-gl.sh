@@ -33,12 +33,8 @@ DIRS="src/ivf2d src/common src/paintview src/qtforcepad"
 
 fail=0
 while IFS= read -r file; do
-    # Files intentionally out of scope: the v1 FemGrid/ImageGrid classes are
-    # compiled only into the legacy FLTK app, not the Qt/WebGL build.
-    case "$file" in
-        */common/FemGrid.cpp|*/common/FemGrid.h|*/common/ImageGrid.cpp|*/common/ImageGrid.h)
-            continue ;;
-    esac
+    # (The v1 FemGrid/ImageGrid exclusion that used to live here is gone: those
+    # classes were deleted with the FLTK port on 2026-08-01.)
 
     # Strip // line comments, then drop block-comment body / opener lines
     # (leading '*' or '/') so documentation that references the old calls does
@@ -61,4 +57,20 @@ if [ "$fail" -ne 0 ]; then
     exit 1
 fi
 
+# Second invariant, established by Phase 6 of the ivf2d modernisation: no file
+# in ivf2d includes a platform GL header any more. GL entry points are reached
+# exclusively through Qt's QOpenGLExtraFunctions inside GLProgram / Renderer2D /
+# StreamTexture, which is what makes the library build unchanged for WebGL.
+# A direct <GL/gl.h> also drags in a <windows.h> dependency on Win32 (it needs
+# APIENTRY / WINGDIAPI), which is exactly what removing CommonDefs.h eliminated.
+gl_includes=$(grep -rn 'include[[:space:]]*<\(GL\|OpenGL\)/' src/ivf2d || true)
+if [ -n "$gl_includes" ]; then
+    echo "Platform GL headers included in src/ivf2d:"
+    echo "$gl_includes" | sed 's/^/    /'
+    echo ""
+    echo "ERROR: ivf2d must reach GL only via QOpenGLExtraFunctions."
+    exit 1
+fi
+
 echo "OK: no legacy OpenGL in the migrated render path."
+echo "OK: no platform GL headers in src/ivf2d."

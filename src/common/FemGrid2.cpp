@@ -27,6 +27,12 @@
 
 #include "Renderer2D.h"
 #include "Vec3d.h"
+#include "Constants.h"
+#include <algorithm>
+#include <cmath>
+#include <vector>
+#include <ostream>
+#include <istream>
 
 using namespace std;
 
@@ -1212,8 +1218,8 @@ void FemGrid2::drawStressArrow(double x, double y, const double *values)
 			else
 				ren.color(0.0f, 0.0f, 1.0f, (float)m_stressAlpha);
 
-			ren.vertex((float)(x - 0.5*sig2*m_stressSize*cos(alpha+M_PI/2.0)), (float)(y - 0.5*sig2*m_stressSize*sin(alpha+M_PI/2.0)));
-			ren.vertex((float)(x + 0.5*sig2*m_stressSize*cos(alpha+M_PI/2.0)), (float)(y + 0.5*sig2*m_stressSize*sin(alpha+M_PI/2.0)));
+			ren.vertex((float)(x - 0.5*sig2*m_stressSize*cos(alpha+ivf2d::PI/2.0)), (float)(y - 0.5*sig2*m_stressSize*sin(alpha+ivf2d::PI/2.0)));
+			ren.vertex((float)(x + 0.5*sig2*m_stressSize*cos(alpha+ivf2d::PI/2.0)), (float)(y + 0.5*sig2*m_stressSize*sin(alpha+ivf2d::PI/2.0)));
 		}
 
 		ren.end();

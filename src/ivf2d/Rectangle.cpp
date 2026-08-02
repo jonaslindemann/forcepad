@@ -32,14 +32,10 @@ Rectangle::Rectangle()
 {
 	m_size[0] = 1.0;
 	m_size[1] = 1.0;
-	m_ratioX = 1.0;
-	m_ratioY = 1.0;
-	m_imageRatio = 1.0;
-	m_textureSetup = 1;
 
 	m_lineFactor = 1;
-	m_lineType = LT_SOLID;
-	m_rectType = RT_SOLID;
+	m_lineType = TLineType::LT_SOLID;
+	m_rectType = TRectangleType::RT_SOLID;
 	m_lineWidth = 1.0;
 	m_lineColor = Color::create();
 	m_lineColor->setColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -54,45 +50,18 @@ void Rectangle::setSize(double width, double height)
 {
 	m_size[0] = width;
 	m_size[1] = height;
-
-	//
-	// Calculate ratios
-	//
-
-	m_ratioX = m_size[0]/m_size[1];
-	m_ratioY = m_size[1]/m_size[0];
-
-	//
-	// Determine texture setup
-	//
-
-	if (m_ratioX>1.0)
-	{
-		if (m_imageRatio>m_ratioX)
-			m_textureSetup = 1;
-		else
-			m_textureSetup = 2;
-	}
-	else
-	{
-		if (m_imageRatio<m_ratioX)
-			m_textureSetup = 3;
-		else
-			m_textureSetup = 4;
-	}
 }
 
-void Rectangle::getSize(double &width, double &height)
+Vec2d Rectangle::getSize() const
 {
-	width = m_size[0];
-	height = m_size[1];
+	return {m_size[0], m_size[1]};
 }
 
 void Rectangle::doGeometry()
 {
 	Renderer2D &r = Renderer2D::instance();
 
-	if ((m_rectType==RT_SOLID)||(m_rectType==RT_SOLID_OUTLINE))
+	if ((m_rectType==TRectangleType::RT_SOLID)||(m_rectType==TRectangleType::RT_SOLID_OUTLINE))
 	{
 		r.beginQuads();
 		r.texCoord(0.0f, 0.0f);
@@ -110,7 +79,7 @@ void Rectangle::doGeometry()
 		r.end();
 	}
 
-	if ((m_rectType==RT_OUTLINE)||(m_rectType==RT_SOLID_OUTLINE))
+	if ((m_rectType==TRectangleType::RT_OUTLINE)||(m_rectType==TRectangleType::RT_SOLID_OUTLINE))
 	{
 		m_lineColor->render();
 
@@ -118,12 +87,12 @@ void Rectangle::doGeometry()
 		// loop) so dashed rendering gets continuous per-segment distances.
 		const float w = (float)m_size[0];
 		const float h = (float)m_size[1];
-		if (m_lineType != LT_SOLID)
+		if (m_lineType != TLineType::LT_SOLID)
 		{
 			// glLineStipple periods, mapped to shader dash periods (px):
 			//   LT_DASHED 0x00FF -> 16 (8 on / 8 off)
 			//   LT_DOTTED 0x0101 ->  4 (dotted approximation)
-			const float period = (m_lineType == LT_DOTTED) ? 4.0f : 16.0f;
+			const float period = (m_lineType == TLineType::LT_DOTTED) ? 4.0f : 16.0f;
 			r.beginDashedLines((float)m_lineWidth, period * (float)m_lineFactor);
 		}
 		else
@@ -136,20 +105,6 @@ void Rectangle::doGeometry()
 		r.vertex(0.0f, h);    r.vertex(0.0f, 0.0f);
 		r.end();
 	}
-}
-
-void Rectangle::setTexture(TexturePtr texture)
-{
-	//
-	// Let's snatch us some image info from the texture
-	//
-
-	if (texture->getImage()!=nullptr)
-	{
-		Image* image = texture->getImage();
-		m_imageRatio = image->getRatio();				
-	}
-	Shape::setTexture(texture);
 }
 
 void Rectangle::setRectangleType(TRectangleType type)

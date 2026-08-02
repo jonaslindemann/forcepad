@@ -33,6 +33,7 @@
 
 #include "Renderer2D.h"
 #include "StreamTexture.h"
+#include <memory>
 
 namespace ivf2d {
 
@@ -53,7 +54,7 @@ ScreenImage::ScreenImage()
 	m_cols = 12;
 	m_tileSpacing[0] = -1;
 	m_tileSpacing[1] = -1;
-	m_renderMode = RM_NORMAL;
+	m_renderMode = TRenderMode::RM_NORMAL;
 	m_devicePixelRatio = 1.0;
 }
 
@@ -96,11 +97,11 @@ void ScreenImage::doGeometry()
 	m_streamTexture->update(m_image->getImageMap(), imgW, imgH, GL_RGBA);
 
 	switch (m_renderMode) {
-	case RM_NORMAL:
+	case TRenderMode::RM_NORMAL:
 		m_streamTexture->draw((float)x, (float)y, (float)imgW, (float)imgH);
 		break;
 
-	case RM_SUBIMAGE:
+	case TRenderMode::RM_SUBIMAGE:
 	{
 		const float u0 = (float)m_subImagePos[0] / (float)imgW;
 		const float v0 = (float)m_subImagePos[1] / (float)imgH;
@@ -112,7 +113,7 @@ void ScreenImage::doGeometry()
 		break;
 	}
 
-	case RM_TILED:
+	case TRenderMode::RM_TILED:
 		for (int i = 0; i < m_rows; i++)
 		{
 			for (int j = 0; j < m_cols; j++)
@@ -150,12 +151,6 @@ void ScreenImage::setSubImageSize(int width, int height)
 	m_subImageSize[1] = height;
 }
 
-void ScreenImage::getSubImageSize(int &width, int &height)
-{
-	width = m_subImageSize[0];
-	height = m_subImageSize[1];
-}
-
 void ScreenImage::reset()
 {
 	if (m_image!=nullptr)
@@ -173,11 +168,6 @@ void ScreenImage::setRenderMode(TRenderMode mode)
 	m_renderMode = mode;
 }
 
-ScreenImage::TRenderMode ScreenImage::getRenderMode()
-{
-	return m_renderMode;
-}
-
 void ScreenImage::setTiles(int rows, int cols)
 {
 	m_rows = rows;
@@ -188,22 +178,6 @@ void ScreenImage::setTiles(int rows, int cols)
 		m_tileSpacing[0] = m_image->getWidth() / m_cols;
 		m_tileSpacing[1] = m_image->getHeight() / m_rows;
 	}
-}
-
-void ScreenImage::getTiles(int &rows, int &cols)
-{
-	rows = m_rows;
-	cols = m_cols;
-}
-
-int ScreenImage::getRows()
-{
-	return m_rows;
-}
-
-int ScreenImage::getCols()
-{
-	return m_cols;
 }
 
 void ScreenImage::update(int x1, int y1, int x2, int y2)

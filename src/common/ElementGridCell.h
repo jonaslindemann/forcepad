@@ -26,10 +26,13 @@
 #define _ElementGridCell_h_
 
 #include "Element.h"
+#include <memory>
+#include <vector>
 
 namespace fp {
 
-IvfSmartPointer(ElementGridCell);
+class ElementGridCell;
+using ElementGridCellPtr = std::shared_ptr<ElementGridCell>;
 
 class ElementGridCell : public ivf2d::Point {
 private:
@@ -40,8 +43,6 @@ public:
 	virtual ~ElementGridCell();
 
 	static ElementGridCellPtr create() { return std::make_shared<ElementGridCell>(); }
-
-	IvfClassInfo("ElementGridCell",ivf2d::Base);
 };
 
 

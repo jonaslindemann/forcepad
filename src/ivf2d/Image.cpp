@@ -23,123 +23,62 @@
 //
 
 #include "Image.h"
+#include <vector>
 
-#ifdef __APPLE__
-#include <OpenGL/glu.h>
-#include <OpenGL/gl.h>
-#else
-#include <GL/glu.h>
-#include <GL/gl.h>
-#endif
+// No GL calls are made here -- the image is a pure CPU pixel buffer. The old
+// GL/GLU includes were vestigial and are gone with CommonDefs.h, which used to
+// supply the APIENTRY/WINGDIAPI that <GL/gl.h> needs on Win32.
 
 namespace ivf2d {
 
-Image::Image()
-{
-	m_imageMap = nullptr;
-	m_imageMaps = nullptr;
-	m_layers = 1;
-	m_currentLayer = 0;
-	m_size[0] = -1;
-	m_size[1] = -1;
-	m_channels = 3;
-	m_currentAlpha = 255;
-	m_ownData = true;
-
-	m_fillColor[0] = 0;
-	m_fillColor[1] = 0;
-	m_fillColor[2] = 0;
-
-	initLayers();
-}
-
 Image::Image(int nLayers)
+	: m_layers(nLayers > 0 ? nLayers : 1)
 {
-	m_imageMap = nullptr;
-	m_imageMaps = nullptr;
-	m_layers = nLayers;
-	m_currentLayer = 0;
-	m_size[0] = -1;
-	m_size[1] = -1;
-	m_channels = 3;
-	m_currentAlpha = 255;
-	m_ownData = true;
-
-	m_fillColor[0] = 0;
-	m_fillColor[1] = 0;
-	m_fillColor[2] = 0;
-
-	initLayers();
 }
 
-Image::~Image()
+void Image::pointAtLayer(int layer)
 {
-	if (m_ownData)
-	{
-		destroyLayers();
-	}
-}
-
-void Image::clearLayers()
-{
-	int i;
-
-	if (m_imageMaps==nullptr)
-		return;
-
-	for (i=0; i<m_layers; i++)
-		if (m_imageMaps[i]!=nullptr)
-			delete [] m_imageMaps[i];
-}
-
-void Image::initLayers()
-{
-	int i;
-
-    m_imageMaps = new unsigned char*[m_layers];
-
-	for (i=0; i<m_layers; i++)
-		m_imageMaps[i] = nullptr;
-
-	m_imageMap = m_imageMaps[m_currentLayer];
-}
-
-void Image::destroyLayers()
-{
-	clearLayers();
-	delete [] m_imageMaps;
+	if (layer >= 0 && layer < static_cast<int>(m_layerData.size()) &&
+	    !m_layerData[layer].empty())
+		m_imageMap = m_layerData[layer].data();
+	else
+		m_imageMap = nullptr;
 }
 
 void Image::setSize(int width, int height)
 {
-	if (m_ownData)
+	if (!m_ownData)
+		return;
+
+	if (width <= 0 || height <= 0)
 	{
-		clearLayers();
-
-		int i;
-
-		for (i=0; i<m_layers; i++)
-		{
-			if ((width>0)&&(height>0))
-			{
-				m_size[0] = width;
-				m_size[1] = height;
-				m_ratio = width/height;
-
-                m_imageMaps[i] = new unsigned char[m_size[0]*m_size[1]*m_channels];
-			}
-		}
-		if ((width>0)&&(height>0))
-			m_imageMap = m_imageMaps[0];
+		// The old implementation deleted every layer buffer and then skipped
+		// reallocation for a non-positive size, leaving m_imageMaps[] and
+		// m_imageMap dangling. Bail out before touching the storage instead.
+		return;
 	}
+
+	m_size[0] = width;
+	m_size[1] = height;
+
+	const size_t bytes = static_cast<size_t>(width) *
+	                     static_cast<size_t>(height) *
+	                     static_cast<size_t>(m_channels);
+
+	m_layerData.assign(m_layers, std::vector<unsigned char>(bytes));
+
+	// Matches the previous behaviour: the working pointer is reset to layer 0
+	// while m_currentLayer is deliberately left alone. Any subsequent
+	// setLayer() call re-syncs the two unconditionally.
+	pointAtLayer(0);
 }
 
-int Image::getWidth()
+int Image::getWidth() const
 {
 	return m_size[0];
 }
 
-int Image::getHeight()
+int Image::getHeight() const
 {
 	return m_size[1];
 }
@@ -148,17 +87,17 @@ void Image::setLayer(int layer)
 {
 	if ((layer>=0)&&(layer<m_layers))
 	{
-		m_imageMap = m_imageMaps[layer];
+		pointAtLayer(layer);
 		m_currentLayer = layer;
 	}
 }
 
-int Image::getLayer()
+int Image::getLayer() const
 {
 	return m_currentLayer;
 }
 
-int Image::getLayerCount()
+int Image::getLayerCount() const
 {
 	return m_layers;
 }
@@ -214,12 +153,12 @@ void Image::subtractPixel(int x, int y, unsigned char red, unsigned char green, 
 	}
 }
 
-bool Image::valid(int x, int y)
+bool Image::valid(int x, int y) const
 {
 	return ((x>=0)&&(x<m_size[0])&&(y>=0)&&(y<m_size[1]));
 }
 
-void Image::getPixel(int x, int y, unsigned char &red, unsigned char &green, unsigned char &blue)
+void Image::getPixel(int x, int y, unsigned char &red, unsigned char &green, unsigned char &blue) const
 {
 	if (valid(x, y))
 	{
@@ -267,12 +206,6 @@ void Image::fillRectAlpha(int x1, int y1, int x2, int y2, unsigned char alpha)
 	}
 }
 
-double Image::getRatio()
-{
-	return m_ratio;
-}
-
-
 void Image::drawFrame(int x1, int y1, int x2, int y2, unsigned char red, unsigned char green, unsigned char blue)
 {
 	if ( (valid(x1, y1))&&(valid(x2, y2)) )
@@ -311,7 +244,7 @@ void Image::setAlpha(unsigned char alpha)
 	m_currentAlpha = alpha;
 }
 
-unsigned char Image::getAlpha()
+unsigned char Image::getAlpha() const
 {
 	return m_currentAlpha;
 }
@@ -341,31 +274,7 @@ void Image::subtractValue(int x, int y, int channel, unsigned char value)
 }
 
 
-void Image::createAlphaAll(unsigned char max, unsigned char min)
-{
-	int i, j;
-
-    unsigned char red, green, blue;
-
-	for (i=0; i<m_size[0]; i++)
-	{
-		for (j=0; j<m_size[1]; j++)
-		{
-			getValue(i, j, 0, red);
-			getValue(i, j, 1, green);
-			getValue(i, j, 2, blue);
-
-			//average = ((double)red + (double)green + (double)blue) / 3.0;
-
-			if (red<5)
-				setValue(i, j, 3, 255);
-			else
-				setValue(i, j, 3, 0);
-		}
-	}
-}
-
-void Image::getValue(int x, int y, int channel, unsigned char &value)
+void Image::getValue(int x, int y, int channel, unsigned char &value) const
 {
 	value = m_imageMap[x*m_channels + m_size[0]*y*m_channels + channel];
 }
@@ -583,7 +492,7 @@ void Image::floodFill(int x, int y)
 	} while (!m_processListX.empty());
 }
 
-bool Image::validPixel(int x, int y)
+bool Image::validPixel(int x, int y) const
 {
 	if (valid(x, y))
 	{
@@ -679,27 +588,37 @@ void Image::copyFrom(Image* image, int startx, int starty, const float* color)
 }
 
 
-void* Image::getData()
-{
-	return (void*)m_imageMap;
-}
-
 void Image::setImageMap(int width, int height, unsigned char* data, bool ownData)
 {
-	if (m_ownData)
-	{
-		if (m_imageMap!=nullptr)
-			delete [] m_imageMap;
-	}
+	// Releasing the owned storage here used to be a latent double-free: the old
+	// code did `delete [] m_imageMap`, but that pointer aliased one of the
+	// m_imageMaps[] layer buffers, which the destructor then deleted again.
+	m_layerData.clear();
+	m_layerData.shrink_to_fit();
 
 	m_ownData = ownData;
-    m_imageMap = (unsigned char*)data;
+	m_imageMap = data;
 	m_size[0] = width;
 	m_size[1] = height;
 	m_channels = 3;
+
+	if (ownData && data != nullptr)
+	{
+		// Adopting a caller-allocated raw buffer is not expressible with the
+		// vector-backed storage, so take a copy and point at that instead. The
+		// caller keeps ownership of what it passed in. No caller in the tree
+		// does this -- Clipboard::copyImage passes ownData = false.
+		const size_t bytes = static_cast<size_t>(width) *
+		                     static_cast<size_t>(height) *
+		                     static_cast<size_t>(m_channels);
+		m_layers = 1;
+		m_currentLayer = 0;
+		m_layerData.assign(1, std::vector<unsigned char>(data, data + bytes));
+		pointAtLayer(0);
+	}
 }
 
-int Image::getChannels()
+int Image::getChannels() const
 {
 	return m_channels;
 }

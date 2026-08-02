@@ -142,6 +142,15 @@ public:
      */
     void setForceOpaque(bool enable);
 
+    /**
+     * Colour-keys pure white out of subsequent textured draws: any texel whose
+     * three channels are all 255 is discarded instead of shaded. Used by the
+     * paste preview so the clipboard image stamps onto the canvas as an opaque
+     * cut-out rather than an alpha-blended ghost, matching the PM_NON_WHITE
+     * paste rule in Clipboard::paste().
+     */
+    void setDiscardWhite(bool enable);
+
 private:
     Renderer2D();
     ~Renderer2D();
@@ -166,6 +175,7 @@ private:
     Primitive m_primitive{Triangles};
     bool m_inBatch{false};
     bool m_forceOpaque{false};
+    bool m_discardWhite{false};
     bool m_dashed{false};
     float m_dashPeriod{16.0f};
     float m_lineWidth{1.0f};

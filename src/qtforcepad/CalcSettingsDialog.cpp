@@ -1,5 +1,5 @@
 #include "CalcSettingsDialog.h"
-#include "QtPaintView.h"
+#include "qtpaintview.h"
 
 #include <QTabWidget>
 #include <QSlider>

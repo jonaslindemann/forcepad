@@ -2,25 +2,26 @@
 #define _UiSettings_h_
 
 #include "Base.h"
-#include "SingletonDestroyer.h"
 
 namespace fp {
 
-IvfStdPointer(UiSettings);
+class UiSettings;
+using UiSettingsPtr = UiSettings*;
 
 class UiSettings: public ivf2d::Base {
 private:
-	static UiSettings* m_instance;
-	static ivf2d::SingletonDestroyer<UiSettings> m_destroyer;
-
-	double m_symbolLength;
-	double m_lineThickness;
-	double m_devicePixelRatio;
+	double m_symbolLength{50.0};
+	double m_lineThickness{3.0};
+	double m_devicePixelRatio{1.0};
 public:
-	/** Returns the PlatformInfo singleton */
+	/**
+	 * Returns the UiSettings singleton.
+	 *
+	 * Backed by a function-local static, which C++11 guarantees is initialised
+	 * exactly once (thread-safely) and destroyed at exit -- replacing the
+	 * hand-rolled SingletonDestroyer that used to manage the teardown.
+	 */
 	static UiSettings* getInstance();
-
-	IvfClassInfo("UiSettings", ivf2d::Base);
 
 	void setSymbolLength(double length);
 	double getSymbolLength();
@@ -32,9 +33,8 @@ public:
 	double getDevicePixelRatio();
 
 protected:
-	/** Protected constructor (do not use) */
-	UiSettings();
-	friend class ivf2d::SingletonDestroyer<UiSettings>;
+	/** Protected constructor -- use getInstance(). */
+	UiSettings() = default;
 };
 
 } // namespace fp

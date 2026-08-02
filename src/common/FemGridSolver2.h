@@ -42,6 +42,8 @@
 #include "FemGrid2.h"
 
 #include "calfem.h"
+#include <memory>
+#include <string>
 
 
 class GSStatusMessageEvent {
@@ -64,7 +66,8 @@ public:
 
 namespace fp {
 
-IvfSmartPointer(FemGridSolver2);
+class FemGridSolver2;
+using FemGridSolver2Ptr = std::shared_ptr<FemGridSolver2>;
 
 /**
  * Fem Internal solver class.

@@ -23,6 +23,7 @@
 //
 
 #include "ForcePadClipboard.h"
+#include <memory>
 
 namespace fp {
 
@@ -81,8 +82,9 @@ void ForcePadClipboard::paste(int x, int y)
 
 	if (m_grid!=nullptr)
 	{
-		int x1, y1, x2, y2;
-		this->getSelection(x1, y1, x2, y2);
+		const ivf2d::Rect2i sel = this->getSelection();
+		const int x1 = sel.x1;
+		const int y1 = sel.y1;
 
 		for (int i=0; i<m_forceSelection->getSize(); i++)
 		{
@@ -127,8 +129,9 @@ void ForcePadClipboard::setDrawingOffset(int x, int y)
 
 void ForcePadClipboard::render(int x, int y)
 {
-	int x1, y1, x2, y2;
-	this->getSelection(x1, y1, x2, y2);
+	const ivf2d::Rect2i sel = this->getSelection();
+	const int x1 = sel.x1;
+	const int y1 = sel.y1;
 
 	auto newForce = Force::create();
 	auto newConstraint = Constraint::create();

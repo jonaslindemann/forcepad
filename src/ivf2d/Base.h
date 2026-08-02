@@ -24,53 +24,36 @@
 
 #pragma once
 
-#include "CommonDefs.h"
+// OpenGL is linked via CMake (Qt6::OpenGL / OpenGL::GL), not #pragma comment.
 
-#ifdef WIN32
-#pragma comment( lib, "opengl32" )
-#pragma comment( lib, "glu32" )
-//#pragma comment( lib, "ivf2d" )
-#endif
-
-#include <iostream>
-#include <cmath>
-#include <cstdlib>
-#include <cstring>
-#include <cstdio>
-#include <vector>
-#include <stack>
-#include <deque>
-#include <set>
+// Base only needs stream forward declarations and shared_ptr. It used to pull
+// in <iostream> <cmath> <cstdlib> <cstring> <cstdio> <vector> <stack> <deque>
+// <set> for the benefit of everything downstream; those now belong to the files
+// that actually use them.
+#include <iosfwd>
+#include <memory>
 
 namespace ivf2d {
 
-IvfSmartPointer(Base);
+class Base;
+using BasePtr = std::shared_ptr<Base>;
 
 /**
  * Base class
- * 
- * Base class used by most ForcePAD classes.
- * Contains code for reference counting, parent pointer and
- * stream handling.
+ *
+ * Minimal polymorphic base for most ForcePAD classes: it provides the virtual
+ * destructor and the stream serialisation hooks that Force/Constraint and the
+ * FemGrid classes override.
+ *
+ * The former reference counting is gone -- ownership is std::shared_ptr via the
+ * static create() factories -- and so is the parent pointer, which had no users.
  */
 class Base {
-private:
-	Base* m_parent;
 public:
-	/** Base class constructor.*/
-	Base ();
-	/** Base class destructor.*/
-	virtual ~Base ();
+	Base() = default;
+	virtual ~Base() = default;
 
 	static BasePtr create() { return std::make_shared<Base>(); }
-
-	IvfClassInfoTop("Base");
-
-	/** Sets parent object. */
-	void setParent(Base* parent);
-
-	/** Returns parent object. */
-	virtual Base* getParent();
 
 	/** Virtual method for retrieving object from a stream. */
 	virtual void readFromStream(std::istream &in);

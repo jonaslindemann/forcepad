@@ -25,36 +25,34 @@
 #pragma once
 
 #include "Shape.h"
-#include "Texture.h"
+#include "Vec2d.h"
 #include "Image.h"
+#include <memory>
 
 namespace ivf2d {
 
-IvfSmartPointer(Rectangle);
+class Rectangle;
+using RectanglePtr = std::shared_ptr<Rectangle>;
 
 /**
  * Rectangle class
  *
- * Implements a textured rectangle.
+ * Implements a solid and/or outlined rectangle.
  */
 class Rectangle : public Shape {
 public:
-	enum TRectangleType {
+	enum class TRectangleType {
 		RT_SOLID,
 		RT_OUTLINE,
 		RT_SOLID_OUTLINE
 	};
-	enum TLineType {
+	enum class TLineType {
 		LT_SOLID,
 		LT_DASHED,
 		LT_DOTTED
 	};
 private:
 	double m_size[2];
-	double m_ratioX;
-	double m_ratioY;
-	double m_imageRatio;
-	int m_textureSetup;
 	TRectangleType m_rectType;
 	TLineType m_lineType;
 	double m_lineWidth;
@@ -70,16 +68,11 @@ public:
 
 	static RectanglePtr create() { return std::make_shared<Rectangle>(); }
 
-	IvfClassInfo("Rectangle",Shape);
-
 	/** Set size of rectangle in world coordinates. */
 	void setSize(double width, double height);
 
-	/** Get size of rectangle in world coordinates. */ 
-	void getSize(double &width, double &height);
-
-	/** Set texture override. */
-	void setTexture(TexturePtr texture); // Override
+	/** Get size of rectangle in world coordinates. */
+	Vec2d getSize() const;
 
 	/** Draw rectangle in OpenGL. */
 	virtual void doGeometry() override;

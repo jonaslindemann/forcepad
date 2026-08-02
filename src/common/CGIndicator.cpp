@@ -26,6 +26,8 @@
 #include "UiSettings.h"
 
 #include "Renderer2D.h"
+#include "Constants.h"
+#include <cmath>
 
 namespace fp {
 
@@ -39,7 +41,7 @@ CGIndicator::CGIndicator()
 
 	m_arrowLength = 50.0;
 	m_arrowSize = 10.0;
-	m_arrowAngle = M_PI/6.0;
+	m_arrowAngle = ivf2d::PI/6.0;
 	
 	this->initAngle();
 }

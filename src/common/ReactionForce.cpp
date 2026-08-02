@@ -26,6 +26,8 @@
 
 #include "Renderer2D.h"
 #include "UiSettings.h"
+#include "Constants.h"
+#include <cmath>
 
 namespace fp {
 
@@ -38,7 +40,7 @@ ReactionForce::ReactionForce ()
 	m_length = 50.0;
 	m_offset = 40.0;
 	m_arrowSize = 10.0;
-	m_arrowAngle = M_PI/6.0;
+	m_arrowAngle = ivf2d::PI/6.0;
 	this->initAngle();
 }
 
@@ -159,14 +161,14 @@ void ReactionForce::doGeometry()
 // ------------------------------------------------------------
 void ReactionForce::setArrowAngle(double angle)
 {
-	m_arrowAngle = angle*2.0*M_PI/360.0;
+	m_arrowAngle = angle*2.0*ivf2d::PI/360.0;
 	this->initAngle();
 }
 
 // ------------------------------------------------------------
 double ReactionForce::getArrowAngle()
 {
-	return m_arrowAngle*360.0/M_PI/2.0;
+	return m_arrowAngle*360.0/ivf2d::PI/2.0;
 }
 
 // ------------------------------------------------------------

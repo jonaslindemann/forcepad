@@ -23,6 +23,8 @@
 //
 
 #include "JpegImage.h"
+#include <cstdio>
+#include <string>
 
 namespace ivf2d {
 

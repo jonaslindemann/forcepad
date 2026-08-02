@@ -52,16 +52,13 @@ public:
 	void setPosition(const double* pos);
 
 	/** Get Point position. */
-	void getPosition(double &x, double &y);
-
-	/** Return pointer to point position. (read-only) _*/
-	const double* getPosition();
+	void getPosition(double &x, double &y) const;
 
 	/** Return point x position. */
-	double x();
+	double x() const;
 
 	/** Return point y position. */
-	double y();
+	double y() const;
 };
 
 

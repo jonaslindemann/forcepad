@@ -26,28 +26,28 @@
 
 #include "DrawableBase.h"
 #include "Color.h"
-#include "Texture.h"
+#include <memory>
 
 namespace ivf2d {
 
-IvfSmartPointer(Shape);
+class Shape;
+using ShapePtr = std::shared_ptr<Shape>;
 
 /**
  * Shape base class
  *
  * Base class for all classes in ForcePAD which have
- * a visual representation with a position, rotation,
- * color and a texture. (Drawable in OpenGL).
+ * a visual representation with a position, rotation
+ * and color.
  */
 class Shape : public DrawableBase {
 private:
 	double m_pos[2];
 	double m_rotation;
 	ColorPtr m_color;
-	TexturePtr m_texture;
 	bool m_useRasterPos;
 public:
-	bool getUseRasterPosition();
+	bool getUseRasterPosition() const;
 	void setUseRasterPosition(bool flag);
 	/** Shape class constructor. */
 	Shape();
@@ -57,33 +57,25 @@ public:
 
 	static ShapePtr create() { return std::make_shared<Shape>(); }
 
-	IvfClassInfo("Shape",DrawableBase);
-
 	// Get/set methods 
 	
 	/** Set position of shape. */
 	void setPosition(double x, double y);
 
 	/** Get position of shape. */
-	void getPosition(double &x, double &y);
+	void getPosition(double &x, double &y) const;
 
 	/** Set shape rotation. (degrees)*/
 	void setRotation(double angle);
 
 	/** Get shape rotation. (degrees)*/
-	double getRotation();
+	double getRotation() const;
 
 	/** Set shape color. */
 	void setColor(ColorPtr color);
 
 	/** Return shape color. */
-	ColorPtr getColor();
-
-	/** Set shape texture. */
-	void setTexture(TexturePtr texture);
-
-	/** Get shape texture. */
-	Texture* getTexture();
+	ColorPtr getColor() const;
 
 	// Implemented virtual methods
 

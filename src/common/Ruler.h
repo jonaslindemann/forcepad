@@ -26,10 +26,12 @@
 #define _Ruler_h_
 
 #include "Shape.h"
+#include <memory>
 
 namespace fp {
 
-IvfSmartPointer(Ruler);
+class Ruler;
+using RulerPtr = std::shared_ptr<Ruler>;
 
 /**
  * Ruler class
@@ -52,9 +54,7 @@ public:
 
 	static RulerPtr create() { return std::make_shared<Ruler>(); }
 
-	IvfClassInfo("Ruler",ivf2d::Shape);
-
-	void doGeometry();
+	void doGeometry() override;
 
 	void setEndPos(int x, int y);
 	void setStartPos(int x, int y);

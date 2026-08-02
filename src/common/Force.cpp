@@ -26,6 +26,10 @@
 
 #include "Renderer2D.h"
 #include "UiSettings.h"
+#include "Constants.h"
+#include <cmath>
+#include <ostream>
+#include <istream>
 
 using namespace std;
 
@@ -39,7 +43,7 @@ Force::Force ()
 	m_direction[1] = 1.0;
 	m_length = 50.0;
 	m_arrowSize = 10.0;
-	m_arrowAngle = M_PI/6.0;
+	m_arrowAngle = ivf2d::PI/6.0;
 	m_forceType = FT_VECTOR;
 	this->initAngle();
 }
@@ -152,14 +156,14 @@ void Force::doGeometry()
 // ------------------------------------------------------------
 void Force::setArrowAngle(double angle)
 {
-	m_arrowAngle = angle*2.0*M_PI/360.0;
+	m_arrowAngle = angle*2.0*ivf2d::PI/360.0;
 	this->initAngle();
 }
 
 // ------------------------------------------------------------
 double Force::getArrowAngle()
 {
-	return m_arrowAngle*360.0/M_PI/2.0;
+	return m_arrowAngle*360.0/ivf2d::PI/2.0;
 }
 
 // ------------------------------------------------------------
@@ -217,7 +221,7 @@ void Force::assignFrom(Force *force)
 	m_value = force->getValue();
 	m_length = force->getLength();
 	m_arrowSize = force->getArrowSize();
-	m_arrowAngle = force->getArrowAngle()*2.0*M_PI/360.0;
+	m_arrowAngle = force->getArrowAngle()*2.0*ivf2d::PI/360.0;
 	force->getDirection(vx, vy);
 	m_direction[0] = vx;
 	m_direction[1] = vy;

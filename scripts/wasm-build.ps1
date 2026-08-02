@@ -55,7 +55,13 @@ if ($Clean -and (Test-Path $build)) { Remove-Item -Recurse -Force $build }
 
 if (-not (Test-Path (Join-Path $build 'CMakeCache.txt'))) {
     Write-Host "==> Configuring wasm build, $Config ($QtWasm)" -ForegroundColor Cyan
-    & $qtcmake -G Ninja -S $repo -B $build -DCMAKE_BUILD_TYPE=$Config
+    # The -D argument must be quoted: unquoted, PowerShell hands the literal
+    # string "-DCMAKE_BUILD_TYPE=$Config" to the qt-cmake batch file without
+    # expanding $Config, and the build type ends up as the literal '$Config'.
+    # That produces a confusing failure much later, in ninja:
+    #   CMakeFiles/rules.ninja: expected newline, got lexing error
+    #   rule CXX_COMPILER__spdlog_unscanned_$Config
+    & $qtcmake -G Ninja -S $repo -B $build "-DCMAKE_BUILD_TYPE=$Config"
     if ($LASTEXITCODE -ne 0) { throw "configure failed" }
 }
 

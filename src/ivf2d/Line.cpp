@@ -98,7 +98,7 @@ void Line::initLine()
 	m_p4 = p2 + (double)m_width*0.5*right;
 }
 
-int Line::getWidth()
+int Line::getWidth() const
 {
 	return m_width;
 }

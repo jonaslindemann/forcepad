@@ -26,10 +26,13 @@
 
 #include "Base.h"
 #include "Color.h"
+#include <memory>
+#include <vector>
 
 namespace fp {
 
-IvfSmartPointer(ColorMap);
+class ColorMap;
+using ColorMapPtr = std::shared_ptr<ColorMap>;
 
 class ColorMap : public ivf2d::Base {
 private:

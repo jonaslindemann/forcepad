@@ -24,13 +24,9 @@
 
 #include "Point.h"
 
-#ifdef __APPLE__
-#include <OpenGL/glu.h>
-#include <OpenGL/gl.h>
-#else
-#include <GL/glu.h>
-#include <GL/gl.h>
-#endif
+// No GL calls are made here. The old GL/GLU includes were vestigial and are
+// gone with CommonDefs.h, which used to supply the APIENTRY/WINGDIAPI that
+// <GL/gl.h> needs on Win32.
 
 namespace ivf2d {
 
@@ -51,15 +47,10 @@ void Point::setPosition(double x, double y)
 	m_pos[1] = y;
 }
 
-void Point::getPosition(double &x, double &y)
+void Point::getPosition(double &x, double &y) const
 {
 	x = m_pos[0];
 	y = m_pos[1];
-}
-
-const double* Point::getPosition()
-{
-	return m_pos;
 }
 
 void Point::setPosition(const double *pos)
@@ -68,12 +59,12 @@ void Point::setPosition(const double *pos)
 	m_pos[1] = pos[1];
 }
 
-double Point::x()
+double Point::x() const
 {
 	return m_pos[0];
 }
 
-double Point::y()
+double Point::y() const
 {
 	return m_pos[1];
 }

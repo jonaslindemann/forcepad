@@ -25,10 +25,8 @@
 #include "Vec3d.h"
 
 #include <cmath>
+#include "Constants.h"
 
-#ifndef M_PI
-#define M_PI 3.1415926535897932384626433832795
-#endif
 
 namespace ivf2d {
 
@@ -42,18 +40,6 @@ Vec3d::Vec3d(double vx, double vy, double vz)
 	m_vector[0] = vx;
 	m_vector[1] = vy;
 	m_vector[2] = vz;
-}
-
-Vec3d::Vec3d(const Vec3d& v)
-{
-	m_vector[0] = v.m_vector[0];
-	m_vector[1] = v.m_vector[1];
-	m_vector[2] = v.m_vector[2];
-}
-
-Vec3d::~Vec3d()
-{
-
 }
 
 void Vec3d::setComponents(double vx, double vy, double vz)
@@ -186,8 +172,8 @@ void Vec3d::normalize()
 
 void Vec3d::rotate(Vec3d &axis, double angle)
 {
-	double cost = cos(angle*2*M_PI/360.0);
-	double sint = sin(angle*2*M_PI/360.0);
+	double cost = cos(angle*2*PI/360.0);
+	double sint = sin(angle*2*PI/360.0);
 
 	double rv[3];
 
@@ -211,11 +197,11 @@ void Vec3d::rotate(Vec3d &axis, double angle)
 	m_vector[2] = rv[2];
 }
 
-void Vec3d::getEulerAngles(double &pitch, double &heading)
+void Vec3d::getEulerAngles(double &pitch, double &heading) const
 {
-	heading = atan2(m_vector[0], m_vector[2])*180.0/M_PI;
+	heading = atan2(m_vector[0], m_vector[2])*180.0/PI;
 	double t = sqrt(m_vector[0]*m_vector[0]+m_vector[2]*m_vector[2]);
-	pitch = atan2(m_vector[1], t)*180.0/M_PI;
+	pitch = atan2(m_vector[1], t)*180.0/PI;
 }
 
 void Vec3d::negate()

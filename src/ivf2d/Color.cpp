@@ -59,14 +59,14 @@ void Color::setAlpha(float alpha)
 	m_color[3] = alpha;
 }
 
-void Color::getColor(float *array)
+void Color::getColor(float *array) const
 {
 	array[0] = m_color[0];
 	array[1] = m_color[1];
 	array[2] = m_color[2];
 }
 
-void Color::getColor(float &r, float &g, float &b, float &a)
+void Color::getColor(float &r, float &g, float &b, float &a) const
 {
 	r = m_color[0];
 	g = m_color[1];

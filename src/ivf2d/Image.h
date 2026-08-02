@@ -25,48 +25,65 @@
 #pragma once
 
 #include "Base.h"
-#include "DrawableBase.h" // OpenGL stuff
+#include "DrawableBase.h"
+#include <deque>
+#include <memory>
+#include <vector>
 
 namespace ivf2d {
 
-IvfSmartPointer(Image);
+class Image;
+using ImagePtr = std::shared_ptr<Image>;
 
 /**
  * Image class
  *
- * The image class handles a general 2D color image, which
- * can be used in conjunction with the Texture class.
+ * The image class handles a general 2D color image. It is the CPU-side pixel
+ * buffer that StreamTexture uploads to the GPU.
  */
 class Image : public Base {
 private:
-	int m_layers;
-	int m_currentLayer;
-	int m_size[2];
-	double m_ratio;
-    unsigned char* m_imageMap;
-    unsigned char** m_imageMaps;
-	int m_channels;
-    unsigned char m_currentAlpha;
-    unsigned char m_startColor[3];
-    unsigned char m_fillColor[3];
+	int m_layers{1};
+	int m_currentLayer{0};
+	int m_size[2]{-1, -1};
+	int m_channels{3};
+
+	/**
+	 * Owned pixel storage, one buffer per layer. Empty when m_ownData is false,
+	 * i.e. when setImageMap() has pointed this image at a caller-owned buffer.
+	 */
+	std::vector<std::vector<unsigned char>> m_layerData;
+
+	/**
+	 * Points at the current layer's pixels -- either into m_layerData or at the
+	 * external buffer handed to setImageMap(). Non-owning either way.
+	 */
+	unsigned char* m_imageMap{nullptr};
+
+	unsigned char m_currentAlpha{255};
+	unsigned char m_startColor[3]{};
+	unsigned char m_fillColor[3]{};
 	std::deque<int> m_nextListX;
 	std::deque<int> m_nextListY;
 	std::deque<int> m_processListX;
 	std::deque<int> m_processListY;
-	bool m_ownData;
+	bool m_ownData{true};
 
-	void initLayers();
-	void clearLayers();
-	void destroyLayers();
+	/** Points m_imageMap at layer \c layer of m_layerData, or null if unsized. */
+	void pointAtLayer(int layer);
 public:
-	Image();
-	Image(int nLayers);
-	virtual ~Image();
+	Image() = default;
+	explicit Image(int nLayers);
+	~Image() override = default;
+
+	// Owns heap pixel data through m_layerData; copying was never supported by
+	// the old raw-pointer implementation (it would have double-freed), so the
+	// copy operations stay deleted rather than silently becoming valid.
+	Image(const Image &) = delete;
+	Image &operator=(const Image &) = delete;
 
 	static ImagePtr create() { return std::make_shared<Image>(); }
 	static ImagePtr create(int nLayers) { return std::make_shared<Image>(nLayers); }
-
-	IvfClassInfo("Image",Base);
 
 	// Methods
 
@@ -83,7 +100,7 @@ public:
 	void clear();
 
 	/** Returns true if position (\c x, \c y) is a valid image pixel. */
-	bool valid(int x, int y);
+	bool valid(int x, int y) const;
 
 	/** Sets the pixel at position (\c x, \c y) to a specified color. */
     void setPixel(int x, int y, unsigned char red, unsigned char green, unsigned char blue);
@@ -92,19 +109,18 @@ public:
     void subtractPixel(int x, int y, unsigned char red, unsigned char green, unsigned char blue);
 
 	/** Retrieve pixel color at position (\c x, \c y). */
-    void getPixel(int x, int y, unsigned char &red, unsigned char &green, unsigned char &blue);
+    void getPixel(int x, int y, unsigned char &red, unsigned char &green, unsigned char &blue) const;
 
 	void drawImage(int x, int y, Image* image);
 	void drawImageLine(Image* image, int x1, int y1, int x2, int y2, float* color);
 	void grayscale();
-	int getChannels();
+	int getChannels() const;
     void setImageMap(int width, int height, unsigned char* data, bool ownData);
-	void* getData();
 	void copyFrom(Image* image);
 	void copyFrom(Image* image, int startx, int starty);
 	void copyFrom(Image* image, int startx, int starty, const float* color);
     void setFillColor(unsigned char red, unsigned char green, unsigned char blue);
-	bool validPixel(int x, int y);
+	bool validPixel(int x, int y) const;
 	void floodFill(int x, int y);
 	bool popNextPixel(int &x, int &y);
 	void pushNextPixel(int x, int y);
@@ -116,8 +132,7 @@ public:
     void createAlphaMask(unsigned char min, unsigned char max);
     void createMask(unsigned char comp, unsigned char treshold, unsigned char over, unsigned char under);
     void fillAlpha(unsigned char alpha);
-    void getValue(int x, int y, int channel, unsigned char &value);
-    void createAlphaAll(unsigned char max, unsigned char min);
+    void getValue(int x, int y, int channel, unsigned char &value) const;
     void fillRectAlpha(int x1, int y1, int x2, int y2, unsigned char alpha);
 
 	// Get/set methods
@@ -126,18 +141,15 @@ public:
 	void setSize(int width, int height);
 
 	/** Return height of image in pixels. */
-	int getHeight();
+	int getHeight() const;
 
 	/** Return width of image in pixels. */
-	int getWidth();
-
-	/** Return image ratio width/height. */
-	double getRatio();
+	int getWidth() const;
 
 	void setLayer(int layer);
-	int getLayer();
+	int getLayer() const;
 
-	int getLayerCount();
+	int getLayerCount() const;
 
 	/** 
 	 * Return pointer to image map. 
@@ -147,7 +159,7 @@ public:
     unsigned char* getImageMap();
 
     void setAlpha(unsigned char alpha);
-    unsigned char getAlpha();
+    unsigned char getAlpha() const;
 	void setChannels(int number);
     void setValue(int x, int y, int channel, unsigned char value);
     void addValue(int x, int y, int channel, unsigned char value);

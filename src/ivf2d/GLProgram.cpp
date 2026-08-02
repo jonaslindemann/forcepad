@@ -22,6 +22,7 @@
 #include <vector>
 
 #include "FPLog.h"
+#include <string>
 
 namespace ivf2d {
 

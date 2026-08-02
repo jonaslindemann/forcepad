@@ -1,0 +1,16 @@
+# Change to directory where compile_commands.json is
+compilation_database_dir: .
+# Change to directory where diagram should be written
+output_directory: docs/diagrams
+diagrams:
+  example_class_diagram:
+    type: class
+    glob:
+      - src/*.cpp
+      - src/*/*.cpp
+    include:
+      namespaces:
+        - myproject
+    exclude:
+      namespaces:
+        - myproject::detail

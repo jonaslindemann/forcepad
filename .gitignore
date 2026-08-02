@@ -21,7 +21,17 @@ vcpkg_installed/
 # ...but keep the wasm build/serve helper scripts (tooling referenced by docs)
 !scripts/wasm-build.ps1
 !scripts/wasm-serve.ps1
+# ...and the UML compilation-database helper (used by scripts/gen-uml.cmd)
+!scripts/msvc-db-to-clang.ps1
 /docs/site
+# UML diagrams (scripts/gen-uml.cmd): configure-only CMake tree for the
+# compilation database, the downloaded PlantUML jar, and the .puml
+# intermediates. The rendered .svg/.png are left tracked so they can be used
+# in the docs site.
+/build-uml/
+/tools/plantuml.jar
+/docs/uml/*.puml
+/docs/uml/*.plantuml
 bin/release/qtforcepad
 /bin/release/qtforcepad.app
 bin/.DS_Store

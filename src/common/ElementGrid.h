@@ -28,10 +28,13 @@
 #include "Base.h"
 #include "Node.h"
 #include "ElementGridCell.h"
+#include <memory>
+#include <vector>
 
 namespace fp {
 
-IvfSmartPointer(ElementGrid);
+class ElementGrid;
+using ElementGridPtr = std::shared_ptr<ElementGrid>;
 
 class ElementGrid : public ivf2d::Base {
 private:
@@ -51,8 +54,6 @@ public:
 
 	void setSize(int rows, int cols);
 	void setWidth(double width);
-
-	IvfClassInfo("ElementGrid",ivf2d::Base);
 };
 
 

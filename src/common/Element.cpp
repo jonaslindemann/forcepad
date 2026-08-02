@@ -23,6 +23,7 @@
 //
 
 #include "Element.h"
+#include <memory>
 
 namespace fp {
 

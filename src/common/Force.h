@@ -26,10 +26,12 @@
 #define _Force_h_
 
 #include "Shape.h"
+#include <memory>
 
 namespace fp {
 
-IvfSmartPointer(Force);
+class Force;
+using ForcePtr = std::shared_ptr<Force>;
 
 /**
  * Force class
@@ -61,8 +63,6 @@ public:
 	virtual ~Force ();
 
 	static ForcePtr create() { return std::make_shared<Force>(); }
-
-	IvfClassInfo("Force",ivf2d::Shape);
 
 	// Methods
 

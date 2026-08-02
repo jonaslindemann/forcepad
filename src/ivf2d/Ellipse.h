@@ -25,10 +25,12 @@
 #pragma once
 
 #include "Shape.h"
+#include <memory>
 
 namespace ivf2d {
 
-IvfSmartPointer(Ellipse);
+class Ellipse;
+using EllipsePtr = std::shared_ptr<Ellipse>;
 
 class Ellipse : public Shape {
 private:
@@ -40,9 +42,7 @@ public:
 
 	static EllipsePtr create() { return std::make_shared<Ellipse>(); }
 
-	IvfClassInfo("Ellipse",Shape);
-
-	virtual void doGeometry();
+	void doGeometry() override;
 
 	void setSectors(int sectors);
 	void setSize(int width, int height);

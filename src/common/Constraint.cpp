@@ -26,6 +26,10 @@
 
 #include "Renderer2D.h"
 #include "UiSettings.h"
+#include "Constants.h"
+#include <cmath>
+#include <ostream>
+#include <istream>
 
 using namespace std;
 
@@ -126,7 +130,7 @@ void Constraint::doGeometry()
 		// Filled disc (was GL_POLYGON -> triangle fan).
 		r.color(1.0f, 1.0f, 1.0f, 1.0f);
 		r.beginTriangleFan();
-		for (angle = 0.0; angle<2*M_PI; angle+=2*M_PI/20.0)
+		for (angle = 0.0; angle<2*ivf2d::PI; angle+=2*ivf2d::PI/20.0)
 		{
 			x = ox + (m_vectorRadius-1.0)*cos(angle);
 			y = oy + (m_vectorRadius-1.0)*sin(angle);
@@ -136,7 +140,7 @@ void Constraint::doGeometry()
 
 		this->getColor()->render();
 		r.beginLineLoop(lineWidth);
-		for (angle = 0.0; angle<2*M_PI; angle+=2*M_PI/20.0)
+		for (angle = 0.0; angle<2*ivf2d::PI; angle+=2*ivf2d::PI/20.0)
 		{
 			x = ox + m_vectorRadius*cos(angle);
 			y = oy + m_vectorRadius*sin(angle);
@@ -145,7 +149,7 @@ void Constraint::doGeometry()
 		r.end();
 
 		r.beginLineLoop(lineWidth);
-		for (angle = 2*M_PI/40.0; angle<2*M_PI+2*M_PI/40.0; angle+=2*M_PI/20.0)
+		for (angle = 2*ivf2d::PI/40.0; angle<2*ivf2d::PI+2*ivf2d::PI/40.0; angle+=2*ivf2d::PI/20.0)
 		{
 			x = ox + m_vectorRadius*cos(angle);
 			y = oy + m_vectorRadius*sin(angle);
@@ -166,7 +170,7 @@ void Constraint::doGeometry()
 
 		r.color(1.0f, 1.0f, 1.0f, 1.0f);
 		r.beginTriangleFan();
-		for (angle = 0.0; angle<2*M_PI; angle+=2*M_PI/20.0)
+		for (angle = 0.0; angle<2*ivf2d::PI; angle+=2*ivf2d::PI/20.0)
 		{
 			x = ox + (m_vectorRadius-1.0)*cos(angle);
 			y = oy + (m_vectorRadius-1.0)*sin(angle);
@@ -176,7 +180,7 @@ void Constraint::doGeometry()
 
 		this->getColor()->render();
 		r.beginLineLoop(lineWidth);
-		for (angle = 0.0; angle<2*M_PI; angle+=2*M_PI/20.0)
+		for (angle = 0.0; angle<2*ivf2d::PI; angle+=2*ivf2d::PI/20.0)
 		{
 			x = ox + m_vectorRadius*cos(angle);
 			y = oy + m_vectorRadius*sin(angle);

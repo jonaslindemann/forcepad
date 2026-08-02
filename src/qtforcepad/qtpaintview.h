@@ -9,6 +9,7 @@
 #include <QString>
 
 #include "PaintView.h"
+#include <string>
 
 class InfoOverlay;
 

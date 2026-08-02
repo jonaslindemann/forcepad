@@ -27,10 +27,12 @@
 
 #include "Shape.h"
 #include "ReactionForce.h"
+#include <memory>
 
 namespace fp {
 
-IvfSmartPointer(Constraint);
+class Constraint;
+using ConstraintPtr = std::shared_ptr<Constraint>;
 
 /**
  * Constraint class
@@ -68,8 +70,6 @@ public:
 	virtual ~Constraint ();
 
 	static ConstraintPtr create() { return std::make_shared<Constraint>(); }
-
-	IvfClassInfo("Constraint",ivf2d::Shape);
 
 	// Methods
 

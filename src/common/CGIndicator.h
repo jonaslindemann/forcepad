@@ -26,10 +26,12 @@
 #define _CGIndicator_h_
 
 #include "Shape.h"
+#include <memory>
 
 namespace fp {
 
-IvfSmartPointer(CGIndicator);
+class CGIndicator;
+using CGIndicatorPtr = std::shared_ptr<CGIndicator>;
 
 class CGIndicator : public ivf2d::Shape {
 private:
@@ -51,8 +53,6 @@ public:
 
 	static CGIndicatorPtr create() { return std::make_shared<CGIndicator>(); }
 
-	IvfClassInfo("CGIndicator",ivf2d::Shape);
-
 	void setArrowLength(double length);
 	double getArrowLength();
 
@@ -65,7 +65,7 @@ public:
 	void setArrowSize(double size);
 	double getArrowSize();
 
-	virtual void doGeometry();
+	void doGeometry() override;
 };
 
 

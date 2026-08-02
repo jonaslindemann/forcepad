@@ -27,6 +27,7 @@
 #include <cmath>
 
 #include "Renderer2D.h"
+#include "Constants.h"
 
 namespace ivf2d {
 
@@ -61,7 +62,7 @@ void Ellipse::doGeometry()
 	int x, y;
 	double dr;
 
-	dr = 2.0*M_PI/(double)m_sectors;
+	dr = 2.0*PI/(double)m_sectors;
 
 	Renderer2D &r = Renderer2D::instance();
 	r.beginTriangleFan();

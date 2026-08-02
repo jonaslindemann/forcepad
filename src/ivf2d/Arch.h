@@ -25,13 +25,15 @@
 #pragma once
 
 #include "Shape.h"
-#include "Texture.h"
+#include "Vec2d.h"
 #include "Image.h"
 #include "Ellipse.h"
+#include <memory>
 
 namespace ivf2d {
 
-IvfSmartPointer(Arch);
+class Arch;
+using ArchPtr = std::shared_ptr<Arch>;
 
 /**
  * Rectangle class
@@ -55,20 +57,18 @@ public:
 
 	static ArchPtr create() { return std::make_shared<Arch>(); }
 
-    IvfClassInfo("Arch",Shape);
-
 	/** Set size of rectangle in world coordinates. */
 	void setSize(double width, double height);
 
 	/** Get size of rectangle in world coordinates. */ 
-	void getSize(double &width, double &height);
+	Vec2d getSize() const;
 
 	/** Draw rectangle in OpenGL. */
-	virtual void doGeometry();
+	void doGeometry() override;
 
 	void setLineColor(ColorPtr color);
 	void setLineWidth(double width);
-    double getLineWidth();
+    double getLineWidth() const;
 };
 
 

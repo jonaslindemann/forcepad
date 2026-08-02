@@ -1,8 +1,9 @@
 #pragma once
 
 #include <QMainWindow>
-#include "QtPaintView.h"
+#include "qtpaintview.h"
 #include "../common/FemGridSolver2.h"
+#include <string>
 
 class QAction;
 class QToolBar;
@@ -66,6 +67,7 @@ private Q_SLOTS:
     void editCopy();
     void editCut();
     void editPaste();
+    void editPasteIgnoreWhite(bool checked);
     void runCalculate();
     void runOptimise();
     void stopOptimise();
@@ -189,6 +191,7 @@ private:
     QAction *m_actCopy{nullptr};
     QAction *m_actCut{nullptr};
     QAction *m_actPaste{nullptr};
+    QAction *m_actPasteIgnoreWhite{nullptr};
 
     // Run actions (keyboard shortcuts only — not in a menu)
     QAction *m_actCalculate{nullptr};

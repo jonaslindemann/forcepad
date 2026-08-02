@@ -103,6 +103,14 @@ public:
         VM_STRUCTURE
     };
 
+    /**
+     * Brush selected at startup, as an index into the loaded brush list
+     * (rbrush4/8/16/32/64 -- so 3 is the 32 px brush). The UI reads this to
+     * decide which brush-size button starts out checked, since the brushes
+     * themselves are not loaded until setCommandLine() runs.
+     */
+    static constexpr int DEFAULT_BRUSH_IDX = 3;
+
 protected:
     /*
      *    Command line arguments
@@ -218,6 +226,7 @@ protected:
     ivf2d::RectanglePtr m_selectionBox;
     fp::ForcePadClipboardPtr m_clipboard;
     ivf2d::ClipboardPtr m_undoClipboard;
+    bool m_pasteIgnoreWhite;
 
     ivf2d::ImagePtr m_drawing;
     ivf2d::ImagePtr m_optConstraintImage;
@@ -243,8 +252,6 @@ protected:
     bool m_calcCG;
     double m_relativeForceSize;
     bool m_checkOpenGL;
-
-    void *m_mainFrame;
 
     /*
      *    Misc
@@ -420,6 +427,17 @@ public:
     void undo();
     void cut();
     void copy();
+
+    /**
+     * When true (the default), pure white pixels in the clipboard are treated
+     * as transparent -- both in the paste preview and when the paste is
+     * committed -- so the clipboard acts as a stamp. Turn it off to paste the
+     * rectangle verbatim, which is what you want to punch white holes into a
+     * dark area.
+     */
+    void setPasteIgnoreWhite(bool ignore);
+    bool pasteIgnoreWhite() const;
+
     void lockScaleFactor();
     void unlockScaleFactor();
     void applyElementScale();
@@ -445,7 +463,6 @@ public:
 
     // Child/Parent relationship
 
-    void setMainFrame(void *frame);
     void setCommandLine(int argc, char **argv);
 
     // ExecutablePath

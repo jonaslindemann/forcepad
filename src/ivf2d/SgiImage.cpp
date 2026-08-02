@@ -26,31 +26,20 @@
 
 #include <cstring>
 #include <cstdlib>
+#include <cstdio>
+#include <string>
 
 namespace ivf2d {
 
-SgiImage::SgiImage()
+void SgiImage::setFileName(const std::string &name)
 {
-	m_fileName = nullptr;
-	m_alphaChannel = false;
+	m_fileName = name;
 }
 
-SgiImage::~SgiImage()
-{
-	if (m_fileName!=nullptr)
-		delete [] m_fileName;
-}
-
-void SgiImage::setFileName(const char *name)
-{
-	if (m_fileName!=nullptr)
-		delete [] m_fileName;
-
-	m_fileName = new char[strlen(name)+1];
-	strcpy(m_fileName, name);
-}
-
-void SgiImage::expandrow(unsigned char *optr, unsigned char *iptr, int z)
+// The z (channel offset) argument is vestigial -- the only use was the
+// commented-out `optr += z` below -- but it is kept in the signature to match
+// the original SGI reference implementation this was ported from.
+void SgiImage::expandrow(unsigned char *optr, unsigned char *iptr, int /*z*/)
 {
 	unsigned char pixel, count;
 	
@@ -107,10 +96,10 @@ bool SgiImage::read()
 	// Open file
 	//
 
-	if (this->getFileName()==nullptr)
+	if (this->getFileName().empty())
 		return false;
 
-	inf = fopen(this->getFileName(), "rb");
+	inf = fopen(this->getFileName().c_str(), "rb");
 
 	if (!inf)
 		return false;
@@ -297,7 +286,7 @@ void SgiImage::setAlphaChannel(bool flag)
 	m_alphaChannel = flag;
 }
 
-const char* SgiImage::getFileName()
+const std::string& SgiImage::getFileName() const
 {
 	return m_fileName;
 }

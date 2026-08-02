@@ -1,4 +1,4 @@
-#include "MainWindow.h"
+#include "mainwindow.h"
 #include "../common/FemGrid2.h"
 #include "CalcSettingsDialog.h"
 #include "GeneralSettingsDialog.h"
@@ -46,6 +46,8 @@
 #include <QPlainTextEdit>
 #include <QSplitter>
 #include <QFont>
+#include <memory>
+#include <string>
 
 static QColor stiffnessColorForPercent(int percent)
 {
@@ -458,6 +460,11 @@ void MainWindow::editPaste()
     m_actCut->setEnabled(false);
 }
 
+void MainWindow::editPasteIgnoreWhite(bool checked)
+{
+    m_paintView->setPasteIgnoreWhite(checked);
+}
+
 void MainWindow::runCalculate()
 {
     m_paintView->setViewMode(fp::PaintView::VM_PHYSICS);
@@ -844,6 +851,11 @@ void MainWindow::createActions()
     m_actCut       = new QAction("Cut",       this);  m_actCut->setShortcut(QKeySequence::Cut);
     m_actPaste     = new QAction("Paste",     this);  m_actPaste->setShortcut(QKeySequence::Paste);
     m_actPaste->setEnabled(false);
+    // Off = paste the clipboard rectangle verbatim, so white areas punch holes
+    // into dark material. On = white is transparent and the paste acts as a stamp.
+    m_actPasteIgnoreWhite = new QAction("Ignore White When Pasting", this);
+    m_actPasteIgnoreWhite->setCheckable(true);
+    m_actPasteIgnoreWhite->setChecked(true);
     m_actCalculate = new QAction("Calculate", this);  m_actCalculate->setShortcut(Qt::Key_F5);
     m_actOptimise  = new QAction("Optimise",  this);  m_actOptimise->setShortcut(Qt::Key_F6);
     // Keep Calculate/Optimise actions alive for keyboard shortcuts even without a menu
@@ -868,6 +880,7 @@ void MainWindow::createActions()
     connect(m_actCopy,             &QAction::triggered, this, &MainWindow::editCopy);
     connect(m_actCut,              &QAction::triggered, this, &MainWindow::editCut);
     connect(m_actPaste,            &QAction::triggered, this, &MainWindow::editPaste);
+    connect(m_actPasteIgnoreWhite, &QAction::toggled,   this, &MainWindow::editPasteIgnoreWhite);
     connect(m_actCalculate,        &QAction::triggered, this, &MainWindow::runCalculate);
     connect(m_actOptimise,         &QAction::triggered, this, &MainWindow::runOptimise);
     connect(m_actSettingsCalc,     &QAction::triggered, this, &MainWindow::settingsCalc);
@@ -898,6 +911,8 @@ void MainWindow::createMenus()
     editMenu->addAction(m_actCopy);
     editMenu->addAction(m_actCut);
     editMenu->addAction(m_actPaste);
+    editMenu->addSeparator();
+    editMenu->addAction(m_actPasteIgnoreWhite);
 
     QMenu *settingsMenu = menuBar()->addMenu("Settings");
     settingsMenu->addAction(m_actSettingsCalc);
@@ -1286,7 +1301,10 @@ QWidget* MainWindow::createSketchPropsPanel()
     for (int i = 0; i < 5; i++) {
         auto *btn = new BrushSizeButton(dotRadii[i]);
         brushGroup->addButton(btn);
-        if (i == 0) btn->setChecked(true);
+        // The brushes are not loaded yet (setCommandLine() runs after this
+        // window is constructed), so check the button for the brush the view
+        // will end up selecting rather than querying getCurrentBrushIdx().
+        if (i == fp::PaintView::DEFAULT_BRUSH_IDX) btn->setChecked(true);
         const int idx = i;
         connect(btn, &QToolButton::clicked, this, [this, idx]() {
             m_paintView->setCurrentBrush(idx);

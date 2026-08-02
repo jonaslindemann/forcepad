@@ -27,10 +27,13 @@
 
 #include "Base.h"
 #include "Force.h"
+#include <memory>
+#include <vector>
 
 namespace fp {
 
-IvfSmartPointer(ForceSelection);
+class ForceSelection;
+using ForceSelectionPtr = std::shared_ptr<ForceSelection>;
 
 class ForceSelection : public ivf2d::Base {
 private:
@@ -42,8 +45,6 @@ public:
 	virtual ~ForceSelection();
 
 	static ForceSelectionPtr create() { return std::make_shared<ForceSelection>(); }
-
-	IvfClassInfo("ForceSelection",ivf2d::Base);
 
 	void add(ForcePtr force);
 	void clear();

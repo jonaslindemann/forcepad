@@ -1,0 +1,197 @@
+# clang-uml configuration for ForcePAD.
+#
+#   scripts\gen-uml.cmd                      generate + render everything
+#   scripts\gen-uml.cmd --diagram fem_model  one diagram only
+#   clang-uml --list-diagrams                list the names defined below
+#
+# All paths in this file are relative to the directory holding it (repo root),
+# so clang-uml must be run from the repo root - which gen-uml.cmd does.
+#
+# build-uml is a configure-only CMake tree (Ninja) that exists just to produce
+# compile_commands.json; the Visual Studio generator used for the normal build
+# cannot emit one. gen-uml.cmd creates it.
+#
+# The compilation database comes from the Qt build (BUILD_FLTK_APP=OFF), so
+# USE_QT is defined and the FLTK sources are absent from every diagram below.
+#
+# Controlling whether attributes/methods are shown - two independent stages:
+#
+#   1. What clang-uml writes into the .puml. Member filtering is by access
+#      specifier only, so it applies to fields and methods alike:
+#          exclude:
+#            access: [private]                      # no private members
+#            access: [public, protected, private]   # no members at all
+#      Related: include_relations_also_as_members (default true) - when a
+#      member also produces an association/aggregation edge it is listed in the
+#      class body as well; set it to false to keep only the edge.
+#      generate_method_arguments: none|abbreviated|full trims signatures.
+#
+#   2. What PlantUML renders from a complete .puml. This is the stage where
+#      attributes and methods can be separated:
+#          plantuml:
+#            before:
+#              - "hide attributes"      # fields only
+#              - "hide methods"
+#              - "hide members"         # both
+#              - "hide empty members"
+#              - "hide circle"          # the C/I badge
+#      Per-class forms work too: "hide fp::PaintView attributes", and
+#      "show <class> members" re-exposes one class after a global hide.
+#
+# Stage 1 keeps the .puml small (fp::PaintView alone has a few hundred
+# methods); stage 2 keeps it complete, so visibility can be flipped by editing
+# the .puml or this file without re-parsing the codebase.
+
+compilation_database_dir: build-uml
+output_directory: docs/uml
+
+diagrams:
+
+  # Structure only, no members: the map of the whole codebase.
+  overview:
+    type: class
+    title: ForcePAD - class overview
+    glob:
+      - src/common/*.cpp
+      - src/ivf2d/*.cpp
+      - src/calfem/*.cpp
+      - src/fplog/*.cpp
+      - src/paintview/PaintView.cpp
+      - src/qtforcepad/*.cpp
+    include:
+      namespaces:
+        - fp
+        - ivf2d
+        - calfem
+    exclude:
+      access:
+        - public
+        - protected
+        - private
+      relationships:
+        - dependency
+        - instantiation
+    generate_packages: true
+
+  # The FEM data model: FemGrid2/ImageGrid2 and the entities they own.
+  fem_model:
+    type: class
+    title: ForcePAD - FEM data model (namespace fp)
+    glob:
+      - src/common/*.cpp
+    include:
+      namespaces:
+        - fp
+    exclude:
+      access:
+        - private
+        - public
+      relationships:
+        - dependency
+        - instantiation
+    using_namespace: fp
+    generate_method_arguments: none
+
+  # The solver and the callback interfaces MainWindow implements to follow it.
+  fem_solver:
+    type: class
+    title: ForcePAD - FEM solver and its callback interfaces
+    glob:
+      - src/common/*.cpp
+      - src/qtforcepad/*.cpp
+    include:
+      elements:
+        - fp::FemGridSolver2
+        - fp::FemGrid2
+        - fp::ElementGrid
+        - fp::ElementGridCell
+        - GSStatusMessageEvent
+        - GSLogMessageEvent
+        - GSContinueCalcEvent
+        - MainWindow
+        - ivf2d::Base
+    exclude:
+      access:
+        - private
+        - public
+      relationships:
+        - instantiation
+    generate_method_arguments: none
+
+  # The bridge pattern: framework-agnostic fp::PaintView plus the concrete
+  # widget subclass, and the PV* observer interfaces MainWindow implements.
+  paintview_bridge:
+    type: class
+    title: ForcePAD - PaintView bridge and observer interfaces
+    glob:
+      - src/paintview/PaintView.cpp
+      - src/qtforcepad/*.cpp
+    include:
+      elements:
+        - fp::PaintView
+        - QtPaintView
+        - MainWindow
+      subclasses:
+        - fp::PaintView
+      parents:
+        - QtPaintView
+        - MainWindow
+    exclude:
+      # fp::PaintView alone has a few hundred methods; this diagram is about
+      # which class bridges to which, so members are suppressed throughout.
+      access:
+        - public
+        - protected
+        - private
+      relationships:
+        - dependency
+        - instantiation
+
+  # The 2D drawing primitives and the modern-GL renderer behind them.
+  ivf2d_shapes:
+    type: class
+    title: ForcePAD - ivf2d drawing primitives and renderer
+    glob:
+      - src/ivf2d/*.cpp
+    include:
+      namespaces:
+        - ivf2d
+    exclude:
+      access:
+        - private
+        - public
+      relationships:
+        - dependency
+        - instantiation
+    using_namespace: ivf2d
+    generate_method_arguments: none
+
+  # The Qt6 UI layer. Elements are listed explicitly because these classes
+  # live in the global namespace, mixed in with all of Qt.
+  qt_ui:
+    type: class
+    title: ForcePAD - Qt6 user interface
+    glob:
+      - src/qtforcepad/*.cpp
+    include:
+      elements:
+        - MainWindow
+        - QtPaintView
+        - AboutDialog
+        - CalcSettingsDialog
+        - GeneralSettingsDialog
+        - OptimisationSettingsDialog
+        - QtLogSink
+        - fp::PaintView
+        - QMainWindow
+        - QDialog
+        - QOpenGLWidget
+    exclude:
+      access:
+        - private
+        - public
+        - protected
+      relationships:
+        - dependency
+        - instantiation
+    generate_method_arguments: none

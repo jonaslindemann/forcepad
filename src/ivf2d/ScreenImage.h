@@ -31,7 +31,8 @@
 
 namespace ivf2d {
 
-IvfSmartPointer(ScreenImage);
+class ScreenImage;
+using ScreenImagePtr = std::shared_ptr<ScreenImage>;
 
 // Forward-declared so the modern-GL header (and its Qt include) stays out of
 // ScreenImage.h, which is pulled into framework-agnostic consumers.
@@ -39,7 +40,7 @@ class StreamTexture;
 
 class ScreenImage : public Shape {
 public:
-	enum TRenderMode {
+	enum class TRenderMode {
 		RM_NORMAL,
 		RM_SUBIMAGE,
 		RM_TILED
@@ -60,27 +61,22 @@ public:
 
 	static ScreenImagePtr create() { return std::make_shared<ScreenImage>(); }
 
-	IvfClassInfo("ScreenImage",Shape);
-
 	void reset();
 	void update(int x1, int y1, int x2, int y2);
 
+	// getTiles/getRows/getCols/getRenderMode/getSubImageSize were reference
+	// out-parameter accessors with no callers anywhere; removed rather than
+	// converted to return values.
 	void setTiles(int rows, int cols);
-	void getTiles(int &rows, int &cols);
 
-	int getRows();
-	int getCols();
-
-	TRenderMode getRenderMode();
 	void setRenderMode(TRenderMode mode);
 
 	void setImage(ImagePtr image);
-	void getSubImageSize(int &width, int &height);
 	void setSubImageSize(int width, int height);
 
 	void setDevicePixelRatio(double dpr);
 
-	virtual void doGeometry();
+	void doGeometry() override;
 
 protected:
 	// The image is positioned and drawn entirely by doGeometry() via Renderer2D,

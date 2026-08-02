@@ -48,10 +48,16 @@ public:
 	Vec3d(double vx, double vy, double vz);
 
 	/** Class assignment constructor. */
-	Vec3d(const Vec3d& v);
+	Vec3d(const Vec3d& v) = default;
 
-	/** Class destructor. */
-	virtual ~Vec3d();
+	/**
+	 * Class destructor.
+	 *
+	 * Deliberately non-virtual: nothing derives from Vec3d, and this is a small
+	 * value type. A virtual destructor would add a vtable pointer to what is
+	 * otherwise three doubles and make the type non-trivially-copyable.
+	 */
+	~Vec3d() = default;
 
 	/** 
 	 * Rotate vector around an axis. 
@@ -100,7 +106,7 @@ public:
 	void setComponents(const int* pos);
 
 	/** Calculate euler angles of vector. */
-	void getEulerAngles(double &pitch, double &heading);
+	void getEulerAngles(double &pitch, double &heading) const;
 
 
 	/** Set z-component of vector */

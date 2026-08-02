@@ -34,7 +34,6 @@ Shape::Shape()
 	m_pos[1] = 0.0;
 	m_rotation = 0.0;
 	m_color = nullptr;
-	m_texture = nullptr;
 	m_useRasterPos = false;
 }
 
@@ -48,7 +47,7 @@ void Shape::setPosition(double x, double y)
 	m_pos[1] = y;
 }
 
-void Shape::getPosition(double &x, double &y)
+void Shape::getPosition(double &x, double &y) const
 {
 	x = m_pos[0];
 	y = m_pos[1];
@@ -59,7 +58,7 @@ void Shape::setRotation(double angle)
 	m_rotation = angle;
 }
 
-double Shape::getRotation()
+double Shape::getRotation() const
 {
 	return m_rotation;
 }
@@ -94,19 +93,9 @@ void Shape::setColor(ColorPtr color)
 	m_color = color;
 }
 
-ColorPtr Shape::getColor()
+ColorPtr Shape::getColor() const
 {
 	return m_color;
-}
-
-void Shape::setTexture(TexturePtr texture)
-{
-	m_texture = texture;
-}
-
-Texture* Shape::getTexture()
-{
-	return m_texture.get();
 }
 
 void Shape::setUseRasterPosition(bool flag)
@@ -114,7 +103,7 @@ void Shape::setUseRasterPosition(bool flag)
 	m_useRasterPos = flag;
 }
 
-bool Shape::getUseRasterPosition()
+bool Shape::getUseRasterPosition() const
 {
 	return m_useRasterPos;
 }

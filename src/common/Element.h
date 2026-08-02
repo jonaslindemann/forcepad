@@ -27,10 +27,13 @@
 
 #include "Base.h"
 #include "Node.h"
+#include <memory>
+#include <vector>
 
 namespace fp {
 
-IvfSmartPointer(Element);
+class Element;
+using ElementPtr = std::shared_ptr<Element>;
 
 class Element : public ivf2d::Base {
 private:
@@ -43,8 +46,6 @@ public:
 	virtual ~Element();
 
 	static ElementPtr create() { return std::make_shared<Element>(); }
-
-	IvfClassInfo("Element",ivf2d::Base);
 
 	void setNodes(int number);
 	void setNode(int idx, Node* node);

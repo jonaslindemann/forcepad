@@ -4,19 +4,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-ForcePAD is an educational sketch-based finite element analysis tool. Users draw structural shapes with a brush, place forces and boundary conditions, and run a 2D FEM solver to see stress/displacement results. The primary build is the Qt6 port (`qtforcepad`); the original FLTK build (`forcepad`) is kept but is not the default.
+ForcePAD is an educational sketch-based finite element analysis tool. Users draw structural shapes with a brush, place forces and boundary conditions, and run a 2D FEM solver to see stress/displacement results. The only build is the Qt6 port (`qtforcepad`).
+
+**The legacy FLTK port was retired on 2026-08-01.** The `BUILD_FLTK_APP` option, the `src/forcepad/`, `src/forcepad_r/` and `src/forcepad_kiosk/` trees, all `Fl_*`/`fl_*` sources in `src/common/`, the v1 `FemGrid`/`ImageGrid` classes and `src/common/obsolete/` are gone. Recover from git history if ever needed. Some `#ifndef USE_QT` branches still remain inside `src/paintview/PaintView.cpp` and are scheduled for a dedicated collapse pass; one of them still `#include`s the deleted `MainFrame2.h`, which is harmless because `USE_QT` is always defined now.
 
 ## Build
 
 The project uses CMake with vcpkg for dependency management. vcpkg is auto-detected at `E:/vcpkg`, `C:/vcpkg`, or `$VCPKG_ROOT`.
 
 ```bash
-# Qt6 build (default)
+# Qt6 build (the only build)
 cmake -B build-debug
-cmake --build build-debug --config Debug
-
-# FLTK build (legacy, opt-in)
-cmake -B build-debug -DBUILD_FLTK_APP=ON
 cmake --build build-debug --config Debug
 
 # Force rebuild of a single target (e.g. after CMakeLists changes)
@@ -71,16 +69,36 @@ The `FORCEPAD_VERSION` CMake variable (currently `"2.7"`, set once near the top 
 
 The post-build step in `src/qtforcepad/CMakeLists.txt` copies Qt plugin directories (`platforms/`, `styles/`) and `Qt6Svg(d).dll` next to the executable. If plugins are missing after a build, it usually means the target was already up-to-date and MSBuild skipped it — use `--clean-first` to force the post-build step to re-run.
 
+## UML class diagrams (clang-uml + PlantUML)
+
+`scripts\gen-uml.cmd` generates the class diagrams defined in the root `.clang-uml` into `docs/uml/` and renders them to SVG. `--list` shows the diagram names, `--diagram <name>` generates one, `--no-render` stops after the `.puml` sources, `--fresh` reconfigures, `--fetch-plantuml` downloads `plantuml.jar` into `tools/`.
+
+The non-obvious part is the compilation database. clang-uml parses the real sources with libclang and therefore needs a `compile_commands.json`, but the default Visual Studio generator cannot emit one — `CMAKE_EXPORT_COMPILE_COMMANDS` is a no-op there. The script therefore configures a **separate, configure-only** tree `build-uml/` with `-G Ninja`, purely to produce the database; nothing is compiled. It reuses `build-debug/vcpkg_installed` (via `VCPKG_INSTALLED_DIR` + `VCPKG_MANIFEST_INSTALL=OFF`) so Qt/Eigen/spdlog are not installed a second time, and calls `vcvars64.bat` when `VCINSTALLDIR` is unset, which puts `cl.exe` and VS's bundled ninja on `PATH` and — importantly — sets `INCLUDE`, which is how clang finds the MSVC and Windows SDK headers.
+
+That last point matters because the installed clang-uml (0.6.1, `C:\Program Files\clang-uml`) ships **only** `bin\clang-uml.exe` — there is no `lib\clang\<ver>\include` resource directory, so clang's builtin headers have to come from MSVC's own copies.
+
+The database is generated with **`cl.exe`** by default, since clang-uml 0.6.1's changelog lists "Fixed MSVC compilation flags" and that avoids requiring a second toolchain. If that turns out not to cover this project, there are two fallbacks, in order of cost:
+
+- `--rewrite-db` runs `scripts/msvc-db-to-clang.ps1`, which replaces each entry's compiler token with `clang-cl.exe --driver-mode=cl` and strips `/showIncludes`. **No clang-cl binary needs to exist** — clang derives its flag dialect from argv[0] of the command, and the tooling never executes the compiler, so the name alone is enough to stop `/`-style flags from being parsed as GCC-style ones. The script is idempotent and writes BOM-less UTF-8 (clang's JSON parser rejects a BOM).
+- `--clang-cl` configures with clang-cl as `CMAKE_CXX_COMPILER` instead. This machine has no clang-cl: VS 2022 Community ships only `clang-format`/`clang-tidy` under `VC\Tools\Llvm`, VS 18 Community has no `Llvm` directory at all, and there is no `C:\Program Files\LLVM`. It needs the VS component "C++ Clang tools for Windows" or a standalone LLVM install.
+
+Nothing in the project uses AUTOUIC-generated `ui_*.h` or `#include "*.moc"`, so configuring without building is sufficient — there are no generated headers the parse would miss.
+
+For rendering, the script prefers `PLANTUML_JAR`, then a `plantuml` launcher on `PATH`, then the Microsoft Store package **WinPlantUml** (`50760EliasAE.PlantUml`), which is what this machine has. That package is self-contained — `Java\plantuml.jar` plus a private JRE at `Java\jre\x64\bin\java.exe` and its own Graphviz at `Graphviz\bin\dot.exe` — so no separate Java install is needed. Its install path embeds the package version and `C:\Program Files\WindowsApps` cannot be enumerated by a normal user (a known full path *inside* it reads fine), so the script asks `Get-AppxPackage` for `InstallLocation` instead of globbing. Its `WinPlantUml.exe` is a GUI and registers no command-line alias, so it is not used.
+
+`USE_QT` is defined in every diagram. The FLTK sources that used to be filtered out of the database no longer exist at all.
+
+Diagrams are filtered by namespace (`fp`, `ivf2d`, `calfem`) where that works, and by explicit `include: elements:` lists for the Qt UI classes, which live in the global namespace mixed in with all of Qt. `overview` and `paintview_bridge` suppress members entirely (`exclude: access: [public, protected, private]`) — `fp::PaintView` alone has a few hundred methods and drowns out the structure otherwise.
+
 ## Architecture
 
-### Two parallel UI targets
+### The single UI target
 
 | Target | Directory | UI framework | Preprocessor |
 |---|---|---|---|
-| `forcepad` | `src/forcepad/` | FLTK + OpenGL | *(none)* |
 | `qtforcepad` | `src/qtforcepad/` | Qt6 + QOpenGLWidget | `USE_QT`, `QT_NO_KEYWORDS` |
 
-Both targets share the same static libraries: `common`, `ivf2d`, `calfem`, `fplog`.
+It links the static libraries `common`, `ivf2d`, `calfem`, `fplog`. `USE_QT` is now unconditionally defined, so any surviving `#ifndef USE_QT` branch is dead code.
 
 ### The `fp::PaintView` bridge pattern
 
@@ -94,44 +112,37 @@ virtual bool doNewModel(int &w, int &h, int &initialStiffness);
 // etc.
 ```
 
-Each UI port provides a concrete subclass that inherits from both a framework widget and `fp::PaintView`:
+The UI port provides a concrete subclass inheriting from both a framework widget and `fp::PaintView`:
 
-- **FLTK**: `FlPaintView : public Fl_Gl_Window, public fp::PaintView` (`src/forcepad/FlPaintView.h/cpp`)
 - **Qt6**: `QtPaintView : public QOpenGLWidget, public fp::PaintView` (`src/qtforcepad/QtPaintView.h/cpp`)
 
-When adding UI-specific behaviour to `PaintView.cpp`, guard it with `#ifndef USE_QT` / `#else`.
+The bridge pattern is retained (it is what keeps `PaintView` portable to the wasm target), but with FLTK gone there is only one implementation, so new UI-specific behaviour goes straight into `QtPaintView` — no `#ifndef USE_QT` guard is needed.
 
 ### Shared library: `common`
 
 Contains the FEM data model and purely algorithmic code: `FemGrid2`, `Node`, `Element`, `Force`, `Constraint`, `ColorMap`, `ImageGrid2`, `ForcePadClipboard`, etc.
 
-**Important**: `FemGridSolver2.cpp` is excluded from the `common` library glob and compiled directly into each executable target. This is because it has framework-specific dependencies (`Fl::check()`/`QCoreApplication::processEvents()`) that differ between the FLTK and Qt builds. Do not add it back to the glob.
+**Important**: `FemGridSolver2.cpp` is excluded from the `common` library glob and compiled directly into the executable target, because it calls `QCoreApplication::processEvents()` and so needs the UI framework. (Before the FLTK retirement this was an `#ifndef USE_QT` fork against `Fl::check()`; only the Qt branch remains.) Do not add it back to the glob.
 
-`LogWindow.cpp` and other `Fl_*` files in `src/common/` are FLTK-specific and get pulled into `commond.lib`. They are harmless for the Qt build only so long as `FemGridSolver2.cpp` is excluded from `common` (otherwise `FemGridSolver2.obj` would reference `LogWindow` and pull in FLTK symbols at Qt link time).
+All `Fl_*`/`fl_*` sources, `LogWindow`, `NewModelDlg`, the v1 `FemGrid`/`ImageGrid` and `src/common/obsolete/` were deleted with the FLTK retirement, so `common` no longer carries any FLTK code.
 
 ### FEM solver
 
-`fp::FemGridSolver2` (`src/common/FemGridSolver2.h/cpp`) assembles and solves the 2D plane-stress FEM problem using `calfem` (CALFEM C++ port) and Eigen for matrix algebra. It also runs topology optimisation (Sigmund filter). It is compiled separately into each executable because of the `Fl::check()` / `QCoreApplication::processEvents()` difference.
-
-### FLTK dialogs
-
-All FLTK dialogs in `src/forcepad/` are generated by FLUID (Fast Light User Interface Designer) from `.fl` source files. **Edit the `.fl` file, not the generated `.h/.cpp`**. The generated pair has the same base name.
+`fp::FemGridSolver2` (`src/common/FemGridSolver2.h/cpp`) assembles and solves the 2D plane-stress FEM problem using `calfem` (CALFEM C++ port) and Eigen for matrix algebra. It also runs topology optimisation (Sigmund filter). It is compiled separately into the executable because it calls `QCoreApplication::processEvents()`.
 
 ### Logging: `fplog` library
 
-`src/fplog/` is a thin spdlog wrapper that works in both the FLTK and Qt builds.
+`src/fplog/` is a thin spdlog wrapper.
 
 - **`FPLog.h`** exposes `fp_debug/fp_info/fp_warn/fp_error(ctx, fmt, ...)` macros (fmt-style) and a `FPLog::init()` function that wires up sinks.
 - **`FPLog.cpp`** sets up a console sink by default; callers can pass additional sinks (e.g. a Qt widget sink) to `FPLog::init()`.
-- **`so_print` compatibility**: `FPLog.h` defines `so_print(ctx, msg)` as `spdlog::info(...)` so legacy calls compile in both builds, but only when `LogWindow.h` hasn't already defined it. Include `FPLog.h` instead of `LogWindow.h` in any file shared between FLTK and Qt.
+- **`so_print` compatibility**: `FPLog.h` defines `so_print(ctx, msg)` as `spdlog::info(...)` so legacy calls still compile. The `LogWindow.h` that used to compete for that name is gone.
 
 **Qt log sink** (`src/qtforcepad/QtLogSink.h`): a `spdlog::sinks::base_sink` subclass that appends colour-coded messages to a `QPlainTextEdit` via `QMetaObject::invokeMethod(..., Qt::QueuedConnection)`, making it safe to call from the solver thread. It is instantiated in `MainWindow` and passed to `FPLog::init()` at startup.
 
-**Old pattern** (still present in `src/common/LogWindow.h` for the FLTK build): `so_print(context, message)` routes to an FLTK log window. Do not include `LogWindow.h` in files compiled into the Qt build without a `#ifndef USE_QT` guard.
-
 ### FEM solver logging
 
-`FemGridSolver2.cpp` now includes `FPLog.h` and uses `fp_debug/fp_info/fp_warn` throughout instead of bare `so_print`. It also has a local `#define NOMINMAX` before `<windows.h>` on WIN32 to guard against the `min`/`max` macro conflict independently of the global CMake definition.
+`FemGridSolver2.cpp` includes `FPLog.h` and uses `fp_debug/fp_info/fp_warn` throughout instead of bare `so_print`. It also has a local `#define NOMINMAX` before `<windows.h>` on WIN32 to guard against the `min`/`max` macro conflict independently of the global CMake definition — now wrapped in `#ifndef NOMINMAX`, since the unguarded define collided with the global `-DNOMINMAX` and warned (C4005).
 
 ### OpenMP and Eigen
 
