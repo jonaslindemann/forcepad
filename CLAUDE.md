@@ -69,6 +69,46 @@ The `FORCEPAD_VERSION` CMake variable (currently `"2.7"`, set once near the top 
 
 The post-build step in `src/qtforcepad/CMakeLists.txt` copies Qt plugin directories (`platforms/`, `styles/`) and `Qt6Svg(d).dll` next to the executable. If plugins are missing after a build, it usually means the target was already up-to-date and MSBuild skipped it — use `--clean-first` to force the post-build step to re-run.
 
+### Windows: MSIX packaging (`FORCEPAD_WINDOWS_DISTRIBUTION`)
+
+`src/qtforcepad/CMakeLists.txt` has a cache option `FORCEPAD_WINDOWS_DISTRIBUTION` (`dev` | `store` | `sideload`, default `dev`) that selects the MSIX signing path, deliberately parallel to the macOS `FORCEPAD_MACOS_DISTRIBUTION` block. It adds a `qtforcepad_msix` target (not part of ALL — `makeappx` shouldn't run on every incremental build):
+
+```bash
+cmake --build build-release --config Release --target qtforcepad_msix
+```
+
+Output lands in `build-release/msix/<config>/ForcePAD2-<version>.msix`.
+
+**The key economics: a Microsoft Store submission needs no purchased code signing certificate.** You upload an *unsigned* `.msix` and Store ingestion re-signs it with Microsoft's own certificate. Signing here is only for installing the package locally to test it, or for handing it out directly outside the Store. The only unavoidable cost is the one-time Partner Center registration fee.
+
+The app's Partner Center identity is already baked in as the `FORCEPAD_MSIX_*` defaults — all three are checked at ingestion and any mismatch rejects the upload. They are not secrets; the same values are readable in any published package:
+
+| Field | Value |
+|---|---|
+| `Package/Identity/Name` | `17491JonasLindemann.ForcePAD` |
+| `Package/Identity/Publisher` | `CN=5736CE36-A1C5-4931-83A8-5F229116A2A6` |
+| `Package/Properties/PublisherDisplayName` | `Jonas Lindemann` |
+| Store listing | <https://apps.microsoft.com/detail/9WZDNCRDX1MP> |
+| Package Family Name | `17491JonasLindemann.ForcePAD_rg3wn24t07nt8` |
+
+- **`dev`** (default): signs with a self-signed certificate that `scripts/msix-devcert.ps1` creates on demand into `build-*/msix/forcepad-dev.pfx` (target `qtforcepad_msix_devcert`, run automatically as a dependency). The certificate *subject* must equal the manifest `Publisher` exactly or the install fails with `0x800B0100`, which is why both come from `FORCEPAD_MSIX_PUBLISHER` — the dev certificate is issued to the real Partner Center publisher CN, not a separate development subject. The script's fast path therefore checks the existing `.pfx`'s *subject*, not just that the file exists: a stale certificate left over from a changed `FORCEPAD_MSIX_PUBLISHER` signs fine and then fails to install with no hint as to why. Its import into `Cert:\LocalMachine\TrustedPeople` needs elevation, so on a normal shell it warns and prints the exact elevated command instead of failing — until that runs, `signtool verify /pa` reports "terminated in a root certificate which is not trusted" and `Add-AppxPackage` refuses the package. That is the expected state, not a packaging bug. `qtforcepad_msix_install` wraps `Add-AppxPackage -ForceUpdateFromAnyVersion` for the local test loop.
+- **`store`**: leaves the package unsigned, ready for Partner Center upload. Configure *warns* (doesn't fail) if `FORCEPAD_MSIX_PUBLISHER` is not a Partner Center publisher CN — i.e. `CN=` followed by a bare GUID.
+- **`sideload`**: signs with a real certificate — `FORCEPAD_MSIX_CERT` (+ `FORCEPAD_MSIX_CERT_PASSWORD`) for a `.pfx`, or `FORCEPAD_MSIX_CERT_THUMBPRINT` for an installed/hardware-token certificate that can't be exported. The latter is the path for the same certificate `install/win32/forcepad2.iss` uses via `SignTool=signtool_lu`.
+
+Non-obvious parts:
+
+- **The VC++ redistributable has to travel app-local.** An MSIX package has no equivalent of the installer's `[Run]` section, so the `VC_redist.x64.exe` step in `forcepad2.iss` simply has no counterpart. `cmake/MsixStage.cmake` copies `msvcp140*.dll` / `vcruntime140*.dll` / `concrt140.dll` into the package instead, located via `InstallRequiredSystemLibraries` (included with `CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP` so it doesn't also generate install rules). A static CRT is not an alternative — vcpkg's Qt is built against the dynamic one.
+- **The `.fp2` file association moves into the manifest.** A packaged app cannot write the `HKCR` keys the `[Registry]` block of `forcepad2.iss` writes; the `uap:FileTypeAssociation` extension in `AppxManifest.xml.in` replaces them.
+- **Staging is a separate `cmake -P` script** (`cmake/MsixStage.cmake`) rather than a chain of `cmake -E copy` commands, because the DLL set must be globbed at *build* time — vcpkg's `applocal.ps1` deposits the Qt/ICU/OpenSSL DLLs as a post-build step, so a configure-time glob is empty on a fresh tree. It stages into a fresh directory rather than packing `bin/release` directly, since that tree also holds `forcepad.exe`, `kiosk/`, `test.fp2` and `forcepad_kiosk_auto_restart.cmd`. It also excludes `*.pdb` from the copied plugin directories — vcpkg ships debug symbols next to the Qt plugin DLLs, and they were 39 MB of a 43 MB package before that filter.
+- **The manifest is generated in two passes.** `configure_file()` expands the `@VAR@` placeholders, then `file(GENERATE)` resolves `TARGET_FILE_NAME` so Debug packages reference `qtforcepadd.exe` (`DEBUG_POSTFIX`). Watch out when editing `AppxManifest.xml.in`: `file(GENERATE)` scans the **whole file** for generator expressions, XML comments included, so a literal `$` followed by `<` anywhere in it is a configure-time error.
+- **The Store rejects a non-zero fourth version component**, and requires all four. `FORCEPAD_MSIX_VERSION` is derived from `FORCEPAD_VERSION` with the revision pinned to `0`.
+- **WACK's "Blocked executables" failure is a known false positive here and can be ignored.** It lands in the report's "Results for optional tests" section, which is explicitly informational and not used during Store onboarding. It flags `CreateProcessW`/`ShellExecuteW` imports in `Qt6Core.dll` and the Qt platform plugins, plus literal substrings `"reg"`, `"cmd"` and `"CSI"` found inside `icudt78.dll`, `icuin78.dll`, `libcrypto-3-x64.dll` and `Qt6Gui.dll` — the ICU ones are hits in compiled locale data, not code. The check only governs behaviour on Windows 10 S. The report's own guidance covers this: "If the flagged files are part of your application, you may ignore the warning."
+- `makepri` builds a `resources.pri` so the `scale-*` tile variants in `images/forcepad_winstore_new/` are actually indexed; without it only the unqualified filenames the manifest names are ever used. It's optional — the package is valid and Store-acceptable without it — and the step is skipped if `makepri.exe` isn't found.
+- `FORCEPAD_VERSION` (currently `"2.7"`) moved from inside the `APPLE` block to the top of `src/qtforcepad/CMakeLists.txt` so it drives the macOS bundle versions/`.dmg`/`.pkg` names *and* the MSIX package version/filename. `install/win32/forcepad2.iss` still carries its own copy — Inno Setup isn't driven through CMake.
+- **`src/qtforcepad/qtforcepad.manifest` exists only to satisfy the certification kit's High-DPI check.** Qt 6 already makes the process per-monitor-v2 DPI aware at runtime, but that call lives in Qt6Gui / the qwindows plugin, and WACK inspects the *executable* for either a `PerMonitorV2` manifest entry or a direct import of `SetProcessDpiAwarenessContext`. Without the manifest it reports "The app ... is not DPI Aware". CMake passes `.manifest` sources to the MSVC linker as `/MANIFESTINPUT`, so it is merged into the default generated manifest (which keeps its `asInvoker` trustInfo) rather than replacing it — verify with `mt.exe -inputresource:qtforcepad.exe;#1 -out:...` if it ever seems to go missing.
+- **Overriding the identity vars on a PowerShell command line silently truncates them.** `cmake -B build-release -DFORCEPAD_MSIX_IDENTITY_NAME=17491JonasLindemann.ForcePAD` lands in the cache as `17491JonasLindemann` — everything from the `.` onward is lost, and the only symptom is a wrong `Name=` in the generated manifest and a Partner Center rejection much later. Quote the whole argument (`"-DFORCEPAD_MSIX_IDENTITY_NAME=..."`), or better, rely on the defaults in `CMakeLists.txt` and use `cmake -B build-release -U FORCEPAD_MSIX_IDENTITY_NAME` to drop a stale cache entry.
+- **`.gitignore` has blanket `*.ps1` and `*.in` rules** with `!` exceptions listed per file. `scripts/msix-devcert.ps1` and `src/qtforcepad/AppxManifest.xml.in` needed exceptions added; anything new of those types will silently fail to be tracked otherwise. (Note `src/qtforcepad/Info.plist.in`, referenced by `MACOSX_BUNDLE_INFO_PLIST`, has no exception and is not in the repo at all — a fresh clone has no such file.)
+
 ## UML class diagrams (clang-uml + PlantUML)
 
 `scripts\gen-uml.cmd` generates the class diagrams defined in the root `.clang-uml` into `docs/uml/` and renders them to SVG. `--list` shows the diagram names, `--diagram <name>` generates one, `--no-render` stops after the `.puml` sources, `--fresh` reconfigures, `--fetch-plantuml` downloads `plantuml.jar` into `tools/`.

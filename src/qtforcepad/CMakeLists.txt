@@ -2,6 +2,13 @@ include_directories(../paintview ../common ../ivf2d ../calfem ../defs ../fplog)
 
 add_definitions(-DQT_NO_KEYWORDS -DUSE_QT)
 
+# Single source of truth for the shipped version number. Drives the macOS
+# bundle version strings and .dmg/.pkg filenames, and the Windows MSIX
+# package version and .msix filename. Bump here, nowhere else.
+# (install/win32/forcepad2.iss still carries its own copy for the Inno Setup
+# installer, which is not built through CMake.)
+set(FORCEPAD_VERSION "2.7")
+
 set(SOURCES
     main.cpp
     MainWindow.cpp
@@ -17,6 +24,13 @@ set(SOURCES
 
 if(WIN32)
     list(APPEND SOURCES app.rc)
+    # CMake passes .manifest sources to the MSVC linker as /MANIFESTINPUT, so
+    # this is merged into the default generated manifest rather than replacing
+    # it. Declares DPI awareness statically - see the comment in the file for
+    # why Qt's own runtime call is not enough for the certification kit.
+    if(MSVC)
+        list(APPEND SOURCES qtforcepad.manifest)
+    endif()
 endif()
 
 if(APPLE)
@@ -64,8 +78,6 @@ if(APPLE)
         "-framework Foundation"
         "-framework UniformTypeIdentifiers"
     )
-
-    set(FORCEPAD_VERSION "2.7")
 
     set_target_properties(qtforcepad PROPERTIES
         MACOSX_BUNDLE               TRUE
@@ -434,5 +446,261 @@ if(APPLE)
                              "Installer' identity found; qtforcepad_pkg will fail to sign until one is "
                              "installed in the keychain.")
         endif()
+    endif()
+endif()
+
+if(WIN32)
+    # ------------------------------------------------------------------
+    # MSIX packaging (Microsoft Store / sideloading)
+    # ------------------------------------------------------------------
+    # Deliberately parallel to the macOS FORCEPAD_MACOS_DISTRIBUTION block
+    # above: one cache switch selects the whole signing/packaging path, and
+    # the packaging itself lives in targets that are NOT part of ALL, because
+    # nobody wants makeappx running on every incremental build.
+    #
+    #   cmake --build build-release --config Release --target qtforcepad_msix
+    #
+    # The key economics: a Store submission does not need a purchased code
+    # signing certificate. You upload an unsigned .msix and Store ingestion
+    # re-signs it with Microsoft's certificate. Signing here is only for
+    # testing the package locally, or for handing it out directly.
+    #
+    #   dev       - sign with a self-signed certificate created on demand by
+    #               scripts/msix-devcert.ps1, so the package can actually be
+    #               installed on this machine for testing.
+    #   store     - leave the package unsigned, ready to upload to Partner
+    #               Center. Identity/Publisher must match the reservation
+    #               there or ingestion rejects it.
+    #   sideload  - sign with a real certificate (FORCEPAD_MSIX_CERT or
+    #               FORCEPAD_MSIX_CERT_THUMBPRINT), e.g. the same one
+    #               forcepad2.iss uses via SignTool=signtool_lu, for direct
+    #               distribution outside the Store.
+    set(FORCEPAD_WINDOWS_DISTRIBUTION "dev" CACHE STRING
+        "Windows MSIX signing channel: dev (self-signed, local testing), store (unsigned, for Partner Center), or sideload (real certificate)")
+    set_property(CACHE FORCEPAD_WINDOWS_DISTRIBUTION PROPERTY STRINGS dev store sideload)
+
+    # Verbatim from this app's Partner Center "Product identity" page. All
+    # three are checked at ingestion and a mismatch in any of them rejects the
+    # upload, so they are defaults here rather than something to remember to
+    # pass on the command line. They are not secrets - the same values are
+    # readable in any published package.
+    #   Store listing: https://apps.microsoft.com/detail/9WZDNCRDX1MP
+    #   Package Family Name: 17491JonasLindemann.ForcePAD_rg3wn24t07nt8
+    set(FORCEPAD_MSIX_IDENTITY_NAME "17491JonasLindemann.ForcePAD" CACHE STRING
+        "MSIX Identity/Name. Must match the name reserved in Partner Center.")
+    set(FORCEPAD_MSIX_PUBLISHER "CN=5736CE36-A1C5-4931-83A8-5F229116A2A6" CACHE STRING
+        "MSIX Identity/Publisher. Must match the CN=... string Partner Center assigns; also used as the dev channel's self-signed certificate subject.")
+    set(FORCEPAD_MSIX_PUBLISHER_DISPLAY_NAME "Jonas Lindemann" CACHE STRING
+        "MSIX PublisherDisplayName - must match the Partner Center account's publisher display name.")
+
+    set(FORCEPAD_MSIX_CERT "" CACHE FILEPATH
+        "sideload channel: .pfx code signing certificate passed to signtool /f.")
+    set(FORCEPAD_MSIX_CERT_PASSWORD "" CACHE STRING
+        "Password for FORCEPAD_MSIX_CERT, if it has one (signtool /p).")
+    set(FORCEPAD_MSIX_CERT_THUMBPRINT "" CACHE STRING
+        "sideload channel: SHA1 thumbprint of an installed certificate (signtool /sha1). Use this instead of FORCEPAD_MSIX_CERT for hardware-token certificates, which cannot be exported to a .pfx.")
+
+    message(STATUS "qtforcepad Windows distribution channel: ${FORCEPAD_WINDOWS_DISTRIBUTION}")
+
+    # The Store rejects packages whose fourth version component is non-zero,
+    # and requires all four to be present - so derive Major.Minor.Build.0 from
+    # the two-component FORCEPAD_VERSION rather than maintaining it twice.
+    string(REPLACE "." ";" _fp_version_parts "${FORCEPAD_VERSION}")
+    list(APPEND _fp_version_parts 0 0 0)
+    list(GET _fp_version_parts 0 _fp_version_major)
+    list(GET _fp_version_parts 1 _fp_version_minor)
+    list(GET _fp_version_parts 2 _fp_version_build)
+    set(FORCEPAD_MSIX_VERSION "${_fp_version_major}.${_fp_version_minor}.${_fp_version_build}.0")
+
+    # makeappx/signtool/makepri live in a version-stamped Windows SDK bin
+    # directory. Sort descending so the newest installed SDK wins - the
+    # 10.0.x.0 names compare correctly lexicographically at the width they use.
+    set(_fp_winsdk_hints)
+    foreach(_fp_winsdk_root
+            "$ENV{WindowsSdkDir}bin"
+            "C:/Program Files (x86)/Windows Kits/10/bin"
+            "C:/Program Files/Windows Kits/10/bin")
+        file(GLOB _fp_winsdk_versions "${_fp_winsdk_root}/*/x64")
+        list(APPEND _fp_winsdk_hints ${_fp_winsdk_versions})
+    endforeach()
+    list(SORT _fp_winsdk_hints)
+    list(REVERSE _fp_winsdk_hints)
+
+    find_program(FORCEPAD_MAKEAPPX makeappx HINTS ${_fp_winsdk_hints})
+    find_program(FORCEPAD_SIGNTOOL signtool HINTS ${_fp_winsdk_hints})
+    find_program(FORCEPAD_MAKEPRI  makepri  HINTS ${_fp_winsdk_hints})
+    find_program(FORCEPAD_POWERSHELL NAMES pwsh powershell)
+
+    if(NOT FORCEPAD_MAKEAPPX)
+        message(STATUS "qtforcepad: makeappx.exe not found - the qtforcepad_msix target "
+                       "will not be created. Install the Windows 10/11 SDK, or set "
+                       "FORCEPAD_MAKEAPPX manually.")
+    else()
+        # Full paths to msvcp140.dll / vcruntime140*.dll, so they can be
+        # staged app-local. An MSIX package has no [Run] section, so the
+        # installer's VC_redist.x64.exe step has no equivalent - see
+        # cmake/MsixStage.cmake.
+        set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
+        include(InstallRequiredSystemLibraries)
+        set(_fp_vcrt_dir "")
+        if(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
+            list(GET CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS 0 _fp_vcrt_first)
+            get_filename_component(_fp_vcrt_dir "${_fp_vcrt_first}" DIRECTORY)
+            message(STATUS "qtforcepad MSIX: staging VC++ runtime from ${_fp_vcrt_dir}")
+        else()
+            message(WARNING "qtforcepad MSIX: could not locate the VC++ redistributable DLLs; "
+                            "the package will require the redistributable to be pre-installed.")
+        endif()
+
+        # Two-step generation: configure_file() expands the @VAR@ placeholders,
+        # then file(GENERATE) resolves $<TARGET_FILE_NAME:qtforcepad> - which
+        # configure_file cannot do - so Debug packages correctly reference
+        # qtforcepadd.exe (DEBUG_POSTFIX).
+        configure_file(
+            "${CMAKE_CURRENT_SOURCE_DIR}/AppxManifest.xml.in"
+            "${CMAKE_CURRENT_BINARY_DIR}/AppxManifest.xml.configured"
+            @ONLY
+        )
+        set(_fp_msix_manifest "${CMAKE_CURRENT_BINARY_DIR}/msix/$<CONFIG>/AppxManifest.xml")
+        file(GENERATE
+            OUTPUT "${_fp_msix_manifest}"
+            INPUT  "${CMAKE_CURRENT_BINARY_DIR}/AppxManifest.xml.configured"
+        )
+
+        set(_fp_msix_dir   "${CMAKE_BINARY_DIR}/msix/$<CONFIG>")
+        set(_fp_msix_stage "${_fp_msix_dir}/stage")
+        set(_fp_msix_out   "${_fp_msix_dir}/ForcePAD2-${FORCEPAD_MSIX_VERSION}.msix")
+
+        # Certificate handling per channel. Built as a command list here so the
+        # target below can simply omit it when empty (the store channel).
+        set(_fp_msix_sign_command "")
+        set(_fp_msix_devcert_target "")
+
+        if(FORCEPAD_WINDOWS_DISTRIBUTION STREQUAL "store")
+            # Partner Center always assigns a bare GUID as the publisher CN.
+            # Anything else means the value was overridden with a development
+            # subject, which ingestion rejects - catch it before the upload.
+            if(NOT FORCEPAD_MSIX_PUBLISHER MATCHES
+               "^CN=[0-9A-Fa-f]+-[0-9A-Fa-f]+-[0-9A-Fa-f]+-[0-9A-Fa-f]+-[0-9A-Fa-f]+$")
+                message(WARNING
+                    "FORCEPAD_WINDOWS_DISTRIBUTION=store but FORCEPAD_MSIX_PUBLISHER "
+                    "(${FORCEPAD_MSIX_PUBLISHER}) is not a Partner Center publisher CN. "
+                    "Partner Center will reject the upload: use the Package/Identity/Publisher "
+                    "value from the app's Product identity page.")
+            endif()
+        elseif(NOT FORCEPAD_SIGNTOOL)
+            message(WARNING "FORCEPAD_WINDOWS_DISTRIBUTION=${FORCEPAD_WINDOWS_DISTRIBUTION} requires "
+                            "signtool.exe, which was not found; the package will be produced unsigned.")
+        elseif(FORCEPAD_WINDOWS_DISTRIBUTION STREQUAL "sideload")
+            if(FORCEPAD_MSIX_CERT_THUMBPRINT)
+                set(_fp_msix_sign_command "${FORCEPAD_SIGNTOOL}" sign /fd SHA256
+                    /sha1 "${FORCEPAD_MSIX_CERT_THUMBPRINT}" "${_fp_msix_out}")
+            elseif(FORCEPAD_MSIX_CERT)
+                set(_fp_msix_sign_command "${FORCEPAD_SIGNTOOL}" sign /fd SHA256
+                    /f "${FORCEPAD_MSIX_CERT}")
+                if(FORCEPAD_MSIX_CERT_PASSWORD)
+                    list(APPEND _fp_msix_sign_command /p "${FORCEPAD_MSIX_CERT_PASSWORD}")
+                endif()
+                list(APPEND _fp_msix_sign_command "${_fp_msix_out}")
+            else()
+                message(WARNING "FORCEPAD_WINDOWS_DISTRIBUTION=sideload but neither "
+                                "FORCEPAD_MSIX_CERT nor FORCEPAD_MSIX_CERT_THUMBPRINT is set; "
+                                "the package will be produced unsigned.")
+            endif()
+        else()
+            # dev: create the self-signed certificate on demand. Its subject
+            # has to equal the manifest Publisher or the install is refused
+            # with 0x800B0100.
+            if(NOT FORCEPAD_POWERSHELL)
+                message(WARNING "dev channel: no PowerShell found; cannot create a development "
+                                "certificate, so the package will be produced unsigned.")
+            else()
+                set(_fp_msix_devcert "${CMAKE_BINARY_DIR}/msix/forcepad-dev.pfx")
+                add_custom_target(qtforcepad_msix_devcert
+                    COMMAND "${FORCEPAD_POWERSHELL}" -NoProfile -ExecutionPolicy Bypass
+                        -File "${CMAKE_SOURCE_DIR}/scripts/msix-devcert.ps1"
+                        -Subject "${FORCEPAD_MSIX_PUBLISHER}"
+                        -PfxPath "${_fp_msix_devcert}"
+                    BYPRODUCTS "${_fp_msix_devcert}"
+                    COMMENT "Ensuring MSIX development certificate (${FORCEPAD_MSIX_PUBLISHER})"
+                    VERBATIM
+                )
+                set(_fp_msix_devcert_target qtforcepad_msix_devcert)
+                set(_fp_msix_sign_command "${FORCEPAD_SIGNTOOL}" sign /fd SHA256
+                    /f "${_fp_msix_devcert}" /p "forcepad" "${_fp_msix_out}")
+            endif()
+        endif()
+
+        # VERBATIM plus explicitly quoted -D arguments: VCRUNTIME_DIR resolves
+        # under "C:/Program Files/Microsoft Visual Studio/...", so the spaces
+        # have to survive the trip through the generated command line.
+        add_custom_target(qtforcepad_msix
+            COMMAND ${CMAKE_COMMAND}
+                "-DSTAGE_DIR=${_fp_msix_stage}"
+                "-DPAYLOAD_DIR=$<TARGET_FILE_DIR:qtforcepad>"
+                "-DEXE_NAME=$<TARGET_FILE_NAME:qtforcepad>"
+                "-DMANIFEST=${_fp_msix_manifest}"
+                "-DASSETS_DIR=${CMAKE_SOURCE_DIR}/images/forcepad_winstore_new"
+                "-DVCRUNTIME_DIR=${_fp_vcrt_dir}"
+                -P "${CMAKE_SOURCE_DIR}/cmake/MsixStage.cmake"
+            COMMENT "Staging MSIX payload..."
+            VERBATIM
+        )
+
+        # Index the scale-* asset variants so Windows picks the right tile for
+        # the display DPI. Without a resources.pri only the unqualified
+        # filenames the manifest names are ever used. Optional: the package is
+        # valid (and Store-acceptable) without it.
+        if(FORCEPAD_MAKEPRI)
+            add_custom_command(TARGET qtforcepad_msix POST_BUILD
+                COMMAND "${FORCEPAD_MAKEPRI}" createconfig
+                    /cf "${_fp_msix_dir}/priconfig.xml" /dq en-US /o
+                COMMAND "${FORCEPAD_MAKEPRI}" new
+                    /pr "${_fp_msix_stage}"
+                    /cf "${_fp_msix_dir}/priconfig.xml"
+                    /of "${_fp_msix_dir}/resources.pri" /o
+                COMMAND ${CMAKE_COMMAND} -E copy
+                    "${_fp_msix_dir}/resources.pri" "${_fp_msix_stage}/resources.pri"
+                COMMENT "Indexing MSIX resources with makepri..."
+                VERBATIM
+            )
+        endif()
+
+        add_custom_command(TARGET qtforcepad_msix POST_BUILD
+            COMMAND "${FORCEPAD_MAKEAPPX}" pack /d "${_fp_msix_stage}" /p "${_fp_msix_out}" /o
+            COMMENT "Packing ${_fp_msix_out}"
+            VERBATIM
+        )
+
+        if(_fp_msix_sign_command)
+            add_custom_command(TARGET qtforcepad_msix POST_BUILD
+                COMMAND ${_fp_msix_sign_command}
+                COMMENT "Signing the MSIX package..."
+                VERBATIM
+            )
+        endif()
+
+        add_dependencies(qtforcepad_msix qtforcepad)
+        if(_fp_msix_devcert_target)
+            add_dependencies(qtforcepad_msix ${_fp_msix_devcert_target})
+        endif()
+        set_target_properties(qtforcepad_msix PROPERTIES FOLDER "Packaging")
+
+        # Convenience for the local test loop. -ForceUpdateFromAnyVersion lets
+        # a rebuild replace an installed package without bumping the version,
+        # which is the normal case while iterating.
+        if(FORCEPAD_POWERSHELL AND NOT FORCEPAD_WINDOWS_DISTRIBUTION STREQUAL "store")
+            add_custom_target(qtforcepad_msix_install
+                COMMAND "${FORCEPAD_POWERSHELL}" -NoProfile -ExecutionPolicy Bypass -Command
+                    "Add-AppxPackage -Path '${_fp_msix_out}' -ForceUpdateFromAnyVersion"
+                COMMENT "Installing ${_fp_msix_out}"
+                VERBATIM
+            )
+            add_dependencies(qtforcepad_msix_install qtforcepad_msix)
+            set_target_properties(qtforcepad_msix_install PROPERTIES FOLDER "Packaging")
+        endif()
+
+        message(STATUS "qtforcepad MSIX: ${FORCEPAD_MSIX_IDENTITY_NAME} "
+                       "${FORCEPAD_MSIX_VERSION} (${FORCEPAD_MSIX_PUBLISHER})")
     endif()
 endif()

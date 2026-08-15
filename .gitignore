@@ -4,7 +4,11 @@
 *.pdb
 *.am
 *.in
+# ...but keep the MSIX package manifest template (configured by CMake)
+!src/qtforcepad/AppxManifest.xml.in
 *.manifest
+# ...but keep the app manifest that declares DPI awareness (linked into the exe)
+!src/qtforcepad/qtforcepad.manifest
 *.dll
 build/
 build-release/
@@ -23,6 +27,8 @@ vcpkg_installed/
 !scripts/wasm-serve.ps1
 # ...and the UML compilation-database helper (used by scripts/gen-uml.cmd)
 !scripts/msvc-db-to-clang.ps1
+# ...and the MSIX development-certificate helper (used by qtforcepad_msix)
+!scripts/msix-devcert.ps1
 /docs/site
 # UML diagrams (scripts/gen-uml.cmd): configure-only CMake tree for the
 # compilation database, the downloaded PlantUML jar, and the .puml

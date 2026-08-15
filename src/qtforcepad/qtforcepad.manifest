@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Application manifest fragment merged into qtforcepad.exe by the linker
+  (/MANIFESTINPUT - CMake does this automatically for .manifest files listed
+  as target sources).
+
+  Its only job is to declare DPI awareness statically. Qt 6 already makes the
+  process per-monitor-v2 aware at runtime, from inside Qt6Gui/the qwindows
+  platform plugin - but that call lives in a DLL, and the Windows App
+  Certification Kit's High-DPI check inspects the *executable*: it looks for
+  either PerMonitorV2 in the manifest or a direct import of
+  SetProcessDpiAwarenessContext / SetThreadDpiAwarenessContext, finds neither,
+  and reports "The app ... is not DPI Aware".
+
+  Declaring it here is also the more correct order of operations regardless of
+  WACK: the manifest is applied by the loader before any application code
+  runs, so the process is never briefly DPI-unaware during startup.
+
+  dpiAware (2005 schema) is the pre-1703 fallback; dpiAwareness (2016 schema)
+  is what current Windows reads and takes precedence where both are present.
+-->
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1"
+          xmlns:asmv3="urn:schemas-microsoft-com:asm.v3"
+          manifestVersion="1.0">
+  <asmv3:application>
+    <asmv3:windowsSettings>
+      <dpiAware xmlns="http://schemas.microsoft.com/SMI/2005/WindowsSettings">true/pm</dpiAware>
+      <dpiAwareness xmlns="http://schemas.microsoft.com/SMI/2016/WindowsSettings">PerMonitorV2,PerMonitor</dpiAwareness>
+    </asmv3:windowsSettings>
+  </asmv3:application>
+</assembly>
