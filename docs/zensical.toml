@@ -39,6 +39,7 @@ extra_css = ["stylesheets/extra.css"]
 # ----------------------------------------------------------------------------
 [project.theme]
 language = "en"
+custom_dir = "overrides"
 features = [
   "content.code.annotate",
   "content.code.copy",
@@ -74,6 +75,9 @@ toggle.name = "Switch to dark mode"
 [[project.extra.social]]
 icon = "fontawesome/brands/github"
 link = "https://github.com/jonaslindemann/forcepad"
+
+[project.extra.analytics]
+provider = "plausible"
 
 # ----------------------------------------------------------------------------
 # Markdown extensions
